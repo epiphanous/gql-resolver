@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "antlr": "yarn run antlr-gql && yarn run antlr-qm",
+    "antlr-gql": "cd src/antlr4 && antlr4ts -o generated GraphQL.g4",
+    "antlr-qm": "cd src/antlr4 && antlr4ts -o generated QueryModification.g4"
+  },
+  "dependencies": {
+    "antlr4ts": "^0.4.1-alpha.0",
+    "dataclass": "^1.1.1",
+    "funfix": "^7.0.1",
+    "immutable": "^4.0.0-rc.12",
+    "n3": "^1.0.1"
+  },
+  "devDependencies": {
+    "antlr4ts-cli": "^0.4.0-alpha.4",
+    "prettier": "^1.15.2",
+    "prettier-tslint": "^0.4.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.6"
+  }
+}

@@ -1,0 +1,9 @@
+export const INTERNAL_PREFIX = '__internal_';
+export const SUBJECT_BINDING_BASE = '_subject';
+export const SUBJECT_BINDING = `${INTERNAL_PREFIX}${SUBJECT_BINDING_BASE}`;
+export const PARENT_BINDING_BASE = '_parent';
+export const PARENT_BINDING = `${INTERNAL_PREFIX}${PARENT_BINDING_BASE}`;
+export const TYPENAME_BINDING_BASE = '_typename';
+export const TYPENAME_BINDING = `${INTERNAL_PREFIX}${TYPENAME_BINDING_BASE}`;
+export const ID_BINDING_BASE = '_id';
+export const ID_BINDING = `${INTERNAL_PREFIX}${ID_BINDING_BASE}`
