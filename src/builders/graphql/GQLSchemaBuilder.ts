@@ -25,19 +25,21 @@ import {
     ValueContext,
     ValueOrVariableContext,
 } from '../../antlr4/generated/GraphQLParser';
-import {GQLDirectiveDefinition} from '../../models/GQLDirectiveDefinition';
-import {GQLEnum} from '../../models/GQLEnum';
-import {GQLFieldDefinition} from '../../models/GQLFieldDefinition';
-import {GQLInputType}      from '../../models/GQLInputType';
-import {GQLInterface}      from '../../models/GQLInterface';
-import {GQLObjectType}     from '../../models/GQLObjectType';
-import {GQLScalarType}     from '../../models/GQLScalarType';
-import {GQLSchema}         from '../../models/GQLSchema';
-import {GQLTypeDefinition} from '../../models/GQLTypeDefinition';
-import {GQLUnion}          from '../../models/GQLUnion';
-import GQLDocumentBuilder  from './GQLDocumentBuilder';
-import {GQLDirective}      from '../../models/GQLDirective';
-import {GQLType}           from '../../models/GQLType';
+import {GQLDirective} from '../../models/GQLDirective';
+import {GQLSchema} from '../../models/GQLSchema';
+import {GQLType} from '../../models/GQLType';
+import {
+    GQLDirectiveDefinition,
+    GQLEnum,
+    GQLFieldDefinition,
+    GQLInputType,
+    GQLInterface,
+    GQLObjectType,
+    GQLScalarType,
+    GQLTypeDefinition,
+    GQLUnion
+} from '../../models/GQLTypeDefinition';
+import GQLDocumentBuilder from './GQLDocumentBuilder';
 
 const STANDARD_ARG_DESCRIPTION = {
     bindings:
@@ -92,25 +94,25 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                     }))));
             const s = Map<string, GQLScalarType>(this.scalarTypes.map<[string, GQLScalarType]>((x) => [x.name, x]).toArray());
             const i = Map<string, GQLInterface>(this.interfaces.map<[string, GQLInterface]>((x) => [x.name, x]).toArray());
-          const o = Map<string, GQLObjectType>(this.objectTypes.map<[string, GQLObjectType]>((x) => [x.name, x]).toArray());
-          const u = Map<string, GQLUnion>(this.unions.map<[string, GQLUnion]>((x) => [x.name, x]).toArray());
-          const e = Map<string, GQLEnum>(this.enums.map<[string, GQLEnum]>((x) => [x.name, x]).toArray());
-          const d = Map<string, GQLDirectiveDefinition>(this.directives.map<[string, GQLDirectiveDefinition]>((x) => [x.name, x]).toArray());
-          const n = Map<string, GQLInputType>(this.inputTypes.map<[string, GQLInputType]>((x) => [x.name, x]).toArray());
-          const allTypes = Map<string, GQLTypeDefinition>().withMutations((map) => {
+            const o = Map<string, GQLObjectType>(this.objectTypes.map<[string, GQLObjectType]>((x) => [x.name, x]).toArray());
+            const u = Map<string, GQLUnion>(this.unions.map<[string, GQLUnion]>((x) => [x.name, x]).toArray());
+            const e = Map<string, GQLEnum>(this.enums.map<[string, GQLEnum]>((x) => [x.name, x]).toArray());
+            const d = Map<string, GQLDirectiveDefinition>(this.directives.map<[string, GQLDirectiveDefinition]>((x) => [x.name, x]).toArray());
+            const n = Map<string, GQLInputType>(this.inputTypes.map<[string, GQLInputType]>((x) => [x.name, x]).toArray());
+            const allTypes = Map<string, GQLTypeDefinition>().withMutations((map) => {
             map.concat([s, i, o, u, e]);
           });
-          const schema = new GQLSchema({
-            operationTypes: this.operationTypes,
-            scalarTypes: s,
-            interfaces: i,
-            objectTypes: o,
-            unions: u,
-            enums: e,
-            inputTypes: n,
-            directives: d,
-            allTypes,
-            allFields: this.allFields,
+            const schema = new GQLSchema({
+                operationTypes: this.operationTypes,
+                scalarTypes: s,
+                interfaces: i,
+                objectTypes: o,
+                unions: u,
+                enums: e,
+                inputTypes: n,
+                directives: d,
+                allTypes,
+                allFields: this.allFields,
           });
 
         }
