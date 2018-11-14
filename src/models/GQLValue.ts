@@ -1,5 +1,5 @@
 import Record from 'dataclass';
 
-export class GQLValue extends Record<GQLValue> {
+export class GQLValue<T> extends Record<GQLValue<T>> {
   public value: any;
 }
