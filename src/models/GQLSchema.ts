@@ -1,16 +1,18 @@
 import Record from 'dataclass';
 import {Option} from 'funfix';
-import {List, Map} from 'immutable';
-import {GQLArgumentDefinition} from './GQLArgumentDefinition';
-import {GQLDirectiveDefinition} from './GQLDirectiveDefinition';
-import {GQLEnum} from './GQLEnum';
-import {GQLFieldDefinition} from './GQLFieldDefinition';
-import {GQLInputType} from './GQLInputType';
-import {GQLInterface} from './GQLInterface';
-import {GQLObjectType} from './GQLObjectType';
-import {GQLScalarType,} from './GQLScalarType';
-import {GQLTypeDefinition} from './GQLTypeDefinition';
-import {GQLUnion} from './GQLUnion';
+import {List, Map, Set} from 'immutable';
+import {
+    GQLArgumentDefinition,
+    GQLDirectiveDefinition,
+    GQLEnum,
+    GQLFieldDefinition,
+    GQLInputType,
+    GQLInterface,
+    GQLObjectType,
+    GQLScalarType,
+    GQLTypeDefinition,
+    GQLUnion
+} from './GQLTypeDefinition';
 
 export class GQLSchema extends Record<GQLSchema> {
   public operationTypes: Map<string, string>;
