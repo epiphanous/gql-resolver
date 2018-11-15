@@ -27,7 +27,7 @@ export class GQLNumberValue extends GQLValue {
 export class GQLDoubleValue extends GQLNumberValue {}
 export class GQLIntValue extends GQLNumberValue {}
 export class GQLLongValue extends GQLNumberValue {}
-
+export class GQLFloatValue extends GQLNumberValue {}
 export class GQLEnumValue extends GQLValue {
   public value: string;
 }
