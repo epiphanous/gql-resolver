@@ -1,22 +1,25 @@
-import Record from 'dataclass';
-import {Option} from 'funfix-core';
+import { None, Option } from 'funfix-core';
 
-export class FakeIRILiteral extends Record<FakeIRILiteral> {
-    public value: Option<any>;
+export class FakeIRILiteral {
+  public value: Option<any>;
 
-    public getLocalName(): string {
-        return this.stringValue();
-    }
+  constructor(value: Option<any> = None) {
+    this.value = value;
+  }
 
-    public getNamespace(): string {
-        return 'gql://scalar-object#';
-    }
+  public getLocalName(): string {
+    return this.stringValue();
+  }
 
-    public stringValue(): string {
-        return this.value.getOrElse('null').toString;
-    }
+  public getNamespace(): string {
+    return 'gql://scalar-object#';
+  }
 
-    public toString(): string {
-        return this.stringValue();
-    }
+  public stringValue(): string {
+    return this.value.getOrElse('null').toString;
+  }
+
+  public toString(): string {
+    return this.stringValue();
+  }
 }

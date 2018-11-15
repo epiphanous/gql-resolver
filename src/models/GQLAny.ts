@@ -1,7 +1,16 @@
-import Record from 'dataclass';
-import {Option} from 'funfix-core';
+import { None, Option } from 'funfix-core';
 
-export class GQLAny extends Record<GQLAny> {
-    public name: string;
-    public value: Option<any>;
+interface IGQLAny {
+  name: string;
+  value: Option<any>;
+}
+
+export class GQLAny implements IGQLAny {
+  public name: string;
+  public value: Option<any>;
+
+  constructor(name: string, value: Option<any> = None) {
+    this.name = name;
+    this.value = value;
+  }
 }

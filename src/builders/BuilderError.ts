@@ -1,12 +1,29 @@
-import {RecognitionException} from 'antlr4ts/RecognitionException';
-import Record from 'dataclass';
-import {Option} from 'funfix';
+import { RecognitionException } from 'antlr4ts/RecognitionException';
+import { None, Option } from 'funfix';
 
-export default class BuilderError extends Record<BuilderError> {
-  public exception: Option<RecognitionException>;
-  public line: number;
+interface IBuilderError {
+  message: string;
+  line: number;
+  position: number;
+  exception: Option<RecognitionException>;
+}
+export default class BuilderError implements IBuilderError {
   public message: string;
+  public line: number;
   public position: number;
+  public exception: Option<RecognitionException>;
+
+  constructor(
+    message: string,
+    line: number,
+    position: number,
+    exception: Option<RecognitionException> = None
+  ) {
+    this.message = message;
+    this.line = line;
+    this.position = position;
+    this.exception = exception;
+  }
 
   public isError() {
     return this.exception.nonEmpty;

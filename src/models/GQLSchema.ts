@@ -1,67 +1,110 @@
-import Record from 'dataclass';
-import {Option} from 'funfix';
-import {List, Map, Set} from 'immutable';
+import { Option } from 'funfix';
+import { List, Map, Set } from 'immutable';
 import {
-    GQLArgumentDefinition,
-    GQLDirectiveDefinition,
-    GQLEnum,
-    GQLFieldDefinition,
-    GQLInputType,
-    GQLInterface,
-    GQLObjectType,
-    GQLScalarType,
-    GQLTypeDefinition,
-    GQLUnion
+  GQLArgumentDefinition,
+  GQLDirectiveDefinition,
+  GQLEnum,
+  GQLFieldDefinition,
+  GQLInputType,
+  GQLInterface,
+  GQLObjectType,
+  GQLScalarType,
+  GQLTypeDefinition,
+  GQLUnion,
 } from './GQLTypeDefinition';
 
-export class GQLSchema extends Record<GQLSchema> {
-  public operationTypes: Map<string, string>;
-  public scalarTypes: Map<string, GQLScalarType>;
-  public interfaces: Map<string, GQLInterface>;
-  public objectTypes: Map<string, GQLObjectType>;
-  public unions: Map<string, GQLUnion>;
+interface IGQLSchema {
+  allFields: Map<string, GQLFieldDefinition>;
+  allTypes: Map<string, GQLTypeDefinition>;
+  directives: Map<string, GQLDirectiveDefinition>;
+  enums: Map<string, GQLEnum>;
+  inputTypes: Map<string, GQLInputType>;
+  interfaces: Map<string, GQLInterface>;
+  objectTypes: Map<string, GQLObjectType>;
+  operationTypes: Map<string, string>;
+  scalarTypes: Map<string, GQLScalarType>;
+  unions: Map<string, GQLUnion>;
+  fieldsByType: Map<string, Map<string, List<string>>>;
+  typesByInterface: Map<string, Set<string>>;
+  objectTypesForField: Map<string, Set<string>>;
+}
+
+export class GQLSchema implements IGQLSchema {
+  public allFields: Map<string, GQLFieldDefinition>;
+  public allTypes: Map<string, GQLTypeDefinition>;
+  public directives: Map<string, GQLDirectiveDefinition>;
   public enums: Map<string, GQLEnum>;
   public inputTypes: Map<string, GQLInputType>;
-  public directives: Map<string, GQLDirectiveDefinition>;
-  public allTypes: Map<string, GQLTypeDefinition>;
-  public allFields: Map<string, GQLFieldDefinition>;
+  public interfaces: Map<string, GQLInterface>;
+  public objectTypes: Map<string, GQLObjectType>;
+  public operationTypes: Map<string, string>;
+  public scalarTypes: Map<string, GQLScalarType>;
+  public unions: Map<string, GQLUnion>;
 
   public fieldsByType: Map<string, Map<string, List<string>>> = Map();
   public typesByInterface: Map<string, Set<string>> = Map();
-  private objectTypesForField: Map<string, Set<string>> = Map();
+  public objectTypesForField: Map<string, Set<string>> = Map();
+
+  constructor(
+    allFields: Map<string, GQLFieldDefinition>,
+    allTypes: Map<string, GQLTypeDefinition>,
+    directives: Map<string, GQLDirectiveDefinition>,
+    enums: Map<string, GQLEnum>,
+    inputTypes: Map<string, GQLInputType>,
+    interfaces: Map<string, GQLInterface>,
+    objectTypes: Map<string, GQLObjectType>,
+    operationTypes: Map<string, string>,
+    scalarTypes: Map<string, GQLScalarType>,
+    unions: Map<string, GQLUnion>
+  ) {
+    this.allFields = allFields;
+    this.allTypes = allTypes;
+    this.directives = directives;
+    this.enums = enums;
+    this.inputTypes = inputTypes;
+    this.interfaces = interfaces;
+    this.objectTypes = objectTypes;
+    this.operationTypes = operationTypes;
+    this.scalarTypes = scalarTypes;
+    this.unions = unions;
+    this.init();
+  }
 
   public init() {
-    this.fieldsByType.withMutations((fbt) =>
+    this.fieldsByType.withMutations(fbt =>
       fbt
         .concat(
           this.interfaces
             .map((d, t) => [
               t,
               d.fields
-                .map((f) => f.name)
-                .map((fn) => this.getFieldTypeDefinition(fn))
+                .map(f => f.name)
+                .map(fn => this.getFieldTypeDefinition(fn))
                 .flatten(),
             ])
-            .toMap(),
+            .toMap()
         )
         .concat(
           this.objectTypes.map((d, t) => [
             t,
             d.fields
-              .map((f) => f.name)
-              .map((f) => {
-                const fd = this.getFieldTypeDefinition(f).map((ftd) =>
-                  this.isScalarLike(ftd) ? 's' : 'o',
+              .map(f => f.name)
+              .map(f => {
+                const fd = this.getFieldTypeDefinition(f).map(ftd =>
+                  this.isScalarLike(ftd) ? 's' : 'o'
                 );
               }),
-          ]),
-        ),
+          ])
+        )
     );
-    this.typesByInterface.withMutations((map) => {
+    this.typesByInterface.withMutations(map => {
       this.objectTypes.forEach((d, t) => {
-        d.implements.forEach((i) => {
-          if (!map.has(i)) { map.set(i, new Set(t)); }
-          else { map.update(i, (s) => s.add(t)); }
+        d.implements.forEach(i => {
+          if (!map.has(i)) {
+            map.set(i, new Set(t));
+          } else {
+            map.update(i, s => s.add(t));
+          }
         });
       });
     });
@@ -84,8 +127,9 @@ export class GQLSchema extends Record<GQLSchema> {
   public isScalarObjectType(t: string | GQLTypeDefinition): boolean {
     if (typeof t === 'string') {
       return t.startsWith('O_') && this.isScalarLike(t.substring(2));
+    } else {
+      return this.isObjectType(t) && this.isScalarObjectType(t.name);
     }
-    else { return this.isObjectType(t) && this.isScalarObjectType(t.name); }
   }
   public isInterface(t: string | GQLTypeDefinition): boolean {
     return this.interfaces.has(this.getTypeName(t));
@@ -97,7 +141,7 @@ export class GQLSchema extends Record<GQLSchema> {
     const name = this.getTypeName(t);
     if (this.unions.has(name)) {
       const u = this.unions.get(name);
-      return u.gqlTypes.filterNot((t) => this.isScalarLike(t)).isEmpty();
+      return u.gqlTypes.filterNot(t => this.isScalarLike(t)).isEmpty();
     }
     return false;
   }
@@ -114,44 +158,70 @@ export class GQLSchema extends Record<GQLSchema> {
     return this.enums.has(this.getTypeName(t));
   }
   public getTypeClass(tdOpt: Option<GQLTypeDefinition>): Option<string> {
-    return tdOpt.map((td) => td.constructor.name);
+    return tdOpt.map(td => td.constructor.name);
   }
   public getKind(t: Option<GQLTypeDefinition>): string {
     return t
-      .map((td) => {
-        if (td instanceof GQLObjectType) { return 'OBJECT'; }
-        if (td instanceof GQLInterface) { return 'INTERFACE'; }
-        if (td instanceof GQLInputType) { return 'INPUT_OBJECT'; }
-        if (td instanceof GQLUnion) { return 'UNION'; }
-        if (td instanceof GQLEnum) { return 'ENUM'; }
+      .map(td => {
+        if (td instanceof GQLObjectType) {
+          return 'OBJECT';
+        }
+        if (td instanceof GQLInterface) {
+          return 'INTERFACE';
+        }
+        if (td instanceof GQLInputType) {
+          return 'INPUT_OBJECT';
+        }
+        if (td instanceof GQLUnion) {
+          return 'UNION';
+        }
+        if (td instanceof GQLEnum) {
+          return 'ENUM';
+        }
         if (td instanceof GQLFieldDefinition) {
           return this.getKind(this.getFieldTypeDefinition(td.name));
         }
         if (td instanceof GQLArgumentDefinition) {
           return this.getKind(this.getTypeDefinition(td.gqlType.name));
         }
-        if (td instanceof GQLDirectiveDefinition) { return 'DIRECTIVE'; }
-        else { return 'GETKIND ERROR'; }
+        if (td instanceof GQLDirectiveDefinition) {
+          return 'DIRECTIVE';
+        } else {
+          return 'GETKIND ERROR';
+        }
       })
       .getOrElse('GETKIND ERROR');
   }
 
   public getType(t: Option<GQLTypeDefinition>): string {
     return t
-      .map((td) => {
-        if (td instanceof GQLObjectType) { return td.name; }
-        if (td instanceof GQLInterface) { return td.name; }
-        if (td instanceof GQLInputType) { return td.name; }
-        if (td instanceof GQLUnion) { return td.name; }
-        if (td instanceof GQLEnum) { return td.name; }
+      .map(td => {
+        if (td instanceof GQLObjectType) {
+          return td.name;
+        }
+        if (td instanceof GQLInterface) {
+          return td.name;
+        }
+        if (td instanceof GQLInputType) {
+          return td.name;
+        }
+        if (td instanceof GQLUnion) {
+          return td.name;
+        }
+        if (td instanceof GQLEnum) {
+          return td.name;
+        }
         if (td instanceof GQLFieldDefinition) {
           return this.getType(this.getFieldTypeDefinition(td.name));
         }
         if (td instanceof GQLArgumentDefinition) {
           return this.getType(this.getTypeDefinition(td.gqlType.name));
         }
-        if (td instanceof GQLDirectiveDefinition) { return td.name; }
-        else { return 'GETTYPE ERROR'; }
+        if (td instanceof GQLDirectiveDefinition) {
+          return td.name;
+        } else {
+          return 'GETTYPE ERROR';
+        }
       })
       .getOrElse('GETTYPE ERROR');
   }
@@ -169,17 +239,17 @@ export class GQLSchema extends Record<GQLSchema> {
   }
 
   public getFieldType(f: string): Option<string> {
-    return this.getFieldDefinition(f).map((fd) => fd.gqlType.name);
+    return this.getFieldDefinition(f).map(fd => fd.gqlType.name);
   }
 
   public getFieldTypeDefinition(f: string): Option<GQLTypeDefinition> {
-    return this.getFieldType(f).flatMap((t) => this.getTypeDefinition(t));
+    return this.getFieldType(f).flatMap(t => this.getTypeDefinition(t));
   }
 
   public containsFields(t: string, fields: List<string>) {
     const td = this.allTypes.get(t);
     if (td instanceof GQLInterface || td instanceof GQLObjectType) {
-      return fields.isSubset(td.fields.map((f) => f.name));
+      return fields.isSubset(td.fields.map(f => f.name));
     }
     return false;
   }
@@ -209,8 +279,11 @@ export class GQLSchema extends Record<GQLSchema> {
   // }
 
   public parseTypeInfo(objType: string): List<string> {
-    if (objType.startsWith('U_')) { return List(objType.substr(2).split('_OR_')); }
-    else { return List(objType); }
+    if (objType.startsWith('U_')) {
+      return List(objType.substr(2).split('_OR_'));
+    } else {
+      return List(objType);
+    }
   }
 
   // partitionFields(fields:List<(string,GQLField)>): (List<(string,GQLField)>, List<(string,GQLField)>, List<UnknownFieldException>) {
@@ -252,11 +325,12 @@ export class GQLSchema extends Record<GQLSchema> {
 
   public getFieldsOf(t: string) {
     return this.getTypeDefinition(t)
-      .map((td) => {
+      .map(td => {
         if (td instanceof GQLInterface || td instanceof GQLObjectType) {
           return td.fields;
+        } else {
+          List<GQLFieldDefinition>();
         }
-        else { List<GQLFieldDefinition>(); }
       })
       .getOrElse(List<GQLFieldDefinition>());
   }
