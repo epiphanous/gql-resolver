@@ -1,5 +1,7 @@
-import Record from 'dataclass';
+export class GQLVariable {
+  public name: string;
 
-export class GQLVariable extends Record<GQLVariable> {
-    public name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
 }

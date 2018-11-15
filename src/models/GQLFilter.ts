@@ -1,8 +1,19 @@
-import Record from 'dataclass';
-import {List} from 'immutable';
-import {GQLObjectQueryModifierDisjunction} from './GQLObjectQueryModifierDisjunction';
+import { List } from 'immutable';
+import { GQLObjectQueryModifierDisjunction } from './GQLObjectQueryModifierDisjunction';
 
-export class GQLFilter extends Record<GQLFilter> {
-    public expression: GQLObjectQueryModifierDisjunction;
-    public fields: List<string>;
+interface IGQLFilter {
+  expression: GQLObjectQueryModifierDisjunction;
+  fields: List<string>;
+}
+export class GQLFilter implements IGQLFilter {
+  public expression: GQLObjectQueryModifierDisjunction;
+  public fields: List<string>;
+
+  constructor(
+    expression: GQLObjectQueryModifierDisjunction,
+    fields: List<string>
+  ) {
+    this.expression = expression;
+    this.fields = fields;
+  }
 }

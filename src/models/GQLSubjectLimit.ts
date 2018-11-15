@@ -1,11 +1,20 @@
-import Record from 'dataclass';
-import {QueryStrategy} from './QueryStrategy';
+import { QueryStrategy } from './QueryStrategy';
 
-export class GQLSubjectLimit extends Record<GQLSubjectLimit> {
-    public maxSubjects: number;
-    public offset: number;
+interface IGQLSubjectLimit {
+  maxSubjects: number;
+  offset: number;
+}
 
-    public updateQuery(query: QueryStrategy): QueryStrategy {
-        return query.withLimitOffset(this.maxSubjects, this.offset);
-    }
+export class GQLSubjectLimit implements IGQLSubjectLimit {
+  public maxSubjects: number;
+  public offset: number;
+
+  constructor(maxSubjects: number, offset: number) {
+    this.maxSubjects = maxSubjects;
+    this.offset = offset;
+  }
+
+  public updateQuery(query: QueryStrategy): QueryStrategy {
+    return query.withLimitOffset(this.maxSubjects, this.offset);
+  }
 }

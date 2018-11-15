@@ -1,4 +1,4 @@
-import {List} from 'immutable';
+import { List } from 'immutable';
 
 interface IGQLValue {
   value: any;
@@ -13,27 +13,15 @@ export class GQLValue implements IGQLValue {
 }
 
 export class GQLBooleanValue extends GQLValue {
-    public value: boolean;
-    constructor(boolValue: boolean) {
-        super();
-        this.value = boolValue;
-    }
+  public value: boolean;
 }
 
 export class GQLArrayValue extends GQLValue {
-    public value: List<any>;
-    constructor(arrValue: []) {
-        super();
-        this.value = List(arrValue);
-    }
+  public value: List<any>;
 }
 
 export class GQLNumberValue extends GQLValue {
-    public value: number;
-    constructor(numValue: number) {
-      super();
-      this.value = numValue;
-    }
+  public value: number;
 }
 
 export class GQLDoubleValue extends GQLNumberValue {}
@@ -41,17 +29,9 @@ export class GQLIntValue extends GQLNumberValue {}
 export class GQLLongValue extends GQLNumberValue {}
 
 export class GQLEnumValue extends GQLValue {
-    public value: string;
-    constructor(strValue: string) {
-        super();
-        this.value = strValue;
-    }
+  public value: string;
 }
 
 export class GQLStringValue extends GQLValue {
-    public value: string;
-    constructor(strValue: string) {
-        super();
-        this.value = strValue;
-    }
+  public value: string;
 }
