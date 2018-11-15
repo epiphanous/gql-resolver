@@ -1,6 +1,4 @@
-import Record from 'dataclass';
-
-export class QueryStrategy extends Record<QueryStrategy> {
+export class QueryStrategy {
   public withLimitOffset(limit: number, offset: number): QueryStrategy {
     return this;
   }
