@@ -97,19 +97,19 @@ export class GQLFieldDefinition extends GQLTypeDefinition
 
 interface IGQLArgumentDefinition extends IGQLTypeDefinition {
   gqlType: GQLType;
-  defaultValue: Option<GQLValue<any>>;
+  defaultValue: Option<GQLValue>;
 }
 
 export class GQLArgumentDefinition extends GQLTypeDefinition
   implements IGQLArgumentDefinition {
   public gqlType: GQLType;
-  public defaultValue: Option<GQLValue<any>>;
+  public defaultValue: Option<GQLValue>;
 
   constructor(
     name: string,
     description: string,
     gqlType: GQLType,
-    defaultValue: Option<GQLValue<any>> = None
+    defaultValue: Option<GQLValue> = None
   ) {
     super(name, description);
     this.gqlType = gqlType;
