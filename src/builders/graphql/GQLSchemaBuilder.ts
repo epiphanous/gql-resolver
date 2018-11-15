@@ -1,5 +1,5 @@
 import {TerminalNode} from 'antlr4ts/tree/TerminalNode';
-import {Option, Try} from 'funfix';
+import {None, Option, Try} from 'funfix';
 import {Map, Set} from 'immutable';
 import {
     ArrayValueContext,
@@ -25,19 +25,30 @@ import {
     ValueContext,
     ValueOrVariableContext,
 } from '../../antlr4/generated/GraphQLParser';
-import {GQLDirectiveDefinition} from '../../models/GQLDirectiveDefinition';
-import {GQLEnum} from '../../models/GQLEnum';
-import {GQLFieldDefinition} from '../../models/GQLFieldDefinition';
-import {GQLInputType}      from '../../models/GQLInputType';
-import {GQLInterface}      from '../../models/GQLInterface';
-import {GQLObjectType}     from '../../models/GQLObjectType';
-import {GQLScalarType}     from '../../models/GQLScalarType';
-import {GQLSchema}         from '../../models/GQLSchema';
-import {GQLTypeDefinition} from '../../models/GQLTypeDefinition';
-import {GQLUnion}          from '../../models/GQLUnion';
-import GQLDocumentBuilder  from './GQLDocumentBuilder';
-import {GQLDirective}      from '../../models/GQLDirective';
-import {GQLType}           from '../../models/GQLType';
+import {GQLDirective} from '../../models/GQLDirective';
+import {GQLSchema} from '../../models/GQLSchema';
+import {GQLType} from '../../models/GQLType';
+import {
+    GQLArgumentDefinition,
+    GQLDirectiveDefinition,
+    GQLEnum,
+    GQLFieldDefinition,
+    GQLInputType,
+    GQLInterface,
+    GQLObjectType,
+    GQLScalarType,
+    GQLTypeDefinition,
+    GQLUnion
+} from '../../models/GQLTypeDefinition';
+import {
+    GQLArrayValue,
+    GQLBooleanValue,
+    GQLDoubleValue,
+    GQLEnumValue,
+    GQLIntValue,
+    GQLStringValue
+} from '../../models/GQLValue';
+import GQLDocumentBuilder from './GQLDocumentBuilder';
 
 const STANDARD_ARG_DESCRIPTION = {
     bindings:
@@ -92,27 +103,27 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                     }))));
             const s = Map<string, GQLScalarType>(this.scalarTypes.map<[string, GQLScalarType]>((x) => [x.name, x]).toArray());
             const i = Map<string, GQLInterface>(this.interfaces.map<[string, GQLInterface]>((x) => [x.name, x]).toArray());
-          const o = Map<string, GQLObjectType>(this.objectTypes.map<[string, GQLObjectType]>((x) => [x.name, x]).toArray());
-          const u = Map<string, GQLUnion>(this.unions.map<[string, GQLUnion]>((x) => [x.name, x]).toArray());
-          const e = Map<string, GQLEnum>(this.enums.map<[string, GQLEnum]>((x) => [x.name, x]).toArray());
-          const d = Map<string, GQLDirectiveDefinition>(this.directives.map<[string, GQLDirectiveDefinition]>((x) => [x.name, x]).toArray());
-          const n = Map<string, GQLInputType>(this.inputTypes.map<[string, GQLInputType]>((x) => [x.name, x]).toArray());
-          const allTypes = Map<string, GQLTypeDefinition>().withMutations((map) => {
+            const o = Map<string, GQLObjectType>(this.objectTypes.map<[string, GQLObjectType]>((x) => [x.name, x]).toArray());
+            const u = Map<string, GQLUnion>(this.unions.map<[string, GQLUnion]>((x) => [x.name, x]).toArray());
+            const e = Map<string, GQLEnum>(this.enums.map<[string, GQLEnum]>((x) => [x.name, x]).toArray());
+            const d = Map<string, GQLDirectiveDefinition>(this.directives.map<[string, GQLDirectiveDefinition]>((x) => [x.name, x]).toArray());
+            const n = Map<string, GQLInputType>(this.inputTypes.map<[string, GQLInputType]>((x) => [x.name, x]).toArray());
+            const allTypes = Map<string, GQLTypeDefinition>().withMutations((map) => {
             map.concat([s, i, o, u, e]);
           });
-          const schema = new GQLSchema({
-            operationTypes: this.operationTypes,
-            scalarTypes: s,
-            interfaces: i,
-            objectTypes: o,
-            unions: u,
-            enums: e,
-            inputTypes: n,
-            directives: d,
-            allTypes,
-            allFields: this.allFields,
+            const schema = new GQLSchema({
+                operationTypes: this.operationTypes,
+                scalarTypes: s,
+                interfaces: i,
+                objectTypes: o,
+                unions: u,
+                enums: e,
+                inputTypes: n,
+                directives: d,
+                allTypes,
+                allFields: this.allFields,
           });
-
+            return Try.of(() => schema);
         }
     }
 
@@ -252,7 +263,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     }
 
     public exitDirectiveDefinition(ctx: DirectiveDefinitionContext) {
-        const args = Option(ctx.argumentsDefinition())
+        const args = Option.of(ctx.argumentsDefinition())
             .map((ad) =>
                 ad
                     .inputValueDefinition()
@@ -260,20 +271,20 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                         (a) =>
                             new GQLArgumentDefinition(
                                 this.textOf(a.NAME()),
-                                this.getComment(Option(a.COMMENT())),
+                                this.getComment(Option.of(a.COMMENT())),
                                 this.getType(a.type()),
-                                this.processDefaultValue(Option(a.defaultValue())),
+                                this.processDefaultValue(Option.of(a.defaultValue())),
                             ),
                     ),
             )
             .getOrElse([]);
-        const locations = Option(ctx.directiveLocations())
+        const locations = Option.of(ctx.directiveLocations())
             .map((l) => l.NAME().map((n) => this.textOf(n)))
             .getOrElse([]);
         this.directives.add(
             new GQLDirectiveDefinition(
                 this.textOf(ctx.NAME()),
-                this.getComment(Option(ctx.COMMENT())),
+                this.getComment(Option.of(ctx.COMMENT())),
                 args,
                 locations,
             ),
@@ -300,34 +311,34 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     }
 
     public getFieldDefinition(ctx: FieldDefinitionContext) {
-        const fieldName = this.textOf(Option(ctx.NAMETYPE()).getOrElse(ctx.NAME()));
+        const fieldName = this.textOf(Option.of(ctx.NAMETYPE()).getOrElse(ctx.NAME()));
         const fieldType = this.getType(ctx.type());
-        const args = Option(ctx.argumentsDefinition())
+        const args = Option.of(ctx.argumentsDefinition())
             .map((ad) =>
                 ad.inputValueDefinition().map((a) => {
                     const argName = this.textOf(a.NAME());
-                    let argDesc = this.getComment(Option(a.COMMENT()));
-                    if (argDesc.length == 0) {
+                    let argDesc = this.getComment(Option.of(a.COMMENT()));
+                    if (argDesc.length === 0) {
                         argDesc = STANDARD_ARG_DESCRIPTION[argName] || '';
                     }
                     return new GQLArgumentDefinition(
                         this.textOf(a.NAME()),
                         argDesc,
                         this.getType(a.type()),
-                        this.processDefaultValue(Option(a.defaultValue())),
+                        this.processDefaultValue(Option.of(a.defaultValue())),
                     );
                 }),
             )
             .getOrElse([]);
         const [isDeprecated, deprecationReason] = this.getDeprecation(
-            Option(ctx.deprecated()),
+            Option.of(ctx.deprecated()),
         );
         const fd = new GQLFieldDefinition(
             fieldName,
-            this.getComment(Option(ctx.COMMENT())),
+            this.getComment(Option.of(ctx.COMMENT())),
+            fieldType,
             isDeprecated,
             deprecationReason,
-            fieldType,
             args,
         );
         this.allFields.set(fieldName, fd);
@@ -335,11 +346,11 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     }
 
     public getDeprecation(ctxOpt: Option<DeprecatedContext>): [boolean, Option<string>] {
-        if (ctxOpt.isDefined) {
-            const drcOpt = Option(ctxOpt.get().deprecationReason());
-            if (drcOpt.isDefined) {
+        if (!ctxOpt.isEmpty()) {
+            const drcOpt = Option.of(ctxOpt.get().deprecationReason());
+            if (!drcOpt.isEmpty()) {
                 const dr = this.textOf(drcOpt.get().STRING());
-                return [true, Option(dr)];
+                return [true, Option.of(dr)];
             }
             return [true, None];
         } else {
@@ -352,9 +363,9 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     }
 
     public processValueOrVariable(ctx: ValueOrVariableContext) {
-        const valueOpt = Option(ctx.value());
-        const varOpt = Option(ctx.variable());
-        if (valueOpt.isDefined && !varOpt.isDefined) {
+        const valueOpt = Option.of(ctx.value());
+        const varOpt = Option.of(ctx.variable());
+        if (!valueOpt.isEmpty() && varOpt.isEmpty()) {
             return this.processValue(valueOpt.get());
         }
         throw new Error('wat?');
@@ -373,10 +384,10 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
             }
         }
         if (ctx instanceof BooleanValueContext) {
-            return new new GQLBooleanValue(this.textOf(ctx.BOOLEAN()))();
+            return new GQLBooleanValue(this.textOf(ctx.BOOLEAN()))();
         }
         if (ctx instanceof ArrayValueContext) {
-            return new new GQLArrayValue(
+            return new GQLArrayValue(
                 ctx
                     .array()
                     .value()
