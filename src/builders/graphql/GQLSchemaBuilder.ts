@@ -47,7 +47,7 @@ import {
     GQLEnumValue,
     GQLIntValue,
     GQLStringValue
-} from '../../models/GQLValueDefinition';
+} from '../../models/GQLValue';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
 
 const STANDARD_ARG_DESCRIPTION = {
