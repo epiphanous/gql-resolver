@@ -42,10 +42,15 @@ export class GQLTextMatchPattern extends GQLPattern {
     public isGeo: boolean;
     public text: string;
     public boost: GQLFieldBooster;
-    public minScore: Option<number>;
-    public maxHits: Option<number>;
+    public minScore: Option<number> = None;
+    public maxHits: Option<number> = None;
 
-    constructor(fieldarg, text: string, boost: GQLFieldBooster, isGeo: boolean, minScore, maxHits: Option<number>) {
+    constructor(
+        fieldarg, text: string,
+        boost: GQLFieldBooster,
+        isGeo: boolean,
+        minScore, maxHits: Option<number> = None
+    ) {
         super(fieldarg);
         this.isGeo = isGeo;
         this.text = text;
