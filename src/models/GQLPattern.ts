@@ -1,8 +1,12 @@
 import Record from 'dataclass';
-import {Option} from 'funfix';
+import {None, Option} from 'funfix';
 import {GQLFieldBooster} from './GQLFieldBooster';
 
-export class GQLPattern extends Record<GQLPattern> {
+interface IGQLPattern {
+    field: string;
+}
+
+export class GQLPattern implements IGQLPattern{
     public field: string;
 
     constructor(fieldarg: string) {
@@ -15,7 +19,7 @@ export class GQLGeoNearFeaturePattern extends GQLPattern {
     public distance: number;
     public units: string;
 
-    constructor(fieldarg, feature, units: string, distance: number) {
+    constructor(fieldarg: string, feature: string, units: string, distance: number) {
         super(fieldarg);
         this.feature = feature;
         this.distance = distance;
@@ -29,7 +33,7 @@ export class GQLGeoNearLatLonPattern extends GQLPattern {
     public distance: number;
     public units: string;
 
-    constructor(fieldarg, lat, lon, units: string, distance: number) {
+    constructor(fieldarg: string, lat: string, lon: string, units: string, distance: number) {
         super(fieldarg);
         this.lat = lat;
         this.lon = lon;
@@ -42,14 +46,16 @@ export class GQLTextMatchPattern extends GQLPattern {
     public isGeo: boolean;
     public text: string;
     public boost: GQLFieldBooster;
-    public minScore: Option<number> = None;
-    public maxHits: Option<number> = None;
+    public minScore: Option<number>;
+    public maxHits: Option<number>;
 
     constructor(
-        fieldarg, text: string,
+        fieldarg: string,
+        text: string,
         boost: GQLFieldBooster,
         isGeo: boolean,
-        minScore, maxHits: Option<number> = None
+        minScore: Option<number> = None,
+        maxHits: Option<number> = None
     ) {
         super(fieldarg);
         this.isGeo = isGeo;
