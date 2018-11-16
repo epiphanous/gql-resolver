@@ -1,4 +1,4 @@
-import { None, Option } from 'funfix-core';
+import { None, Option } from 'funfix';
 
 export class FakeIRILiteral {
   public value: Option<any>;

@@ -1,4 +1,4 @@
-import { Either } from 'funfix-core';
+import { Either } from 'funfix';
 import { Map } from 'immutable';
 import { GQLValue } from './GQLValue';
 import { GQLVariable } from './GQLVariable';

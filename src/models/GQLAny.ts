@@ -1,4 +1,4 @@
-import { None, Option } from 'funfix-core';
+import { None, Option } from 'funfix';
 
 interface IGQLAny {
   name: string;
