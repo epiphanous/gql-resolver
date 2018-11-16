@@ -4,7 +4,7 @@ import {sortMapByProjectionOrder} from '../utils/MapSorter';
 import {AliasAndName} from './AliasAndName';
 import {ID_BINDING, INTERNAL_PREFIX, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
-import {GQLField} from './GQLField';
+import {GQLField} from './GQLSelection';
 import {QueryStrategy} from './QueryStrategy';
 
 export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
