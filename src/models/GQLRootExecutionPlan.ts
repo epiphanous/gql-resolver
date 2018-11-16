@@ -4,6 +4,17 @@ import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {QueryStrategy} from './QueryStrategy';
 
 export class GQLRootExecutionPlan extends GQLExecutionPlan {
+
+    constructor(
+        parentTypes: Set<string>,
+        name: string,
+        key: string,
+        subPlans: List<GQLExecutionPlan> = List(),
+        errors: List<Error> = List(),
+    ) {
+       super(parentTypes, name, key, subPlans, errors);
+    }
+
     public execute(
         parentIris: List<string>,
         executor: (strategy: QueryStrategy) => List<Map<string, any>>,
