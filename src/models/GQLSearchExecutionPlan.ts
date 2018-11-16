@@ -3,6 +3,7 @@ import {Option} from 'funfix-core';
 import {List, Map, OrderedMap, Set} from 'immutable';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
 import {AliasAndName} from './AliasAndName';
+import {PARENT_BINDING, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {GQLQueryArguments} from './GQLQueryArguments';
 import {QueryStrategy} from './QueryStrategy';
@@ -58,8 +59,8 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
             .map(
                 (bindings) =>
                     new MaybeParentAndSubject({
-                        parent: Option.of(bindings.get(BINDINGS.get('parent')).toString()),
-                        subject: bindings.get(BINDINGS.get('subject')).toString(),
+                        parent: Option.of(bindings.get(PARENT_BINDING).toString()),
+                        subject: bindings.get(SUBJECT_BINDING).toString(),
                     }),
             )
             .filterNot((ps) => ps.parent.isEmpty())
@@ -78,8 +79,8 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
         const subjectIds: List<IRIAndType> = results.map(
             (r) =>
                 new IRIAndType({
-                    iri: r.get(BINDINGS.get('subject')),
-                    iriType: r.get(BINDINGS.get('typeName')),
+                    iri: r.get(SUBJECT_BINDING),
+                    iriType: r.get(TYPENAME_BINDING),
                 }),
         );
 
@@ -105,7 +106,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
         );
 
         const subjectsById: Map<string, OrderedMap<string, any>> = Map(
-            merged.map((x) => [x.get(BINDINGS.get('subject')), x]),
+            merged.map((x) => [x.get(SUBJECT_BINDING), x]),
         );
 
         let ordered: OrderedMap<string, List<OrderedMap<string, any>>>;
@@ -134,7 +135,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
         return parentIri.map((parentId) => {
             const followees = parentIdsToSubjectIdsMap.get(parentId) || List();
             return OrderedMap({
-                [BINDINGS.get('subject')]: parentId,
+                [SUBJECT_BINDING]: parentId,
                 [key]: followees.map((id: string) => merged.get(id) || id),
             });
         });
@@ -166,17 +167,17 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
         const dataBySubject: Map<string, OrderedMap<string, any>> = this.flattened(
             data,
         )
-            .groupBy((m) => m.get(BINDINGS.get('subject')).toString())
-            .map((value) => value.toList())
-            .map((maps) => {
+            .groupBy(m => m.get(SUBJECT_BINDING.toString()))
+            .map(value => value.toList())
+            .map(maps => {
                 const unsortedCombined = this.combineMaps(maps);
                 return sortMapByProjectionOrder(
                     unsortedCombined,
-                    this.projectionOrder.map((an) => an.alias),
+                    this.projectionOrder.map(an => an.alias),
                 );
             })
             .toMap();
 
-        return subjects.map((s) => dataBySubject.get(s));
+        return subjects.map(s => dataBySubject.get(s));
     }
 }
