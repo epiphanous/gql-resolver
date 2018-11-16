@@ -116,7 +116,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
             const reGroupedByParent: List<OrderedMap<string, any>> = this.regroupByParent(
                 parentIris,
                 this.key,
-                parentIdsToSubjectIdsMap,
+                parentIdsToSubjectIdsMap, // TODO: reformat to Map<string, List<string>>
                 subjectsById,
             );
 
