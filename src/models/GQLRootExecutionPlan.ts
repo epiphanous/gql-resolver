@@ -1,4 +1,4 @@
-import {List, Map, OrderedMap} from 'immutable';
+import {List, Map, OrderedMap, Set} from 'immutable';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {QueryStrategy} from './QueryStrategy';
