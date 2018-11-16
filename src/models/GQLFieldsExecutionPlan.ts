@@ -1,17 +1,31 @@
 import {Option} from 'funfix-core';
-import {List, Map, OrderedMap} from 'immutable';
+import {List, Map, OrderedMap, Set} from 'immutable';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
 import {AliasAndName} from './AliasAndName';
+import {ID_BINDING, INTERNAL_PREFIX, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {GQLField} from './GQLField';
 import {QueryStrategy} from './QueryStrategy';
-import {INTERNAL_PREFIX, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
 
 export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
     public projectionOrder: List<AliasAndName> = List<AliasAndName>();
     public projectionsByType: Map<string, List<GQLField>> = Map<string,
         List<GQLField>>();
     public strategies: (slist: List<string>) => List<QueryStrategy> = null;
+
+    constructor(
+        parentTypes: Set<string>,
+        name: string,
+        key: string,
+        subPlans: List<GQLExecutionPlan> = List(),
+        errors: List<Error> = List(),
+        projectionOrder: List<AliasAndName> = List<AliasAndName>(),
+        projectionsByType: Map<string, List<GQLField>> = Map<string, List<GQLField>>()
+    ) {
+        super(parentTypes, name, key, subPlans, errors);
+        this.projectionOrder = projectionOrder;
+        this.projectionsByType = projectionsByType;
+    }
 
     /**
      * Convert a list of maps into a map of lists, maintaining order of the list data.
@@ -48,7 +62,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
                 const mapOfLists: Map<string, List<any>> = this.combineMaps(listOfMaps);
                 const specialFields: Map<string, List<any>> = Map([
                     [
-                        BINDINGS.get('id'),
+                        ID_BINDING,
                         Option.of(mapOfLists.get(SUBJECT_BINDING)).getOrElse(
                             List<any>(),
                         ),
@@ -71,11 +85,12 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
                         RDFQueryService.shouldHaveOnlyOne(k) ? [k, v.first()] : [k, v],
                     );
 
-                const unsortedAliased: Map<string, any> = this.projectionOrder.reduce<Map<string, any>>((acc: Map<string, any>, an: AliasAndName) => {
-                    if (unsorted.has(an.name)) {
-                        acc.set(an.alias, unsorted.get(an.name));
-                    }
-                    return acc;
+                const unsortedAliased: Map<string, any> =
+                    this.projectionOrder.reduce<Map<string, any>>((acc: Map<string, any>, an: AliasAndName) => {
+                        if (unsorted.has(an.name)) {
+                            acc.set(an.alias, unsorted.get(an.name));
+                        }
+                        return acc;
                 }, unsorted.filter((kv) => kv._1.startsWith(INTERNAL_PREFIX)));
 
                 const sorted = sortMapByProjectionOrder(

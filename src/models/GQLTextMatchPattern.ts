@@ -1,5 +1,5 @@
 import {Option} from 'funfix-core';
-import {GQLFieldBooster} from './GQLFieldBooster';
+import {GQLFieldBooster} from './GQLBooster';
 import {GQLPattern} from './GQLPattern';
 
 export class GQLTextMatchPattern extends GQLPattern {

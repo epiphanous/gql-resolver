@@ -13,6 +13,22 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
     public subjectTypes: List<string>;
     public strategies: (slist: List<string>) => List<QueryStrategy> = null;
 
+    constructor(
+        parentTypes: Set<string>,
+        name: string,
+        key: string,
+        subPlans: List<GQLExecutionPlan> = List(),
+        errors: List<Error> = List(),
+        projectionOrder: List<AliasAndName>,
+        queryArguments: GQLQueryArguments,
+        subjectTypes: List<string>,
+    ) {
+        super(parentTypes, name, key, subPlans, errors);
+        this.projectionOrder = projectionOrder;
+        this.queryArguments = queryArguments;
+        this.subjectTypes = subjectTypes;
+    }
+
     public hasLimits() {
         return !this.queryArguments.limit.isEmpty;
     }
@@ -67,22 +83,23 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
                 }),
         );
 
-        const subPlanData: List<OrderedMap<string, List<OrderedMap<string, any>>>> = this.subPlans.map((child: GQLExecutionPlan) => {
-            const subjectIdsOfType = subjectIds
-                .filter((c) => child.parentTypes.contains(c.iriType))
-                .map((c) => c.iri);
+        const subPlanData: List<OrderedMap<string, List<OrderedMap<string, any>>>> =
+            this.subPlans.map((child: GQLExecutionPlan) => {
+                const subjectIdsOfType = subjectIds
+                    .filter((c) => child.parentTypes.contains(c.iriType))
+                    .map((c) => c.iri);
 
-            if (subjectIdsOfType.isEmpty) {
-                return OrderedMap<string, List<OrderedMap<string, any>>>();
-            } else {
-                const childFields: OrderedMap<string,
-                    List<OrderedMap<string, any>>> = child.execute(subjectIdsOfType, executor);
-                return childFields;
-            }
+                if (subjectIdsOfType.isEmpty) {
+                    return OrderedMap<string, List<OrderedMap<string, any>>>();
+                } else {
+                    const childFields: OrderedMap<string,
+                        List<OrderedMap<string, any>>> = child.execute(subjectIdsOfType, executor);
+                    return childFields;
+                }
         });
 
         const merged: List<OrderedMap<string, any>> = this.mergedSubjects(
-            subjectIds.map((s) => s.iri),
+            subjectIds.map(s => s.iri),
             subPlanData,
             this.key,
         );
@@ -92,7 +109,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
         );
 
         let ordered: OrderedMap<string, List<OrderedMap<string, any>>>;
-        if (this.parentTypes == Set(topType)) {
+        if (this.parentTypes === Set(topType)) {
             ordered = OrderedMap([[[this.key], merged]]);
         } else {
             const reGroupedByParent: List<OrderedMap<string, any>> = this.regroupByParent(
