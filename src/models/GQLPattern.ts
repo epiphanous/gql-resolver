@@ -1,4 +1,3 @@
-import Record from 'dataclass';
 import {None, Option} from 'funfix';
 import {GQLFieldBooster} from './GQLFieldBooster';
 
