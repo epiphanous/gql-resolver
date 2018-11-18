@@ -51,10 +51,7 @@ export class GQLObjectQueryModifierOptionalNegation extends GQLObjectQueryModifi
 export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExpression {
   constructor(conjunctives: List<GQLObjectQueryModifierOptionalNegation>) {
     super(
-      conjunctives
-        .map(x => x.expression)
-        .map(x => `(${x})`)
-        .join(' && '),
+      conjunctives.map(x => `(${x.expression})`).join(' && '),
       'xsd:boolean'
     );
   }
@@ -71,10 +68,7 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
     >
   ) {
     super(
-      disjunctives
-        .map(x => x.expression)
-        .map(x => `(${x})`)
-        .join(' || '),
+      disjunctives.map(x => `(${x.expression})`).join(' || '),
       'xsd:boolean'
     );
   }
