@@ -1,4 +1,0 @@
-import {GQLObjectQueryModifierPrimitiveExpression} from './GQLObjectQueryModifierPrimitiveExpression';
-
-export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQueryModifierPrimitiveExpression {
-}

@@ -1,4 +1,4 @@
-import { None, Option } from 'funfix-core';
+import { None, Option } from 'funfix';
 import { List } from 'immutable';
 import { GQLDirective } from './GQLDirective';
 import { GQLExecutionPlan } from './GQLExecutionPlan';

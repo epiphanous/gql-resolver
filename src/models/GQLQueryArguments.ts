@@ -1,4 +1,4 @@
-import { None, Option } from 'funfix-core';
+import { None, Option } from 'funfix';
 import { List } from 'immutable';
 import { GQLAny } from './GQLAny';
 import { GQLBinding } from './GQLBinding';

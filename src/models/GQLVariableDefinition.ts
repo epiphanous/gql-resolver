@@ -1,4 +1,4 @@
-import { Either, None, Option } from 'funfix-core';
+import { Either, None, Option } from 'funfix';
 import { GQLType } from './GQLType';
 import { GQLValue } from './GQLValue';
 import { GQLVariable } from './GQLVariable';
