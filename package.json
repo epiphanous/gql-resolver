@@ -2,7 +2,8 @@
   "scripts": {
     "antlr": "yarn run antlr-gql && yarn run antlr-qm",
     "antlr-gql": "cd src/antlr4 && antlr4ts -o generated GraphQL.g4",
-    "antlr-qm": "cd src/antlr4 && antlr4ts -o generated QueryModification.g4"
+    "antlr-qm": "cd src/antlr4 && antlr4ts -o generated QueryModification.g4",
+    "test": "mocha -r ts-node/register src/**/_t/*.ts"
   },
   "dependencies": {
     "antlr4ts": "^0.4.1-alpha.0",
@@ -13,9 +14,15 @@
     "n3": "^1.0.1"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.9",
     "antlr4ts-cli": "^0.4.0-alpha.4",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
     "prettier": "^1.15.2",
     "prettier-tslint": "^0.4.0",
+    "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
     "typescript": "^3.1.6"
   }
