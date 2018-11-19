@@ -1,9 +1,9 @@
 import Record from 'dataclass';
-import {Option} from 'funfix-core';
+import {Option} from 'funfix';
 import {List, Map, OrderedMap, Set} from 'immutable';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
 import {AliasAndName} from './AliasAndName';
-import {PARENT_BINDING, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
+import {PARENT_BINDING, SUBJECT_BINDING, TYPENAME_BINDING, DEFAULT_PREFIXES} from './Constants';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {GQLQueryArguments} from './GQLQueryArguments';
 import {QueryStrategy} from './QueryStrategy';
@@ -71,8 +71,9 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
                 subjects
                     .flatten()
                     .toSet()
-                    .toList(),
-            ])
+                    .toList()
+                ]
+            )
             .toMap();
 
         // assume every result has subject and typename fields
@@ -116,7 +117,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
             const reGroupedByParent: List<OrderedMap<string, any>> = this.regroupByParent(
                 parentIris,
                 this.key,
-                parentIdsToSubjectIdsMap, // TODO: reformat to Map<string, List<string>>
+                parentIdsToSubjectIdsMap,
                 subjectsById,
             );
 

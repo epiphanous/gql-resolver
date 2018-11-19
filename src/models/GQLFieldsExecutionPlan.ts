@@ -1,8 +1,8 @@
-import {Option} from 'funfix-core';
+import {Option} from 'funfix';
 import {List, Map, OrderedMap, Set} from 'immutable';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
 import {AliasAndName} from './AliasAndName';
-import {ID_BINDING, INTERNAL_PREFIX, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
+import {DEFAULT_PREFIXES, ID_BINDING, INTERNAL_PREFIX, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {GQLField} from './GQLSelection';
 import {QueryStrategy} from './QueryStrategy';
@@ -12,6 +12,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
     public projectionsByType: Map<string, List<GQLField>> = Map<string,
         List<GQLField>>();
     public strategies: (slist: List<string>) => List<QueryStrategy> = null;
+    public nameToPrefix = DEFAULT_PREFIXES.map(t => ({[t[1].getName] : t[0]})).toMap();
 
     constructor(
         parentTypes: Set<string>,
@@ -48,6 +49,17 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
         );
     }
 
+
+    public shouldHaveOnlyOne(key: string) {
+        return Set([ID_BINDING, TYPENAME_BINDING])
+                .contains(key) || key.startsWith(INTERNAL_PREFIX);
+    }
+
+    public iriWithNameToPrefixedString(iri: string) {
+        return this.nameToPrefix.keys.find(name => iri.startsWith(name)).map(name => {
+            iri.replace(name, this.nameToPrefix.get(name) + '_');
+        }).getOrElse(iri);
+    }
     public execute(
         subjectIris: List<string>,
         executor: (strategy: QueryStrategy) => List<Map<string, any>>,
@@ -73,7 +85,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
                             mapOfLists.get(TYPENAME_BINDING),
                         ).getOrElse(List<any>()),
                     ],
-                ]).map((x) => RDFPrefixes.iriWithNameToPrefixedString(x.toString));
+                ]).map((x) => this.iriWithNameToPrefixedString(x.toString));
 
                 const mapOfListsWithSpecialFields: Map<string,
                     List<any>> = mapOfLists.concat(specialFields);
@@ -82,7 +94,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
                     any> = mapOfListsWithSpecialFields
                     .filterNot((v) => v.isEmpty())
                     .map((v, k) =>
-                        RDFQueryService.shouldHaveOnlyOne(k) ? [k, v.first()] : [k, v],
+                        this.shouldHaveOnlyOne(k) ? [k, v.first()] : [k, v],
                     );
 
                 const unsortedAliased: Map<string, any> =
