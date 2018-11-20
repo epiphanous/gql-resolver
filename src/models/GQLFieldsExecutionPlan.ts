@@ -1,10 +1,11 @@
 import {Option} from 'funfix';
 import {List, Map, OrderedMap, Set} from 'immutable';
+import * as _ from 'lodash';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
-import {AliasAndName} from './AliasAndName';
 import {DEFAULT_PREFIXES, ID_BINDING, INTERNAL_PREFIX, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {GQLField} from './GQLSelection';
+import AliasAndName from './NameAndAlias';
 import {QueryStrategy} from './QueryStrategy';
 
 export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
@@ -12,7 +13,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
     public projectionsByType: Map<string, List<GQLField>> = Map<string,
         List<GQLField>>();
     public strategies: (slist: List<string>) => List<QueryStrategy> = null;
-    public nameToPrefix = DEFAULT_PREFIXES.map(t => ({[t[1].getName] : t[0]})).toMap();
+    public nameToPrefix = Map(_.invert(DEFAULT_PREFIXES.toObject()));
 
     constructor(
         parentTypes: Set<string>,
@@ -56,14 +57,14 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
     }
 
     public iriWithNameToPrefixedString(iri: string) {
-        return this.nameToPrefix.keys.find(name => iri.startsWith(name)).map(name => {
-            iri.replace(name, this.nameToPrefix.get(name) + '_');
-        }).getOrElse(iri);
+        const keys = this.nameToPrefix.keySeq().toArray();
+        const name = keys.find(nameToFind => iri.startsWith(nameToFind));
+        return iri.replace(name, this.nameToPrefix.get(name) + '_') || iri;
     }
     public execute(
         subjectIris: List<string>,
         executor: (strategy: QueryStrategy) => List<Map<string, any>>,
-    ): OrderedMap<string, List<OrderedMap<string, any>>> {
+    ): OrderedMap<string, any> { // TODO: swap back to List<OrderedMap<...>> if needed
         // parentIris is the list of subjects to return data for
 
         const results: List<OrderedMap<string, any>> = this.strategies(subjectIris)
@@ -72,12 +73,12 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
             .valueSeq()
             .map((listOfMaps: List<Map<string, any>>) => {
                 const mapOfLists: Map<string, List<any>> = this.combineMaps(listOfMaps);
-                const specialFields: Map<string, List<any>> = Map([
+                const specialFields: Map<string, List<any>> = Map<any>([
                     [
                         ID_BINDING,
-                        Option.of(mapOfLists.get(SUBJECT_BINDING)).getOrElse(
-                            List<any>(),
-                        ),
+                        Option.of(
+                            mapOfLists.get(SUBJECT_BINDING)
+                        ).getOrElse(List<any>()),
                     ],
                     [
                         TYPENAME_BINDING,
@@ -85,7 +86,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
                             mapOfLists.get(TYPENAME_BINDING),
                         ).getOrElse(List<any>()),
                     ],
-                ]).map((x) => this.iriWithNameToPrefixedString(x.toString));
+                ]).map(x => List(this.iriWithNameToPrefixedString(x.toString)));
 
                 const mapOfListsWithSpecialFields: Map<string,
                     List<any>> = mapOfLists.concat(specialFields);

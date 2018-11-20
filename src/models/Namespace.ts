@@ -12,6 +12,7 @@ export default class SimpleNamespace implements INamespace {
     ) {
         this.setPrefix(prefix);
         this.setName(name);
+        return [this.getPrefix(), this.getName()];
     }
 
     public getPrefix() {
@@ -31,6 +32,6 @@ export default class SimpleNamespace implements INamespace {
     }
 
     public toString(): string {
-        return `${this.prefix} :: ${this.name}`;
+        return `${this.getPrefix()} :: ${this.getName()}`;
     }
 }

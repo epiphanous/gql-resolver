@@ -2,10 +2,10 @@ import Record from 'dataclass';
 import {Option} from 'funfix';
 import {List, Map, OrderedMap, Set} from 'immutable';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
-import {AliasAndName} from './AliasAndName';
-import {PARENT_BINDING, SUBJECT_BINDING, TYPENAME_BINDING, DEFAULT_PREFIXES} from './Constants';
+import {DEFAULT_PREFIXES, PARENT_BINDING, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
 import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {GQLQueryArguments} from './GQLQueryArguments';
+import AliasAndName from './NameAndAlias';
 import {QueryStrategy} from './QueryStrategy';
 
 export class GQLSearchExecutionPlan extends GQLExecutionPlan {
@@ -100,17 +100,17 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
                 }
         });
 
-        const merged: List<OrderedMap<string, any>> = this.mergedSubjects(
+        const merged: List<any> = this.mergedSubjects(
             subjectIds.map(s => s.iri),
             subPlanData,
             this.key,
         );
 
-        const subjectsById: Map<string, OrderedMap<string, any>> = Map(
+        const subjectsById: Map<string, OrderedMap<string, any>> = Map<any>(
             merged.map((x) => [x.get(SUBJECT_BINDING), x]),
         );
 
-        let ordered: OrderedMap<string, List<OrderedMap<string, any>>>;
+        let ordered: OrderedMap<any, any>;
         if (this.parentTypes === Set(topType)) {
             ordered = OrderedMap([[[this.key], merged]]);
         } else {
@@ -121,7 +121,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
                 subjectsById,
             );
 
-            ordered = OrderedMap([[[this.key], reGroupedByParent]]);
+            ordered = OrderedMap([[this.key], reGroupedByParent]);
         }
 
         return ordered;
@@ -130,11 +130,11 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
     public regroupByParent(
         parentIri: List<string>,
         key: string,
-        parentIdsToSubjectIdsMap: Map<string, List<string>>,
+        parentIdsToSubjectIdsMap: Map<string, Array<string | List<string>>>,
         merged: Map<string, OrderedMap<string, any>>,
     ): List<OrderedMap<string, any>> {
         return parentIri.map((parentId) => {
-            const followees = parentIdsToSubjectIdsMap.get(parentId) || List();
+            const followees = List(parentIdsToSubjectIdsMap.get(parentId)) || List();
             return OrderedMap({
                 [SUBJECT_BINDING]: parentId,
                 [key]: followees.map((id: string) => merged.get(id) || id),
