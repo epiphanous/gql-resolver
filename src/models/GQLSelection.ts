@@ -3,6 +3,7 @@ import id64 from 'id64';
 import { List } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
+import {assign} from 'lodash';
 
 interface IGQLSelection {
   name: string;
@@ -45,6 +46,9 @@ export class GQLField extends GQLSelection implements IGQLField {
     this.directives = directives;
     this.selections = selections;
     this.fields = fields;
+  }
+  public copy(fields){
+    return assign({}, this, fields);
   }
 }
 
