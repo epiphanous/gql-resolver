@@ -1,4 +1,4 @@
-export class NameAndAlias {
+export default class NameAndAlias {
   public alias: string;
   public name: string;
 
