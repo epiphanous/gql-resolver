@@ -36,10 +36,7 @@ export class GQLOperation implements IGQLOperation {
     }
   }
 
-  public copy(fields: object) {
-    /**
-     * TODO: Are fields even an object?
-     */
-    return assign({}, this, fields);
+  public copy(fields: Partial<IGQLOperation>) {
+    return new GQLOperation({...(this as object), ...fields});
   }
 }

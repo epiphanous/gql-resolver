@@ -1,7 +1,7 @@
 import {List, Map, OrderedMap, Set} from 'immutable';
 import {QueryStrategy} from './QueryStrategy';
 
-interface IGQLExecutionPlan {
+export interface IGQLExecutionPlan {
     parentTypes: Set<string>;
     name: string;
     key: string;

@@ -3,12 +3,19 @@ import {Option} from 'funfix';
 import {List, Map, OrderedMap, Set} from 'immutable';
 import {sortMapByProjectionOrder} from '../utils/MapSorter';
 import {DEFAULT_PREFIXES, PARENT_BINDING, SUBJECT_BINDING, TYPENAME_BINDING} from './Constants';
-import {GQLExecutionPlan} from './GQLExecutionPlan';
+import {GQLExecutionPlan, IGQLExecutionPlan} from './GQLExecutionPlan';
 import {GQLQueryArguments} from './GQLQueryArguments';
 import AliasAndName from './NameAndAlias';
 import {QueryStrategy} from './QueryStrategy';
 
-export class GQLSearchExecutionPlan extends GQLExecutionPlan {
+interface IGQLSearchExecutionPlan extends IGQLExecutionPlan {
+    projectionOrder: List<AliasAndName>;
+    queryArguments: GQLQueryArguments;
+    subjectTypes: List<string>;
+    strategies: (slist: List<string>) => List<QueryStrategy>;
+}
+
+export class GQLSearchExecutionPlan extends GQLExecutionPlan implements IGQLSearchExecutionPlan {
     public projectionOrder: List<AliasAndName>;
     public queryArguments: GQLQueryArguments;
     public subjectTypes: List<string>;
@@ -34,8 +41,8 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan {
         return !this.queryArguments.limit.isEmpty;
     }
 
-    public copy(fields) {
-        return assign({}, this, fields);
+    public copy(fields: Partial<IGQLSearchExecutionPlan>) {
+        return new GQLSearchExecutionPlan(...(this as object), ...fields);
     }
 
     public execute(

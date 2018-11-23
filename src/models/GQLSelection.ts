@@ -47,8 +47,9 @@ export class GQLField extends GQLSelection implements IGQLField {
     this.selections = selections;
     this.fields = fields;
   }
-  public copy(fields) {
-    return assign({}, this, fields);
+
+  public copy(fields: Partial<IGQLField>) {
+      return new GQLField({...(this as object), ...fields});
   }
 }
 
