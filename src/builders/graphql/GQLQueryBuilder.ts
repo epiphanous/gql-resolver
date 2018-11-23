@@ -506,9 +506,13 @@ public processVariableDefinition(ctx: VariableDefinitionContext) {
 
  public exitSelectionOnlyOperationDefinition(
     ctx: SelectionOnlyOperationDefinitionContext): void {
-    this.operations = this.operations.add(new GQLOperation('', 'query', '', List<GQLVariableDefinition>().clear(),
-        List<GQLDirective>().clear(),
-        this.processSelectionSet(ctx.selectionSet()))
+    this.operations = this.operations.add(new GQLOperation({
+        name: '',
+        operationType: 'query',
+        fields: List().clear(),
+        variables: List<GQLVariableDefinition>().clear(),
+        directives: List<GQLDirective>().clear(),
+        selections: this.processSelectionSet(ctx.selectionSet())})
     );
   }
 
