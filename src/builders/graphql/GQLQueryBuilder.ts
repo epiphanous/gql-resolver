@@ -18,7 +18,7 @@ import {
     TypeConditionContext,
     ValueContext,
     ValueDirectiveContext,
-    ValueOrVariableContext, VariableContext, VariableDefinitionContext
+    ValueOrVariableContext, VariableContext, VariableDefinitionContext, VariableDefinitionsContext
 } from '../../antlr4/generated/GraphQLParser';
 import { GQLAny } from '../../models/GQLAny';
 import { GQLAnyArgument, GQLArgument, GQLBindingsArgument, GQLBoostersArgument, GQLFilterArgument, GQLIncludeDeprecatedArgument, GQLInvalidArgument, GQLLimitArgument, GQLNameArgument, GQLOffsetArgument, GQLOrderArgument, GQLPatternsArgument, GQLTransformsArgument } from '../../models/GQLArgument';
@@ -326,7 +326,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     const mySubPlans = this.getSearchSubPlans(name, selections, objects);
 
-    return new GQLRootExecutionPlan(name, mySubPlans, errors);
+    return new GQLRootExecutionPlan(name, mySubPlans, errors); // TODO other fields?
   }
 
  public specialObjectFields: () => Map<string, SpecialObjectField> = () => Map(List(
@@ -359,7 +359,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
       objects
         .map(x => x[0])
         .flatMap((typ) => this.getSchema().getImplementingTypes(typ))
-        .map((it) => [it, List(hiddenIdField)])
+        .map((it) => [it, List().set(0, hiddenIdField)])
         .toMap;
 
     console.log(`getPlan ${name} requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom = ${requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom}`);
@@ -386,14 +386,15 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
         if (fieldsPlanParentTypes.isEmpty) {
             return List().clear();
         } else {
-            return List(
-                new GQLFieldsExecutionPlan( // TODO: constructor inside the GQLFEP class
-                    fieldsPlanParentTypes.toSet,
+            return List().set(0,
+                new GQLFieldsExecutionPlan(
+                    fieldsPlanParentTypes.toSet(),
                     name,
                     key,
-                    fullProjectionOrder,
-                    projectionsByType,
                     RDFQueryService.createFieldsStrategyCreator(subjectTypes.toSet, projectionsByType, RDFQueryService.this.getPrefixes(), this.getSchema()),
+                    List().clear(),
+                    fullProjectionOrder(),
+                    projectionsByType,
                 ),
             );
         }
@@ -401,27 +402,31 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     const [specialObjects, normalObjects] = partition(objects, ((x: [string, GQLField]) => Set(Object.keys(this.specialObjectFields)).contains(x[1].name));
     const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map((o) => {
-        const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields()[o[1].name].returnType));
-      return new GQLFieldsExecutionPlan(Set(parentType), o[1].name, key,
-        fullProjectionOrder.filter(_.alias === o[1].alias.getOrElse(o[1].name)),
-        projectionsByType,
-        specialObjectFields(o[1].name).generator(args));
+    const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields()[o[1].name].returnType));
+    return new GQLFieldsExecutionPlan(Set(
+          parentType),
+          o[1].name,
+          key,
+          this.specialObjectFields(o[1].name).generator(args)), // TODO I'm not sure this should be here..
+          List().clear(),
+          fullProjectionOrder().filter(a => a.alias === o[1].alias.getOrElse(o[1].name)),
+          projectionsByType;
     });
     console.info(`specialObjects = ${specialObjects}`);
     console.info(`normalObjects = ${normalObjects}`);
     console.info(`fields plan ${fieldsPlan}`);
-    const nonIgnoredNormalObjects = normalObjects.filterNot((f) => ignoredObjectFields.contains(f[1].name));
+    const nonIgnoredNormalObjects = normalObjects.filter(f => !ignoredObjectFields.contains(f[1].name));
     const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(specialPlans.unshift(...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)));
-    const plan = new GQLSearchExecutionPlan(Set(parentType), name, key, fullProjectionOrder, queryArgs, subjectTypes, mySubPlans, null, errors); // TODO: constr & copy() for GQLSEP class
+    const plan = new GQLSearchExecutionPlan(Set(parentType), name, key, mySubPlans, errors, fullProjectionOrder(), queryArgs, subjectTypes);
 
-    plan.copy(strategies = RDFQueryService.createSearchStrategyCreator(plan, RDFQueryService.this.getPrefixes(), this.getSchema()));
+    plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, RDFQueryService.this.getPrefixes(), this.getSchema()) });
   }
 
  public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
-    const description = Option.of(ctx.COMMENT()).map(x => x.asScala()).getOrElse(List<string>()).mkString('\n');
+    const description = Option.of(ctx.COMMENT()).getOrElse(List<string>()).join('\n');
     this.operations.add(new GQLOperation({
             name: this.textOf(ctx.NAME()),
-            description,
+            description: Option.of(description),
             operationType: ctx.operationType().getText,
             variables: this.processVariableDefinitions(Option.of(ctx.variableDefinitions())),
             directives: this.processDirectives(Option.of(ctx.directives())),
@@ -430,12 +435,12 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
  public processVariableDefinitions(
     ctxOpt: Option<VariableDefinitionsContext>): List<GQLVariableDefinition> {
-      return ctxOpt.isEmpty() ? ctx.variableDefinition().asScala.toList.map(this.processVariableDefinition) : List().clear();
+      return ctxOpt.isEmpty() ? ctxOpt.variableDefinition().asScala.toList.map(this.processVariableDefinition) : List().clear();
   }
 
 public processVariableDefinition(ctx: VariableDefinitionContext) {
-    const description = Option.of(ctx.COMMENT()).map(x => x.asScala).getOrElse(List<string>().clear()).mkString('\n');
-    const vd = new GQLVariableDefinition(this.textOf(ctx.variable().NAME()), description, this.getType(ctx.`type`()),
+    const description = Option.of(ctx.COMMENT()).getOrElse(List<string>().clear()).join('\n');
+    const vd = new GQLVariableDefinition(this.textOf(ctx.variable().NAME()), this.getType(ctx.`type`(), description),
       this.processDefaultValue(Option.of(ctx.defaultValue())));
     this.variables = this.variables.add(vd);
     return vd;
@@ -509,8 +514,8 @@ public processVariableDefinition(ctx: VariableDefinitionContext) {
 
 public exitFragmentDefinition(ctx: FragmentDefinitionContext): void {
     this.fragmentDefinitions = this.fragmentDefinitions.add(new GQLFragmentDefinition(this.textOf(ctx.fragmentName().NAME()),
-      new processTypeCondition(ctx.typeCondition()), this.processDirectives(Option.of(ctx.directives())),
-      new processSelectionSet(ctx.selectionSet())));
+      new this.processTypeCondition(ctx.typeCondition()), this.processDirectives(Option.of(ctx.directives())),
+      new this.processSelectionSet(ctx.selectionSet())));
   }
 
 public processTypeCondition(ctx: TypeConditionContext) {
@@ -562,7 +567,7 @@ public processArgument(ctx: ArgumentContext, fdOpt: Option<GQLFieldDefinition>):
     const name = this.textOf(ctx.NAME());
     const [fieldName, argDefOpt] = Option.of(fdOpt).nonEmpty() ? [fdOpt.value.name, fdOpt.value.args.find(a => a.name === name)] : None;
     if (argDefOpt.isEmpty()) {
-      this.check(ok = false, s"unknown argument '$name' on field '$fieldName'", ctx);
+      this.check(ok = false, `unknown argument '${name}' on field '${fieldName}`, ctx); // TODO ?
       return new GQLInvalidArgument(name, Left(new GQLStringValue('error')));
     } else {
       const expectedType = argDefOpt.get.gqlType.xsdType;
