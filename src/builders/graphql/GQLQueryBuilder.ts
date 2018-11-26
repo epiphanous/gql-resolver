@@ -561,7 +561,7 @@ public processFieldName(ctx: FieldNameContext) {
 
 public processArguments(ctxOpt: Option<ArgumentsContext>, fdOpt: Option<GQLFieldDefinition>) {
       if (Option.of(ctxOpt).nonEmpty()) {
-          return List(ctxOpt.argument()).map(a => this.processArgument(a, fdOpt));
+          return List(ctxOpt.value.argument()).map(a => this.processArgument(a, fdOpt));
       } else {
           return List().clear();
       }
@@ -571,42 +571,49 @@ public processArgument(ctx: ArgumentContext, fdOpt: Option<GQLFieldDefinition>):
     const name = this.textOf(ctx.NAME());
     const [fieldName, argDefOpt] = Option.of(fdOpt).nonEmpty() ? [fdOpt.value.name, fdOpt.value.args.find(a => a.name === name)] : None;
     if (argDefOpt.isEmpty()) {
-      this.check(ok = false, `unknown argument '${name}' on field '${fieldName}`, ctx); // TODO ?
+      check(false, `unknown argument '${name}' on field '${fieldName}`, ctx);
       return new GQLInvalidArgument(name, Left(new GQLStringValue('error')));
     } else {
       const expectedType = argDefOpt.get.gqlType.xsdType;
       const v = this.processValueOrVariable(ctx.valueOrVariable());
-      switch (v) {
-          case Left(_: GQLStringValue): return expectedType === 'xsd:string';
-          case Left(_: GQLIntValue): return expectedType === 'xsd:integer';
-          case Left(_: GQLBooleanValue): return expectedType === 'xsd:boolean';
-          case Right(some_val): switch (variables.find(a => a.name === variable.name)) {
-              case Some(vd: GQLVariableDefinition): return vd.gqlType.xsdType === expectedType;
-              default: return false;
+      let typeOk;
+      if (v.isLeft()) {
+          switch (v.get.constructor.name) {
+              case 'GQLStringValue': typeOk = expectedType === 'xsd:string'; break;
+              case 'GQLIntValue': typeOk =  expectedType === 'xsd:integer'; break;
+              case 'GQLBooleanValue': typeOk = expectedType === 'xsd:boolean';
+          }
+      } else {
+          const hasVar = this.variables.find(a => a.name === v.get.name);
+          if (hasVar) {
+              typeOk = hasVar.gqlType.xsdType === expectedType;
+          } else {
+              typeOk = false;
           }
       }
-      (name, typeOk); match; {
-        public case(ARG_FILTER,      true) => public GQLFilterArgument(name, v);
-        public case(ARG_ORDER,      true) => public GQLOrderArgument(name, v);
-        public case(ARG_LIMIT,      true) => public GQLLimitArgument(name, v);
-        public case(ARG_OFFSET,      true) => public GQLOffsetArgument(name, v);
-        public case(ARG_TRANSFORMS,      true) => public GQLTransformsArgument(name, v);
-        public case(ARG_PATTERNS,      true) => public GQLPatternsArgument(name, v);
-        public case(ARG_BOOSTERS,      true) => public GQLBoostersArgument(name, v);
-        public case(ARG_BINDINGS,      true) => public GQLBindingsArgument(name, v);
-        public case(ARG_INCLUDE_DEPRECATED,      true) => public GQLIncludeDeprecatedArgument(name, v);
-        public case(ARG_NAME,      true) => public GQLNameArgument(name, v);
-        public case(x,      true) => {
-          logger.info(`name = ${v}`);
-          GQLAnyArgument(name, v);
-        }
-        case (_) => /* keep compiler happy */ new GQLInvalidArgument(name, Left(new GQLStringValue('error')));
+
+      if (typeOk) {
+          switch (name) {
+              case ARG_TYPES.ARG_FILTER: return new GQLFilterArgument(name, v);
+              case ARG_TYPES.ARG_ORDER: return new GQLOrderArgument(name, v);
+              case ARG_TYPES.ARG_LIMIT: return new GQLLimitArgument(name, v);
+              case ARG_TYPES.ARG_OFFSET: return new GQLOffsetArgument(name, v);
+              case ARG_TYPES.ARG_TRANSFORMS: return new GQLTransformsArgument(name, v);
+              case ARG_TYPES.ARG_PATTERNS: return new GQLPatternsArgument(name, v);
+              case ARG_TYPES.ARG_BOOSTERS: return new GQLBoostersArgument(name, v);
+              case ARG_TYPES.ARG_BINDINGS: return new GQLBindingsArgument(name, v);
+              case ARG_TYPES.ARG_INCLUDE_DEPRECATED: return new GQLIncludeDeprecatedArgument(name, v);
+              case ARG_TYPES.ARG_NAME: return new GQLNameArgument(name, v);
+              default: return new GQLAnyArgument(name, v);
+          }
+      } else {
+          return new GQLInvalidArgument(name, Left(new GQLStringValue('error')));
       }
     }
   }
 
 public processInlineFragment(ctx: InlineFragmentContext): GQLInlineFragment {
-    return new GQLInlineFragment(textOf(ctx.typeCondition().typeName().NAME()),
+    return new GQLInlineFragment(this.textOf(ctx.typeCondition().typeName().NAME()),
         this.processDirectives(Option.of(ctx.directives())),
       this.processSelectionSet(ctx.selectionSet()));
 }
