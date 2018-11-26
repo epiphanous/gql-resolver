@@ -1,5 +1,5 @@
 import {None, Option} from 'funfix';
-import {GQLFieldBooster} from './GQLFieldBooster';
+import {GQLFieldBooster} from './GQLBooster';
 
 interface IGQLPattern {
     field: string;
