@@ -3,6 +3,7 @@ import { Failure, None, Option, Some, Success, Try} from 'funfix';
 import Map, {List} from 'immutable';
 import { pickBy } from 'lodash';
 import {
+    AbsFuncContext,
     BuiltinCallAtomContext, BuiltinCallContext,
     ComparisonPredicateContext, ExpressionContext, InVarPredicateContext, ParenPredicateContext,
     PredicateContext, PrimitiveExpressionContext,
@@ -402,6 +403,23 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             {${inTypes.join(',')}},' got '${expr.dataType}'`, context);
         }
         return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.expression})`, outType.getOrElse(expr.dataType));
+    }
+
+    public zeroArgBuiltin(
+        context: BuiltinCallContext,
+        name: string,
+        outType: string
+    ) {
+        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}()`, outType);
+    }
+
+    public processAbsFunction(context: AbsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+        return this.oneArgBuiltin(context, context.expression(), 'ABS', GQLObjectQueryModifierBuilderTypes.numeric);
+    }
+
+    public processBoundFunc(context: Qmp.BoundFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+        const expr = this.processFieldRef(context.fieldRef())
+        return new GQLObjectQueryModifierBasicPrimitiveExpression(`BOUND(${expr.expression})`, expr.dataType);
     }
 }
 
