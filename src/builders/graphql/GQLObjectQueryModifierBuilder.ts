@@ -1,8 +1,9 @@
 import {CharStream, Parser, TokenStream} from 'antlr4ts';
 import { Failure, None, Option, Some, Success, Try} from 'funfix';
 import Map, {List} from 'immutable';
+import { pickBy } from 'lodash';
 import {
-    BuiltinCallAtomContext,
+    BuiltinCallAtomContext, BuiltinCallContext,
     ComparisonPredicateContext, ExpressionContext, InVarPredicateContext, ParenPredicateContext,
     PredicateContext, PrimitiveExpressionContext,
     QueryModificationParser, SearchConditionAndContext,
@@ -19,7 +20,6 @@ import {
 } from '../../models/GQLObjectQueryModifierExpression';
 import {GQLVariableDefinition} from '../../models/GQLVariableDefinition';
 import BuilderBase from '../BuilderBase';
-import { pickBy } from 'lodash';
 
 abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     public PREFIXED_IRI_PATTERN: string;
@@ -155,7 +155,6 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                 .toMap();
         };
 
-
         if (isRoot) {
             const terms: List<GQLObjectQueryModifierDisjunction> = basicDisjunction.disjunctives;
             const fieldsInEachConjuction: Set<string> = () => {
@@ -235,13 +234,13 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 
         switch (op) {
             case '~' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                return GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
+                       return GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
             case '!~' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                return GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
+                        return GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
             case '~*' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                return GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
+                        return GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
             case '!~*' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                return GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
+                         return GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
             case _ : GQLObjectQueryBasicComparisonPredicate(lhs, op, rhs);
         }
     }
@@ -291,7 +290,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     }
 
     public processExpression(context: ExpressionContext): GQLObjectQueryModifierExpression {
-        switch(context.constructor.name) {
+        switch (context.constructor.name) {
             case 'PrimitiveExpressionContext': return this.processPrimitiveExpression(context);
             case 'ParenExpressionContext': return this.processParenExpression(context);
             case 'UnaryExpressionContext': return this.processUnaryExpression(context);
@@ -372,6 +371,38 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             case 'YearFuncContext'         : return this.processYearFunc(b);
         }
     }
+
+    public NArgBuiltin(context: BuiltinCallContext,
+                       expressions: [ExpressionContext],
+                       name: string,
+                       inTypes: List<List<string>>,
+                       outType: string
+                       ): GQLObjectQueryModifierBasicPrimitiveExpression {
+        const expr = List(expressions).map(ex => this.processExpression(ex));
+        expr.map((a, index) => [a, index]).forEach(elem => {
+            const tl = inTypes.size < elem[1] ? inTypes.last : inTypes.get(elem.get(1));
+            check(tl.contains(elem[0].dataType),
+                // tslint: disable-next-line
+                `wrong type for argument #${elem[1] + 1} of ${name} builtin; expecting one of {${tl.join(',')}}, got '${elem[0].dataType}'`,
+                context);
+        });
+        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.map(el => el.expression)
+            .join(', ')})`, outType);
+    }
+
+    public oneArgBuiltin(context: BuiltinCallContext,
+                         expression: ExpressionContext,
+                         name: string,
+                         inTypes: List<string>,
+                         outType: string
+    ) {
+        const expr = this.processExpression(expression);
+        if (inTypes.nonEmpty()) {
+            check(inTypes.contains(expr.dataType), `wrong type for ${name} builtin; expecting one of
+            {${inTypes.join(',')}},' got '${expr.dataType}'`, context);
+        }
+        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.expression})`, outType.getOrElse(expr.dataType));
+    }
 }
 
 const GQLObjectQueryModifierBuilderTypes = {
@@ -395,4 +426,4 @@ const GQLObjectQueryModifierBuilderTypes = {
     rURI_PATTERN      : new RegExp(this.URI_PATTERN),
     IRI_PATTERN       : '(<https?://.*>)',
     rIRI_PATTERN      : new RegExp(this.IRI_PATTERN)
-}
+};
