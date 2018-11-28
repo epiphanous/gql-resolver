@@ -10,9 +10,10 @@ import {
     DecimalLiteralContext, DoubleLiteralContext,
     DtRdfLiteralContext,
     ExistsFuncContext,
-    ExpressionContext, FactorExpressionContext, FieldRefAtomContext, FieldRefContext, FunctionCallAtomContext,
+    ExpressionContext, FactorExpressionContext, FieldRefAtomContext, FieldRefContext, FloorFuncContext,
+    FunctionCallAtomContext,
     FuncWithArgsContext,
-    FuncWithoutArgsContext,
+    FuncWithoutArgsContext, HoursFuncContext,
     IfFuncContext,
     InVarPredicateContext, IriFuncContext, IriRefAtomContext, IriRefContext, IriRefOrVarRefContext, IsBlankFuncContext,
     IsLiteralFuncContext,
@@ -49,9 +50,15 @@ import {
 } from '../../models/GQLObjectQueryModifierExpression';
 import {GQLVariableDefinition} from '../../models/GQLVariableDefinition';
 import BuilderBase from '../BuilderBase';
+import {Context} from "vm";
 
 abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     public result: any;
+    public PREFIXED_IRI_PATTERN: string;
+    public rPREFIXED_IRI_PATTERN: RegExp;
+    public vars: any;
+    public validFields: Map<string>;
+    public validVariables: Set<GQLVariableDefinition>;
     constructor(
         validFields: Map[string],
         validVariables: Set<GQLVariableDefinition>,
@@ -60,10 +67,11 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         source: string = 'filter'
     ) {
         super();
-
-        const result: any;
-
+        this.vars = vars;
+        this.PREFIXED_IRI_PATTERN = `(${prefixes.join('|')})_(.*)`;
+        this.rPREFIXED_IRI_PATTERN = new RegExp(this.PREFIXED_IRI_PATTERN);
     }
+
 
     public parser(tokenStream: TokenStream) {
         return new QueryModificationParser(tokenStream);
@@ -92,7 +100,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             if (!conjunctive.hasNot) {
                 let disjunctionOpt: Option<GQLObjectQueryModifierDisjunction> = conjunctive.expr.expr;
                 if (conjunctive.expr.expr instanceof GQLObjectQueryModifierParensExpression) {
-                    if (conjuctive.expr.expr.expr instanceof GQLObjectQueryModifierDisjunction) {
+                    if (conjunctive.expr.expr.expr instanceof GQLObjectQueryModifierDisjunction) {
                         disjunctionOpt = Some(conjunctive.expr.expr.expr);
                     } else {
                         disjunctionOpt = None;
@@ -102,47 +110,47 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                 } else {
                     disjunctionOpt = None;
                 }
-                if (disjunctionOpt.isDefined()) {
-                    const disjunction = this.simplifyDisjunction(disjunctionOpt.get);
+                if (disjunctionOpt.nonEmpty()) {
+                    const disjunction = this.simplifyDisjunction(disjunctionOpt.value);
                     if (disjunction.disjunctives.size === 1 && disjunction.values.isEmpty()) {
-                        return disjuction.disjunctives[0].conjuctives;
+                        return disjunction.disjunctives.get(0).conjunctives;
                     } else {
-                        return List(conjunctive);
+                        return List([conjunctive]);
                     }
                 } else {
-                    return List(conjuctive);
+                    return List([conjunctive]);
                 }
             } else {
-                return List(conjuctive);
+                return List([conjunctive]);
             }
         });
         return newConjunctives;
     }
 
     public simplifyDisjunction(disjunction: GQLObjectQueryModifierDisjunction): GQLObjectQueryModifierDisjunction {
-        if (disjunction.value.isEmpty) {
+        if (disjunction.values.isEmpty()) {
             const newDisjunctives = disjunction.disjunctives.map(a => this.simplifyConjunction(a)).flatMap(disjunctive => {
                 const conjunction = disjunctive;
-                if (conjunction.conjuctives.size === 1 && !!conjunction.conjuctives[0]) {
+                if (conjunction.conjunctives.size === 1 && !!conjunction.conjunctives.get(0)) {
                     let disjunctionOpt: Option<any>;
-                    if (conjunction.conjuctives[0].expr.expr instanceof GQLObjectQueryModifierParensExpression) {
-                        if (conjunction.conjuctives[0].expr.expr.expr instanceof GQLObjectQueryModifierDisjunction) {
-                            disjunctionOpt = Some(conjunction.conjuctives[0].expr.expr.expr);
+                    if (conjunction.conjunctives.get(0).expr.expr instanceof GQLObjectQueryModifierParensExpression) {
+                        if (conjunction.conjunctives.get(0).expr.expr.expr instanceof GQLObjectQueryModifierDisjunction) {
+                            disjunctionOpt = Some(conjunction.conjunctives.get(0).expr.expr.expr);
                         } else {
                             disjunctionOpt = None;
                         }
-                    } else if (conjunction.conjuctives[0].expr.expr instanceof GQLObjectQueryModifierDisjunction) {
-                        disjunctionOpt = Some(conjunction.conjuctives[0].expr.expr);
+                    } else if (conjunction.conjunctives.get(0).expr.expr instanceof GQLObjectQueryModifierDisjunction) {
+                        disjunctionOpt = Some(conjunction.conjunctives.get(0).expr.expr);
                     } else {
                         return None;
                     }
                     if (!disjunctionOpt.isEmpty()) {
                         return disjunctionOpt.get.disjunctives;
                     } else {
-                        return List(disjunctive);
+                        return List([disjunctive]);
                     }
                 } else {
-                    return List(disjunctive);
+                    return List([disjunctive]);
                 }
             });
             return new GQLObjectQueryModifierDisjunction(newDisjunctives, List().clear());
@@ -157,14 +165,14 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             List().clear())
         );
 
-        const getValidEqualityTermsInConjuction = (con: GQLObjectQueryModifierConjunction): Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression> => {
-            con.conjuctives.filterNot((a: any) => a.hasNot()).map(a => a.expr.expr)
+        const getValidEqualityTermsInconjunction = (con: GQLObjectQueryModifierConjunction): Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression> => {
+            con.conjunctives.filterNot((a: any) => a.hasNot()).map(a => a.expr.expr)
                 .flatMap((a: any) =>
                     a instanceof GQLObjectQueryBasicComparisonPredicate ? a : List().clear()
                 )
                 .flatMap((b: any) => {
                     if (b.op === '=') {
-                        if (b.lhs instanceof GQLObjectQueryModifierField && b.rhs instanceof GQLObjectQueryModifierPrimitiveExpression) {
+                        if (b.lhs instanceof GQLObjectQueryModifierField && b.rhs instanceof GQLObjectQueryModifierPrimitiveExpression && !b.rhs instanceof GQLObjectQueryModifierField) {
                             if (!b.rhs instanceof GQLObjectQueryModifierField) {
                                 return List().set(0, [b.lhs, b.rhs]);
                             }
@@ -181,34 +189,35 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         };
 
         if (isRoot) {
-            const terms: List<GQLObjectQueryModifierDisjunction> = basicDisjunction.disjunctives;
-            const fieldsInEachConjuction: Set<string> = () => {
+            const terms: List<GQLObjectQueryModifierDisjunction | GQLObjectQueryModifierConjunction> =
+                basicDisjunction.disjunctives;
+            const fieldsInEachconjunction: () => Set<string> = () => {
                 if (terms.isEmpty()) {
                     return new Set();
                 } else {
-                    const fieldsInHead = new Set(getValidEqualityTermsInConjuction(terms.first)
+                    const fieldsInHead = new Set(getValidEqualityTermsInconjunction(terms.first())
                         .keys.map(a => a.expression));
                     terms.slice(1).reduce((acc, current) => {
                         if (acc instanceof Set && current instanceof GQLObjectQueryModifierConjunction) {
-                            return acc.intersect(getValidEqualityTermsInConjuction(current)
+                            return acc.intersect(getValidEqualityTermsInconjunction(current)
                                 .keys.map(a => a.expression).toSet());
                         }
                     }, fieldsInHead);
                 }
             };
 
-            const values: List<Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>> = () => {
-                if (!fieldsInEachConjuction.isEmpty()) {
-                    return terms.map(x => pickBy(getValidEqualityTermsInConjuction(x), (val, key) =>
-                        fieldsInEachConjuction.contains(key.expression)
+            const values: () => List<Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>> = () => {
+                if (!fieldsInEachconjunction().isEmpty()) {
+                    return terms.map(x => pickBy(getValidEqualityTermsInconjunction(x), (val, key) =>
+                        fieldsInEachconjunction().contains(key.expression)
                     ));
                 } else {
                     return List();
                 }
             };
 
-            const valuesIsComplete = () => terms.map(x => x.conjuctives.size)
-                .every(r => r === fieldsInEachConjuction.size);
+            const valuesIsComplete = () => terms.map(x => x.conjunctives.size)
+                .every(r => r === fieldsInEachconjunction().size);
 
             const finalTerms = () => valuesIsComplete() ? List() : terms;
 
@@ -244,7 +253,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     public processComparisonPredicate(context: ComparisonPredicateContext): GQLObjectQueryModifierExpression {
         const lhs = this.processExpression(context.expression(0));
         const rhs = this.processExpression(context.expression(1));
-        const op = context.comparisonOp().getText();
+        const op = context.comparisonOp().text;
 
         List([
             GQLObjectQueryModifierBuilderTypes.numeric,
@@ -253,27 +262,30 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             GQLObjectQueryModifierBuilderTypes.dateTime
             ]).forEach(el => {
                 if (el.contains(lhs.dataType)) {
-                    check(el.contains(rhs.dataType), `${op} comparison predicate contains incompatible types`, context);
+                    this.check(el.contains(rhs.dataType),
+                        `${op} comparison predicate contains incompatible types`, context);
                 }
         });
 
+        // tslint:disable
         switch (op) {
-            case '~' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                       return GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
-            case '!~' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                        return GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
-            case '~*' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                        return GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
-            case '!~*' : check(string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                         return GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
-            case _ : GQLObjectQueryBasicComparisonPredicate(lhs, op, rhs);
+            case '~' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
+                       return new GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
+            case '!~' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
+                        return new GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
+            case '~*' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
+                        return new GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
+            case '!~*' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
+                         return new GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
+            case _ : new GQLObjectQueryBasicComparisonPredicate(lhs, op, rhs);
         }
+        // tslint:enable
     }
 
     public processInPredicate(context: InVarPredicateContext) {
         const not = Option.of(context.NOT()).nonEmpty() ? 'NOT' : '';
         const lhs = this.processExpression(context.expression());
-        const rhs = List(context.expressionList().expression()).map(a => this.processExpression(a));
+        const rhs = List(context.expressionList.expression()).map(a => this.processExpression(a));
 
         List([
             GQLObjectQueryModifierBuilderTypes.numeric,
@@ -282,12 +294,13 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             GQLObjectQueryModifierBuilderTypes.dateTime
         ]).forEach(el => {
                 if (el.contains(lhs.dataType)) {
-                    check(rhs.every(m => el.contains(m.dataType)), 'IN predicate contains incompatible types', context);
+                    this.check(rhs.every(m => el.contains(m.dataType)),
+                        'IN predicate contains incompatible types', context);
                 }
             });
 
-        return GQLObjectQueryModifierBasicExpression(
-            `${lhs.expression} ${not} in (${rhs.map(a => a.expression).join(', ')})`
+        return new GQLObjectQueryModifierBasicExpression(
+            `${lhs.expression} ${not} in (${rhs.map(a => a.expression).join(', ')})`, "xsd:boolean"
         );
     }
 
@@ -303,7 +316,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             GQLObjectQueryModifierBuilderTypes.dateTime
         ]).forEach(el => {
             if (el.contains(lhs.dataType)) {
-                check(rhsVar.dataType === lhs.dataType, 'IN predicate contains incompatible types', context);
+                this.check(rhsVar.dataType === lhs.dataType, 'IN predicate contains incompatible types', context);
             }
         });
         return new GQLObjectQueryModifierBasicExpression(`${lhs.expression} ${not} IN (${rhsVar.expression})`,
@@ -314,35 +327,35 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         return new GQLObjectQueryModifierParensExpression(this.processSearchCondition(context.searchCondition()));
     }
 
-    public processExpression(context: ExpressionContext): GQLObjectQueryModifierExpression {
+    public processExpression(context: any): GQLObjectQueryModifierExpression {
         switch (context.constructor.name) {
             case 'PrimitiveExpressionContext': return this.processPrimitiveExpression(context);
             case 'ParenExpressionContext': return this.processParenExpression(context);
             case 'UnaryExpressionContext': return this.processUnaryExpression(context);
             case 'FactorExpressionContext': return this.processFactorExpression(context);
             case 'TermExpressionContext': return this.processTermExpression(context);
-            default: return new GQLObjectQueryModifierBasicExpression(context.getText(), 'error');
+            default: return new GQLObjectQueryModifierBasicExpression(context.text, 'error');
         }
     }
 
-    public processPrimitiveExpression(context: PrimitiveExpressionContext): GQLObjectQueryModifierPrimitiveExpression {
+    public processPrimitiveExpression(context: any): GQLObjectQueryModifierPrimitiveExpression | GQLObjectQueryModifierBasicPrimitiveExpression {
         switch (context.expressionAtom().constructor.name) {
-            case 'BuiltinCallAtomContext' : return this.processBuiltinCallAtom(e);
-            case 'FunctionCallAtomContext' : return this.processFunctionCallAtom(e);
-            case 'RdfLiteralAtomContext' : return this.processRdfLiteralAtom(e);
-            case 'StringLiteralAtomContext' : return this.processStringLiteralAtom(e);
-            case 'BooleanLiteralAtomContext' : return this.processBooleanLiteralAtom(e);
-            case 'NumericLiteralAtomContext' : return this.processNumericLiteralAtom(e);
-            case 'IriRefAtomContext' : return this.processIriRefAtom(e);
-            case 'FieldRefAtomContext' : return this.processFieldRefAtom(e);
-            case 'VarRefAtomContext' : return this.processVarRefAtom(e);
+            case 'BuiltinCallAtomContext' : return this.processBuiltInCallAtom(context.expressionAtom());
+            case 'FunctionCallAtomContext' : return this.processFunctionCallAtom(context.expressionAtom());
+            case 'RdfLiteralAtomContext' : return this.processRdfLiteralAtom(context.expressionAtom());
+            case 'StringLiteralAtomContext' : return this.processStringLiteralAtom(context.expressionAtom());
+            case 'BooleanLiteralAtomContext' : return this.processBooleanLiteralAtom(context.expressionAtom());
+            case 'NumericLiteralAtomContext' : return this.processNumericLiteralAtom(context.expressionAtom());
+            case 'IriRefAtomContext' : return this.processIriRefAtom(context.expressionAtom());
+            case 'FieldRefAtomContext' : return this.processFieldRefAtom(context.expressionAtom());
+            case 'VarRefAtomContext' : return this.processVarRefAtom(context.expressionAtom());
         }
     }
 
-    public processBuiltInCallAtom(context: BuiltinCallAtomContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processBuiltInCallAtom(context: any): GQLObjectQueryModifierBasicPrimitiveExpression {
         switch (context.builtinCall().constructor.name) {
-            case 'AbsFuncContext'          : return this.processAbsFunc(context.builtinCall());
-            case 'BnodeFuncContext'        : return this.processBnodeFunc(context.builtinCall());
+            case 'AbsFuncContext'          : return this.processAbsFunction(context.builtinCall());
+            case 'BnodeFuncContext'        : return this.processBnodeFunction(context.builtinCall());
             case 'BoundFuncContext'        : return this.processBoundFunc(context.builtinCall());
             case 'CeilFuncContext'         : return this.processCeilFunc(context.builtinCall());
             case 'CoalesceFuncContext'     : return this.processCoalesceFunc(context.builtinCall());
@@ -350,7 +363,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             case 'ContainsFuncContext'     : return this.processContainsFunc(context.builtinCall());
             case 'DatatypeFuncContext'     : return this.processDatatypeFunc(context.builtinCall());
             case 'DayFuncContext'          : return this.processDayFunc(context.builtinCall());
-            case 'EncodeForUriFuncContext' : return this.processEncodeForUriFunc(context.builtinCall());
+            case 'EncodeForUriFuncContext' : return this.processEncodeForUriFunction(context.builtinCall());
             case 'ExistsFuncContext'       : return this.processExistsFunc(context.builtinCall());
             case 'FloorFuncContext'        : return this.processFloorFunc(context.builtinCall());
             case 'HoursFuncContext'        : return this.processHoursFunc(context.builtinCall());
@@ -398,17 +411,17 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     }
 
     public NArgBuiltin(context: BuiltinCallContext,
-                       expressions: [ExpressionContext],
+                       expressions: ExpressionContext[],
                        name: string,
                        inTypes: List<List<string>>,
                        outType: string
                        ): GQLObjectQueryModifierBasicPrimitiveExpression {
         const expr = List(expressions).map(ex => this.processExpression(ex));
         expr.map((a, index) => [a, index]).forEach(elem => {
-            const tl = inTypes.size < elem[1] ? inTypes.last : inTypes.get(elem.get(1));
-            check(tl.contains(elem[0].dataType),
+            const tl = inTypes.size < elem.get(1) ? inTypes.last : inTypes.get(elem.get(1));
+            this.check(tl.contains(elem.get(0).dataType),
                 // tslint: disable-next-line
-                `wrong type for argument #${elem[1] + 1} of ${name} builtin; expecting one of {${tl.join(',')}}, got '${elem[0].dataType}'`,
+                `wrong type for argument #${elem.get(1) + 1} of ${name} builtin; expecting one of {${tl.join(',')}}, got '${elem.get(0).dataType}'`,
                 context);
         });
         return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.map(el => el.expression)
@@ -419,14 +432,14 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                          expression: ExpressionContext,
                          name: string,
                          inTypes: List<string>,
-                         outType: string
+                         outType: Option<string> = None
     ) {
         const expr = this.processExpression(expression);
-        if (inTypes.nonEmpty()) {
-            check(inTypes.contains(expr.dataType), `wrong type for ${name} builtin; expecting one of
+        if (!inTypes.isEmpty()) {
+            this.check(inTypes.contains(expr.dataType), `wrong type for ${name} builtin; expecting one of
             {${inTypes.join(',')}},' got '${expr.dataType}'`, context);
         }
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.expression})`, outType.getOrElse(expr.dataType));
+        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.expression})`, outType.value || expr.dataType);
     }
 
     public zeroArgBuiltin(
@@ -452,25 +465,25 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 
     public processCoalesceFunc(context: CoalesceFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expressionList().expression(), 'COALESCE', List(),
-            context.iriRefOrVarRef().getText());
+            context.iriRefOrVarRef().text);
     }
 
     public processConcatFunc(context: ConcatFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expressionList().expression(),
-            'CONCAT', List(string), 'xsd:string');
+            'CONCAT', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string');
     }
     public processContainsFunc(context: ContainsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'CONTAINS', List(string), 'xsd:boolean');
+        return this.NArgBuiltin(context, context.expression(), 'CONTAINS', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean');
     }
     public processDatatypeFunc(context: DatatypeFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'DATATYPE', string);
+        return this.oneArgBuiltin(context, context.expression(), 'DATATYPE', GQLObjectQueryModifierBuilderTypes.string);
     }
     public processDayFunc(context: DayFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'DAY', dateTime, Some('xsd:integer'));
+        return this.oneArgBuiltin(context, context.expression(), 'DAY', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer'));
     }
 
     public processEncopublicorUriFunc(context: EncopublicorUriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'ENCODE_FOR_URI', string);
+        return this.oneArgBuiltin(context, context.expression(), 'ENCODE_FOR_URI', GQLObjectQueryModifierBuilderTypes.string);
     }
 
     public processExistsFunc(context: ExistsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
@@ -478,59 +491,71 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         return new GQLObjectQueryModifierBasicPrimitiveExpression(`EXISTS { ${s} ${p} ${o} }`, 'xsd:boolean');
     }
 
-    public processFloorFunc(context: Qmp.FloorFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'FLOOR', numeric);
+    public processFloorFunc(context: FloorFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+        return this.oneArgBuiltin(context, context.expression(), 'FLOOR', GQLObjectQueryModifierBuilderTypes.numeric);
     }
-    public processHoursFunc(context: Qmp.HoursFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'HOURS', dateTime, Some('xsd:integer'));
+    public processHoursFunc(context: HoursFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+        return this.oneArgBuiltin(context, context.expression(), 'HOURS', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer'));
     }
 
     public processIfFunc(context: IfFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        const predicate = this.processpredicate(context.predicate());
+        const predicate = this.processPredicate(context.predicate());
         const trueExpr = this.processExpression(context.expression(0));
         const falseExpr = this.processExpression(context.expression(1));
-        check(trueExpr.dataType === falseExpr.dataType,
+        this.check(trueExpr.dataType === falseExpr.dataType,
             'mismatched return types for true and false branches of IF() builtin', context);
         return new GQLObjectQueryModifierBasicPrimitiveExpression(
-            `IF(${prediate.expression}, ${trueExpr.expression}, ${falseExpr.expression})`, trueExpr.dataType
+            `IF(${predicate.expression}, ${trueExpr.expression}, ${falseExpr.expression})`, trueExpr.dataType
         );
     }
 
     public processIriFunc(context: IriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'IRI', List('xsd:string', 'iri'), Some('iri')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'IRI', List(['xsd:string', 'iri']), Some('iri')); }
 
     public processIsBlankFunc(context: IsBlankFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'IsBLANK', List.empty, Some('xsd:boolean')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'IsBLANK', List(), Some('xsd:boolean')); }
 
     public processIsIriFunc(context: IsIriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'IsIRI', List.empty, Some('xsd:boolean')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'IsIRI', List(), Some('xsd:boolean')); }
 
     public processIsLiteralFunc(context: IsLiteralFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'IsLITERAL', List.empty, Some('xsd:boolean')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'IsLITERAL', List(), Some('xsd:boolean')); }
 
     public processIsNumericFunc(context: IsNumericFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'IsNUMERIC', List.empty, Some('xsd:boolean')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'IsNUMERIC', List(), Some('xsd:boolean')); }
 
     public processIsURIFunc(context: IsURIFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'IsURI', List.empty, Some('xsd:boolean')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'IsURI', List(), Some('xsd:boolean')); }
 
     public processLangFunc(context: LangFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'LANG', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'LANG', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processLangMatchesFunc(context: LangMatchesFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'LANGMATCHES', List(string), 'xsd:boolean'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'LANGMATCHES', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
     public processLcaseFunc(context: LcaseFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'LCASE', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'LCASE', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processMd5Func(context: Md5FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'MD5', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'MD5', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processMinutesFunc(context: MinutesFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'MINUTES', dateTime, Some('xsd:integer')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'MINUTES', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer')); }
 
     public processMonthFunc(context: MonthFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'MONTH', dateTime, Some('xsd:integer')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'MONTH', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer')); }
 
     public processNowFunc(context: NowFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.zeroArgBuiltin(context, 'NOW', 'xsd:dateTime'); }
@@ -539,13 +564,16 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         return this.zeroArgBuiltin(context, 'RAND', 'xsd:double'); }
 
     public processRegexFunc(context: RegexFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'REGEX', List(string), 'xsd:boolean'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'REGEX', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
     public processReplaceFunc(context: ReplaceFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'REPLACE', List(string), 'xsd:string'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'REPLACE', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string'); }
 
     public processRoundFunc(context: RoundFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'ROUND', numeric); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'ROUND', GQLObjectQueryModifierBuilderTypes.numeric); }
 
     public processSameTermFunc(context: SameTermFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
         return new GQLObjectQueryModifierBasicPrimitiveExpression(`sameTerm(${List(context.fieldRef())
@@ -553,73 +581,94 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 )`, 'xsd:boolean'); }
 
     public processSecondsFunc(context: SecondsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'SECONDS', dateTime, Some('xsd:double')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'SECONDS', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:double')); }
 
     public processSha1Func(context: Sha1FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'SHA1', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'SHA1', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processSha256Func(context: Sha256FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'SHA256', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'SHA256', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processSha384Func(context: Sha384FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'SHA384', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'SHA384', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processSha512Func(context: Sha512FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'SHA512', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'SHA512', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processStrFunc(context: StrFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'STR', List.empty, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(), 'STR', List(), Some('xsd:string')); }
 
     public processStrAfterFunc(context: StrAfterFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'STRAFTER', List(string), 'xsd:string'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'STRAFTER', List(GQLObjectQueryModifierBuilderTypes.string), 'xsd:string'); }
 
     public processStrBeforeFunc(context: StrBeforeFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'STRBEFORE', List(string), 'xsd:string'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'STRBEFORE', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string'); }
 
     public StrDtFunc(context: StrDtFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
         const str = this.processExpression(context.expression());
-        check(string.contains(str.dataType),
+        this.check(GQLObjectQueryModifierBuilderTypes.string.contains(str.dataType),
             `wrong type for argument #1 of STRDT() builtin; expecting one of {xsd:string}, got '${str.dataType}'`,
             context);
-        const iripublic = context.iriRefOrVarRef().getText();
+        const iriDef = context.iriRefOrVarRef().text;
         return new GQLObjectQueryModifierPrimitiveExpression(`STRDT(${str.expression}, ${iriDef})`, iriDef);
     }
 
     public processStrEndsFunc(context: StrEndsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'STRENDS', List(string), 'xsd:boolean'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'STRENDS', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
     public processStrLangFunc(context: StrLangFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'STRLANG', List(string), 'xsd:string'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'STRLANG', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string'); }
 
     public processStrLenFunc(context: StrLenFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'STRLEN', string, Some('xsd:integer')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'STRLEN', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:integer')); }
 
     public processStrStartsFunc(context: StrStartsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'STRSTARTS', List(string), 'xsd:boolean'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'STRSTARTS', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
     public processStrUuidFunc(context: StrUuidFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.zeroArgBuiltin(context, 'STRUUID', 'xsd:string'); }
+        return this.zeroArgBuiltin(context, 'STRUUID',
+            'xsd:string'); }
 
     public processSubstrFunc(context: SubstrFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.NArgBuiltin(context, context.expression(), 'SUBSTR', List(string, integer), 'xsd:string'); }
+        return this.NArgBuiltin(context, context.expression(),
+            'SUBSTR',
+            List([GQLObjectQueryModifierBuilderTypes.string, GQLObjectQueryModifierBuilderTypes.integer]),
+            'xsd:string');
+    }
 
     public processTimezoneFunc(context: TimezoneFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'TIMEZONE', dateTime, Some('xsd:dayTimeDuration')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'TIMEZONE', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:dayTimeDuration')); }
 
     public processTzFunc(context: TzFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'TZ', dateTime, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'TZ', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:string')); }
 
     public processUcaseFunc(context: UcaseFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'UCASE', string, Some('xsd:string')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'UCASE', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
     public processUriFunc(context: UriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'URI', List('xsd:string', 'iri'), Some('iri')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'URI', List(['xsd:string', 'iri']), Some('iri')); }
 
     public processUuidFunc(context: UuidFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.zeroArgBuiltin(context, 'UUID', 'iri'); }
 
     public processYearFunc(context: YearFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return this.oneArgBuiltin(context, context.expression(), 'YEAR', dateTime, Some('integer')); }
+        return this.oneArgBuiltin(context, context.expression(),
+            'YEAR', GQLObjectQueryModifierBuilderTypes.dateTime, Some('integer')); }
 
     public processFunctionCallAtom(context: FunctionCallAtomContext) {
         const val = context.functionCall();
@@ -630,21 +679,21 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     public processRdfLiteralAtom(context: RdfLiteralAtomContext) {
         const val = context.rdfLiteral();
         if (val instanceof LangRdfLiteralContext) {
-            return new GQLObjectQueryModifierPrimitiveExpression(lang.getText(), 'xsd:string');
+            return new GQLObjectQueryModifierPrimitiveExpression(val.text, 'xsd:string');
         }
         if (val instanceof DtRdfLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(dt.getText(), dt.iriRef().getText());
+            return new GQLObjectQueryModifierBasicPrimitiveExpression(val.text, val.iriRef().text);
         }
     }
 
     public processStringLiteralAtom(context: StringLiteralAtomContext) {
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(context.getText(), 'xsd:string');
+        return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:string');
     }
 
     public processStringLiteralOrVarRef(context: StringLiteralOrVarRefContext) {
         const optOfStrLit = Option.of(context.stringLiteral());
         if (optOfStrLit.nonEmpty()) {
-            return Option.of(optOfStrLit.value.getText()).getOrElse('');
+            return Option.of(optOfStrLit.value.text).getOrElse('');
         } else {
             const optOfVarRef = Option.of(context.varRef());
             if (optOfVarRef.nonEmpty()) {
@@ -664,7 +713,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             if (optOfVarRef.nonEmpty()) {
                 return this.processVarRef(optOfVarRef.value);
             } else {
-                return new GQLObjectQueryModifierBasicExpression(context.getText(), 'error');
+                return new GQLObjectQueryModifierBasicExpression(context.text, 'error');
             }
         }
     }
@@ -675,18 +724,18 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 
     public processNumericLiteral(context: NumericLiteralContext) {
         if (context instanceof IntegerLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.getText(), 'xsd:integer');
+            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:integer');
         }
         if (context instanceof DecimalLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.getText(), 'xsd:decimal');
+            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:decimal');
         }
         if (context instanceof DoubleLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.getText(), 'xsd:doubel');
+            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:doubel');
         }
     }
 
     public processBooleanLiteralAtom(context: BooleanLiteralAtomContext) {
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(context.booleanLiteral().getText(), 'xsd:boolean');
+        return new GQLObjectQueryModifierBasicPrimitiveExpression(context.booleanLiteral().text, 'xsd:boolean');
     }
 
     public processIriRefAtom(context: IriRefAtomContext) {
@@ -695,10 +744,10 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 
     public processIriRef(context: IriRefContext) {
         if (context instanceof LiteralIriRefContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.getText(), 'iri');
+            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'iri');
         }
         if (context instanceof PrefixedNameIriRefContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.prefixedName().getText(), 'iri');
+            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.prefixedName().text, 'iri');
         }
     }
 
@@ -707,12 +756,12 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     }
 
     public processFieldRef(context: FieldRefContext) {
-        const field = context.getText();
-        if (validFields.get(field)) {
+        const field = context.text;
+        if (this.validFields.get(field)) {
             return new GQLObjectQueryModifierField(
-                field === RDFQueryService.ID_KEY ? `?${RDFQueryService.SUBJECT_BINDING}` : `?${field}`, field.getType());
+                field === RDFQueryService.ID_KEY ? `?${RDFQueryService.SUBJECT_BINDING}` : `?${field}`, typeof field);
         } else {
-            check(false, `invalid field reference '${field}'`, context);
+            this.check(false, `invalid field reference '${field}'`, context);
         }
     }
 
@@ -721,39 +770,39 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     }
 
     public processVarRef(context: VarRefContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        const variable = context.VARNAME().getText();
-        const vd = validVariables.find(a => a.name === variable);
-        check(vd.isDefined(), `unknown variable reference '${variable}'`, context);
-        const value = vars.get(variable);
-        check(value.isDefined(), `no value provided for referenced variable '${variable}', vars: ${vars}`, context);
+        const variable = context.VARNAME().text;
+        const vd = this.validVariables.find(a => a.name === variable);
+        this.check(vd.isDefined(), `unknown variable reference '${variable}'`, context);
+        const value = this.vars.get(variable);
+        this.check(value.isDefined(), `no value provided for referenced variable '${variable}', vars: ${this.vars}`, context);
         const filterExpr = this.asDataType(value.getOrElse('error'));
         const t = vd ? vd[0].gqlType.xsdType : 'error';
-        // TODO check() whether filterExpr.dataType == t
+        // TODO this.check() whether filterExpr.dataType == t
         return filterExpr;
     }
 
     public processFuncWithArgs(context: FuncWithArgsContext) {
-        const returnType = context.prefixedName().getText();
-        const funcName = context.iriRef().getText();
+        const returnType = context.prefixedName().text;
+        const funcName = context.iriRef().text;
         return new GQLObjectQueryModifierBasicPrimitiveExpression(`${funcName}(
             ${List(context.expressionList().expression()).map(a => this.processExpression(a)).map(a => a.expression).join(', ')}
         )`, returnType);
     }
 
     public processFuncWithoutArgs(context: FuncWithoutArgsContext) {
-        const returnType = context.prefixedName().getText();
-        const funcName = context.iriRef().getText();
+        const returnType = context.prefixedName().text;
+        const funcName = context.iriRef().text;
         return new GQLObjectQueryModifierBasicPrimitiveExpression(`${funcName}()`, returnType);
     }
 
-    public quotedDataType(value: Any, dataType: Option<string>): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public quotedDataType(value: any, dataType: Option<string>): GQLObjectQueryModifierBasicPrimitiveExpression {
         const s = `"${value}"${
                 dataType.nonEmpty() ? `^^${dataType.value}` : ''
             }`;
         return new GQLObjectQueryModifierBasicPrimitiveExpression(s, dataType.getOrElse('xsd:string'), Some(value));
     }
 
-    public asDataType(value: Any): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public asDataType(value: any): GQLObjectQueryModifierBasicPrimitiveExpression {
         if (value instanceof Number) {
             if (value.toString().includes('.')) {
                 return this.quotedDataType(value, Some('xsd:double'));
@@ -770,10 +819,11 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                     .map(a => a.expression).join(', '), recValue.first().dataType);
             }
         }
-        if (value instanceof String) {
+        if (typeof value === 'string') {
             if (GQLObjectQueryModifierBuilderTypes.rDATETIME_PATTERN.test(value)) {
-                const regexed = GQLObjectQueryModifierBuilderTypes.rDATETIME_PATTERN.exec(value).split('-');
-                return this.quotedDataType(`${regexed[0]}T${rexeged[1]}${Option.of(regexed[2]).getOrElse('')}`, Some('xsd:dateTime'));
+                const regexed = GQLObjectQueryModifierBuilderTypes.rDATETIME_PATTERN.exec(value)[0].split('-');
+                // tslint:disable-next-line
+                return this.quotedDataType(`${regexed[0]}T${regexed[1]}${Option.of(regexed[2]).getOrElse('')}`, Some('xsd:dateTime'));
             }
             if (GQLObjectQueryModifierBuilderTypes.rDATE_PATTERN.test(value)) {
                 return this.quotedDataType(value, Some('xsd:date'));
@@ -784,8 +834,8 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             if (GQLObjectQueryModifierBuilderTypes.rURI_PATTERN.test(value)) {
                 return this.quotedDataType(value, Some('xsd:anyURI'));
             }
-            if (GQLObjectQueryModifierBuilderTypes.rPREFIXED_IRI_PATTERN.test(value)) {
-                const regexed = GQLObjectQueryModifierBuilderTypes.rPREFIXED_IRI_PATTERN.exec(value).split('_');
+            if (this.rPREFIXED_IRI_PATTERN.test(value)) {
+                const regexed = this.rPREFIXED_IRI_PATTERN.exec(value)[0].split('_');
                 return new GQLObjectQueryModifierBasicPrimitiveExpression(`${regexed[0]}:${regexed[1]}`, 'iri');
             }
             if (GQLObjectQueryModifierBuilderTypes.rIRI_PATTERN.test(value)) {
@@ -798,39 +848,39 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 
     public processParenExpression(context: ParenExpressionContext) {
         const expr = this.processExpression(context.expression());
-        return new GQLObjectQueryModifierBasicExpression(`(${expr.expression()})`, expr.dataType);
+        return new GQLObjectQueryModifierBasicExpression(`(${expr.expression})`, expr.dataType);
     }
 
     public processUnaryExpression(context: UnaryExpressionContext) {
-        const op = context.unaryOp().getText() === '-' ? '-' : '';
+        const op = context.unaryOp().text === '-' ? '-' : '';
         const expr = this.processExpression(context.expression());
-        check(GQLObjectQueryModifierBuilderTypes.numeric.contains(expr.dataType),
+        this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(expr.dataType),
             `invalid unary expression; expecting numeric but got ${expr.dataType } expression`, context);
-        return new GQLObjectQueryModifierBasicExpression(`${op}${expr.expression()}`, expr.dataType);
+        return new GQLObjectQueryModifierBasicExpression(`${op}${expr.expression}`, expr.dataType);
     }
 
     public processFactorExpression(context: FactorExpressionContext) {
-        const op = context.factorOp().getText();
+        const op = context.factorOp().text;
         const lhs = this.processExpression(context.expression(0));
         const rhs = this.processExpression(context.expression(1));
-        check(GQLObjectQueryModifierBuilderTypes.numeric.contains(lhs.dataType),
+        this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(lhs.dataType),
             `invalid binary expression with '$op'; expecting numeric but got ${lhs.dataType } left operand`, context);
-        check(GQLObjectQueryModifierBuilderTypes.numeric.contains(rhs.dataType),
+        this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(rhs.dataType),
             `invalid binary expression with '$op'; expecting numeric but got ${rhs.dataType } right operand`, context);
-        return new GQLObjectQueryModifierBasicExpression(`${lhs.expression()} ${op} ${rhs.expression()}`,
+        return new GQLObjectQueryModifierBasicExpression(`${lhs.expression} ${op} ${rhs.expression}`,
             this.resolveTypes(lhs.dataType, rhs.dataType));
 
     }
 
     public processTermExpression(context: TermExpressionContext) {
-        const op = context.termOp().getText;
+        const op = context.termOp().text;
         const lhs = this.processExpression(context.expression(0));
         const rhs = this.processExpression(context.expression(1));
-        check(GQLObjectQueryModifierBuilderTypes.numeric.contains(lhs.dataType),
+        this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(lhs.dataType),
              `invalid binary expression with '$op'; expecting numeric but got ${lhs.dataType } left operand`, context);
-        check(GQLObjectQueryModifierBuilderTypes.numeric.contains(rhs.dataType),
+        this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(rhs.dataType),
             `invalid binary expression with '$op'; expecting numeric but got ${rhs.dataType } right operand`, context);
-        return new GQLObjectQueryModifierBasicExpression(`${lhs.expression()}, ${op} ${rhs.expression()}`,
+        return new GQLObjectQueryModifierBasicExpression(`${lhs.expression}, ${op} ${rhs.expression}`,
             this.resolveTypes(lhs.dataType, rhs.dataType));
     }
 
@@ -862,7 +912,5 @@ const GQLObjectQueryModifierBuilderTypes = {
     URI_PATTERN       : '(https?://.*)',
     rURI_PATTERN      : new RegExp(this.URI_PATTERN),
     IRI_PATTERN       : '(<https?://.*>)',
-    rIRI_PATTERN      : new RegExp(this.IRI_PATTERN),
-    PREFIXED_IRI_PATTERN = `(${prefixes.join('|')})_(.*)`,
-    rPREFIXED_IRI_PATTERN = new RegExp(PREFIXED_IRI_PATTERN),
+    rIRI_PATTERN      : new RegExp(this.IRI_PATTERN)
 };
