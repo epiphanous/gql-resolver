@@ -7,7 +7,7 @@ import * as QME from '../../models/GQLObjectQueryModifierExpression';
 import {GQLVariableDefinition} from '../../models/GQLVariableDefinition';
 import BuilderBase from '../BuilderBase';
 
-export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
+export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     public result: any;
     public PREFIXED_IRI_PATTERN: string;
     public rPREFIXED_IRI_PATTERN: RegExp;
