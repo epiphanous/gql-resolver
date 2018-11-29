@@ -1,68 +1,23 @@
 import {CharStream, Parser, TokenStream} from 'antlr4ts';
 import { Failure, None, Option, Some, Success, Try} from 'funfix';
-import Map, {List} from 'immutable';
+import {List, Map} from 'immutable';
 import { pickBy } from 'lodash';
-import {IntegerLiteralContext, IsIriFuncContext} from '../../../generated/src/antlr4/QueryModificationParser';
-import {
-    AbsFuncContext, BooleanLiteralAtomContext, BoundFuncContext,
-    BuiltinCallAtomContext, BuiltinCallContext, CeilFuncContext, CoalesceFuncContext,
-    ComparisonPredicateContext, ConcatFuncContext, ContainsFuncContext, DatatypeFuncContext, DayFuncContext,
-    DecimalLiteralContext, DoubleLiteralContext,
-    DtRdfLiteralContext,
-    ExistsFuncContext,
-    ExpressionContext, FactorExpressionContext, FieldRefAtomContext, FieldRefContext, FloorFuncContext,
-    FunctionCallAtomContext,
-    FuncWithArgsContext,
-    FuncWithoutArgsContext, HoursFuncContext,
-    IfFuncContext,
-    InVarPredicateContext, IriFuncContext, IriRefAtomContext, IriRefContext, IriRefOrVarRefContext, IsBlankFuncContext,
-    IsLiteralFuncContext,
-    IsNumericFuncContext,
-    IsURIFuncContext, LangFuncContext, LangMatchesFuncContext, LangRdfLiteralContext, LcaseFuncContext,
-    LiteralIriRefContext, Md5FuncContext,
-    MinutesFuncContext,
-    MonthFuncContext, NowFuncContext, NumericLiteralAtomContext, NumericLiteralContext, ParenExpressionContext,
-    ParenPredicateContext,
-    PredicateContext, PrefixedNameIriRefContext, PrimitiveExpressionContext,
-    QueryModificationParser, RandFuncContext, RdfLiteralAtomContext, RegexFuncContext, ReplaceFuncContext,
-    RoundFuncContext,
-    SameTermFuncContext,
-    SearchConditionAndContext,
-    SearchConditionContext, SearchConditionNotContext, SecondsFuncContext, Sha1FuncContext, Sha256FuncContext,
-    Sha384FuncContext, Sha512FuncContext, StrAfterFuncContext, StrBeforeFuncContext, StrDtFuncContext,
-    StrEndsFuncContext, StrFuncContext, StringLiteralAtomContext, StringLiteralOrVarRefContext, StrLangFuncContext,
-    StrLenFuncContext,
-    StrStartsFuncContext, StrUuidFuncContext,
-    SubstrFuncContext, TermExpressionContext, TimezoneFuncContext, TzFuncContext, UcaseFuncContext,
-    UnaryExpressionContext, UriFuncContext,
-    UuidFuncContext,
-    VarRefAtomContext, VarRefContext,
-    YearFuncContext
-} from '../../antlr4/generated/QueryModificationParser';
-import {
-    GQLObjectQueryBasicComparisonPredicate, GQLObjectQueryModifierBasicExpression,
-    GQLObjectQueryModifierBasicPrimitiveExpression,
-    GQLObjectQueryModifierConjunction,
-    GQLObjectQueryModifierDisjunction, GQLObjectQueryModifierExpression, GQLObjectQueryModifierField,
-    GQLObjectQueryModifierOptionalNegation,
-    GQLObjectQueryModifierParensExpression, GQLObjectQueryModifierPredicate,
-    GQLObjectQueryModifierPrimitiveExpression
-} from '../../models/GQLObjectQueryModifierExpression';
+import * as QMP from '../../antlr4/generated/QueryModificationParser';
+import * as QME from '../../models/GQLObjectQueryModifierExpression';
 import {GQLVariableDefinition} from '../../models/GQLVariableDefinition';
 import BuilderBase from '../BuilderBase';
-import {Context} from "vm";
 
-abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
+export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     public result: any;
     public PREFIXED_IRI_PATTERN: string;
     public rPREFIXED_IRI_PATTERN: RegExp;
     public vars: any;
-    public validFields: Map<string>;
+    public validFields: Map<string, string>;
     public validVariables: Set<GQLVariableDefinition>;
     constructor(
-        validFields: Map[string],
+        validFields: Map<string, string>,
         validVariables: Set<GQLVariableDefinition>,
-        vars: Map[any],
+        vars: Map<any, string>,
         prefixes: Set<string>,
         source: string = 'filter'
     ) {
@@ -74,11 +29,11 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 
 
     public parser(tokenStream: TokenStream) {
-        return new QueryModificationParser(tokenStream);
+        return new QMP.QueryModificationParser(tokenStream);
     }
 
     public lexer(input: CharStream) {
-        return new GQLObjectQueryModifierLexer(input);
+        return new QMP.GQLObjectQueryModifierLexer(input);
     }
 
     public build(parser: Parser) {
@@ -95,17 +50,17 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         }
     }
 
-    public simplifyConjunction(conjunction: GQLObjectQueryModifierConjunction): GQLObjectQueryModifierConjunction {
+    public simplifyConjunction(conjunction: QME.GQLObjectQueryModifierConjunction): QME.GQLObjectQueryModifierConjunction {
         const newConjunctives = conjunction.conjunctives.flatMap(conjunctive => {
             if (!conjunctive.hasNot) {
-                let disjunctionOpt: Option<GQLObjectQueryModifierDisjunction> = conjunctive.expr.expr;
-                if (conjunctive.expr.expr instanceof GQLObjectQueryModifierParensExpression) {
-                    if (conjunctive.expr.expr.expr instanceof GQLObjectQueryModifierDisjunction) {
+                let disjunctionOpt: Option<QME.GQLObjectQueryModifierDisjunction> = conjunctive.expr.expr;
+                if (conjunctive.expr.expr instanceof QME.GQLObjectQueryModifierParensExpression) {
+                    if (conjunctive.expr.expr.expr instanceof QME.GQLObjectQueryModifierDisjunction) {
                         disjunctionOpt = Some(conjunctive.expr.expr.expr);
                     } else {
                         disjunctionOpt = None;
                     }
-                } else if (conjunctive.expr.expr instanceof GQLObjectQueryModifierDisjunction) {
+                } else if (conjunctive.expr.expr instanceof QME.GQLObjectQueryModifierDisjunction) {
                     disjunctionOpt = Some(conjunctive.expr.expr);
                 } else {
                     disjunctionOpt = None;
@@ -127,19 +82,19 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         return newConjunctives;
     }
 
-    public simplifyDisjunction(disjunction: GQLObjectQueryModifierDisjunction): GQLObjectQueryModifierDisjunction {
+    public simplifyDisjunction(disjunction: QME.GQLObjectQueryModifierDisjunction): QME.GQLObjectQueryModifierDisjunction {
         if (disjunction.values.isEmpty()) {
             const newDisjunctives = disjunction.disjunctives.map(a => this.simplifyConjunction(a)).flatMap(disjunctive => {
                 const conjunction = disjunctive;
                 if (conjunction.conjunctives.size === 1 && !!conjunction.conjunctives.get(0)) {
                     let disjunctionOpt: Option<any>;
-                    if (conjunction.conjunctives.get(0).expr.expr instanceof GQLObjectQueryModifierParensExpression) {
-                        if (conjunction.conjunctives.get(0).expr.expr.expr instanceof GQLObjectQueryModifierDisjunction) {
+                    if (conjunction.conjunctives.get(0).expr.expr instanceof QME.GQLObjectQueryModifierParensExpression) {
+                        if (conjunction.conjunctives.get(0).expr.expr.expr instanceof QME.GQLObjectQueryModifierDisjunction) {
                             disjunctionOpt = Some(conjunction.conjunctives.get(0).expr.expr.expr);
                         } else {
                             disjunctionOpt = None;
                         }
-                    } else if (conjunction.conjunctives.get(0).expr.expr instanceof GQLObjectQueryModifierDisjunction) {
+                    } else if (conjunction.conjunctives.get(0).expr.expr instanceof QME.GQLObjectQueryModifierDisjunction) {
                         disjunctionOpt = Some(conjunction.conjunctives.get(0).expr.expr);
                     } else {
                         return None;
@@ -153,31 +108,31 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                     return List([disjunctive]);
                 }
             });
-            return new GQLObjectQueryModifierDisjunction(newDisjunctives, List().clear());
+            return new QME.GQLObjectQueryModifierDisjunction(newDisjunctives, List().clear());
         } else {
             return disjunction;
         }
     }
 
-    public processSearchCondition(context: SearchConditionContext, isRoot: boolean = false): GQLObjectQueryModifierDisjunction {
-        const basicDisjunction = this.simplifyDisjunction(new GQLObjectQueryModifierDisjunction(List(context.searchConditionAnd())
+    public processSearchCondition(context: QMP.SearchConditionContext, isRoot: boolean = false): QME.GQLObjectQueryModifierDisjunction {
+        const basicDisjunction = this.simplifyDisjunction(new QME.GQLObjectQueryModifierDisjunction(List(context.searchConditionAnd())
                 .map(a => this.processSearchCondition(a)),
             List().clear())
         );
 
-        const getValidEqualityTermsInconjunction = (con: GQLObjectQueryModifierConjunction): Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression> => {
-            con.conjunctives.filterNot((a: any) => a.hasNot()).map(a => a.expr.expr)
+        const getValidEqualityTermsInconjunction = (con: QME.GQLObjectQueryModifierConjunction): Map<QME.GQLObjectQueryModifierField, QME.GQLObjectQueryModifierPrimitiveExpression> => {
+            return con.conjunctives.filterNot((a: any) => a.hasNot()).map(a => a.expr.expr)
                 .flatMap((a: any) =>
-                    a instanceof GQLObjectQueryBasicComparisonPredicate ? a : List().clear()
+                    a instanceof QME.GQLObjectQueryBasicComparisonPredicate ? a : List().clear()
                 )
                 .flatMap((b: any) => {
                     if (b.op === '=') {
-                        if (b.lhs instanceof GQLObjectQueryModifierField && b.rhs instanceof GQLObjectQueryModifierPrimitiveExpression && !b.rhs instanceof GQLObjectQueryModifierField) {
-                            if (!b.rhs instanceof GQLObjectQueryModifierField) {
+                        if (b.lhs instanceof QME.GQLObjectQueryModifierField && b.rhs instanceof QME.GQLObjectQueryModifierPrimitiveExpression && !b.rhs instanceof QME.GQLObjectQueryModifierField) {
+                            if (!b.rhs instanceof QME.GQLObjectQueryModifierField) {
                                 return List().set(0, [b.lhs, b.rhs]);
                             }
-                        } else if (b.lhs instanceof GQLObjectQueryModifierPrimitiveExpression && b.rhs instanceof GQLObjectQueryModifierField) {
-                            if (!b.rhs instanceof GQLObjectQueryModifierField) {
+                        } else if (b.lhs instanceof QME.GQLObjectQueryModifierPrimitiveExpression && b.rhs instanceof QME.GQLObjectQueryModifierField) {
+                            if (!b.rhs instanceof QME.GQLObjectQueryModifierField) {
                                 return List().set(0, [b.lhs, b.rhs]);
                             }
                         } else {
@@ -189,7 +144,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         };
 
         if (isRoot) {
-            const terms: List<GQLObjectQueryModifierDisjunction | GQLObjectQueryModifierConjunction> =
+            const terms: List<QME.GQLObjectQueryModifierDisjunction | QME.GQLObjectQueryModifierConjunction> =
                 basicDisjunction.disjunctives;
             const fieldsInEachconjunction: () => Set<string> = () => {
                 if (terms.isEmpty()) {
@@ -198,7 +153,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                     const fieldsInHead = new Set(getValidEqualityTermsInconjunction(terms.first())
                         .keys.map(a => a.expression));
                     terms.slice(1).reduce((acc, current) => {
-                        if (acc instanceof Set && current instanceof GQLObjectQueryModifierConjunction) {
+                        if (acc instanceof Set && current instanceof QME.GQLObjectQueryModifierConjunction) {
                             return acc.intersect(getValidEqualityTermsInconjunction(current)
                                 .keys.map(a => a.expression).toSet());
                         }
@@ -206,7 +161,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                 }
             };
 
-            const values: () => List<Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>> = () => {
+            const values: () => List<Map<QME.GQLObjectQueryModifierField, QME.GQLObjectQueryModifierPrimitiveExpression>> = () => {
                 if (!fieldsInEachconjunction().isEmpty()) {
                     return terms.map(x => pickBy(getValidEqualityTermsInconjunction(x), (val, key) =>
                         fieldsInEachconjunction().contains(key.expression)
@@ -221,24 +176,24 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
 
             const finalTerms = () => valuesIsComplete() ? List() : terms;
 
-            return new GQLObjectQueryModifierDisjunction(finalTerms(), values);
+            return new QME.GQLObjectQueryModifierDisjunction(finalTerms(), values);
         } else {
             return basicDisjunction;
         }
     }
 
-    public processSearchConditionAnd(context: SearchConditionAndContext): GQLObjectQueryModifierConjunction {
-        return this.simplifyConjunction(new GQLObjectQueryModifierConjunction(
+    public processSearchConditionAnd(context: QMP.SearchConditionAndContext): QME.GQLObjectQueryModifierConjunction {
+        return this.simplifyConjunction(new QME.GQLObjectQueryModifierConjunction(
             List(context.searchConditionNot()).map(x => this.processSearchConditionNot(x))
         ));
     }
 
-    public processSearchConditionNot(context: SearchConditionNotContext): GQLObjectQueryModifierOptionalNegation {
+    public processSearchConditionNot(context: QMP.SearchConditionNotContext): QME.GQLObjectQueryModifierOptionalNegation {
         const predicate = this.processPredicate(context.predicate());
-        return new GQLObjectQueryModifierOptionalNegation(Option.of(context.NOT()).nonEmpty(), predicate);
+        return new QME.GQLObjectQueryModifierOptionalNegation(Option.of(context.NOT()).nonEmpty(), predicate);
     }
 
-    public processPredicate(context: PredicateContext): GQLObjectQueryModifierPredicate {
+    public processPredicate(context: QMP.PredicateContext): QME.GQLObjectQueryModifierPredicate {
         let predicate;
 
         switch (context.constructor.name) {
@@ -247,10 +202,10 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             case 'InVarPredicateContext': predicate = this.processInVarPredicate(context); break;
             case 'ParenPredicateContext': predicate = this.processParenPredicate(context); break;
         }
-        return new GQLObjectQueryModifierPredicate(predicate);
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
     }
 
-    public processComparisonPredicate(context: ComparisonPredicateContext): GQLObjectQueryModifierExpression {
+    public processComparisonPredicate(context: QMP.ComparisonPredicateContext): QME.GQLObjectQueryModifierExpression {
         const lhs = this.processExpression(context.expression(0));
         const rhs = this.processExpression(context.expression(1));
         const op = context.comparisonOp().text;
@@ -270,19 +225,19 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         // tslint:disable
         switch (op) {
             case '~' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                       return new GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
+                       return new QME.GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
             case '!~' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                        return new GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
+                        return new QME.GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression })`, 'xsd:boolean');
             case '~*' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                        return new GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
+                        return new QME.GQLObjectQueryModifierBasicExpression(`regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
             case '!~*' : this.check(GQLObjectQueryModifierBuilderTypes.string.contains(lhs.dataType), `${op} pattern match predicate contains invalid types`, context);
-                         return new GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
-            case _ : new GQLObjectQueryBasicComparisonPredicate(lhs, op, rhs);
+                         return new QME.GQLObjectQueryModifierBasicExpression(`!regex(${lhs.expression }, ${rhs.expression }, 'i')`, 'xsd:boolean');
+            case _ : new QME.GQLObjectQueryBasicComparisonPredicate(lhs, op, rhs);
         }
         // tslint:enable
     }
 
-    public processInPredicate(context: InVarPredicateContext) {
+    public processInPredicate(context: QMP.InVarPredicateContext) {
         const not = Option.of(context.NOT()).nonEmpty() ? 'NOT' : '';
         const lhs = this.processExpression(context.expression());
         const rhs = List(context.expressionList.expression()).map(a => this.processExpression(a));
@@ -299,12 +254,12 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                 }
             });
 
-        return new GQLObjectQueryModifierBasicExpression(
+        return new QME.GQLObjectQueryModifierBasicExpression(
             `${lhs.expression} ${not} in (${rhs.map(a => a.expression).join(', ')})`, "xsd:boolean"
         );
     }
 
-    public processInVarPredicate(context: InVarPredicateContext) {
+    public processInVarPredicate(context: QMP.InVarPredicateContext) {
         const not = Option.of(context.NOT()).nonEmpty() ? 'NOT' : '';
         const lhs = this.processExpression(context.expression());
         const rhsVar = List(context.varRef());
@@ -319,26 +274,26 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                 this.check(rhsVar.dataType === lhs.dataType, 'IN predicate contains incompatible types', context);
             }
         });
-        return new GQLObjectQueryModifierBasicExpression(`${lhs.expression} ${not} IN (${rhsVar.expression})`,
+        return new QME.GQLObjectQueryModifierBasicExpression(`${lhs.expression} ${not} IN (${rhsVar.expression})`,
             'xsd: boolean');
     }
 
-    public processParenPredicate(context: ParenPredicateContext): GQLObjectQueryModifierParensExpression {
-        return new GQLObjectQueryModifierParensExpression(this.processSearchCondition(context.searchCondition()));
+    public processParenPredicate(context: QMP.ParenPredicateContext): QME.GQLObjectQueryModifierParensExpression {
+        return new QME.GQLObjectQueryModifierParensExpression(this.processSearchCondition(context.searchCondition()));
     }
 
-    public processExpression(context: any): GQLObjectQueryModifierExpression {
+    public processExpression(context: any): QME.GQLObjectQueryModifierExpression {
         switch (context.constructor.name) {
             case 'PrimitiveExpressionContext': return this.processPrimitiveExpression(context);
             case 'ParenExpressionContext': return this.processParenExpression(context);
             case 'UnaryExpressionContext': return this.processUnaryExpression(context);
             case 'FactorExpressionContext': return this.processFactorExpression(context);
             case 'TermExpressionContext': return this.processTermExpression(context);
-            default: return new GQLObjectQueryModifierBasicExpression(context.text, 'error');
+            default: return new QME.GQLObjectQueryModifierBasicExpression(context.text, 'error');
         }
     }
 
-    public processPrimitiveExpression(context: any): GQLObjectQueryModifierPrimitiveExpression | GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processPrimitiveExpression(context: any): QME.GQLObjectQueryModifierPrimitiveExpression | QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         switch (context.expressionAtom().constructor.name) {
             case 'BuiltinCallAtomContext' : return this.processBuiltInCallAtom(context.expressionAtom());
             case 'FunctionCallAtomContext' : return this.processFunctionCallAtom(context.expressionAtom());
@@ -352,7 +307,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         }
     }
 
-    public processBuiltInCallAtom(context: any): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processBuiltInCallAtom(context: any): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         switch (context.builtinCall().constructor.name) {
             case 'AbsFuncContext'          : return this.processAbsFunction(context.builtinCall());
             case 'BnodeFuncContext'        : return this.processBnodeFunction(context.builtinCall());
@@ -410,12 +365,12 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         }
     }
 
-    public NArgBuiltin(context: BuiltinCallContext,
-                       expressions: ExpressionContext[],
+    public NArgBuiltin(context: QMP.BuiltinCallContext,
+                       expressions: QMP.ExpressionContext[],
                        name: string,
                        inTypes: List<List<string>>,
                        outType: string
-                       ): GQLObjectQueryModifierBasicPrimitiveExpression {
+                       ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         const expr = List(expressions).map(ex => this.processExpression(ex));
         expr.map((a, index) => [a, index]).forEach(elem => {
             const tl = inTypes.size < elem.get(1) ? inTypes.last : inTypes.get(elem.get(1));
@@ -424,12 +379,12 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                 `wrong type for argument #${elem.get(1) + 1} of ${name} builtin; expecting one of {${tl.join(',')}}, got '${elem.get(0).dataType}'`,
                 context);
         });
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.map(el => el.expression)
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.map(el => el.expression)
             .join(', ')})`, outType);
     }
 
-    public oneArgBuiltin(context: BuiltinCallContext,
-                         expression: ExpressionContext,
+    public oneArgBuiltin(context: QMP.BuiltinCallContext,
+                         expression: QMP.ExpressionContext,
                          name: string,
                          inTypes: List<string>,
                          outType: Option<string> = None
@@ -439,258 +394,258 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             this.check(inTypes.contains(expr.dataType), `wrong type for ${name} builtin; expecting one of
             {${inTypes.join(',')}},' got '${expr.dataType}'`, context);
         }
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.expression})`, outType.value || expr.dataType);
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`${name}(${expr.expression})`, outType.value || expr.dataType);
     }
 
     public zeroArgBuiltin(
-        context: BuiltinCallContext,
+        context: QMP.BuiltinCallContext,
         name: string,
         outType: string
     ) {
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${name}()`, outType);
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`${name}()`, outType);
     }
 
-    public processAbsFunction(context: AbsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processAbsFunction(context: QMP.AbsFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'ABS', GQLObjectQueryModifierBuilderTypes.numeric);
     }
 
-    public processBoundFunc(context: BoundFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processBoundFunc(context: QMP.BoundFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         const expr = this.processFieldRef(context.fieldRef());
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`BOUND(${expr.expression})`, expr.dataType);
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`BOUND(${expr.expression})`, expr.dataType);
     }
 
-    public processCeilFunc(context: CeilFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processCeilFunc(context: QMP.CeilFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'CEIL', GQLObjectQueryModifierBuilderTypes.numeric);
     }
 
-    public processCoalesceFunc(context: CoalesceFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processCoalesceFunc(context: QMP.CoalesceFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expressionList().expression(), 'COALESCE', List(),
             context.iriRefOrVarRef().text);
     }
 
-    public processConcatFunc(context: ConcatFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processConcatFunc(context: QMP.ConcatFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expressionList().expression(),
             'CONCAT', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string');
     }
-    public processContainsFunc(context: ContainsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processContainsFunc(context: QMP.ContainsFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(), 'CONTAINS', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean');
     }
-    public processDatatypeFunc(context: DatatypeFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processDatatypeFunc(context: QMP.DatatypeFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'DATATYPE', GQLObjectQueryModifierBuilderTypes.string);
     }
-    public processDayFunc(context: DayFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processDayFunc(context: QMP.DayFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'DAY', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer'));
     }
 
-    public processEncopublicorUriFunc(context: EncopublicorUriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processEncopublicorUriFunc(context: QMP.EncopublicorUriFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'ENCODE_FOR_URI', GQLObjectQueryModifierBuilderTypes.string);
     }
 
-    public processExistsFunc(context: ExistsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processExistsFunc(context: QMP.ExistsFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         const [s, o, p] = List(context.expression()).map(a => this.processExpression(a));
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`EXISTS { ${s} ${p} ${o} }`, 'xsd:boolean');
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`EXISTS { ${s} ${p} ${o} }`, 'xsd:boolean');
     }
 
-    public processFloorFunc(context: FloorFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processFloorFunc(context: QMP.FloorFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'FLOOR', GQLObjectQueryModifierBuilderTypes.numeric);
     }
-    public processHoursFunc(context: HoursFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processHoursFunc(context: QMP.HoursFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'HOURS', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer'));
     }
 
-    public processIfFunc(context: IfFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processIfFunc(context: QMP.IfFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         const predicate = this.processPredicate(context.predicate());
         const trueExpr = this.processExpression(context.expression(0));
         const falseExpr = this.processExpression(context.expression(1));
         this.check(trueExpr.dataType === falseExpr.dataType,
             'mismatched return types for true and false branches of IF() builtin', context);
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(
             `IF(${predicate.expression}, ${trueExpr.expression}, ${falseExpr.expression})`, trueExpr.dataType
         );
     }
 
-    public processIriFunc(context: IriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processIriFunc(context: QMP.IriFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'IRI', List(['xsd:string', 'iri']), Some('iri')); }
 
-    public processIsBlankFunc(context: IsBlankFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processIsBlankFunc(context: QMP.IsBlankFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'IsBLANK', List(), Some('xsd:boolean')); }
 
-    public processIsIriFunc(context: IsIriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processIsIriFunc(context: QMP.IsIriFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'IsIRI', List(), Some('xsd:boolean')); }
 
-    public processIsLiteralFunc(context: IsLiteralFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processIsLiteralFunc(context: QMP.IsLiteralFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'IsLITERAL', List(), Some('xsd:boolean')); }
 
-    public processIsNumericFunc(context: IsNumericFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processIsNumericFunc(context: QMP.IsNumericFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'IsNUMERIC', List(), Some('xsd:boolean')); }
 
-    public processIsURIFunc(context: IsURIFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processIsURIFunc(context: QMP.IsURIFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'IsURI', List(), Some('xsd:boolean')); }
 
-    public processLangFunc(context: LangFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processLangFunc(context: QMP.LangFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'LANG', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processLangMatchesFunc(context: LangMatchesFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processLangMatchesFunc(context: QMP.LangMatchesFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'LANGMATCHES', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
-    public processLcaseFunc(context: LcaseFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processLcaseFunc(context: QMP.LcaseFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'LCASE', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processMd5Func(context: Md5FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processMd5Func(context: QMP.Md5FuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'MD5', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processMinutesFunc(context: MinutesFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processMinutesFunc(context: QMP.MinutesFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'MINUTES', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer')); }
 
-    public processMonthFunc(context: MonthFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processMonthFunc(context: QMP.MonthFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'MONTH', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:integer')); }
 
-    public processNowFunc(context: NowFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processNowFunc(context: QMP.NowFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.zeroArgBuiltin(context, 'NOW', 'xsd:dateTime'); }
 
-    public processRandFunc(context: RandFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processRandFunc(context: QMP.RandFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.zeroArgBuiltin(context, 'RAND', 'xsd:double'); }
 
-    public processRegexFunc(context: RegexFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processRegexFunc(context: QMP.RegexFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'REGEX', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
-    public processReplaceFunc(context: ReplaceFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processReplaceFunc(context: QMP.ReplaceFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'REPLACE', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string'); }
 
-    public processRoundFunc(context: RoundFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processRoundFunc(context: QMP.RoundFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'ROUND', GQLObjectQueryModifierBuilderTypes.numeric); }
 
-    public processSameTermFunc(context: SameTermFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`sameTerm(${List(context.fieldRef())
+    public processSameTermFunc(context: QMP.SameTermFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`sameTerm(${List(context.fieldRef())
             .map(a => this.processFieldRef(a)).join(', ')}
 )`, 'xsd:boolean'); }
 
-    public processSecondsFunc(context: SecondsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processSecondsFunc(context: QMP.SecondsFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'SECONDS', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:double')); }
 
-    public processSha1Func(context: Sha1FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processSha1Func(context: QMP.Sha1FuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'SHA1', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processSha256Func(context: Sha256FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processSha256Func(context: QMP.Sha256FuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'SHA256', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processSha384Func(context: Sha384FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processSha384Func(context: QMP.Sha384FuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'SHA384', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processSha512Func(context: Sha512FuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processSha512Func(context: QMP.Sha512FuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'SHA512', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processStrFunc(context: StrFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrFunc(context: QMP.StrFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(), 'STR', List(), Some('xsd:string')); }
 
-    public processStrAfterFunc(context: StrAfterFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrAfterFunc(context: QMP.StrAfterFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
-            'STRAFTER', List(GQLObjectQueryModifierBuilderTypes.string), 'xsd:string'); }
+            'STRAFTER', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string'); }
 
-    public processStrBeforeFunc(context: StrBeforeFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrBeforeFunc(context: QMP.StrBeforeFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'STRBEFORE', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string'); }
 
-    public StrDtFunc(context: StrDtFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public StrDtFunc(context: QMP.StrDtFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         const str = this.processExpression(context.expression());
         this.check(GQLObjectQueryModifierBuilderTypes.string.contains(str.dataType),
             `wrong type for argument #1 of STRDT() builtin; expecting one of {xsd:string}, got '${str.dataType}'`,
             context);
         const iriDef = context.iriRefOrVarRef().text;
-        return new GQLObjectQueryModifierPrimitiveExpression(`STRDT(${str.expression}, ${iriDef})`, iriDef);
+        return new QME.GQLObjectQueryModifierPrimitiveExpression(`STRDT(${str.expression}, ${iriDef})`, iriDef);
     }
 
-    public processStrEndsFunc(context: StrEndsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrEndsFunc(context: QMP.StrEndsFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'STRENDS', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
-    public processStrLangFunc(context: StrLangFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrLangFunc(context: QMP.StrLangFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'STRLANG', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:string'); }
 
-    public processStrLenFunc(context: StrLenFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrLenFunc(context: QMP.StrLenFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'STRLEN', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:integer')); }
 
-    public processStrStartsFunc(context: StrStartsFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrStartsFunc(context: QMP.StrStartsFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'STRSTARTS', List([GQLObjectQueryModifierBuilderTypes.string]), 'xsd:boolean'); }
 
-    public processStrUuidFunc(context: StrUuidFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processStrUuidFunc(context: QMP.StrUuidFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.zeroArgBuiltin(context, 'STRUUID',
             'xsd:string'); }
 
-    public processSubstrFunc(context: SubstrFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processSubstrFunc(context: QMP.SubstrFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.NArgBuiltin(context, context.expression(),
             'SUBSTR',
             List([GQLObjectQueryModifierBuilderTypes.string, GQLObjectQueryModifierBuilderTypes.integer]),
             'xsd:string');
     }
 
-    public processTimezoneFunc(context: TimezoneFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processTimezoneFunc(context: QMP.TimezoneFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'TIMEZONE', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:dayTimeDuration')); }
 
-    public processTzFunc(context: TzFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processTzFunc(context: QMP.TzFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'TZ', GQLObjectQueryModifierBuilderTypes.dateTime, Some('xsd:string')); }
 
-    public processUcaseFunc(context: UcaseFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processUcaseFunc(context: QMP.UcaseFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'UCASE', GQLObjectQueryModifierBuilderTypes.string, Some('xsd:string')); }
 
-    public processUriFunc(context: UriFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processUriFunc(context: QMP.UriFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'URI', List(['xsd:string', 'iri']), Some('iri')); }
 
-    public processUuidFunc(context: UuidFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processUuidFunc(context: QMP.UuidFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.zeroArgBuiltin(context, 'UUID', 'iri'); }
 
-    public processYearFunc(context: YearFuncContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processYearFunc(context: QMP.YearFuncContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.oneArgBuiltin(context, context.expression(),
             'YEAR', GQLObjectQueryModifierBuilderTypes.dateTime, Some('integer')); }
 
-    public processFunctionCallAtom(context: FunctionCallAtomContext) {
+    public processFunctionCallAtom(context: QMP.FunctionCallAtomContext) {
         const val = context.functionCall();
-        if (val instanceof FuncWithoutArgsContext) { return this.processFuncWithoutArgs(val); }
-        if (val instanceof FuncWithArgsContext) { return this.processFuncWithArgs(val); }
+        if (val instanceof QMP.FuncWithoutArgsContext) { return this.processFuncWithoutArgs(val); }
+        if (val instanceof QMP.FuncWithArgsContext) { return this.processFuncWithArgs(val); }
     }
 
-    public processRdfLiteralAtom(context: RdfLiteralAtomContext) {
+    public processRdfLiteralAtom(context: QMP.RdfLiteralAtomContext) {
         const val = context.rdfLiteral();
-        if (val instanceof LangRdfLiteralContext) {
-            return new GQLObjectQueryModifierPrimitiveExpression(val.text, 'xsd:string');
+        if (val instanceof QMP.LangRdfLiteralContext) {
+            return new QME.GQLObjectQueryModifierPrimitiveExpression(val.text, 'xsd:string');
         }
-        if (val instanceof DtRdfLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(val.text, val.iriRef().text);
+        if (val instanceof QMP.DtRdfLiteralContext) {
+            return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(val.text, val.iriRef().text);
         }
     }
 
-    public processStringLiteralAtom(context: StringLiteralAtomContext) {
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:string');
+    public processStringLiteralAtom(context: QMP.StringLiteralAtomContext) {
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:string');
     }
 
-    public processStringLiteralOrVarRef(context: StringLiteralOrVarRefContext) {
+    public processStringLiteralOrVarRef(context: QMP.StringLiteralOrVarRefContext) {
         const optOfStrLit = Option.of(context.stringLiteral());
         if (optOfStrLit.nonEmpty()) {
             return Option.of(optOfStrLit.value.text).getOrElse('');
@@ -704,7 +659,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         }
     }
 
-    public processIriRefOrVarRef(context: IriRefOrVarRefContext) {
+    public processIriRefOrVarRef(context: QMP.IriRefOrVarRefContext) {
         const optOfIriRef = Option.of(context.iriRef());
         if (optOfIriRef.nonEmpty()) {
             return this.processIriRef(optOfIriRef.value);
@@ -713,63 +668,63 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             if (optOfVarRef.nonEmpty()) {
                 return this.processVarRef(optOfVarRef.value);
             } else {
-                return new GQLObjectQueryModifierBasicExpression(context.text, 'error');
+                return new QME.GQLObjectQueryModifierBasicExpression(context.text, 'error');
             }
         }
     }
 
-    public processNumericLiteralAtom(context: NumericLiteralAtomContext) {
+    public processNumericLiteralAtom(context: QMP.NumericLiteralAtomContext) {
         return this.processNumericLiteral(context.numericLiteral());
     }
 
-    public processNumericLiteral(context: NumericLiteralContext) {
-        if (context instanceof IntegerLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:integer');
+    public processNumericLiteral(context: QMP.NumericLiteralContext) {
+        if (context instanceof QMP.IntegerLiteralContext) {
+            return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:integer');
         }
-        if (context instanceof DecimalLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:decimal');
+        if (context instanceof QMP.DecimalLiteralContext) {
+            return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:decimal');
         }
-        if (context instanceof DoubleLiteralContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:doubel');
+        if (context instanceof QMP.DoubleLiteralContext) {
+            return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'xsd:doubel');
         }
     }
 
-    public processBooleanLiteralAtom(context: BooleanLiteralAtomContext) {
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(context.booleanLiteral().text, 'xsd:boolean');
+    public processBooleanLiteralAtom(context: QMP.BooleanLiteralAtomContext) {
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(context.booleanLiteral().text, 'xsd:boolean');
     }
 
-    public processIriRefAtom(context: IriRefAtomContext) {
+    public processIriRefAtom(context: QMP.IriRefAtomContext) {
         return this.processIriRef(context.iriRef());
     }
 
-    public processIriRef(context: IriRefContext) {
-        if (context instanceof LiteralIriRefContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'iri');
+    public processIriRef(context: QMP.IriRefContext) {
+        if (context instanceof QMP.LiteralIriRefContext) {
+            return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(context.text, 'iri');
         }
-        if (context instanceof PrefixedNameIriRefContext) {
-            return new GQLObjectQueryModifierBasicPrimitiveExpression(context.prefixedName().text, 'iri');
+        if (context instanceof QMP.PrefixedNameIriRefContext) {
+            return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(context.prefixedName().text, 'iri');
         }
     }
 
-    public processFieldRefAtom(context: FieldRefAtomContext): GQLObjectQueryModifierPrimitiveExpression {
+    public processFieldRefAtom(context: QMP.FieldRefAtomContext): QME.GQLObjectQueryModifierPrimitiveExpression {
         return this.processFieldRef(context.fieldRef());
     }
 
-    public processFieldRef(context: FieldRefContext) {
+    public processFieldRef(context: QMP.FieldRefContext) {
         const field = context.text;
         if (this.validFields.get(field)) {
-            return new GQLObjectQueryModifierField(
+            return new QME.GQLObjectQueryModifierField(
                 field === RDFQueryService.ID_KEY ? `?${RDFQueryService.SUBJECT_BINDING}` : `?${field}`, typeof field);
         } else {
             this.check(false, `invalid field reference '${field}'`, context);
         }
     }
 
-    public processVarRefAtom(context: VarRefAtomContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processVarRefAtom(context: QMP.VarRefAtomContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         return this.processVarRef(context.varRef());
     }
 
-    public processVarRef(context: VarRefContext): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public processVarRef(context: QMP.VarRefContext): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         const variable = context.VARNAME().text;
         const vd = this.validVariables.find(a => a.name === variable);
         this.check(vd.isDefined(), `unknown variable reference '${variable}'`, context);
@@ -781,28 +736,28 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         return filterExpr;
     }
 
-    public processFuncWithArgs(context: FuncWithArgsContext) {
+    public processFuncWithArgs(context: QMP.FuncWithArgsContext) {
         const returnType = context.prefixedName().text;
         const funcName = context.iriRef().text;
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${funcName}(
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`${funcName}(
             ${List(context.expressionList().expression()).map(a => this.processExpression(a)).map(a => a.expression).join(', ')}
         )`, returnType);
     }
 
-    public processFuncWithoutArgs(context: FuncWithoutArgsContext) {
+    public processFuncWithoutArgs(context: QMP.FuncWithoutArgsContext) {
         const returnType = context.prefixedName().text;
         const funcName = context.iriRef().text;
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(`${funcName}()`, returnType);
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`${funcName}()`, returnType);
     }
 
-    public quotedDataType(value: any, dataType: Option<string>): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public quotedDataType(value: any, dataType: Option<string>): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         const s = `"${value}"${
                 dataType.nonEmpty() ? `^^${dataType.value}` : ''
             }`;
-        return new GQLObjectQueryModifierBasicPrimitiveExpression(s, dataType.getOrElse('xsd:string'), Some(value));
+        return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(s, dataType.getOrElse('xsd:string'), Some(value));
     }
 
-    public asDataType(value: any): GQLObjectQueryModifierBasicPrimitiveExpression {
+    public asDataType(value: any): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
         if (value instanceof Number) {
             if (value.toString().includes('.')) {
                 return this.quotedDataType(value, Some('xsd:double'));
@@ -812,10 +767,10 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         if (value instanceof List) {
             const recValue = value.map(a => this.asDataType(a));
             if (recValue instanceof List && recValue.isEmpty()) {
-                return new GQLObjectQueryModifierBasicPrimitiveExpression('', 'xsd:string');
+                return new QME.GQLObjectQueryModifierBasicPrimitiveExpression('', 'xsd:string');
             }
             if (recValue instanceof List) {
-                return new GQLObjectQueryModifierBasicPrimitiveExpression(recValue
+                return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(recValue
                     .map(a => a.expression).join(', '), recValue.first().dataType);
             }
         }
@@ -836,30 +791,30 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             }
             if (this.rPREFIXED_IRI_PATTERN.test(value)) {
                 const regexed = this.rPREFIXED_IRI_PATTERN.exec(value)[0].split('_');
-                return new GQLObjectQueryModifierBasicPrimitiveExpression(`${regexed[0]}:${regexed[1]}`, 'iri');
+                return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(`${regexed[0]}:${regexed[1]}`, 'iri');
             }
             if (GQLObjectQueryModifierBuilderTypes.rIRI_PATTERN.test(value)) {
-                return new GQLObjectQueryModifierBasicPrimitiveExpression(value, 'iri');
+                return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(value, 'iri');
             } else {
                 return this.quotedDataType(value, None);
             }
         }
     }
 
-    public processParenExpression(context: ParenExpressionContext) {
+    public processParenExpression(context: QMP.ParenExpressionContext) {
         const expr = this.processExpression(context.expression());
-        return new GQLObjectQueryModifierBasicExpression(`(${expr.expression})`, expr.dataType);
+        return new QME.GQLObjectQueryModifierBasicExpression(`(${expr.expression})`, expr.dataType);
     }
 
-    public processUnaryExpression(context: UnaryExpressionContext) {
+    public processUnaryExpression(context: QMP.UnaryExpressionContext) {
         const op = context.unaryOp().text === '-' ? '-' : '';
         const expr = this.processExpression(context.expression());
         this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(expr.dataType),
             `invalid unary expression; expecting numeric but got ${expr.dataType } expression`, context);
-        return new GQLObjectQueryModifierBasicExpression(`${op}${expr.expression}`, expr.dataType);
+        return new QME.GQLObjectQueryModifierBasicExpression(`${op}${expr.expression}`, expr.dataType);
     }
 
-    public processFactorExpression(context: FactorExpressionContext) {
+    public processFactorExpression(context: QMP.FactorExpressionContext) {
         const op = context.factorOp().text;
         const lhs = this.processExpression(context.expression(0));
         const rhs = this.processExpression(context.expression(1));
@@ -867,12 +822,12 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             `invalid binary expression with '$op'; expecting numeric but got ${lhs.dataType } left operand`, context);
         this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(rhs.dataType),
             `invalid binary expression with '$op'; expecting numeric but got ${rhs.dataType } right operand`, context);
-        return new GQLObjectQueryModifierBasicExpression(`${lhs.expression} ${op} ${rhs.expression}`,
+        return new QME.GQLObjectQueryModifierBasicExpression(`${lhs.expression} ${op} ${rhs.expression}`,
             this.resolveTypes(lhs.dataType, rhs.dataType));
 
     }
 
-    public processTermExpression(context: TermExpressionContext) {
+    public processTermExpression(context: QMP.TermExpressionContext) {
         const op = context.termOp().text;
         const lhs = this.processExpression(context.expression(0));
         const rhs = this.processExpression(context.expression(1));
@@ -880,7 +835,7 @@ abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
              `invalid binary expression with '$op'; expecting numeric but got ${lhs.dataType } left operand`, context);
         this.check(GQLObjectQueryModifierBuilderTypes.numeric.contains(rhs.dataType),
             `invalid binary expression with '$op'; expecting numeric but got ${rhs.dataType } right operand`, context);
-        return new GQLObjectQueryModifierBasicExpression(`${lhs.expression}, ${op} ${rhs.expression}`,
+        return new QME.GQLObjectQueryModifierBasicExpression(`${lhs.expression}, ${op} ${rhs.expression}`,
             this.resolveTypes(lhs.dataType, rhs.dataType));
     }
 
