@@ -51,6 +51,7 @@ import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
 import BuilderError from '../BuilderError';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
+import GQLFilterBuilder from "./GQLFilterBuilder";
 
 class UnknownFieldException extends Error {
     constructor() {
