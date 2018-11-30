@@ -1,6 +1,6 @@
 import {CharStream, Parser, TokenStream} from 'antlr4ts';
 import { Failure, None, Option, Some, Success, Try} from 'funfix';
-import {List, Map} from 'immutable';
+import {List, Map, Set} from 'immutable';
 import { pickBy } from 'lodash';
 import * as QMP from '../../antlr4/generated/QueryModificationParser';
 import * as QME from '../../models/GQLObjectQueryModifierExpression';
