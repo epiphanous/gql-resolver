@@ -1,17 +1,17 @@
-import { List } from 'immutable';
-import { GQLObjectQueryModifierDisjunction } from './GQLObjectQueryModifierDisjunction';
+import { Set } from 'immutable';
+import {GQLObjectQueryModifierDisjunction} from './GQLObjectQueryModifierExpression';
 
 interface IGQLFilter {
   expression: GQLObjectQueryModifierDisjunction;
-  fields: List<string>;
+  fields: Set<string>;
 }
 export class GQLFilter implements IGQLFilter {
   public expression: GQLObjectQueryModifierDisjunction;
-  public fields: List<string>;
+  public fields: Set<string>;
 
   constructor(
     expression: GQLObjectQueryModifierDisjunction,
-    fields: List<string>
+    fields: Set<string>
   ) {
     this.expression = expression;
     this.fields = fields;

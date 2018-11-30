@@ -4,7 +4,6 @@ import {GQLExecutionPlan} from './GQLExecutionPlan';
 import {QueryStrategy} from './QueryStrategy';
 
 export class GQLRootExecutionPlan extends GQLExecutionPlan {
-
     constructor(
         parentTypes: Set<string>,
         name: string,
