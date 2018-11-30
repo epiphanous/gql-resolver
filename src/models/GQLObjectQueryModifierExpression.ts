@@ -30,7 +30,9 @@ export class GQLObjectQueryModifierPrimitiveExpression extends GQLObjectQueryMod
 
 export class GQLObjectQueryModifierField extends GQLObjectQueryModifierPrimitiveExpression {}
 
-export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQueryModifierPrimitiveExpression {}
+export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQueryModifierPrimitiveExpression {
+    expression:String, dataType:String, underlyingValue:Option[Any] = None
+}
 
 export class GQLObjectQueryBasicComparisonPredicate extends GQLObjectQueryModifierExpression {
   constructor(
@@ -43,21 +45,32 @@ export class GQLObjectQueryBasicComparisonPredicate extends GQLObjectQueryModifi
 }
 
 export class GQLObjectQueryModifierOptionalNegation extends GQLObjectQueryModifierExpression {
+  public hasNot: boolean
   constructor(hasNot: boolean, expr: GQLObjectQueryModifierPredicate) {
     super(`${hasNot ? '!' : ''}${expr.expression}`, 'xsd:boolean');
+    this.hasNot = hasNot;
   }
 }
 
 export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExpression {
+  public conjunctives: List<GQLObjectQueryModifierOptionalNegation>
   constructor(conjunctives: List<GQLObjectQueryModifierOptionalNegation>) {
     super(
       conjunctives.map(x => `(${x.expression})`).join(' && '),
       'xsd:boolean'
     );
+    this.conjunctives = conjunctives;
   }
 }
 
 export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExpression {
+  public disjunctives: List<GQLObjectQueryModifierConjunction>,
+  public values: List<
+      Map<
+          GQLObjectQueryModifierField,
+          GQLObjectQueryModifierPrimitiveExpression
+          >
+      >
   constructor(
     disjunctives: List<GQLObjectQueryModifierConjunction>,
     values: List<
@@ -71,6 +84,8 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
       disjunctives.map(x => `(${x.expression})`).join(' || '),
       'xsd:boolean'
     );
+    this.disjunctives = disjunctives;
+    this.values = values;
   }
 }
 

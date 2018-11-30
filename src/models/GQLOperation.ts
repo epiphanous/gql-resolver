@@ -1,5 +1,6 @@
 import { None, Option } from 'funfix';
 import { List } from 'immutable';
+import { assign } from 'lodash';
 import { GQLDirective } from './GQLDirective';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLField, GQLSelection } from './GQLSelection';
@@ -33,5 +34,9 @@ export class GQLOperation implements IGQLOperation {
         this[key] = props[key];
       }
     }
+  }
+
+  public copy(fields: Partial<IGQLOperation>) {
+    return new GQLOperation({...(this as object), ...fields});
   }
 }
