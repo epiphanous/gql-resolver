@@ -12,7 +12,7 @@ export default class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
         validVariables: Set<GQLVariableDefinition>,
         vars: Map<string, any>,
         prefixes: Set<string>,
-        source: string = 'bindings'
+        source: string = 'boosters'
     ) {
         super(
             validFields,
