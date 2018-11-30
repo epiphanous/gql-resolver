@@ -1,5 +1,6 @@
+import {Parser} from 'antlr4ts';
 import {List, Map, Set} from 'immutable';
-import {BindingContext, BindingsContext} from '../../antlr4/generated/QueryModificationParser';
+import {BindingContext, BindingsContext, QueryModificationParser} from '../../antlr4/generated/QueryModificationParser';
 import {GQLBinding} from '../../models/GQLBinding';
 import {GQLVariableDefinition} from '../../models/GQLVariableDefinition';
 import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
@@ -23,28 +24,32 @@ export default class GQLBindingsBuilder extends GQLObjectQueryModifierBuilder {
         );
     }
 
+    public parse(parser: Parser) {
+        return (parser as QueryModificationParser).bindings();
+    }
+
     public exitBindings(context: BindingsContext) {
         this.result = this.processBindings(context);
     }
 
     public processBindings(context: BindingsContext) {
-        List(context.binding()).map(a => this.processBinding(a));
+        return List(context.binding()).map(a => this.processBinding(a));
     }
 
     public processBinding(context: BindingContext) {
         const expression = this.processExpression(context.expression());
-        const varName = context.VARNAME();
+        const varName = context.VARNAME().text;
         this.check(
             this.validFields.get(varName).isEmpty(),
             `binding variable ${varName} clashes with existing field name`,
             context
         );
         this.check(
-            !this.validVariables.some(a => a === varName),
+            !this.validVariables.some(a => a.name === varName),
             `binding variable ${varName} clashes with existing variable name`,
             context
         );
-        return new GQLBInding(varName, expression);
+        return new GQLBinding(varName, expression);
     }
 
 }
