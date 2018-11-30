@@ -1,5 +1,5 @@
 import {Parser} from 'antlr4ts';
-import {List} from 'immutable';
+import {List, Map, Set} from 'immutable';
 import * as QMP from '../../antlr4/generated/QueryModificationParser';
 import {GQLFieldBooster} from '../../models/GQLBooster';
 import {GQLFilter} from '../../models/GQLFilter';
