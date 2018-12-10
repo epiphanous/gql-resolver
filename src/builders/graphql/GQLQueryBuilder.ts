@@ -52,6 +52,7 @@ import Builder from '../Builder';
 import BuilderError from '../BuilderError';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
 import GQLFilterBuilder from "./GQLFilterBuilder";
+import GQLPatternsBuilder from "./GQLPatternsBuilder";
 
 class UnknownFieldException extends Error {
     constructor() {
