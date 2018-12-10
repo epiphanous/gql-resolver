@@ -1,27 +1,10 @@
-import { ok } from 'assert';
 import {Either, Failure, Left, None, Option, Right, Some, Success, Try} from 'funfix';
 import {List, Map, Set} from 'immutable';
 import {mapValues, partition} from 'lodash';
-import { stringify } from 'querystring';
-import { types } from 'util';
 import { BooleanValueContext, GraphQLParser, StringValueContext } from '../../../generated/src/antlr4/GraphQLParser';
-import {
-    ArgumentContext,
-    ArgumentsContext,
-    ArrayValueContext,
-    DefaultValueContext, DirectiveContext, DirectivesContext, EnumValueValueContext, FieldContext, FieldNameContext,
-    FieldSelectionContext,
-    FragmentDefinitionContext, FragmentSpreadContext,
-    FragmentSpreadSelectionContext, FullOperationDefinitionContext, InlineFragmentContext,
-    InlineFragmentSelectionContext,
-    NameDirectiveContext, NumberValueContext, SelectionOnlyOperationDefinitionContext, SelectionSetContext,
-    TypeConditionContext,
-    ValueContext,
-    ValueDirectiveContext,
-    ValueOrVariableContext, VariableContext, VariableDefinitionContext, VariableDefinitionsContext
-} from '../../antlr4/generated/GraphQLParser';
+import * as GQLParser from '../../antlr4/generated/GraphQLParser';
 import { GQLAny } from '../../models/GQLAny';
-import { GQLAnyArgument, GQLArgument, GQLBindingsArgument, GQLBoostersArgument, GQLFilterArgument, GQLIncludeDeprecatedArgument, GQLInvalidArgument, GQLLimitArgument, GQLNameArgument, GQLOffsetArgument, GQLOrderArgument, GQLPatternsArgument, GQLTransformsArgument } from '../../models/GQLArgument';
+import * as GQLArg from '../../models/GQLArgument';
 import { GQLBinding } from '../../models/GQLBinding';
 import { GQLBooster } from '../../models/GQLBooster';
 import { GQLDirective, GQLNameDirective, GQLValueDirective } from '../../models/GQLDirective';
@@ -45,14 +28,18 @@ import {
 } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import { NameAndAlias as AliasAndName} from '../../models/NameAndAlias'; // TODO: set to AliasAndName from ...
+import AliasAndName from '../../models/NameAndAlias';
 import {QueryStrategy} from '../../models/QueryStrategy';
 import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
 import BuilderError from '../BuilderError';
+import GQLBindingsBuilder from './GQLBindingsBuilder';
+import GQLBoostersBuilder from './GQLBoostersBuilder';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
-import GQLFilterBuilder from "./GQLFilterBuilder";
-import GQLPatternsBuilder from "./GQLPatternsBuilder";
+import GQLFilterBuilder from './GQLFilterBuilder';
+import GQLOrderByBuilder from './GQLOrderByBuilder';
+import GQLPatternsBuilder from './GQLPatternsBuilder';
+import GQLTransformsBuilder from './GQLTransformsBuilder';
 
 class UnknownFieldException extends Error {
     constructor() {
@@ -186,10 +173,10 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     }); });
   }
 
-  public processArgs(args: List<GQLArgument>, allFields: Map<string, string>): GQLQueryArguments {
+  public processArgs(args: List<GQLArg.GQLArgument>, allFields: Map<string, string>): GQLQueryArguments {
     return args.reduce((qa, arg) => {
-      if (arg instanceof GQLAnyArgument) {
-        const anyArg = arg as GQLAnyArgument;
+      if (arg instanceof GQLArg.GQLAnyArgument) {
+        const anyArg = arg as GQLArg.GQLAnyArgument;
         if (anyArg.value.isRight) {
           const variable = anyArg.value._A;
           const value = Option.of(this.vars.get(variable.name));
@@ -197,41 +184,41 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
         } else {
           return qa.copy({any: Some(new GQLAny(anyArg.name, None))});
         }
-      } else if (arg instanceof GQLFilterArgument) {
-        const a = arg as GQLFilterArgument;
+      } else if (arg instanceof GQLArg.GQLFilterArgument) {
+        const a = arg as GQLArg.GQLFilterArgument;
         return qa.copy({filter: Some(this.processFilter(a.resolve(this.vars), allFields))});
-      } else if (arg instanceof GQLPatternsArgument) {
-        const a = arg as GQLPatternsArgument;
+      } else if (arg instanceof GQLArg.GQLPatternsArgument) {
+        const a = arg as GQLArg.GQLPatternsArgument;
         return qa.copy({patterns: this.processPatterns(a.resolve(this.vars), allFields)});
-      } else if (arg instanceof GQLBoostersArgument) {
-        const a = arg as GQLBoostersArgument;
+      } else if (arg instanceof GQLArg.GQLBoostersArgument) {
+        const a = arg as GQLArg.GQLBoostersArgument;
         return qa.copy({boosters: this.processBoosters(a.resolve(this.vars), allFields)});
-      } else if (arg instanceof GQLBindingsArgument) {
-        const a = arg as GQLBindingsArgument;
+      } else if (arg instanceof GQLArg.GQLBindingsArgument) {
+        const a = arg as GQLArg.GQLBindingsArgument;
         return qa.copy({bindings: this.processBindings(a.resolve(this.vars), allFields)});
-      } else if (arg instanceof GQLOrderArgument) {
-        const a = arg as GQLOrderArgument;
+      } else if (arg instanceof GQLArg.GQLOrderArgument) {
+        const a = arg as GQLArg.GQLOrderArgument;
         return qa.copy({order: this.processOrder(a.resolve(this.vars), allFields)});
-      } else if (arg instanceof GQLTransformsArgument) {
-        const a = arg as GQLTransformsArgument;
+      } else if (arg instanceof GQLArg.GQLTransformsArgument) {
+        const a = arg as GQLArg.GQLTransformsArgument;
         return qa.copy({transforms: this.processTransforms(a.resolve(this.vars), allFields)});
-      } else if (arg instanceof GQLLimitArgument) {
-        const a = arg as GQLLimitArgument;
+      } else if (arg instanceof GQLArg.GQLLimitArgument) {
+        const a = arg as GQLArg.GQLLimitArgument;
         const limit = Some(parseInt(a.resolve(this.vars), 10));
         if (qa.offset.nonEmpty) {
           return qa.copy({limit});
         } else {
           return qa.copy({limit, offset: Some(0)});
         }
-      } else if (arg instanceof GQLOffsetArgument) {
-        const a = arg as GQLOffsetArgument;
+      } else if (arg instanceof GQLArg.GQLOffsetArgument) {
+        const a = arg as GQLArg.GQLOffsetArgument;
         const offset = Some(parseInt(a.resolve(this.vars), 10));
         return qa.copy({offset});
-      } else if (arg instanceof GQLNameArgument) {
-        const a = arg as GQLNameArgument;
+      } else if (arg instanceof GQLArg.GQLNameArgument) {
+        const a = arg as GQLArg.GQLNameArgument;
         return qa.copy({name: Some(a.resolve(this.vars))});
-      } else if (arg instanceof GQLIncludeDeprecatedArgument) {
-        const a = arg as GQLIncludeDeprecatedArgument;
+      } else if (arg instanceof GQLArg.GQLIncludeDeprecatedArgument) {
+        const a = arg as GQLArg.GQLIncludeDeprecatedArgument;
         const b = /^(1|t|true)$/.test(a.resolve(this.vars).toLowerCase());
         return qa.copy({includeDeprecated: Some(b)});
       } else { return qa; }
@@ -346,7 +333,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
      })
   ))
 
- public getSearchPlan(parentType: string, name: string, key: string, selections: List < GQLSelection > , args: List<GQLArgument>, fields: List <[string, GQLField]> , scalars: List <[string, GQLField]> , objects: List <[string, GQLField]> , errors: List<UnknownFieldException>) {
+ public getSearchPlan(parentType: string, name: string, key: string, selections: List < GQLSelection > , args: List<GQLArg.GQLArgument>, fields: List <[string, GQLField]> , scalars: List <[string, GQLField]> , objects: List <[string, GQLField]> , errors: List<UnknownFieldException>) {
 
     const queryFields: List<[string, GQLField]> = scalars;
     console.log(`queryFields for plan ${name} = ${queryFields}`);
@@ -402,7 +389,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
         }
     };
 
-    const [specialObjects, normalObjects] = partition(objects, ((x: [string, GQLField]) => Set(Object.keys(this.specialObjectFields)).contains(x[1].name));
+    const [specialObjects, normalObjects] = partition(objects, ((x: [string, GQLField]) => Set(Object.keys(this.specialObjectFields)).contains(x[1].name)));
     const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map((o) => {
     const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields()[o[1].name].returnType));
     return new GQLFieldsExecutionPlan(Set(
@@ -424,35 +411,36 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, RDFQueryService.this.getPrefixes(), this.getSchema()) });
   }
 
- public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
+ public exitFullOperationDefinition(ctx: GQLParser.FullOperationDefinitionContext) {
     const description = Option.of(ctx.COMMENT()).getOrElse(List<string>()).join('\n');
     this.operations.add(new GQLOperation({
             name: this.textOf(ctx.NAME()),
             description: Option.of(description),
-            operationType: ctx.operationType().getText,
+            operationType: ctx.operationType(),
             variables: this.processVariableDefinitions(Option.of(ctx.variableDefinitions())),
             directives: this.processDirectives(Option.of(ctx.directives())),
             selections: this.processSelectionSet(ctx.selectionSet())}));
   }
 
  public processVariableDefinitions(
-    ctxOpt: Option<VariableDefinitionsContext>): List<GQLVariableDefinition> {
-      return ctxOpt.isEmpty() ? ctxOpt.variableDefinition().asScala.toList.map(this.processVariableDefinition) : List().clear();
+    ctxOpt: Option<GQLParser.VariableDefinitionsContext>): List<GQLVariableDefinition> {
+      return ctxOpt.nonEmpty() ? List(ctxOpt.value.variableDefinition()).map(this.processVariableDefinition) :
+          List().clear();
   }
 
-public processVariableDefinition(ctx: VariableDefinitionContext) {
+public processVariableDefinition(ctx: GQLParser.VariableDefinitionContext) {
     const description = Option.of(ctx.COMMENT()).getOrElse(List<string>().clear()).join('\n');
-    const vd = new GQLVariableDefinition(this.textOf(ctx.variable().NAME()), this.getType(ctx.`type`(), description),
+    const vd = new GQLVariableDefinition(this.textOf(ctx.variable().NAME()), this.getType(ctx.type()),
       this.processDefaultValue(Option.of(ctx.defaultValue())));
     this.variables = this.variables.add(vd);
     return vd;
   }
 
-    public processDefaultValue(ctxOpt: Option<DefaultValueContext>) {
-        return ctxOpt.map(dv => this.processValueOrVariable(dv.valueOrVariable());
+    public processDefaultValue(ctxOpt: Option<GQLParser.DefaultValueContext>) {
+        return ctxOpt.map(dv => this.processValueOrVariable(dv.valueOrVariable()));
     }
 
-    public processValueOrVariable(ctx: ValueOrVariableContext): Either<GQLValue, GQLVariable> {
+    public processValueOrVariable(ctx: GQLParser.ValueOrVariableContext): Either<GQLValue, GQLVariable> {
       if (Option.of(ctx.value()).nonEmpty()) {
           if (Option.of(ctx.variable()).nonEmpty()) {
               throw new Error('wat?'); // legacy
@@ -466,13 +454,13 @@ public processVariableDefinition(ctx: VariableDefinitionContext) {
       }
     }
 
-  public processValue(ctx: ValueContext): GQLValue {
+  public processValue(ctx: GQLParser.ValueContext): GQLValue {
     switch (ctx.constructor) {
-        case StringValueContext: return new GQLStringValue(this.textOf(ctx.STRING()));
-        case BooleanValueContext: return new GQLBooleanValue(this.textOf(ctx.BOOLEAN()).toBoolean());
-        case EnumValueValueContext: return new GQLEnumValue(this.textOf(ctx.enumValue().NAME()));
-        case NumberValueContext:
-            const numText = ctx.NUMBER().getText();
+        case GQLParser.StringValueContext: return new GQLStringValue(this.textOf(ctx.constructor().STRING()));
+        case GQLParser.BooleanValueContext: return new GQLBooleanValue(this.textOf(ctx.constructor().BOOLEAN()));
+        case GQLParser.EnumValueValueContext: return new GQLEnumValue(this.textOf(ctx.constructor().enumValue().NAME()));
+        case GQLParser.NumberValueContext:
+            const numText = ctx.constructor().NUMBER().getText();
             if (numText.includes('.')) {
                 return new GQLDoubleValue(parseFloat(numText));
             } else {
@@ -482,32 +470,32 @@ public processVariableDefinition(ctx: VariableDefinitionContext) {
                     throw new Error('Failed to find the type of number in value processing..');
                 }
             }
-        case ArrayValueContext: return new GQLArrayValue(List(ctx).map(x => this.processValue(x)));
+        case GQLParser.ArrayValueContext: return new GQLArrayValue(List(ctx.constructor()).map(x => this.processValue(x)));
     }
   }
 
-   public processVariable(ctx: VariableContext): GQLVariable {
+   public processVariable(ctx: GQLParser.VariableContext): GQLVariable {
       return new GQLVariable(this.textOf(ctx.NAME()));
   }
 
-  public processDirectives(ctxOpt: Option<DirectivesContext>) {
+  public processDirectives(ctxOpt: Option<GQLParser.DirectivesContext>) {
       if (ctxOpt.nonEmpty()) {
-          return List(ctxOpt.directive()).map(x => this.processDirective(x));
+          return List(ctxOpt.value.directive()).map(x => this.processDirective(x));
       } else {
           return List().clear();
       }
   }
 
- public processDirective(ctx: DirectiveContext) {
+ public processDirective(ctx: GQLParser.DirectiveContext) {
       switch (ctx.constructor) {
-          case ValueDirectiveContext: return new GQLValueDirective(this.textOf(ctx.NAME()),
-              this.processValueOrVariable(ctx.valueOrVariable()));
-          case NameDirectiveContext: return new GQLNameDirective(this.textOf(ctx.NAME()));
+          case GQLParser.ValueDirectiveContext: return new GQLValueDirective(this.textOf(ctx.constructor().NAME()),
+              this.processValueOrVariable(ctx.constructor().valueOrVariable()));
+          case GQLParser.NameDirectiveContext: return new GQLNameDirective(this.textOf(ctx.constructor().NAME()));
       }
   }
 
  public exitSelectionOnlyOperationDefinition(
-    ctx: SelectionOnlyOperationDefinitionContext): void {
+    ctx: GQLParser.SelectionOnlyOperationDefinitionContext): void {
     this.operations = this.operations.add(new GQLOperation({
         name: '',
         operationType: 'query',
@@ -518,39 +506,39 @@ public processVariableDefinition(ctx: VariableDefinitionContext) {
     );
   }
 
-public exitFragmentDefinition(ctx: FragmentDefinitionContext): void {
+public exitFragmentDefinition(ctx: GQLParser.FragmentDefinitionContext): void {
     this.fragmentDefinitions = this.fragmentDefinitions.add(new GQLFragmentDefinition(this.textOf(ctx.fragmentName().NAME()),
       new this.processTypeCondition(ctx.typeCondition()), this.processDirectives(Option.of(ctx.directives())),
       new this.processSelectionSet(ctx.selectionSet())));
   }
 
-public processTypeCondition(ctx: TypeConditionContext) {
+public processTypeCondition(ctx: GQLParser.TypeConditionContext) {
     return this.textOf(ctx.typeName().NAME());
   }
 
-public processSelectionSet(ctx: SelectionSetContext): List<GQLSelection> {
+public processSelectionSet(ctx: GQLParser.SelectionSetContext): List<GQLSelection> {
       if (Option.of(ctx).nonEmpty()) {
           switch (ctx.constructor) {
-              case Some(ctx): return List(ctx).map(c => c.constructor === FieldSelectionContext ? this.processField(c) : null);
-              case InlineFragmentSelectionContext: return this.processInlineFragment(ctx.inlineFragment());
-              case FragmentSpreadSelectionContext: return this.processFragmentSpread(ctx.fragmentSpread());
+              case Some(ctx): return List(ctx).map(c => c.constructor === GQLParser.FieldSelectionContext ? this.processField(c) : null);
+              case GQLParser.InlineFragmentSelectionContext: return this.processInlineFragment(ctx.inlineFragment());
+              case GQLParser.FragmentSpreadSelectionContext: return this.processFragmentSpread(ctx.fragmentSpread());
           }
       } else {
           return List().clear();
       }
   }
 
-public processField(ctx: FieldContext): GQLField {
+public processField(ctx: GQLParser.FieldContext): GQLField {
     const [name, alias] = this.processFieldName(ctx.fieldName());
-    const fd = this.getSchema().getFieldDefinition(name);
-    return new GQLField(name, alias, this.processArguments(Option.of(ctx.arguments()), fd), this.processDirectives(Option.of(ctx.directives())),
+    const fd = this.getSchema().getFieldDefinition(name.toString());
+    return new GQLField(name.toString(), Option.of(alias.toString()), this.processArguments(Option.of(ctx.arguments()), fd), this.processDirectives(Option.of(ctx.directives())),
       this.processSelectionSet(ctx.selectionSet()));
   }
 
-public processFieldName(ctx: FieldNameContext) {
-      return [Option.of(ctx.NAMETYPE()).value(), Option.of(ctx.NAME()).value(), Option.of(ctx.alias()).value()]
+public processFieldName(ctx: GQLParser.FieldNameContext) {
+      return [Option.of(ctx.NAMETYPE()).value, Option.of(ctx.NAME()).value, Option.of(ctx.alias()).value]
           .map((c, index) => {
-              if (c && c !== None) {
+              if (c && c.isNotEmpty()) {
                   if (index < 2) {
                       return [this.textOf(c), None];
                   } else {
@@ -561,7 +549,7 @@ public processFieldName(ctx: FieldNameContext) {
           });
 }
 
-public processArguments(ctxOpt: Option<ArgumentsContext>, fdOpt: Option<GQLFieldDefinition>) {
+public processArguments(ctxOpt: Option<GQLParser.ArgumentsContext>, fdOpt: Option<GQLFieldDefinition>) {
       if (Option.of(ctxOpt).nonEmpty()) {
           return List(ctxOpt.value.argument()).map(a => this.processArgument(a, fdOpt));
       } else {
@@ -569,12 +557,12 @@ public processArguments(ctxOpt: Option<ArgumentsContext>, fdOpt: Option<GQLField
       }
   }
 
-public processArgument(ctx: ArgumentContext, fdOpt: Option<GQLFieldDefinition>): GQLArgument {
+public processArgument(ctx: GQLParser.ArgumentContext, fdOpt: Option<GQLFieldDefinition>): GQLArg.GQLArgument {
     const name = this.textOf(ctx.NAME());
     const [fieldName, argDefOpt] = Option.of(fdOpt).nonEmpty() ? [fdOpt.value.name, fdOpt.value.args.find(a => a.name === name)] : None;
     if (argDefOpt.isEmpty()) {
-      check(false, `unknown argument '${name}' on field '${fieldName}`, ctx);
-      return new GQLInvalidArgument(name, Left(new GQLStringValue('error')));
+      this.check(false, `unknown argument '${name}' on field '${fieldName}`, ctx);
+      return new GQLArg.GQLInvalidArgument(name, Left(new GQLStringValue('error')));
     } else {
       const expectedType = argDefOpt.get.gqlType.xsdType;
       const v = this.processValueOrVariable(ctx.valueOrVariable());
@@ -596,31 +584,31 @@ public processArgument(ctx: ArgumentContext, fdOpt: Option<GQLFieldDefinition>):
 
       if (typeOk) {
           switch (name) {
-              case ARG_TYPES.ARG_FILTER: return new GQLFilterArgument(name, v);
-              case ARG_TYPES.ARG_ORDER: return new GQLOrderArgument(name, v);
-              case ARG_TYPES.ARG_LIMIT: return new GQLLimitArgument(name, v);
-              case ARG_TYPES.ARG_OFFSET: return new GQLOffsetArgument(name, v);
-              case ARG_TYPES.ARG_TRANSFORMS: return new GQLTransformsArgument(name, v);
-              case ARG_TYPES.ARG_PATTERNS: return new GQLPatternsArgument(name, v);
-              case ARG_TYPES.ARG_BOOSTERS: return new GQLBoostersArgument(name, v);
-              case ARG_TYPES.ARG_BINDINGS: return new GQLBindingsArgument(name, v);
-              case ARG_TYPES.ARG_INCLUDE_DEPRECATED: return new GQLIncludeDeprecatedArgument(name, v);
-              case ARG_TYPES.ARG_NAME: return new GQLNameArgument(name, v);
-              default: return new GQLAnyArgument(name, v);
+              case ARG_TYPES.ARG_FILTER: return new GQLArg.GQLFilterArgument(name, v);
+              case ARG_TYPES.ARG_ORDER: return new GQLArg.GQLOrderArgument(name, v);
+              case ARG_TYPES.ARG_LIMIT: return new GQLArg.GQLLimitArgument(name, v);
+              case ARG_TYPES.ARG_OFFSET: return new GQLArg.GQLOffsetArgument(name, v);
+              case ARG_TYPES.ARG_TRANSFORMS: return new GQLArg.GQLTransformsArgument(name, v);
+              case ARG_TYPES.ARG_PATTERNS: return new GQLArg.GQLPatternsArgument(name, v);
+              case ARG_TYPES.ARG_BOOSTERS: return new GQLArg.GQLBoostersArgument(name, v);
+              case ARG_TYPES.ARG_BINDINGS: return new GQLArg.GQLBindingsArgument(name, v);
+              case ARG_TYPES.ARG_INCLUDE_DEPRECATED: return new GQLArg.GQLIncludeDeprecatedArgument(name, v);
+              case ARG_TYPES.ARG_NAME: return new GQLArg.GQLNameArgument(name, v);
+              default: return new GQLArg.GQLAnyArgument(name, v);
           }
       } else {
-          return new GQLInvalidArgument(name, Left(new GQLStringValue('error')));
+          return new GQLArg.GQLInvalidArgument(name, Left(new GQLStringValue('error')));
       }
     }
   }
 
-public processInlineFragment(ctx: InlineFragmentContext): GQLInlineFragment {
+public processInlineFragment(ctx: GQLParser.InlineFragmentContext): GQLInlineFragment {
     return new GQLInlineFragment(this.textOf(ctx.typeCondition().typeName().NAME()),
         this.processDirectives(Option.of(ctx.directives())),
       this.processSelectionSet(ctx.selectionSet()));
 }
 
-public processFragmentSpread(ctx: FragmentSpreadContext): GQLFragmentSpread {
+public processFragmentSpread(ctx: GQLParser.FragmentSpreadContext): GQLFragmentSpread {
     return new GQLFragmentSpread(this.textOf(ctx.fragmentName().NAME()),
         this.processDirectives(Option.of(ctx.directives())));
     }
