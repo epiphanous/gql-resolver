@@ -1,6 +1,7 @@
 import {TerminalNode} from 'antlr4ts/tree/TerminalNode';
 import {None, Option, Try} from 'funfix';
 import {Map, Set} from 'immutable';
+import { List } from 'immutable';
 import {
     ArrayValueContext,
     BooleanValueContext,
@@ -31,7 +32,7 @@ import {GQLType} from '../../models/GQLType';
 import {
     GQLArgumentDefinition,
     GQLDirectiveDefinition,
-    GQLEnum,
+    GQLEnum, GQLEnumValueDefinition,
     GQLFieldDefinition,
     GQLInputType,
     GQLInterface,
@@ -97,10 +98,12 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         } else {
             this.scalarTypes.withMutations((set) =>
                 ['ID', 'String', 'Boolean', 'Int', 'Float'].forEach((t) =>
-                    set.add(new GQLScalarType({
-                        name: t, description: 'Built-in GraphQL type $t',
-                        nativeType: Option.of(t)
-                    }))));
+                    set.add(
+                        new GQLScalarType(
+                        t,
+                        'Built-in GraphQL type $t',
+                        Option.of(t)
+                    ))));
             const s = Map<string, GQLScalarType>(this.scalarTypes.map<[string, GQLScalarType]>((x) => [x.name, x]).toArray());
             const i = Map<string, GQLInterface>(this.interfaces.map<[string, GQLInterface]>((x) => [x.name, x]).toArray());
             const o = Map<string, GQLObjectType>(this.objectTypes.map<[string, GQLObjectType]>((x) => [x.name, x]).toArray());
@@ -109,20 +112,20 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
             const d = Map<string, GQLDirectiveDefinition>(this.directives.map<[string, GQLDirectiveDefinition]>((x) => [x.name, x]).toArray());
             const n = Map<string, GQLInputType>(this.inputTypes.map<[string, GQLInputType]>((x) => [x.name, x]).toArray());
             const allTypes = Map<string, GQLTypeDefinition>().withMutations((map) => {
-            map.concat([s, i, o, u, e]);
-          });
-            const schema = new GQLSchema({
-                operationTypes: this.operationTypes,
-                scalarTypes: s,
-                interfaces: i,
-                objectTypes: o,
-                unions: u,
-                enums: e,
-                inputTypes: n,
-                directives: d,
+                map.concat([s, i, o, u, e]);
+            });
+            const schema = new GQLSchema(
+                this.operationTypes,
+                s,
+                i,
+                o,
+                u,
+                e,
+                n,
+                d,
                 allTypes,
-                allFields: this.allFields,
-          });
+                this.allFields,
+          );
             return Try.of(() => schema);
         }
     }
@@ -190,74 +193,74 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                 xsd_string: 'String',
             }[sType] || sType;
         this.scalarTypes.add(
-            new GQLScalarType({
-                description: this.getComment(Option.of(ctx.COMMENT())),
-                name: sType,
-                nativeType: nType,
-            }),
+            new GQLScalarType(
+                this.getComment(Option.of(ctx.COMMENT())),
+                sType,
+                nType,
+            ),
         );
     }
 
     public exitInterfaceTypeDefinition(ctx: InterfaceTypeDefinitionContext) {
         this.interfaces.add(
-            new GQLInterface({
-                name: this.textOf(ctx.interfaceType().NAME()),
-                description: this.getComment(Option(ctx.COMMENT())),
-                fields: Option(ctx.fieldDefinition())
+            new GQLInterface(
+                this.textOf(ctx.interfaceType().NAME()),
+                this.getComment(Option.of(ctx.COMMENT())),
+                Option.of(ctx.fieldDefinition())
                     .map((fd) => fd.map((fdc) => this.getFieldDefinition(fdc)))
                     .getOrElse([]),
-            }),
+            ),
         );
     }
 
     public exitObjectTypeDefinition(ctx: ObjectTypeDefinitionContext) {
         this.objectTypes.add(
-            new GQLObjectType({
-                name: this.textOf(ctx.objectType().NAME()),
-                description: this.getComment(Option.of(ctx.COMMENT())),
-                fields: ctx.fieldDefinition().map((fdc) => this.getFieldDefinition(fdc)),
-                implements: Option.of(ctx.implementsInterfaces()).map((il) => {
+            new GQLObjectType(
+                this.textOf(ctx.objectType().NAME()),
+                this.getComment(Option.of(ctx.COMMENT())),
+                ctx.fieldDefinition().map((fdc) => this.getFieldDefinition(fdc)),
+                Option.of(ctx.implementsInterfaces()).map((il) => {
                     il.implementsList()
                         .interfaceType()
                         .map((i) => this.textOf(i.NAME()));
-                })}
+                })
             ),
         );
     }
 
     public exitUnionTypeDefinition(ctx: UnionTypeDefinitionContext) {
         this.unions.add(
-            new GQLUnion({
-                name: this.textOf(ctx.unionType().NAME()),
-                description: this.getComment(Option(ctx.COMMENT())),
-                gqlTypes: ctx
+            new GQLUnion(
+                this.textOf(ctx.unionType().NAME()),
+                this.getComment(Option.of(ctx.COMMENT())),
+                List(ctx
                     .unionMembers()
                     .typeName()
-                    .map((t) => this.textOf(t.NAME())),
-            }),
+                    .map((t) => this.textOf(t.NAME()))),
+            ),
         );
     }
 
     public exitEnumTypeDefinition(ctx: EnumTypeDefinitionContext) {
         this.enums.add(
-            new GQLEnum({
-                name: this.textOf(ctx.enumType().NAME()),
-                description: this.getComment(Option(ctx.COMMENT())),
-                ctx.enumValueDefinition().map((ev) => {
+            new GQLEnum(
+                this.textOf(ctx.enumType().NAME()),
+                this.getComment(Option.of(ctx.COMMENT())),
+                List(ctx.enumValueDefinition().map((ev) => {
                 const evc = ev.enumValue();
                 const name = this.textOf(evc.NAME());
-                const desc = this.getComment(Option(evc.COMMENT()));
+                const desc = this.getComment(Option.of(evc.COMMENT()));
                 const [isDeprecated, deprecationReason] = this.getDeprecation(
-                    Option(evc.deprecated()),
+                    Option.of(evc.deprecated()),
                 );
-                new GQLEnumValueDefinition(
+                return new GQLEnumValueDefinition(
                     name,
                     desc,
                     isDeprecated,
                     deprecationReason,
                 );
-            }),
-    }),
+            })),
+    ),
     )
         ;
     }
@@ -293,17 +296,17 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
 
     public exitInputObjectTypeDefinition(ctx: InputObjectTypeDefinitionContext) {
         const name = this.textOf(ctx.NAME());
-        const desc = this.getComment(Option(ctx.COMMENT()));
-        const args = Option(
+        const desc = this.getComment(Option.of(ctx.COMMENT()));
+        const args = Option.of(
             ctx
                 .inputValueDefinition()
                 .map(
                     (a) =>
                         new GQLArgumentDefinition(
                             this.textOf(a.NAME()),
-                            this.getComment(Option(a.COMMENT())),
+                            this.getComment(Option.of(a.COMMENT())),
                             this.getType(a.type()),
-                            this.processDefaultValue(Option(a.defaultValue())),
+                            this.processDefaultValue(Option.of(a.defaultValue())),
                         ),
                 ),
         ).getOrElse([]);
@@ -384,7 +387,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
             }
         }
         if (ctx instanceof BooleanValueContext) {
-            return new GQLBooleanValue(this.textOf(ctx.BOOLEAN()))();
+            return new GQLBooleanValue(this.textOf(ctx.BOOLEAN()));
         }
         if (ctx instanceof ArrayValueContext) {
             return new GQLArrayValue(
@@ -392,7 +395,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                     .array()
                     .value()
                     .map(this.processValue),
-            )();
+            );
         }
         if (ctx instanceof EnumValueValueContext) {
             return new GQLEnumValue(this.textOf(ctx.enumValue().NAME()));
