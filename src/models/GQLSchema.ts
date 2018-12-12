@@ -1,5 +1,6 @@
 import { Option } from 'funfix';
 import { List, Map, Set } from 'immutable';
+import {GQLField} from './GQLSelection';
 import {
   GQLArgumentDefinition,
   GQLDirectiveDefinition,
@@ -99,9 +100,9 @@ export class GQLSchema implements IGQLSchema {
     );
     this.typesByInterface.withMutations(map => {
       this.objectTypes.forEach((d, t) => {
-        d.implements.forEach(i => {
+        d.interfaces.forEach(i => {
           if (!map.has(i)) {
-            map.set(i, new Set(t));
+            map.set(i, Set(t));
           } else {
             map.update(i, s => s.add(t));
           }
@@ -286,42 +287,50 @@ export class GQLSchema implements IGQLSchema {
     }
   }
 
-  // partitionFields(fields:List<(string,GQLField)>): (List<(string,GQLField)>, List<(string,GQLField)>, List<UnknownFieldException>) {
-  //   const scalars = mutable.ListBuffer.empty[(string,GQLField)]
-  //   const objects = mutable.ListBuffer.empty[(string,GQLField)]
-  //   const errors  = mutable.ListBuffer.empty[UnknownFieldException]
-
-  //   fields
-  //     .flatMap(objTypeAndField => objTypeAndField match {
-  //       case (objType: string, field: GQLField) if objType.startsWith("U_") => {
-  //         objType.drop(2).split("_OR_").map(t => (t, field)).toList
-  //       }
-  //       case (objType: string, field: GQLField) =>
-  //         List(objTypeAndField)
-  //       case x => {
-  //         logger.warn(s"dont know how to handle ${x}!")
-  //         List()
-  //       }
-  //     })
-  //     .map(tf => {
-  //       if (tf._1.startsWith("xsd")) {
-  //         ("O_" + tf._1, tf._2)
-  //       } else {
-  //         tf
-  //       }
-  //     })
-  //     .map(objTypeAndField => objTypeAndField match {
-  //       case (objType: string, field: GQLField) =>
-  //         const so: Map<string, List<string>> = fieldsByType(objType)
-  //         const s: Option<List<string>> = so.get("s")
-  //         const o: Option<List<string>> = so.get("o")
-  //         if (s.nonEmpty && s.get.contains(field.name)) scalars += objTypeAndField
-  //         else if (o.nonEmpty && o.get.contains(field.name)) objects += objTypeAndField
-  //         else errors += new UnknownFieldException(s"field '${field.name}' not in type '$objType'")
-  //     })
-
-  //   (scalars.toList, objects.toList, errors.toList)
-  // }
+  public partitionFields(fields: List<[string, GQLField]>): [List<[string, GQLField]>, List<[string, GQLField]>, List<Error>] {
+    // tslint:disable
+    let scalars: [string, GQLField];
+    let objects: [string, GQLField];
+    let errors: [Error];
+    // tslint:enable
+    fields
+      .flatMap(objTypeAndField => {
+          if (objTypeAndField[0].constructor.name === 'string' && objTypeAndField[1].constructor.name === 'GQLField') {
+              const objType = objTypeAndField[0];
+              const field = objTypeAndField[1];
+              if (objType.startsWith('U_')) {
+                  return List(objType.slice(2).split('_OR_').map(t => [t, field]));
+              } else { return List(objTypeAndField); }
+          } else {
+              console.error(`I DONT KNOW HOW TO HANDLE ${objTypeAndField}!`);
+              return List();
+          }
+      })
+      .map(tf => {
+        if (tf[0].startsWith('xsd')) {
+          return ['O_' + tf[0], tf[1]];
+        } else {
+          return tf;
+        }
+      })
+      .map(objTypeAndField => {
+          const objType = objTypeAndField[0];
+          const field = objTypeAndField[1];
+          if (objTypeAndField[0].constructor.name === 'string' && objTypeAndField[1].constructor.name === 'GQLField') {
+              const so: Map<string, List < string >> = this.fieldsByType.get(objType);
+              const s: Option<List<string>> = Option.of(so.get('s'));
+              const o: Option<List<string>> = Option.of(so.get('o'));
+              if (s.nonEmpty && s.get().includes(field.name)) {
+                  scalars.push(objTypeAndField);
+              } else if (o.nonEmpty && o.get().includes(field.name)) {
+                  objects.push(objTypeAndField);
+              } else {
+                  errors.push(new Error(`field '${field.name}' not in type '$objType'`));
+              }
+          }
+      });
+    return [List([scalars]), List([objects]), List(errors)];
+  }
 
   public getFieldsOf(t: string) {
     return this.getTypeDefinition(t)
@@ -336,10 +345,10 @@ export class GQLSchema implements IGQLSchema {
   }
 
   public getImplementingTypes(t: string) {
-    return Option.of(this.typesByInterface.get(t)).getOrElse(new Set(t));
+    return Option.of(this.typesByInterface.get(t)).getOrElse(Set(t));
   }
 
-  public resolveIntrospectionQuery() {}
+  // public resolveIntrospectionQuery() {}
 
   // isNested(selections:List<GQLSelection>)(fieldName:string):boolean {
   //   const result = selections.foldLeft(false)((acc, node) => {

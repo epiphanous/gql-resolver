@@ -7,7 +7,8 @@ export interface IGQLExecutionPlan {
     key: string;
     subPlans: List<GQLExecutionPlan>;
     errors: List<Error>;
-    execute(parentIris: List<string>, executor: (strategy: QueryStrategy) => List<Map<string, any>>);
+    execute(parentIris: List<string>, executor: (strategy: QueryStrategy) =>
+        List<Map<string, any>>): List<Map<string, any>>;
 }
 
 export class GQLExecutionPlan implements IGQLExecutionPlan {
