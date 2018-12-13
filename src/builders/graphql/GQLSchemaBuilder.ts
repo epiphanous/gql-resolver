@@ -47,11 +47,11 @@ import {
     GQLDoubleValue,
     GQLEnumValue,
     GQLIntValue,
-    GQLStringValue
+    GQLStringValue, GQLValue
 } from '../../models/GQLValue';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
 
-const STANDARD_ARG_DESCRIPTION = {
+const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
     bindings:
         'Optional semi-colon separated list of one or more additional computed values to generate in results',
     boosters:
@@ -111,21 +111,21 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
             const e = Map<string, GQLEnum>(this.enums.map<[string, GQLEnum]>((x) => [x.name, x]).toArray());
             const d = Map<string, GQLDirectiveDefinition>(this.directives.map<[string, GQLDirectiveDefinition]>((x) => [x.name, x]).toArray());
             const n = Map<string, GQLInputType>(this.inputTypes.map<[string, GQLInputType]>((x) => [x.name, x]).toArray());
-            const allTypes = Map<string, GQLTypeDefinition>().withMutations((map) => {
-                map.concat([s, i, o, u, e]);
-            });
+            const allTypes = Map<string, GQLTypeDefinition>().withMutations(map =>
+                map.merge(s).merge(i).merge(o).merge(u).merge(e)
+            );
             const schema = new GQLSchema(
-                this.operationTypes,
-                s,
-                i,
-                o,
-                u,
+                this.allFields,
+                allTypes,
+                d,
                 e,
                 n,
-                d,
-                allTypes,
-                this.allFields,
-          );
+                i,
+                o,
+                this.operationTypes,
+                s,
+                u,
+            );
             return Try.of(() => schema);
         }
     }
@@ -183,15 +183,15 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     }
 
     public exitScalarTypeDefinition(ctx: ScalarTypeDefinitionContext) {
-        const sType = this.textOf(ctx.scalarType().NAME());
-        const nType =
-            {
-                xsd_anyURI: 'ID',
-                xsd_boolean: 'Boolean',
-                xsd_float: 'Float',
-                xsd_integer: 'Int',
-                xsd_string: 'String',
-            }[sType] || sType;
+        const sType: string = this.textOf(ctx.scalarType().NAME());
+        const xsdToType: {[key: string]: string} = {
+            xsd_anyURI: 'ID',
+            xsd_boolean: 'Boolean',
+            xsd_float: 'Float',
+            xsd_integer: 'Int',
+            xsd_string: 'String',
+        };
+        const nType: Option<string> = Option.of(xsdToType[sType]);
         this.scalarTypes.add(
             new GQLScalarType(
                 this.getComment(Option.of(ctx.COMMENT())),
@@ -206,9 +206,8 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
             new GQLInterface(
                 this.textOf(ctx.interfaceType().NAME()),
                 this.getComment(Option.of(ctx.COMMENT())),
-                Option.of(ctx.fieldDefinition())
-                    .map((fd) => fd.map((fdc) => this.getFieldDefinition(fdc)))
-                    .getOrElse([]),
+                List(ctx.fieldDefinition()
+                    .map((fd) =>  this.getFieldDefinition(fd))) || List<GQLFieldDefinition>()
             ),
         );
     }
@@ -218,12 +217,12 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
             new GQLObjectType(
                 this.textOf(ctx.objectType().NAME()),
                 this.getComment(Option.of(ctx.COMMENT())),
-                ctx.fieldDefinition().map((fdc) => this.getFieldDefinition(fdc)),
+                List(ctx.fieldDefinition().map((fdc) => this.getFieldDefinition(fdc))),
                 Option.of(ctx.implementsInterfaces()).map((il) => {
-                    il.implementsList()
+                    return List(il.implementsList()
                         .interfaceType()
-                        .map((i) => this.textOf(i.NAME()));
-                })
+                        .map((i) => this.textOf(i.NAME())));
+                }).getOrElse(List<string>())
             ),
         );
     }
@@ -268,7 +267,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     public exitDirectiveDefinition(ctx: DirectiveDefinitionContext) {
         const args = Option.of(ctx.argumentsDefinition())
             .map((ad) =>
-                ad
+                List(ad
                     .inputValueDefinition()
                     .map(
                         (a) =>
@@ -278,12 +277,13 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                                 this.getType(a.type()),
                                 this.processDefaultValue(Option.of(a.defaultValue())),
                             ),
-                    ),
+                    )
+                ),
             )
-            .getOrElse([]);
+            .getOrElse(List<GQLArgumentDefinition>());
         const locations = Option.of(ctx.directiveLocations())
-            .map((l) => l.NAME().map((n) => this.textOf(n)))
-            .getOrElse([]);
+            .map((l) => List(l.NAME().map((n) => this.textOf(n))))
+            .getOrElse(List<string>());
         this.directives.add(
             new GQLDirectiveDefinition(
                 this.textOf(ctx.NAME()),
@@ -298,7 +298,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         const name = this.textOf(ctx.NAME());
         const desc = this.getComment(Option.of(ctx.COMMENT()));
         const args = Option.of(
-            ctx
+            List(ctx
                 .inputValueDefinition()
                 .map(
                     (a) =>
@@ -308,8 +308,9 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                             this.getType(a.type()),
                             this.processDefaultValue(Option.of(a.defaultValue())),
                         ),
-                ),
-        ).getOrElse([]);
+                )
+            ),
+        ).getOrElse(List<GQLArgumentDefinition>());
         this.inputTypes.add(new GQLInputType(name, desc, args));
     }
 
@@ -318,7 +319,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         const fieldType = this.getType(ctx.type());
         const args = Option.of(ctx.argumentsDefinition())
             .map((ad) =>
-                ad.inputValueDefinition().map((a) => {
+                List(ad.inputValueDefinition().map((a) => {
                     const argName = this.textOf(a.NAME());
                     let argDesc = this.getComment(Option.of(a.COMMENT()));
                     if (argDesc.length === 0) {
@@ -330,9 +331,9 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
                         this.getType(a.type()),
                         this.processDefaultValue(Option.of(a.defaultValue())),
                     );
-                }),
+                })),
             )
-            .getOrElse([]);
+            .getOrElse(List<GQLArgumentDefinition>());
         const [isDeprecated, deprecationReason] = this.getDeprecation(
             Option.of(ctx.deprecated()),
         );
@@ -362,7 +363,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     }
 
     public processDefaultValue(ctxOpt: Option<DefaultValueContext>) {
-        ctxOpt.map((dv) => this.processValueOrVariable(dv.valueOrVariable()));
+        return ctxOpt.map((dv) => this.processValueOrVariable(dv.valueOrVariable()));
     }
 
     public processValueOrVariable(ctx: ValueOrVariableContext) {
@@ -374,7 +375,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         throw new Error('wat?');
     }
 
-    public processValue(ctx: ValueContext) {
+    public processValue(ctx: ValueContext): GQLValue {
         if (ctx instanceof StringValueContext) {
             return new GQLStringValue(this.textOf(ctx.STRING()));
         }
