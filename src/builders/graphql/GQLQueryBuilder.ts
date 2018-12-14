@@ -21,7 +21,7 @@ import { GQLRootExecutionPlan } from '../../models/GQLRootExecutionPlan';
 import { GQLSearchExecutionPlan } from '../../models/GQLSearchExecutionPlan';
 import { GQLField, GQLFragmentSpread, GQLInlineFragment, GQLSelection } from '../../models/GQLSelection';
 import { GQLTransform } from '../../models/GQLTransform';
-import { GQLFieldDefinition } from '../../models/GQLTypeDefinition';
+import {GQLArgumentDefinition, GQLFieldDefinition} from '../../models/GQLTypeDefinition';
 import {
     GQLArrayValue, GQLBooleanValue, GQLDoubleValue, GQLEnumValue, GQLIntValue, GQLLongValue, GQLNumberValue,
     GQLStringValue, GQLValue
@@ -76,7 +76,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
   public operations: Set<GQLOperation> = Set();
   public fragmentDefinitions: Set<GQLFragmentDefinition> = Set();
   public variables: Set<GQLVariableDefinition> = Set();
-  public GQLRootExecutionPlan;
+  public GQLRootExecutionPlan: GQLRootExecutionPlan;
 
   constructor(context: ResolverContext, vars: Map<string, any>) {
     super();
@@ -89,7 +89,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
   }
 
   public getPrefixes() {
-    return this.context.prefixes;
+    return this.context.prefixes;  // TODO revisit
   }
 
   public build(parser: GraphQLParser): Try<GQLQueryDocument> {
@@ -201,7 +201,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
         return qa.copy({order: this.processOrder(a.resolve(this.vars), allFields)});
       } else if (arg instanceof GQLArg.GQLTransformsArgument) {
         const a = arg as GQLArg.GQLTransformsArgument;
-        return qa.copy({transforms: this.processTransforms(a.resolve(this.vars), allFields)});
+        return qa.copy({transforms: this.processTransforms(a.resolve(this.vars))});
       } else if (arg instanceof GQLArg.GQLLimitArgument) {
         const a = arg as GQLArg.GQLLimitArgument;
         const limit = Some(parseInt(a.resolve(this.vars), 10));
@@ -261,7 +261,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
       objects.flatMap(tf => {
         const [t, f] = tf;
         console.log(`creating subplan ${f.name} from fields ${f.fields}`);
-        return this.getQueryExecutionPlan(t, f.name, f.alias.getOrElse(f.name), f.fields, selections, f.arguments);
+        return this.getQueryExecutionPlan(t, f.name, f.alias.getOrElse(f.name), f.fields, selections, f.args);
       });
     console.log(`subplans for ${name} = ${plans}`);
     return plans;
@@ -272,13 +272,13 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     const {scalars, objects, errors} = this.getSchema().partitionFields(fields);
     if (objects.isEmpty) {
       // return Option.none();
-        return null;
+        return None;
     } else {
       Some(this.getRootPlan(name, selections, objects, errors));
     }
   }
 
-  public getQueryExecutionPlan(parentType: string, name: string, key: string, fields: List<[string, GQLField]>, selections: List<GQLSelection>, args: List<GQLArgument>) {
+  public getQueryExecutionPlan(parentType: string, name: string, key: string, fields: List<[string, GQLField]>, selections: List<GQLSelection>, args: List<GQLArg.GQLArgument>) {
 
     console.log(`plan ${name}: partitioning fields ${fields}`);
     const { scalars, objects, errors } = this.getSchema().partitionFields(fields);
@@ -559,12 +559,20 @@ public processArguments(ctxOpt: Option<GQLParser.ArgumentsContext>, fdOpt: Optio
 
 public processArgument(ctx: GQLParser.ArgumentContext, fdOpt: Option<GQLFieldDefinition>): GQLArg.GQLArgument {
     const name = this.textOf(ctx.NAME());
-    const [fieldName, argDefOpt] = Option.of(fdOpt).nonEmpty() ? [fdOpt.value.name, fdOpt.value.args.find(a => a.name === name)] : None;
+    let fieldName: string;
+    let argDefOpt: Option<GQLArgumentDefinition>;
+    if (fdOpt.nonEmpty()) {
+        fieldName = fdOpt.value.name;
+        argDefOpt = Option.of(fdOpt.value.args.find(a => a.name === name));
+    }
+    // const [fieldName, argDefOpt] = fdOpt.nonEmpty() ?
+    //     [fdOpt.value.name, fdOpt.value.args.find(a => a.name === name)] : None;
+    // TODO figure out why argDefOpt results in (string | GQLArgDef) type
     if (argDefOpt.isEmpty()) {
       this.check(false, `unknown argument '${name}' on field '${fieldName}`, ctx);
       return new GQLArg.GQLInvalidArgument(name, Left(new GQLStringValue('error')));
     } else {
-      const expectedType = argDefOpt.get.gqlType.xsdType;
+      const expectedType = argDefOpt.nonEmpty() ? argDefOpt.value.gqlType.xsdType : 'unknownType';
       const v = this.processValueOrVariable(ctx.valueOrVariable());
       let typeOk;
       if (v.isLeft()) {
@@ -576,7 +584,7 @@ public processArgument(ctx: GQLParser.ArgumentContext, fdOpt: Option<GQLFieldDef
       } else {
           const hasVar = this.variables.find(a => a.name === v.get.name);
           if (hasVar) {
-              typeOk = hasVar.gqlType.xsdType === expectedType;
+              typeOk = hasVar.gqlType.xsdType() === expectedType;
           } else {
               typeOk = false;
           }
