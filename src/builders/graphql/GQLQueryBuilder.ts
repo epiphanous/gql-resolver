@@ -278,7 +278,12 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     }
   }
 
-  public getQueryExecutionPlan(parentType: string, name: string, key: string, fields: List<[string, GQLField]>, selections: List<GQLSelection>, args: List<GQLArg.GQLArgument>) {
+  public getQueryExecutionPlan(parentType: string,
+                               name: string,
+                               key: string,
+                               fields: List<[string, GQLField]>,
+                               selections: List<GQLSelection>,
+                               args: List<GQLArg.GQLArgument>) {
 
     console.log(`plan ${name}: partitioning fields ${fields}`);
     const { scalars, objects, errors } = this.getSchema().partitionFields(fields);
@@ -291,7 +296,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     if (scalars.isEmpty && objects.isEmpty) {
       const fieldsFromFragment =
-        this.getSchema().inlineFragmentChildFieldMappingsOf(selections)(name)
+        this.getSchema().inlineFragmentChildFieldMappingsOf(selections, name)
           .filter(a => typeof(a[1]) !== 'undefined')
             .reduce((acc, item) => {
               acc.push(item[1].map(field => [this.getSchema().getFieldType(name).getOrElse(name), field]));
@@ -339,7 +344,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     console.log(`queryFields for plan ${name} = ${queryFields}`);
 
     const fullProjectionOrder: () => List<AliasAndName> = () => fields.map(x => x[0]).concat(objects.map(x => x[1]))
-      .map((x) => new AliasAndName(x.alias || x.name, x.name));
+      .map((x: GQLField) => new AliasAndName(x.alias.value || x.name, x.name));
 
     const hiddenIdField = new GQLField('id', Some(RDFQueryService.INTERNAL_ID_KEY), List().clear(), List().clear(), List().clear(), List().clear());
 
@@ -360,7 +365,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
               const types = this.getSchema().getImplementingTypes(t).map(it => [it, f]);
               console.log(`implementing types of ${t} = ${types}`);
               return types;
-            }).groupBy(x => x[0]), value => value.map(x => x[1])));
+            }).groupBy(x => x[0]), value => value[1]));
 
     console.log(`getPlan ${name} objects = ${objects}`);
     console.log(`getPlan ${name} projectionsByType = ${projectionsByType}`);
@@ -386,6 +391,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
                     projectionsByType,
                 ),
             );
+            // TODO try and eliminate the context of RDFQueryService as much as possible
         }
     };
 
