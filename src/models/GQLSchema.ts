@@ -410,8 +410,8 @@ export class GQLSchema implements IGQLSchema {
     return Option.of(result.first());
   }
 
-  public typeMembers(fieldsOfType: (a: string) => Option<[[GQLInlineFragment, Option<GQLField>]]>, typeInfo: string): List <GQLField> {
-      return List(fieldsOfType(typeInfo).value).flatMap(fragmentInfo => {
+  public typeMembers(fieldsOfType: (a: string) => Option<[GQLInlineFragment, Option<GQLField>]>, typeInfo: string): List <GQLField> {
+      return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
             return fragmentInfo[0].selections.map(selection => {
                 if (selection.constructor.name === 'GQLField') {
                     return selection as GQLField;
@@ -427,8 +427,8 @@ export class GQLSchema implements IGQLSchema {
   public inlineFragmentChildFieldMappingsOf(selections: List<GQLSelection>, field: string): Map<string, Seq<any, any>> {
     const nestedFieldSelections = (fieldStr: string) => this.nestedField(selections, fieldStr);
     const optField = nestedFieldSelections(field);
-    const nestedFragmentSelections = (someStr: string) => this.nestedFragment(selections, someStr);
-    const membersOfParsedType = (str: string) => this.typeMembers(nestedFieldSelections, str); // TODO finish
+    const nestedFragmentSelections = (someStr: string) => () => this.nestedFragment(selections, someStr);
+    const membersOfParsedType = (str: string) => this.typeMembers(nestedFragmentSelections(str), str); // TODO finish
     const listOfResTuples = List();
     const typeMembersMappings = () => {
         for (const fld of [optField.value]) {
