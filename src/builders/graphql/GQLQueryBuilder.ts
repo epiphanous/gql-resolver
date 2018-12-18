@@ -402,14 +402,14 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
         }
     };
 
-    const [specialObjects, normalObjects] = partition(objects, ((x: [string, GQLField]) => Set(Object.keys(this.specialObjectFields)).contains(x[1].name)));
-    const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map((o) => {
-        const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields()[o[1].name].returnType));
+    const [specialObjects, normalObjects] = partition(objects, (x: [string, GQLField]) => Set(Object.keys(this.specialObjectFields)).contains(x[1].name));
+    const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map(o => {
+        const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields().get(o[1].name).returnType));
         return new GQLFieldsExecutionPlan(Set(
               parentType),
               o[1].name,
               key,
-              this.specialObjectFields(o[1].name).generator(args)), // TODO I'm not sure this should be here..
+              this.specialObjectFields().get(o[1].name).generator(args)),
               List().clear(),
               fullProjectionOrder().filter(a => a.alias === o[1].alias.getOrElse(o[1].name)),
               projectionsByType;
