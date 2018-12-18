@@ -1,3 +1,4 @@
+import {toMap} from 'antlr4ts/misc';
 import { None, Option, Some, TNone, TSome } from 'funfix';
 import {List, Map, Seq, Set} from 'immutable';
 import {GQLField, GQLInlineFragment, GQLSelection} from './GQLSelection';
@@ -45,7 +46,7 @@ export class GQLSchema implements IGQLSchema {
   public fieldsByType: Map<string, Map<string, List<string>>> = Map();
   public typesByInterface: Map<string, Set<string>> = Map();
   public objectTypesForField: Map<string, Set<string>> = Map();
-
+    public types; .public flatten;
   constructor(
     allFields: Map<string, GQLFieldDefinition>,
     allTypes: Map<string, GQLTypeDefinition>,
@@ -255,29 +256,39 @@ export class GQLSchema implements IGQLSchema {
     return false;
   }
 
-  // validFieldsForType(t:string):Map<string, string> {
-  //   const types = getTypeDefinition(t) match {
-  //     case Some(u:GQLUnion) => u.gqlTypes.toSet
-  //     case Some(o:GQLTypeDefinition) => Set(o.name)
-  //     case None => Set.empty[string]
-  //   }
-  //   types.flatten { t =>
-  //     if (isScalarObjectType(t)) (objectTypes.get(t): @unchecked) match {
-  //       case Some(o) => o.fields.map(f => s"${f.gqlType.xsdType}_${f.name}" -> f.gqlType.xsdType)
-  //     }
-  //     else {
-  //       const s = fieldsByType(t).get("s") match {
-  //         case Some(fields) => fields.map(f => f -> getFieldType(f).get)
-  //         case None => List.empty
-  //       }
-  //       const o = fieldsByType(t).get("o") match {
-  //         case Some(fields) => fields.map(f => f -> getFieldType(f).get)
-  //         case None => List.empty
-  //       }
-  //       s ++ o
-  //     }
-  //   }.toMap
-  // }
+  public validFieldsForType(t: string): Map<string, string> {
+      let types: Set<string>;
+      switch (this.getTypeDefinition(t).value.constructor.name) {
+          case 'GQLUnion': types = this.getTypeDefinition(t).value.constructor().gqlTypes.toSet(); break;
+          case 'GQLTypeDefinition': types = Set(this.getTypeDefinition(t).value.constructor().name); break;
+          default: types = Set<string>();
+      }
+
+      return types.map(somePossibleSet => {
+          if (this.isScalarObjectType(somePossibleSet)) {
+                  // This probably won't work..
+                  return this.objectTypes.get(somePossibleSet).fields.map(f => {
+                      const key = f.gqlType.xsdType + '_' + f.name;
+                      const val = f.gqlType.xsdType;
+                      return [key, val];
+                  });
+          } else {
+              let s;
+              let o;
+              if (this.fieldsByType.get(somePossibleSet).get('s')) {
+                  s = this.fieldsByType.get(somePossibleSet).get('s').map(f => [f, this.getFieldType(f).get()]);
+              } else {
+                  s = List();
+              }
+              if (this.fieldsByType.get(somePossibleSet).get('o')) {
+                  o = this.fieldsByType.get(somePossibleSet).get('o').map(f => [f,this.getFieldType(f).get()]);
+               } else {
+                  o = List();
+              }
+              return s.concat(o);
+          }
+      }).flatten().toMap();
+  }
 
   public parseTypeInfo(objType: string): List<string> {
     if (objType.startsWith('U_')) {
@@ -287,7 +298,7 @@ export class GQLSchema implements IGQLSchema {
     }
   }
 
-  public partitionFields(fields: List<[string, GQLField]>): [List<[string, GQLField]>, List<[string, GQLField]>, List<Error>] {
+  public partitionFields(fields: List<[string, GQLField]>): [List < [string, GQLField] > , List < [string, GQLField] > , List<Error>] {
     // tslint:disable
     let scalars: [string, GQLField];
     let objects: [string, GQLField];
@@ -370,7 +381,7 @@ export class GQLSchema implements IGQLSchema {
   //   result
   // }
 
-  public nestedField(selections: List<GQLSelection | GQLField | GQLInlineFragment>, fieldName: string): Option<GQLField> {
+  public nestedField(selections: List < GQLSelection | GQLField | GQLInlineFragment > , fieldName: string): Option < GQLField > {
     const result = selections.reduce((acc, node) => {
         if (node.constructor.name === 'GQLField') {
             if (node.name === fieldName) {
@@ -391,7 +402,7 @@ export class GQLSchema implements IGQLSchema {
     return Option.of(result.first());
   }
 
-  public nestedFragment(selections: List<GQLSelection | GQLField | GQLInlineFragment>, fieldType: string): Option<[GQLInlineFragment, Option<GQLField>]> {
+  public nestedFragment(selections: List < GQLSelection | GQLField | GQLInlineFragment > , fieldType: string): Option < [GQLInlineFragment, Option<GQLField>] > {
     let fragmentOwner: TSome<GQLField> | TNone = None;
     const result = selections.reduce((acc, node) => {
         if (node.constructor.name === 'GQLInlineFragment') {
@@ -410,7 +421,7 @@ export class GQLSchema implements IGQLSchema {
     return Option.of(result.first());
   }
 
-  public typeMembers(fieldsOfType: (a: string) => Option<[GQLInlineFragment, Option<GQLField>]>, typeInfo: string): List <GQLField> {
+  public typeMembers(fieldsOfType: (a: string) => Option < [GQLInlineFragment, Option<GQLField>] > , typeInfo: string): List<GQLField> {
       return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
             return fragmentInfo[0].selections.map(selection => {
                 if (selection.constructor.name === 'GQLField') {
@@ -441,7 +452,7 @@ export class GQLSchema implements IGQLSchema {
         return listOfResTuples;
     };
     return typeMembersMappings().reduce((acc, item) => {
-      return acc + item;
+        return acc + item;
     }, Map<string, List<GQLField>>());
-  }
+}
 }
