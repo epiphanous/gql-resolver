@@ -325,7 +325,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     const mySubPlans = this.getSearchSubPlans(name, selections, objects);
 
-    return new GQLRootExecutionPlan(name, mySubPlans, errors); // TODO other fields?
+    return new GQLRootExecutionPlan(Set<string>(), name, 'key', mySubPlans, errors); // TODO other fields?
   }
 
  public specialObjectFields: () => Map<string, SpecialObjectField> = () => Map(List(
@@ -390,7 +390,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
                     fieldsPlanParentTypes.toSet(),
                     name,
                     key,
-                    RDFQueryService.createFieldsStrategyCreator(subjectTypes.toSet, projectionsByType, RDFQueryService.this.getPrefixes(), this.getSchema()),
+                    RDFQueryService.createFieldsStrategyCreator(subjectTypes.toSet, projectionsByType, this.getPrefixes().keys(), this.getSchema()),
                     List().clear(),
                     fullProjectionOrder(),
                     projectionsByType,
@@ -419,7 +419,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(specialPlans.unshift(...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)));
     const plan = new GQLSearchExecutionPlan(Set(parentType), name, key, mySubPlans, errors, fullProjectionOrder(), queryArgs, subjectTypes);
 
-    plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, RDFQueryService.this.getPrefixes(), this.getSchema()) });
+    plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, this.getPrefixes().keys(), this.getSchema()) });
   }
 
  public exitFullOperationDefinition(ctx: GQLParser.FullOperationDefinitionContext) {
