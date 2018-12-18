@@ -274,7 +274,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
   public getRootExecutionPlan(name: string, fields: List<[string, GQLField]>, selections: List<GQLSelection>) {
     console.log(`plan ${name}: partitioning fields ${fields}`);
-    const {scalars, objects, errors} = this.getSchema().partitionFields(fields);
+    const [scalars, objects, errors] = this.getSchema().partitionFields(fields);
     if (objects.isEmpty) {
       // return Option.none();
         return None;
@@ -329,18 +329,19 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
   }
 
  public specialObjectFields: () => Map<string, SpecialObjectField> = () => Map(List(
-     Map({
-         'athlinks_steps': new SpecialObjectField(
-            'athlinks_StepAction', ( args: GQLQueryArguments ) =>
-                 RDFQueryService.createStepsStrategies(args, Set(this.getPrefixes().keys()), this.getSchema()),
-         ),
-         'schema_dataFeedElement': new SpecialObjectField(
-             'schema_DataFeedItem', (
-                 args: GQLQueryArguments,
-             ) =>
-               RDFQueryService.createDataFeedStrategy(args, Set(this.getPrefixes().keys()), this.getSchema())
-         ),
-     })
+     // TODO Legacy code here, need to implement for Jubel
+     // Map({
+     //     'athlinks_steps': new SpecialObjectField(
+     //        'athlinks_StepAction', ( args: GQLQueryArguments ) =>
+     //             RDFQueryService.createStepsStrategies(args, Set(this.getPrefixes().keys()), this.getSchema()),
+     //     ),
+     //     'schema_dataFeedElement': new SpecialObjectField(
+     //         'schema_DataFeedItem', (
+     //             args: GQLQueryArguments,
+     //         ) =>
+     //           RDFQueryService.createDataFeedStrategy(args, Set(this.getPrefixes().keys()), this.getSchema())
+     //     ),
+     // })
   ))
 
  public getSearchPlan(parentType: string, name: string, key: string, selections: List < GQLSelection > , args: List<GQLArg.GQLArgument>, fields: List <[string, GQLField]> , scalars: List <[string, GQLField]> , objects: List <[string, GQLField]> , errors: List<UnknownFieldException>) {
@@ -351,6 +352,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     const fullProjectionOrder: () => List<AliasAndName> = () => fields.map(x => x[0]).concat(objects.map(x => x[1]))
       .map((x: GQLField) => new AliasAndName(x.alias.value || x.name, x.name));
 
+    // TODO Get the INTERNAL_ID_KEY
     const hiddenIdField = new GQLField('id', Some(RDFQueryService.INTERNAL_ID_KEY), List().clear(), List().clear(), List().clear(), List().clear());
 
      // That's quite a mouthful
@@ -402,23 +404,23 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     const [specialObjects, normalObjects] = partition(objects, ((x: [string, GQLField]) => Set(Object.keys(this.specialObjectFields)).contains(x[1].name)));
     const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map((o) => {
-    const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields()[o[1].name].returnType));
-    return new GQLFieldsExecutionPlan(Set(
-          parentType),
-          o[1].name,
-          key,
-          this.specialObjectFields(o[1].name).generator(args)), // TODO I'm not sure this should be here..
-          List().clear(),
-          fullProjectionOrder().filter(a => a.alias === o[1].alias.getOrElse(o[1].name)),
-          projectionsByType;
+        const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields()[o[1].name].returnType));
+        return new GQLFieldsExecutionPlan(Set(
+              parentType),
+              o[1].name,
+              key,
+              this.specialObjectFields(o[1].name).generator(args)), // TODO I'm not sure this should be here..
+              List().clear(),
+              fullProjectionOrder().filter(a => a.alias === o[1].alias.getOrElse(o[1].name)),
+              projectionsByType;
     });
     console.info(`specialObjects = ${specialObjects}`);
     console.info(`normalObjects = ${normalObjects}`);
     console.info(`fields plan ${fieldsPlan}`);
-    const nonIgnoredNormalObjects = normalObjects.filter(f => !ignoredObjectFields.contains(f[1].name));
+    const nonIgnoredNormalObjects = List(normalObjects.filter(f => !ignoredObjectFields.contains(f[1].name)));
     const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(specialPlans.unshift(...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)));
     const plan = new GQLSearchExecutionPlan(Set(parentType), name, key, mySubPlans, errors, fullProjectionOrder(), queryArgs, subjectTypes);
-
+    // TODO
     plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, this.getPrefixes().keys(), this.getSchema()) });
   }
 
@@ -442,6 +444,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 public processVariableDefinition(ctx: GQLParser.VariableDefinitionContext) {
     const description = Option.of(ctx.COMMENT()).getOrElse(List<string>().clear()).join('\n');
     const vd = new GQLVariableDefinition(this.textOf(ctx.variable().NAME()), this.getType(ctx.type()),
+      Option.of(description),
       this.processDefaultValue(Option.of(ctx.defaultValue())));
     this.variables = this.variables.add(vd);
     return vd;
