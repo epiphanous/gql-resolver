@@ -1,5 +1,5 @@
 import {TerminalNode} from 'antlr4ts/tree';
-import {Either, Failure, Left, None, Option, Right, Some, Success, Try} from 'funfix';
+import {Either, Failure, Left, None, Option, Right, Some, Success, Try, TSome} from 'funfix';
 import {List, Map, Set} from 'immutable';
 import {mapValues, partition} from 'lodash';
 import {
@@ -37,7 +37,7 @@ import {QueryStrategy} from '../../models/QueryStrategy';
 import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
 import BuilderError from '../BuilderError';
-import { DEFAULT_PREFIXES } from '../../models/Constants';
+import { DEFAULT_PREFIXES, INTERNAL_ID_KEY } from '../../models/Constants';
 import GQLBindingsBuilder from './GQLBindingsBuilder';
 import GQLBoostersBuilder from './GQLBoostersBuilder';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
@@ -352,8 +352,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     const fullProjectionOrder: () => List<AliasAndName> = () => fields.map(x => x[0]).concat(objects.map(x => x[1]))
       .map((x: GQLField) => new AliasAndName(x.alias.value || x.name, x.name));
 
-    // TODO Get the INTERNAL_ID_KEY
-    const hiddenIdField = new GQLField('id', Some(RDFQueryService.INTERNAL_ID_KEY), List().clear(), List().clear(), List().clear(), List().clear());
+    const hiddenIdField = new GQLField('id', Some(INTERNAL_ID_KEY), List().clear(), List().clear(), List().clear(), List().clear());
 
      // That's quite a mouthful
     const requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom =
@@ -573,20 +572,14 @@ public processArguments(ctxOpt: Option<GQLParser.ArgumentsContext>, fdOpt: Optio
 
 public processArgument(ctx: GQLParser.ArgumentContext, fdOpt: Option<GQLFieldDefinition>): GQLArg.GQLArgument {
     const name = this.textOf(ctx.NAME());
-    let fieldName: string;
-    let argDefOpt: Option<GQLArgumentDefinition>;
-    if (fdOpt.nonEmpty()) {
-        fieldName = fdOpt.value.name;
-        argDefOpt = Option.of(fdOpt.value.args.find(a => a.name === name));
-    }
-    // const [fieldName, argDefOpt] = fdOpt.nonEmpty() ?
-    //     [fdOpt.value.name, fdOpt.value.args.find(a => a.name === name)] : None;
-    // TODO figure out why argDefOpt results in (string | GQLArgDef) type
-    if (argDefOpt.isEmpty()) {
-      this.check(false, `unknown argument '${name}' on field '${fieldName}`, ctx);
+    const [fieldNameOpt, argDefOpt] =
+        fdOpt.map(fd => [Some(fd.name), Some(fd.args.find(a => a.name === name))])
+            .getOrElse([None, None]);
+    if (argDefOpt.value) {
+      this.check(false, `unknown argument '${name}' on field '${fieldNameOpt.value}`, ctx);
       return new GQLArg.GQLInvalidArgument(name, Left(new GQLStringValue('error')));
     } else {
-      const expectedType = argDefOpt.nonEmpty() ? argDefOpt.value.gqlType.xsdType : 'unknownType';
+      const expectedType = argDefOpt.value instanceof GQLArgumentDefinition ? argDefOpt.value.gqlType.xsdType : 'unknownType';
       const v = this.processValueOrVariable(ctx.valueOrVariable());
       let typeOk;
       if (v.isLeft()) {

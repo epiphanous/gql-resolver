@@ -10,6 +10,7 @@ export const TYPENAME_BINDING_BASE = '_typename';
 export const TYPENAME_BINDING = `${INTERNAL_PREFIX}${TYPENAME_BINDING_BASE}`;
 export const ID_BINDING_BASE = '_id';
 export const ID_BINDING = `${INTERNAL_PREFIX}${ID_BINDING_BASE}`;
+export const INTERNAL_ID_KEY = INTERNAL_PREFIX + ID_BINDING_BASE;
 
 export const DEFAULT_PREFIXES = Map({
     afn: new SimpleNamespace('afn', 'http://jena.hpl.hp.com/ARQ/function#'),
