@@ -40,7 +40,7 @@ export default class GQLBindingsBuilder extends GQLObjectQueryModifierBuilder {
         const expression = this.processExpression(context.expression());
         const varName = context.VARNAME().text;
         this.check(
-            this.validFields.get(varName).isEmpty(),
+            !!this.validFields.get(varName),
             `binding variable ${varName} clashes with existing field name`,
             context
         );

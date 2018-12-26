@@ -24,11 +24,11 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   }
 
   get errorCount() {
-    return this.errors.filter((e) => e.isError()).size;
+    return this.errors.filter((e) => e.isError()).length;
   }
 
   get warningCount() {
-    return this.errors.filter((e) => e.isWarning()).size;
+    return this.errors.filter((e) => e.isWarning()).length;
   }
 
   get errorReport() {
@@ -53,12 +53,12 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   ) {
     if (!ok) {
       const start = ctx.start;
-      const error = new BuilderError({
-        exception: Option.of(ctx.exception),
-        line: start.line,
-        message,
-        position: start.charPositionInLine,
-      });
+      const error = new BuilderError(
+          message,
+          start.line,
+          start.charPositionInLine,
+          Option.of(ctx.exception),
+      );
       this.addError(error);
     }
   }

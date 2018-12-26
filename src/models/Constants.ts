@@ -1,5 +1,5 @@
 import {Map} from 'immutable';
-import SimpleNamespace from 'Namespace';
+import SimpleNamespace from './Namespace';
 
 export const INTERNAL_PREFIX = '__internal_';
 export const SUBJECT_BINDING_BASE = '_subject';
@@ -9,8 +9,12 @@ export const PARENT_BINDING = `${INTERNAL_PREFIX}${PARENT_BINDING_BASE}`;
 export const TYPENAME_BINDING_BASE = '_typename';
 export const TYPENAME_BINDING = `${INTERNAL_PREFIX}${TYPENAME_BINDING_BASE}`;
 export const ID_BINDING_BASE = '_id';
+export const ID_KEY = 'id';
 export const ID_BINDING = `${INTERNAL_PREFIX}${ID_BINDING_BASE}`;
 export const INTERNAL_ID_KEY = INTERNAL_PREFIX + ID_BINDING_BASE;
+export const DEFAULT_GEO_BINDING = 'schema_location';
+export const RDFS_LABEL_KEY = 'rdfs_label';
+export const INTERNAL_RDFS_LABEL_BINDING = INTERNAL_PREFIX + RDFS_LABEL_KEY;
 
 export const DEFAULT_PREFIXES = Map({
     afn: new SimpleNamespace('afn', 'http://jena.hpl.hp.com/ARQ/function#'),

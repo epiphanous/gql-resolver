@@ -7,6 +7,7 @@ import { GQLField, GQLSelection } from './GQLSelection';
 import { GQLVariableDefinition } from './GQLVariableDefinition';
 
 export interface IGQLOperation {
+  [key: string]: any;
   name: string;
   description: Option<string>;
   operationType: 'query' | 'mutation' | 'subscription';
@@ -18,6 +19,7 @@ export interface IGQLOperation {
 }
 
 export class GQLOperation implements IGQLOperation {
+  [key: string]: any
   public name: string;
   public operationType: 'query' | 'mutation' | 'subscription';
   public fields: List<[string, GQLField]>;

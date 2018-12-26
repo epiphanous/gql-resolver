@@ -1,5 +1,5 @@
 import { None, Option } from 'funfix';
-import id64 from 'id64';
+import * as id64 from 'id64';
 import { List } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
@@ -33,19 +33,14 @@ export class GQLField extends GQLSelection implements IGQLField {
   public fields: List<[string, GQLField]>;
 
   constructor(
-    name: string,
-    alias: Option<string> = None,
-    args = List<GQLArgument>(),
-    directives = List<GQLDirective>(),
-    selections = List<GQLSelection>(),
-    fields = List<[string, GQLField]>()
+      data: Partial<IGQLField> = {}
   ) {
-    super(name);
-    this.alias = alias;
-    this.args = args;
-    this.directives = directives;
-    this.selections = selections;
-    this.fields = fields;
+      super(data.name);
+      this.alias = data.alias;
+      this.args = data.args;
+      this.directives = data.directives;
+      this.selections = data.selections;
+      this.fields = data.fields;
   }
 
   public copy(fields: Partial<IGQLField>) {

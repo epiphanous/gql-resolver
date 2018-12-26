@@ -22,19 +22,12 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan implements IGQLSear
     public strategies: (slist: List<string>) => List<QueryStrategy> = null;
 
     constructor(
-        parentTypes: Set<string>,
-        name: string,
-        key: string,
-        subPlans: List<GQLExecutionPlan> = List(),
-        errors: List<Error> = List(),
-        projectionOrder: List<AliasAndName>,
-        queryArguments: GQLQueryArguments,
-        subjectTypes: List<string>,
+        data: Partial<IGQLSearchExecutionPlan> = {},
     ) {
-        super(parentTypes, name, key, subPlans, errors);
-        this.projectionOrder = projectionOrder;
-        this.queryArguments = queryArguments;
-        this.subjectTypes = subjectTypes;
+        super(data.parentTypes, data.name, data.key, data.subPlans, data.errors);
+        this.projectionOrder = data.projectionOrder;
+        this.queryArguments = data.queryArguments;
+        this.subjectTypes = data.subjectTypes;
     }
 
     public hasLimits() {
@@ -42,7 +35,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan implements IGQLSear
     }
 
     public copy(fields: Partial<IGQLSearchExecutionPlan>) {
-        return new GQLSearchExecutionPlan(...(this as object), ...fields);
+        return new GQLSearchExecutionPlan({ ...(this as object), ...fields });
     }
 
     public execute(

@@ -1,5 +1,6 @@
 import {Parser} from 'antlr4ts';
 import {List, Map, Set} from 'immutable';
+import {Option} from 'funfix';
 import {OrderByContext, OrderBysContext, QueryModificationParser} from '../../antlr4/generated/QueryModificationParser';
 import {GQLOrderBy} from '../../models/GQLOrderBy';
 import {GQLVariableDefinition} from '../../models/GQLVariableDefinition';

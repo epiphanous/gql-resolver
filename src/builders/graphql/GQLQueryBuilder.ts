@@ -1,12 +1,17 @@
 import {TerminalNode} from 'antlr4ts/tree';
 import {Either, Failure, Left, None, Option, Right, Some, Success, Try, TSome} from 'funfix';
 import {List, Map, Set} from 'immutable';
-import {mapValues, partition} from 'lodash';
+import {mapValues} from 'lodash';
 import {
     AliasContext, BooleanValueContext, GraphQLParser,
     StringValueContext
 } from '../../../generated/src/antlr4/GraphQLParser';
 import * as GQLParser from '../../antlr4/generated/GraphQLParser';
+import {
+    FieldContext, FieldSelectionContext, SelectionSetContext,
+    ValueContext
+} from '../../antlr4/generated/GraphQLParser';
+import { DEFAULT_PREFIXES, INTERNAL_ID_KEY } from '../../models/Constants';
 import { GQLAny } from '../../models/GQLAny';
 import * as GQLArg from '../../models/GQLArgument';
 import { GQLBinding } from '../../models/GQLBinding';
@@ -37,7 +42,6 @@ import {QueryStrategy} from '../../models/QueryStrategy';
 import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
 import BuilderError from '../BuilderError';
-import { DEFAULT_PREFIXES, INTERNAL_ID_KEY } from '../../models/Constants';
 import GQLBindingsBuilder from './GQLBindingsBuilder';
 import GQLBoostersBuilder from './GQLBoostersBuilder';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
@@ -143,7 +147,12 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
       const field = selection as GQLField;
       return this.getSchema().getFieldType(field.name).map((t: string) => {
         const fields = this.flattenSelections(t, field.selections);
-        return List<[string, GQLField]>([parentType, field.copy({fields})]);
+          /**
+           * TODO We need to find a way of passing this List to the copy funtion with it knowing
+           * which properties to assign to
+           */
+        return List<[string, GQLField]>();
+        // return List<[string, GQLField]>([parentType, field.copy({fields})]);
       }).getOrElseL(() => {
         throw Error(`unable to getFieldType(${field.name})`);
       });
@@ -263,10 +272,10 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
   public getSearchSubPlans(name: string, selections: List<GQLSelection>, objects: List<[string, GQLField]>) {
     console.log(`subPlans name = ${name} objects = ${objects}`);
     const plans: List<GQLSearchExecutionPlan> =
-      objects.flatMap(tf => {
+       objects.map((tf: [string, GQLField]) => {
         const [t, f] = tf;
         console.log(`creating subplan ${f.name} from fields ${f.fields}`);
-        return this.getQueryExecutionPlan(t, f.name, f.alias.getOrElse(f.name), f.fields, selections, f.args);
+        return this.getQueryExecutionPlan(t, f.name, f.alias.getOrElse(f.name), f.fields, selections, f.args).value;
       });
     console.log(`subplans for ${name} = ${plans}`);
     return plans;
@@ -302,22 +311,22 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     if (scalars.isEmpty && objects.isEmpty) {
       const fieldsFromFragment =
         this.getSchema().inlineFragmentChildFieldMappingsOf(selections, name)
-          .filter(a => typeof(a[1]) !== 'undefined')
-            .reduce((acc, item) => {
-              acc.push(item[1].map(field => [this.getSchema().getFieldType(name).getOrElse(name), field]));
+          .filter((a: any) => typeof(a[1]) !== 'undefined')
+            .reduce((acc, item: any) => {
+              acc.push(item[1].map((field: any) => [this.getSchema().getFieldType(name).getOrElse(name), field]));
               return acc;
             }, []);
 
       console.log(`*** plan ${name} has fieldsFromFragment : ${fieldsFromFragment}`);
 
       if (fieldsFromFragment.length > 0) {
-        Some(this.getSearchPlan(parentType, name, key, selections, args, fields, fieldsFromFragment, objects, errors));
+        return Some(this.getSearchPlan(parentType, name, key, selections, args, fields, List(fieldsFromFragment), objects, errors));
       } else {
         console.info(`no plan for ${name}`);
-        return null;
+        return None;
       }
     } else {
-      Some(this.getSearchPlan(parentType, name, key, selections, args, fields, scalars, objects, errors));
+      return Some(this.getSearchPlan(parentType, name, key, selections, args, fields, scalars, objects, errors));
     }
   }
 
@@ -352,7 +361,14 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     const fullProjectionOrder: () => List<AliasAndName> = () => fields.map(x => x[0]).concat(objects.map(x => x[1]))
       .map((x: GQLField) => new AliasAndName(x.alias.value || x.name, x.name));
 
-    const hiddenIdField = new GQLField('id', Some(INTERNAL_ID_KEY), List().clear(), List().clear(), List().clear(), List().clear());
+    const hiddenIdField = new GQLField({
+        name: 'id',
+        alias: Some(INTERNAL_ID_KEY),
+        args: List(),
+        directives: List(),
+        selections: List(),
+        fields: List()
+    });
 
      // That's quite a mouthful
     const requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom =
@@ -364,14 +380,14 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     console.log(`getPlan ${name} requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom = ${requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom}`);
 
-    const projectionsByType: Map<string, List<GQLField>> =
+    const projectionsByType: any =
       requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom().merge(
         mapValues(queryFields.flatMap(tf => {
               const [t, f] = tf;
               const types = this.getSchema().getImplementingTypes(t).map(it => [it, f]);
               console.log(`implementing types of ${t} = ${types}`);
               return types;
-            }).groupBy(x => x[0]), value => value[1]));
+            }).groupBy(x => x[0]), (value: string) => value[1]));
 
     console.log(`getPlan ${name} objects = ${objects}`);
     console.log(`getPlan ${name} projectionsByType = ${projectionsByType}`);
@@ -383,44 +399,54 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     const fieldsPlanParentTypes = subjectTypes.filterNot(x => x.startsWith('O_xsd'));
     const fieldsPlan = () => {
-        if (fieldsPlanParentTypes.isEmpty) {
-            return List().clear();
-        } else {
-            return List().set(0,
-                new GQLFieldsExecutionPlan(
-                    fieldsPlanParentTypes.toSet(),
-                    name,
-                    key,
-                    RDFQueryService.createFieldsStrategyCreator(subjectTypes.toSet, projectionsByType, this.getPrefixes().keys(), this.getSchema()),
-                    List().clear(),
-                    fullProjectionOrder(),
-                    projectionsByType,
-                ),
-            );
-            // TODO try and eliminate the context of RDFQueryService as much as possible
-        }
+        return List(); // for now
+        // if (fieldsPlanParentTypes.isEmpty) {
+        //     return List().clear();
+        // } else {
+        //     return List().set(0,
+        //         new GQLFieldsExecutionPlan(
+        //             fieldsPlanParentTypes.toSet(),
+        //             name,
+        //             key,
+        //             RDFQueryService.createFieldsStrategyCreator(subjectTypes.toSet, projectionsByType, this.getPrefixes().keys(), this.getSchema()),
+        //             List().clear(),
+        //             fullProjectionOrder(),
+        //             projectionsByType,
+        //         ),
+        //     );
+        // }
     };
-
-    const [specialObjects, normalObjects] = partition(objects, (x: [string, GQLField]) => Set(Object.keys(this.specialObjectFields)).contains(x[1].name));
-    const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map(o => {
-        const args = this.processArgs(o[1].arguments, this.getSchema().validFieldsForType(this.specialObjectFields().get(o[1].name).returnType));
-        return new GQLFieldsExecutionPlan(Set(
-              parentType),
-              o[1].name,
-              key,
-              this.specialObjectFields().get(o[1].name).generator(args)),
-              List().clear(),
-              fullProjectionOrder().filter(a => a.alias === o[1].alias.getOrElse(o[1].name)),
-              projectionsByType;
+    const specialObjects = objects.filter(x => Set(Object.keys(this.specialObjectFields())).contains(x[1].name));
+    const normalObjects = objects.filter(x => !Set(Object.keys(this.specialObjectFields())).contains(x[1].name));
+    const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map((o: [string, GQLField]) => {
+        const arg = this.processArgs(o[1].args, this.getSchema().validFieldsForType(this.specialObjectFields().get(o[1].name).returnType));
+        return new GQLFieldsExecutionPlan(
+            Set(parentType),
+            o[1].name,
+            key,
+              // this.specialObjectFields().get(o[1].name).generator(arg)),
+            List<GQLExecutionPlan>(),
+            List().clear(),
+            fullProjectionOrder().filter(a => a.alias === o[1].alias.getOrElse(o[1].name)),
+            projectionsByType);
     });
     console.info(`specialObjects = ${specialObjects}`);
     console.info(`normalObjects = ${normalObjects}`);
     console.info(`fields plan ${fieldsPlan}`);
     const nonIgnoredNormalObjects = List(normalObjects.filter(f => !ignoredObjectFields.contains(f[1].name)));
-    const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(specialPlans.unshift(...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)));
-    const plan = new GQLSearchExecutionPlan(Set(parentType), name, key, mySubPlans, errors, fullProjectionOrder(), queryArgs, subjectTypes);
-    // TODO
-    plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, this.getPrefixes().keys(), this.getSchema()) });
+    const mySubPlans = List<GQLExecutionPlan>();
+    // const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(specialPlans.unshift(...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)));
+    const plan = new GQLSearchExecutionPlan({
+        parentTypes: Set(parentType),
+        name,
+        key,
+        subPlans: mySubPlans,
+        errors,
+        projectionOrder: fullProjectionOrder(),
+        queryArguments: queryArgs,
+        subjectTypes});
+    // plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, this.getPrefixes().keys(), this.getSchema()) });
+    return plan;
   }
 
  public exitFullOperationDefinition(ctx: GQLParser.FullOperationDefinitionContext) {
@@ -428,7 +454,8 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     this.operations.add(new GQLOperation({
             name: this.textOf(ctx.NAME()),
             description: Option.of(description),
-            operationType: ctx.operationType(),
+            operationType: 'query',
+            // operationType: ctx.operationType().text,
             variables: this.processVariableDefinitions(Option.of(ctx.variableDefinitions())),
             directives: this.processDirectives(Option.of(ctx.directives())),
             selections: this.processSelectionSet(ctx.selectionSet())}));
@@ -483,7 +510,7 @@ public processVariableDefinition(ctx: GQLParser.VariableDefinitionContext) {
                     throw new Error('Failed to find the type of number in value processing..');
                 }
             }
-        case GQLParser.ArrayValueContext: return new GQLArrayValue(List(ctx.constructor()).map(x => this.processValue(x)));
+        case GQLParser.ArrayValueContext: return new GQLArrayValue(List(ctx.constructor()).map(x => this.processValue(x as ValueContext)));
     }
   }
 
@@ -529,10 +556,10 @@ public processTypeCondition(ctx: GQLParser.TypeConditionContext) {
     return this.textOf(ctx.typeName().NAME());
   }
 
-public processSelectionSet(ctx: GQLParser.SelectionSetContext): List<GQLSelection> {
+public processSelectionSet(ctx: SelectionSetContext | FieldSelectionContext): List<GQLSelection> {
       if (Option.of(ctx).nonEmpty()) {
           switch (ctx.constructor.name) {
-              case 'TSome': return List([ctx]).map(c => c.constructor === GQLParser.FieldSelectionContext ? this.processField(c) : null);
+              case 'TSome': return List([ctx]).map(c => c.constructor === GQLParser.FieldSelectionContext ? this.processField((c as FieldSelectionContext).field()) : null);
               case 'GQLParser.InlineFragmentSelectionContext': return this.processInlineFragment(ctx.constructor().inlineFragment()).selections;
               case 'GQLParser.FragmentSpreadSelectionContext': return List([this.processFragmentSpread(ctx.constructor().fragmentSpread()) as GQLSelection]);
           }
@@ -544,8 +571,13 @@ public processSelectionSet(ctx: GQLParser.SelectionSetContext): List<GQLSelectio
 public processField(ctx: GQLParser.FieldContext): GQLField {
     const [name, alias] = this.processFieldName(ctx.fieldName());
     const fd = this.getSchema().getFieldDefinition(name.toString());
-    return new GQLField(name.toString(), Option.of(alias.toString()), this.processArguments(Option.of(ctx.arguments()), fd), this.processDirectives(Option.of(ctx.directives())),
-      this.processSelectionSet(ctx.selectionSet()));
+    return new GQLField({
+        name: name.toString(),
+        alias: Option.of(alias.toString()),
+        args: this.processArguments(Option.of(ctx.arguments()), fd),
+        directives: this.processDirectives(Option.of(ctx.directives())),
+        selections: this.processSelectionSet(ctx.selectionSet())
+    });
   }
 
 public processFieldName(ctx: GQLParser.FieldNameContext) {

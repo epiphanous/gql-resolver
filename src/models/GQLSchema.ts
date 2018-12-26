@@ -46,7 +46,7 @@ export class GQLSchema implements IGQLSchema {
   public fieldsByType: Map<string, Map<string, List<string>>> = Map();
   public typesByInterface: Map<string, Set<string>> = Map();
   public objectTypesForField: Map<string, Set<string>> = Map();
-    public types; .public flatten;
+    public types; public flatten;
   constructor(
     allFields: Map<string, GQLFieldDefinition>,
     allTypes: Map<string, GQLTypeDefinition>,

@@ -38,7 +38,7 @@ export default class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder 
     }
 
     public processTransform(context: TransformContext) {
-        const func = this.textOf(context.children.get(0) as TerminalNode);
+        const func = this.textOf(context.children[0] as TerminalNode);
         const iriRef = Option.of(context.iriRefOrVarRef())
             .map(a => this.processIriRefOrVarRef(a))
             .map(e => e.expression as string);
