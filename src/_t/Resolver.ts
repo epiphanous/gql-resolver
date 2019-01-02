@@ -1,12 +1,13 @@
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import fs = require('fs');
-import { None, Some } from 'funfix';
+import { None, Some, Failure, NotImplementedError } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
 import { GQLOperation } from '../models/GQLOperation';
 import { QueryStrategy } from '../models/QueryStrategy';
 import ResolverContext from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
+import QueryExecutionException from '../models/exceptions/QueryExecutionException';
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 
@@ -17,20 +18,20 @@ describe('Resolver', () => {
     'wow'
   );
   it('should create a resolver context', () => {
-    expect(rc).to.have.keys('a', 'b', 'c');
+    expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
   });
   const resolver = new Resolver(rc);
   const op = new GQLOperation({ name: 'test', operationType: 'query' });
 
-  it('should throw on empty op', () => {
-    expect(() => resolver.executeOperation(None)).to.throw(
-      'no executable operation'
-    );
+  it('should throw no op exception on empty op', () => {
+    const result = resolver.executeOperation(None);
+    assert(result.isFailure, 'operation failed');
+    expect(result.value).to.be.an.instanceOf(QueryExecutionException);
   });
 
-  it('should throw on real op', () => {
-    expect(() => resolver.executeOperation(Some(op))).to.throw(
-      'not implemented'
-    );
+  it('should throw not implemented exception on real op', () => {
+    const result = resolver.executeOperation(Some(op));
+    assert(result.isFailure, 'operation failed');
+    expect(result.value).to.be.an.instanceOf(NotImplementedError);
   });
 });
