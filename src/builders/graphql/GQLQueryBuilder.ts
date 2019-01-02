@@ -528,23 +528,31 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     ); // TODO other fields?
   }
 
-  public specialObjectFields: () => Map<string, SpecialObjectField> = () =>
-    Map(
-      List()
-      // TODO Legacy code here, need to implement for Jubel
-      // Map({
-      //     'athlinks_steps': new SpecialObjectField(
-      //        'athlinks_StepAction', ( args: GQLQueryArguments ) =>
-      //             RDFQueryService.createStepsStrategies(args, Set(this.getPrefixes().keys()), this.getSchema()),
-      //     ),
-      //     'schema_dataFeedElement': new SpecialObjectField(
-      //         'schema_DataFeedItem', (
-      //             args: GQLQueryArguments,
-      //         ) =>
-      //           RDFQueryService.createDataFeedStrategy(args, Set(this.getPrefixes().keys()), this.getSchema())
-      //     ),
-      // })
-    );
+  public specialObjectFields(): Map<string, SpecialObjectField> {
+    return Map(List());
+
+    // TODO Legacy code here, need to implement for Jubel
+    // return Map({
+    //   athlinks_steps: new SpecialObjectField(
+    //     'athlinks_StepAction',
+    //     (args: GQLQueryArguments) =>
+    //       RDFQueryService.createStepsStrategies(
+    //         args,
+    //         Set(this.getPrefixes().keys()),
+    //         this.getSchema()
+    //       )
+    //   ),
+    //   schema_dataFeedElement: new SpecialObjectField(
+    //     'schema_DataFeedItem',
+    //     (args: GQLQueryArguments) =>
+    //       RDFQueryService.createDataFeedStrategy(
+    //         args,
+    //         Set(this.getPrefixes().keys()),
+    //         this.getSchema()
+    //       )
+    //   ),
+    // });
+  }
 
   public getSearchPlan(
     parentType: string,
@@ -577,17 +585,16 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       fields: List(),
     });
 
-    // That's quite a mouthful
-    const requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom = objects
+    // request hidden id field for objects we are requesting objects
+    // from but maybe arent requesting scalars from
+    const hiddenIdFields = objects
       .map(x => x[0])
       .flatMap(typ => this.getSchema().getImplementingTypes(typ))
       .map(it => [it, List().set(0, hiddenIdField)]).toMap;
 
-    console.log(
-      `getPlan ${name} requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom = ${requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom}`
-    );
+    console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
 
-    const projectionsByType: any = requestHiddenIdFieldForObjectsWeAreRequestingObjectsFromButMaybeArentRequestingScalarsFrom().merge(
+    const projectionsByType: any = hiddenIdFields().merge(
       mapValues(
         queryFields
           .flatMap(tf => {
@@ -622,19 +629,25 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     const fieldsPlan = () => {
       return List(); // for now
       // if (fieldsPlanParentTypes.isEmpty()) {
-      //     return List().clear();
+      //   return List().clear();
       // } else {
-      //     return List().set(0,
-      //         new GQLFieldsExecutionPlan(
-      //             fieldsPlanParentTypes.toSet(),
-      //             name,
-      //             key,
-      //             RDFQueryService.createFieldsStrategyCreator(subjectTypes.toSet, projectionsByType, this.getPrefixes().keys(), this.getSchema()),
-      //             List().clear(),
-      //             fullProjectionOrder(),
-      //             projectionsByType,
-      //         ),
-      //     );
+      //   return List().set(
+      //     0,
+      //     new GQLFieldsExecutionPlan(
+      //       fieldsPlanParentTypes.toSet(),
+      //       name,
+      //       key,
+      //       RDFQueryService.createFieldsStrategyCreator(
+      //         subjectTypes.toSet,
+      //         projectionsByType,
+      //         this.getPrefixes().keys(),
+      //         this.getSchema()
+      //       ),
+      //       List().clear(),
+      //       fullProjectionOrder(),
+      //       projectionsByType
+      //     )
+      //   );
       // }
     };
     const specialObjects = objects.filter(x =>
@@ -672,7 +685,11 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       normalObjects.filter(f => !ignoredObjectFields.contains(f[1].name))
     );
     const mySubPlans = List<GQLExecutionPlan>();
-    // const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(specialPlans.unshift(...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)));
+    // const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(
+    //   specialPlans.unshift(
+    //     ...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)
+    //   )
+    // );
     const plan = new GQLSearchExecutionPlan({
       parentTypes: Set(parentType),
       name,
@@ -683,7 +700,13 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       queryArguments: queryArgs,
       subjectTypes,
     });
-    // plan.copy({ strategies: RDFQueryService.createSearchStrategyCreator(plan, this.getPrefixes().keys(), this.getSchema()) });
+    // plan.copy({
+    //   strategies: RDFQueryService.createSearchStrategyCreator(
+    //     plan,
+    //     this.getPrefixes().keys(),
+    //     this.getSchema()
+    //   ),
+    // });
     return plan;
   }
 

@@ -1,13 +1,13 @@
 import { assert, expect } from 'chai';
 import fs = require('fs');
-import { None, Some, Failure, NotImplementedError } from 'funfix';
+import { None, NotImplementedError, Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
+import QueryExecutionException from '../models/exceptions/QueryExecutionException';
 import { GQLOperation } from '../models/GQLOperation';
 import { QueryStrategy } from '../models/QueryStrategy';
 import ResolverContext from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
-import QueryExecutionException from '../models/exceptions/QueryExecutionException';
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 

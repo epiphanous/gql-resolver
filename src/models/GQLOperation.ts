@@ -19,7 +19,7 @@ export interface IGQLOperation {
 }
 
 export class GQLOperation implements IGQLOperation {
-  [key: string]: any
+  [key: string]: any;
   public name: string;
   public operationType: 'query' | 'mutation' | 'subscription';
   public fields: List<[string, GQLField]>;
@@ -39,6 +39,6 @@ export class GQLOperation implements IGQLOperation {
   }
 
   public copy(fields: Partial<IGQLOperation>) {
-    return new GQLOperation({...(this as object), ...fields});
+    return new GQLOperation({ ...(this as object), ...fields });
   }
 }

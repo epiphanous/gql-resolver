@@ -1,17 +1,17 @@
 import Record from 'dataclass';
-import {GQLObjectQueryModifierExpression} from './GQLObjectQueryModifierExpression';
+import { GQLObjectQueryModifierExpression } from './GQLObjectQueryModifierExpression';
 
 interface IGQLBinding {
-    name: string;
-    expression: GQLObjectQueryModifierExpression;
+  name: string;
+  expression: GQLObjectQueryModifierExpression;
 }
 
 export class GQLBinding implements IGQLBinding {
-    public name: string;
-    public expression: GQLObjectQueryModifierExpression;
+  public name: string;
+  public expression: GQLObjectQueryModifierExpression;
 
-    constructor(name: string, expression: GQLObjectQueryModifierExpression) {
-        this.name = name;
-        this.expression = expression;
-    }
+  constructor(name: string, expression: GQLObjectQueryModifierExpression) {
+    this.name = name;
+    this.expression = expression;
+  }
 }

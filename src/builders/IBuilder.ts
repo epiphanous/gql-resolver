@@ -1,5 +1,5 @@
-import {ANTLRInputStream, Lexer, Parser, TokenStream} from 'antlr4ts';
-import {Try} from 'funfix';
+import { ANTLRInputStream, Lexer, Parser, TokenStream } from 'antlr4ts';
+import { Try } from 'funfix';
 import BuilderError from './BuilderError';
 
 export default interface IBuilder<T> {

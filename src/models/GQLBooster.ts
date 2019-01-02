@@ -1,38 +1,37 @@
-
 interface IGQLBooster {
-    boost: number;
+  boost: number;
 }
 
 export class GQLBooster implements IGQLBooster {
-    public boost: number;
+  public boost: number;
 
-    constructor(boost: number) {
-        this.boost = boost;
-    }
+  constructor(boost: number) {
+    this.boost = boost;
+  }
 }
 
 export class GQLFieldBooster extends GQLBooster {
-    public field: string;
-    constructor(boost: number, field: string) {
-        super(boost);
-        this.field = field;
-    }
+  public field: string;
+  constructor(boost: number, field: string) {
+    super(boost);
+    this.field = field;
+  }
 }
 
 export class GQLUserFollowsBooster extends GQLBooster {
-    public user: string;
+  public user: string;
 
-    constructor(boost: number, user: string) {
-        super(boost);
-        this.user = user;
-    }
+  constructor(boost: number, user: string) {
+    super(boost);
+    this.user = user;
+  }
 }
 
 export class GQLUserIsFollowedBooster extends GQLBooster {
-    public user: string;
+  public user: string;
 
-    constructor(boost: number, user: string) {
-        super(boost);
-        this.user = user;
-    }
+  constructor(boost: number, user: string) {
+    super(boost);
+    this.user = user;
+  }
 }
