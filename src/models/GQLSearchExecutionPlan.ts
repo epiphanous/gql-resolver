@@ -31,7 +31,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan implements IGQLSear
     }
 
     public hasLimits() {
-        return !this.queryArguments.limit.isEmpty;
+        return !this.queryArguments.limit.isEmpty();
     }
 
     public copy(fields: Partial<IGQLSearchExecutionPlan>) {
@@ -95,7 +95,7 @@ export class GQLSearchExecutionPlan extends GQLExecutionPlan implements IGQLSear
                     .filter((c) => child.parentTypes.contains(c.iriType))
                     .map((c) => c.iri);
 
-                if (subjectIdsOfType.isEmpty) {
+                if (subjectIdsOfType.isEmpty()) {
                     return OrderedMap<string, List<OrderedMap<string, any>>>();
                 } else {
                     const childFields: OrderedMap<string,
