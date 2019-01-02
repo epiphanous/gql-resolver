@@ -3186,7 +3186,7 @@ type j_User implements I_owl_Thing {
 }
 
 type Mutation {
-  tripFilter(input: TripFilterInput!): j_ItineraryAlternative_Connection!
+  tripFilter(filterInput: TripFilterInput!): j_ItineraryAlternative_Connection!
 }
 
 type O_Boolean {

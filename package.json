@@ -3,7 +3,7 @@
     "antlr": "yarn run antlr-gql && yarn run antlr-qm",
     "antlr-gql": "cd src/antlr4 && antlr4ts -o generated GraphQL.g4",
     "antlr-qm": "cd src/antlr4 && antlr4ts -o generated QueryModification.g4",
-    "test": "mocha -r ts-node/register src/**/_t/*.ts"
+    "test": "mocha -r ts-node/register src/_t/*.ts src/**/_t/*.ts"
   },
   "dependencies": {
     "@types/lodash": "^4.14.118",
