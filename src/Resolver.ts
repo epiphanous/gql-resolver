@@ -19,9 +19,11 @@ export class Resolver {
     vars: Map<string, any> = Map<string, any>(),
     operation: Option<string> = None
   ): Try<Map<string, any>> {
+    console.log(`Query ${q}, vars: ${vars}, operation:${operation.value}`);
     const builder = new GQLQueryBuilder(this.context, vars);
     return Builder.parse<GQLQueryDocument>(builder, q).flatMap(doc => {
       const opName = operation.getOrElse(doc.operations.first());
+      console.log('OPERATION NAME: ', opName);
       return this.executeOperation(
         Option.of(
           doc.operations.find(
@@ -40,6 +42,17 @@ export class Resolver {
         new QueryExecutionException('no executable operation found in request')
       );
     }
+    console.log('OPERATION TYPE:', operation.value.operationType);
+    switch (operation.value.operationType) {
+        case 'query': return Try.success(Map({opType: 'Query'}));
+        case 'mutation': return Try.success(Map({opType: 'Mutation'}));
+        case 'subscription': return Try.success(Map({opType: 'Subscription'}));
+    }
     return Try.failure(new NotImplementedError('not implemented'));
   }
+
+  // public executeQueryOperation(operation: GQLOperation) {
+  //   const searchPlan = operation.executionPlan.value;
+  //   const oneResult = searchPlan.execute(List(), )
+  // }
 }

@@ -137,12 +137,12 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   }
 
   public getPrefixes() {
-    return DEFAULT_PREFIXES; // TODO revisit
+    return DEFAULT_PREFIXES;
   }
 
   public build(parser: GraphQLParser): Try<GQLQueryDocument> {
     try {
-      super.build(parser);
+      parser.document();
       this.resolveDefaults(this.vars);
       if (this.errorCount > 0) {
         throw this.errorReport;
@@ -713,22 +713,25 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   public exitFullOperationDefinition(
     ctx: GQLParser.FullOperationDefinitionContext
   ) {
+    console.log('EXIT FULL OPERATION DEFINITION');
     const description = Option.of(ctx.COMMENT())
       .getOrElse(List<string>())
       .join('\n');
-    this.operations.add(
-      new GQLOperation({
-        name: this.textOf(ctx.NAME()),
-        description: Option.of(description),
-        operationType: 'query',
-        // operationType: ctx.operationType().text,
-        variables: this.processVariableDefinitions(
-          Option.of(ctx.variableDefinitions())
-        ),
-        directives: this.processDirectives(Option.of(ctx.directives())),
-        selections: this.processSelectionSet(ctx.selectionSet()),
-      })
+    const gqlOp = new GQLOperation({
+      name: this.textOf(ctx.NAME()),
+      description: Option.of(description),
+      operationType: ctx.operationType().text,
+      variables: this.processVariableDefinitions(
+        Option.of(ctx.variableDefinitions())
+      ),
+      directives: this.processDirectives(Option.of(ctx.directives())),
+      selections: this.processSelectionSet(ctx.selectionSet()),
+    });
+    console.log(gqlOp);
+    this.operations = this.operations.add(
+      gqlOp
     );
+    console.log(this.operations);
   }
 
   public processVariableDefinitions(

@@ -12,6 +12,7 @@ import BuilderBase from '../BuilderBase';
 
 export default class GQLDocumentBuilder<T> extends BuilderBase<T>
   implements GraphQLListener {
+
   public lexer(inputStream: ANTLRInputStream) {
     return new GraphQLLexer(inputStream);
   }
@@ -29,10 +30,6 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
       isList,
       Option.of(ctx.nonNullType()).nonEmpty()
     );
-  }
-
-  public parseWith(parser: GraphQLParser) {
-    parser.document();
   }
 
   public enterDocument(ctx: DocumentContext) {

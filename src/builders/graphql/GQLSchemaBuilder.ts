@@ -94,7 +94,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   }
 
   public build(parser: GraphQLParser): Try<GQLSchema> {
-    this.parseWith(parser);
+    parser.document();
     if (this.errorCount) {
       Try.failure(this.errorReport.asThrowable());
     } else {
