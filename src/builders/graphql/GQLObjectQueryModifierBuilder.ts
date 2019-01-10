@@ -1620,6 +1620,16 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
   }
 }
 
+const GQLObjectQueryModifierBuilderTypesBasePatterns = {
+  DATE_PATTERN: '(\\d{4}-\\d{2}-\\d{2})',
+  TIME_PATTERN: '(\\d{2}:\\d{2}:\\d{2})',
+  TZ_PATTERN: '(Z|[-+]\\d{2}:\\d{2})',
+  URI_PATTERN: '(https?://.*)',
+  IRI_PATTERN: '(<https?://.*>)',
+  DATETIME_PATTERN: `(\\d{4}-\\d{2}-\\d{2})[T | ]
+    (\d{2}:\d{2}:\d{2})(Z|[-+]\\d{2}:\\d{2})?`,
+};
+
 const GQLObjectQueryModifierBuilderTypes = {
   double: List('xsd:double'),
   integer: List('xsd:integer'),
@@ -1632,17 +1642,10 @@ const GQLObjectQueryModifierBuilderTypes = {
   dateTime: List('xsd:dateTime'),
   iri: List('xsd:ID'),
   any: List(),
-  DATE_PATTERN: '(\\d{4}-\\d{2}-\\d{2})',
-  TIME_PATTERN: '(\\d{2}:\\d{2}:\\d{2})',
-  TZ_PATTERN: '(Z|[-+]\\d{2}:\\d{2})',
-  DATETIME_PATTERN: `${this.DATE_PATTERN}[T | ]${
-    this.TIME_PATTERN$TZ_PATTERN
-  }?`,
-  rDATETIME_PATTERN: new RegExp(this.DATETIME_PATTERN),
-  rDATE_PATTERN: new RegExp(this.DATE_PATTERN),
-  rTIME_PATTERN: new RegExp(this.TIME_PATTERN),
-  URI_PATTERN: '(https?://.*)',
-  rURI_PATTERN: new RegExp(this.URI_PATTERN),
-  IRI_PATTERN: '(<https?://.*>)',
-  rIRI_PATTERN: new RegExp(this.IRI_PATTERN),
+
+  rDATETIME_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.DATETIME_PATTERN),
+  rDATE_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.DATE_PATTERN),
+  rTIME_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.TIME_PATTERN),
+  rURI_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.URI_PATTERN),
+  rIRI_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.IRI_PATTERN),
 };

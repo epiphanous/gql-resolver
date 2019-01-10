@@ -417,8 +417,11 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     fields: List<[string, GQLField]>,
     selections: List<GQLSelection>,
   ) {
-    console.log(`plan ${name}: partitioning fields ${JSON.stringify(fields, null, 2)}`);
+    // console.log(`plan ${name}: partitioning fields ${JSON.stringify(fields, null, 2)}`);
     const [scalars, objects, errors] = this.getSchema().partitionFields(fields);
+    if (errors.size > 0) {
+      console.error(`Errors in field partitioning: ${ errors }`);
+    }
     if (objects.isEmpty()) {
       console.log(`no plan for ${name}`);
       return None;
@@ -719,7 +722,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     this.operations.add(
       gqlOp,
     );
-    console.log(this.operations);
+    console.log('Operations in GQBuilder:', this.operations);
   }
 
   public processVariableDefinitions(

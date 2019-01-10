@@ -74,7 +74,7 @@ export class GQLSchema implements IGQLSchema {
   }
 
   public init() {
-    this.fieldsByType.withMutations(fbt =>
+    this.fieldsByType = this.fieldsByType.withMutations(fbt =>
       fbt
         .concat(
           this.interfaces
@@ -93,14 +93,14 @@ export class GQLSchema implements IGQLSchema {
             d.fields
               .map(f => f.name)
               .map(f => {
-                const fd = this.getFieldTypeDefinition(f).map(ftd =>
-                  this.isScalarLike(ftd) ? 's' : 'o'
+                return this.getFieldTypeDefinition(f).map(ftd =>
+                  [this.isScalarLike(ftd) ? 's' : 'o', f]
                 );
               }),
           ])
         )
     );
-    this.typesByInterface.withMutations(map => {
+    this.typesByInterface = this.typesByInterface.withMutations(map => {
       this.objectTypes.forEach((d, t) => {
         d.interfaces.forEach(i => {
           if (!map.has(i)) {
@@ -348,12 +348,22 @@ export class GQLSchema implements IGQLSchema {
       })
       .map(tf => {
         const [objType, field] = tf;
-        const so = this.fieldsByType.get(objType);
+        const fieldStrArrPair = this.fieldsByType.get(objType);
+        const toValues = fieldStrArrPair[1].map((opt: Option<List<string>>) => opt.value).filter(optval => optval);
+        const grouped = toValues.reduce((acc, current) => {
+          if (acc[current[0]]) {
+            acc[current[0]].push(current[1]);
+          } else {
+            acc[current[0]] = [current[1]];
+          }
+          return acc;
+        }, {});
+        const so = Map(grouped);
         const s = Option.of(so.get('s'));
         const o = Option.of(so.get('o'));
-        if (s.nonEmpty && s.get().includes(field.name)) {
+        if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
           scalars.push(tf);
-        } else if (o.nonEmpty && o.get().includes(field.name)) {
+        } else if (o.nonEmpty() && (o.value as List<string>).includes(field.name)) {
           objects.push(tf);
         } else {
           errors.push(

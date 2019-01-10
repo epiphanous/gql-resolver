@@ -1,5 +1,4 @@
 import { assert, expect } from 'chai';
-import fs = require('fs');
 import { None, Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
@@ -8,6 +7,7 @@ import { GQLOperation } from '../models/GQLOperation';
 import { SparqlQueryStrategy } from '../models/QueryStrategy';
 import ResolverContext from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
+const fs = require('fs');
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 
