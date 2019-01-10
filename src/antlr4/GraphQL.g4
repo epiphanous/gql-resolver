@@ -139,7 +139,10 @@ implementsInterfaces
 
 implementsList
   : interfaceType (
-    ','? interfaceType+
+    (
+      ','
+      | '&'
+    )? interfaceType+
   )?
   ;
 
@@ -162,12 +165,12 @@ deprecationReason
 
 argumentsDefinition
   : '(' inputValueDefinition (
-    ',' inputValueDefinition
+    ','? inputValueDefinition
   )* ')'
   ;
 
 inputValueDefinition
-  : COMMENT* NAME ':' type defaultValue?
+  : COMMENT* NAME ':' type defaultValue? directives?
   ;
 
 interfaceType
@@ -175,7 +178,7 @@ interfaceType
   ;
 
 interfaceTypeDefinition
-  : COMMENT* 'interface' interfaceType '{' fieldDefinition+ '}'
+  : COMMENT* 'interface' interfaceType directives? '{' fieldDefinition+ '}'
   ;
 
 unionType
@@ -183,7 +186,7 @@ unionType
   ;
 
 unionTypeDefinition
-  : COMMENT* 'union' unionType '=' unionMembers
+  : COMMENT* 'union' unionType directives? '=' unionMembers
   ;
 
 unionMembers
@@ -207,7 +210,7 @@ enumType
   ;
 
 enumTypeDefinition
-  : COMMENT* 'enum' enumType '{' enumValueDefinition (
+  : COMMENT* 'enum' enumType directives? '{' enumValueDefinition (
     ','? enumValueDefinition
   )* '}'
   ;
@@ -252,7 +255,7 @@ typeCondition
 
 variableDefinitions
   : '(' variableDefinition (
-    ',' variableDefinition
+    ','? variableDefinition
   )* ')'
   ;
 

@@ -31,7 +31,9 @@ export class GQLObjectQueryModifierPrimitiveExpression extends GQLObjectQueryMod
 export class GQLObjectQueryModifierField extends GQLObjectQueryModifierPrimitiveExpression {}
 
 export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQueryModifierPrimitiveExpression {
-    expression:String, dataType:String, underlyingValue:Option[Any] = None
+  public expression: string;
+  public dataType: string;
+  public underlyingValue: Option<any> = None;
 }
 
 export class GQLObjectQueryBasicComparisonPredicate extends GQLObjectQueryModifierExpression {
@@ -45,16 +47,22 @@ export class GQLObjectQueryBasicComparisonPredicate extends GQLObjectQueryModifi
 }
 
 export class GQLObjectQueryModifierOptionalNegation extends GQLObjectQueryModifierExpression {
-  public hasNot: boolean
+  public hasNot: boolean;
+  public expr;
   constructor(hasNot: boolean, expr: GQLObjectQueryModifierPredicate) {
     super(`${hasNot ? '!' : ''}${expr.expression}`, 'xsd:boolean');
     this.hasNot = hasNot;
+    this.expr = expr;
   }
 }
 
 export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExpression {
-  public conjunctives: List<GQLObjectQueryModifierOptionalNegation>
-  constructor(conjunctives: List<GQLObjectQueryModifierOptionalNegation>) {
+  public conjunctives: List<GQLObjectQueryModifierOptionalNegation>;
+  constructor(
+    conjunctives: List<GQLObjectQueryModifierOptionalNegation> = List<
+      GQLObjectQueryModifierOptionalNegation
+    >()
+  ) {
     super(
       conjunctives.map(x => `(${x.expression})`).join(' && '),
       'xsd:boolean'
@@ -64,13 +72,10 @@ export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExp
 }
 
 export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExpression {
-  public disjunctives: List<GQLObjectQueryModifierConjunction>,
+  public disjunctives: List<GQLObjectQueryModifierConjunction>;
   public values: List<
-      Map<
-          GQLObjectQueryModifierField,
-          GQLObjectQueryModifierPrimitiveExpression
-          >
-      >
+    Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>
+  >;
   constructor(
     disjunctives: List<GQLObjectQueryModifierConjunction>,
     values: List<
@@ -90,8 +95,10 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
 }
 
 export class GQLObjectQueryModifierParensExpression extends GQLObjectQueryModifierExpression {
+  public expr;
   constructor(expr: GQLObjectQueryModifierExpression) {
     super(`(${expr.expression})`, expr.dataType);
+    this.expr = expr;
   }
 }
 

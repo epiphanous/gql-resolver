@@ -28,7 +28,7 @@ export class GQLType implements IGQLType {
         Float: 'xsd:float',
         Double: 'xsd:decimal',
         Boolean: 'xsd:boolean',
-      }[name] || name
+      }[this.name] || this.name
     );
   }
 }

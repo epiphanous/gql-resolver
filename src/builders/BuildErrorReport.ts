@@ -8,11 +8,11 @@ export class BuildErrorReport {
   }
 
   get errors() {
-    return this.issues.filter((e) => e.isError());
+    return this.issues.filter(e => e.isError());
   }
 
   get warnings() {
-    return this.issues.filter((e) => e.isWarning());
+    return this.issues.filter(e => e.isWarning());
   }
 
   get hasErrors() {
@@ -24,6 +24,6 @@ export class BuildErrorReport {
   }
 
   public asThrowable() {
-    return new Error(this.issues.map((e) => e.report()).join('\n'));
+    return new Error(this.issues.map(e => e.report()).join('\n'));
   }
 }
