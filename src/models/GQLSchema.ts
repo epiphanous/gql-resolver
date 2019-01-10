@@ -318,63 +318,50 @@ export class GQLSchema implements IGQLSchema {
   public partitionFields(
     fields: List<[string, GQLField]>
   ): [List<[string, GQLField]>, List<[string, GQLField]>, List<Error>] {
-    // tslint:disable
-    let scalars: [string, GQLField];
-    let objects: [string, GQLField];
-    let errors: [Error];
-    // tslint:enable
+    const scalars = List<[string, GQLField]>().asMutable();
+    const objects = List<[string, GQLField]>().asMutable();
+    const errors = List<Error>().asMutable();
+    console.log(fields);
+
     fields
-      .flatMap(objTypeAndField => {
-        if (
-          objTypeAndField[0].constructor.name === 'string' &&
-          objTypeAndField[1].constructor.name === 'GQLField'
-        ) {
-          const objType = objTypeAndField[0];
-          const field = objTypeAndField[1];
-          if (objType.startsWith('U_')) {
-            return List(
-              objType
-                .slice(2)
-                .split('_OR_')
-                .map(t => [t, field])
-            );
-          } else {
-            return List(objTypeAndField);
-          }
+      .flatMap<[string, GQLField]>(tf => {
+        console.log(tf);
+        const [objType, field] = tf;
+        if (objType.startsWith('U_')) {
+          List<[string, GQLField]>(
+            objType
+              .slice(2)
+              .split('_OR_')
+              .map<[string, GQLField]>(t => [t, field])
+          );
         } else {
-          console.error(`I DONT KNOW HOW TO HANDLE ${objTypeAndField}!`);
-          return List();
+          return List<[string, GQLField]>([tf]);
         }
       })
-      .map(tf => {
-        if (tf[0].startsWith('xsd')) {
-          return ['O_' + tf[0], tf[1]];
+      .map<[string, GQLField]>(tf => {
+        const [objType, field] = tf;
+        if (objType.startsWith('xsd')) {
+          return [`O_${objType}`, field];
         } else {
           return tf;
         }
       })
-      .map(objTypeAndField => {
-        const objType = objTypeAndField[0];
-        const field = objTypeAndField[1];
-        if (
-          objTypeAndField[0].constructor.name === 'string' &&
-          objTypeAndField[1].constructor.name === 'GQLField'
-        ) {
-          const so: Map<string, List<string>> = this.fieldsByType.get(objType);
-          const s: Option<List<string>> = Option.of(so.get('s'));
-          const o: Option<List<string>> = Option.of(so.get('o'));
-          if (s.nonEmpty && s.get().includes(field.name)) {
-            scalars.push(objTypeAndField);
-          } else if (o.nonEmpty && o.get().includes(field.name)) {
-            objects.push(objTypeAndField);
-          } else {
-            errors.push(
-              new Error(`field '${field.name}' not in type '$objType'`)
-            );
-          }
+      .map(tf => {
+        const [objType, field] = tf;
+        const so = this.fieldsByType.get(objType);
+        const s = Option.of(so.get('s'));
+        const o = Option.of(so.get('o'));
+        if (s.nonEmpty && s.get().includes(field.name)) {
+          scalars.push(tf);
+        } else if (o.nonEmpty && o.get().includes(field.name)) {
+          objects.push(tf);
+        } else {
+          errors.push(
+            new Error(`field '${field.name}' not in type '${objType}'`)
+          );
         }
       });
-    return [List([scalars]), List([objects]), List(errors)];
+    return [List(scalars), List(objects), List(errors)];
   }
 
   public getFieldsOf(t: string) {
@@ -456,7 +443,7 @@ export class GQLSchema implements IGQLSchema {
     let fragmentOwner: TSome<GQLField> | TNone = None;
     const result = selections.reduce((acc, node) => {
       if (node.constructor.name === 'GQLInlineFragment') {
-        if ((node as GQLInlineFragment).typeConditions === fieldType) {
+        if ((node as GQLInlineFragment).typeCondition === fieldType) {
           return acc.add([node as GQLInlineFragment, fragmentOwner]);
         } else {
           return acc.union(

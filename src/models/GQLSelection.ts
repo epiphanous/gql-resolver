@@ -63,24 +63,25 @@ export class GQLFragmentSpread extends GQLSelection
 }
 
 interface IGQLInlineFragment extends IGQLSelection {
-  typeConditions: string;
+  typeCondition: string;
   directives: List<GQLDirective>;
   selections: List<GQLSelection>;
 }
 
 export class GQLInlineFragment extends GQLSelection
   implements IGQLInlineFragment {
-  public typeConditions: string;
+  public typeCondition: string;
   public selections: List<GQLSelection>;
   public directives: List<GQLDirective>;
 
   constructor(
-    typeConditions: string,
+    typeCondition: string,
     selections: List<GQLSelection>,
     directives: List<GQLDirective> = List<GQLDirective>()
   ) {
     super(id64.gen());
-    this.typeConditions = typeConditions;
+    this.typeCondition = typeCondition;
     this.selections = selections;
+    this.directives = directives;
   }
 }

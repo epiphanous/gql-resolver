@@ -18,7 +18,6 @@ export const INTERNAL_RDFS_LABEL_BINDING = INTERNAL_PREFIX + RDFS_LABEL_KEY;
 
 export const DEFAULT_PREFIXES = Map({
     afn: new SimpleNamespace('afn', 'http://jena.hpl.hp.com/ARQ/function#'),
-    athlinks: new SimpleNamespace('athlinks', 'http://adp.athlinks.com/schema/'),
     dc: new SimpleNamespace('dc', 'http://purl.org/dc/elements/1.1/'),
     dcterms: new SimpleNamespace('dcterms', 'http://purl.org/dc/terms/'),
     fn: new SimpleNamespace('fn', 'http://www.w3.org/2005/xpath-functions#'),

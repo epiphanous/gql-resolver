@@ -38,7 +38,7 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
     this.errors.push(error);
   }
 
-  public textOf(t: TerminalNode, stripQuotes: boolean = false): string {
+  public textOf(t: TerminalNode, stripQuotes: boolean = true): string {
     return stripQuotes
       ? t.text.replace(/^['"]/, '').replace(/['"]$/, '')
       : t.text;

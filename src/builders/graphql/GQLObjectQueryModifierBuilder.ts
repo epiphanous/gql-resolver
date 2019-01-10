@@ -766,16 +766,16 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
     );
   }
 
-  public processEncopublicorUriFunc(
-    context: QMP.EncopublicorUriFuncContext
-  ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
-    return this.oneArgBuiltin(
-      context,
-      context.expression(),
-      'ENCODE_FOR_URI',
-      GQLObjectQueryModifierBuilderTypes.string
-    );
-  }
+//   public processEncopublicorUriFunc(
+//     context: QMP.EncopublicorUriFuncContext
+//   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
+//     return this.oneArgBuiltin(
+//       context,
+//       context.expression(),
+//       'ENCODE_FOR_URI',
+//       GQLObjectQueryModifierBuilderTypes.string
+//     );
+//   }
 
   public processExistsFunc(
     context: QMP.ExistsFuncContext

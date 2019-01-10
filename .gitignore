@@ -1,4 +1,5 @@
 # Logs
+.DS_Store
 .idea
 .vscode
 logs
@@ -6,6 +7,8 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+*.js
 
 # Runtime data
 pids

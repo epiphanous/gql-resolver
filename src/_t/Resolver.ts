@@ -1,6 +1,6 @@
 import { assert, expect } from 'chai';
 import fs = require('fs');
-import { None, NotImplementedError, Some } from 'funfix';
+import { None, Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
 import QueryExecutionException from '../models/exceptions/QueryExecutionException';
@@ -17,13 +17,13 @@ describe('Resolver', () => {
     Map({ sparql: new SparqlQueryStrategy() }),
     'sparql'
   );
-  it('should create a resolver context', () => {
+  it('creates a resolver context', () => {
     expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
   });
   const resolver = new Resolver(rc);
   const op = new GQLOperation({ name: 'test', operationType: 'query' });
 
-  it('should throw no op exception on empty op', () => {
+  it('throws no op exception on empty op', () => {
     const result = resolver.executeOperation(None);
     assert(result.isFailure, 'operation failed');
     expect(result.value).to.be.an.instanceOf(QueryExecutionException);
@@ -35,10 +35,18 @@ describe('Resolver', () => {
   //   expect(result.value).to.be.an.instanceOf(NotImplementedError);
   // });
 
-  it('should db connection have property docs', () => {
+  it('db connection has property \'documents\'', () => {
     const dbconn = resolver.context.strategies.get('sparql').dbConn;
     expect(dbconn).to.haveOwnProperty('documents');
   });
 
-  console.log(resolver.resolve('query myHero { hero (name: "hero1") { name }}', Map({'hero': 'hero'}), Some('query')));
+  it('resolves a query', () => {
+    const result = resolver.resolve(
+      'query test { user(id: "user/1") { s_name }}',
+      Map(),
+      Some('query'));
+    console.log(result);
+    assert(result.isSuccess());
+  });
+
 });

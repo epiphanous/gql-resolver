@@ -68,33 +68,20 @@ const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
 };
 
 export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
-  public operationTypes: Map<string, string>;
-  public scalarTypes: Set<GQLScalarType>;
-  public interfaces: Set<GQLInterface>;
-  public objectTypes: Set<GQLObjectType>;
-  public inputTypes: Set<GQLInputType>;
-  public unions: Set<GQLUnion>;
-  public enums: Set<GQLEnum>;
-  public directives: Set<GQLDirectiveDefinition>;
-  public allTypes: Map<string, GQLTypeDefinition>;
-  public allFields: Map<string, GQLFieldDefinition>;
-
-  constructor() {
-    super();
-    this.operationTypes = Map();
-    this.scalarTypes = Set();
-    this.interfaces = Set();
-    this.objectTypes = Set();
-    this.inputTypes = Set();
-    this.unions = Set();
-    this.enums = Set();
-    this.directives = Set();
-    this.allTypes = Map();
-    this.allFields = Map();
-  }
+  public operationTypes: Map<string, string> = Map<string, string>([
+    ['query', 'Query'], ['mutation', 'Mutation'], ['subscription', 'Subscription']
+  ]).asMutable();
+  public scalarTypes: Set<GQLScalarType> = Set<GQLScalarType>().asMutable();
+  public interfaces: Set<GQLInterface> = Set<GQLInterface>().asMutable();
+  public objectTypes: Set<GQLObjectType> = Set<GQLObjectType>().asMutable();
+  public inputTypes: Set<GQLInputType> = Set<GQLInputType>().asMutable();
+  public unions: Set<GQLUnion> = Set<GQLUnion>().asMutable();
+  public enums: Set<GQLEnum> = Set<GQLEnum>().asMutable();
+  public directives: Set<GQLDirectiveDefinition> = Set<GQLDirectiveDefinition>().asMutable();
+  public allFields: Map<string, GQLFieldDefinition> = Map<string, GQLFieldDefinition>().asMutable();
 
   public build(parser: GraphQLParser): Try<GQLSchema> {
-    parser.document();
+    this.parseWith(parser);
     if (this.errorCount) {
       Try.failure(this.errorReport.asThrowable());
     } else {
@@ -152,7 +139,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         s,
         u
       );
-      return Try.of(() => schema);
+      return Try.success(schema);
     }
   }
 
