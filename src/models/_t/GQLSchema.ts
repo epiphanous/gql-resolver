@@ -188,10 +188,6 @@ describe('GQLSchema', () => {
 
   it('has fields by type', () => {
     loadSchema();
-    schema.fieldsByType.get('s_BroadcastService').map((v, k) => {
-      console.log(k);
-      console.log(v);
-      return k;
-    });
+    console.log(schema.fieldsByType.toJS());
   });
 });

@@ -73,45 +73,28 @@ export class GQLSchema implements IGQLSchema {
   }
 
   public init() {
-    this.fieldsByType = this.fieldsByType.withMutations(fbt => {
-        const z = this.interfaces
-          .map((d, t) => {
-            const x = d.fields
-              .map(fd => this.getFieldTypeDefinition(fd.name)).filter(ftd => ftd.nonEmpty()).map(ftd => ftd.get());
-            return [
-              t,
-              x
-            ];
-          })
-          .toMap();
-        return fbt
-          .concat(z)
-          .concat(
-            this.objectTypes.map((d, t) => [
-              t,
-              d.fields
-                .map(f => f.name)
-                .map(f => {
-                  return this.getFieldTypeDefinition(f).map(ftd => [
-                    this.isScalarLike(ftd) ? 's' : 'o',
-                    f,
-                  ]);
-                }),
-            ])
-          );
-      }
-    );
-    this.typesByInterface = this.typesByInterface.withMutations(map => {
-      this.objectTypes.forEach((d, t) => {
-        d.interfaces.forEach(i => {
-          if (!map.has(i)) {
-            map.set(i, Set(t));
-          } else {
-            map.update(i, s => s.add(t));
-          }
-        });
+
+    const fbt = Map<string, Map<string, List<string>>>().asMutable();
+    const tbi = Map<string, Set<string>>().asMutable();
+    const otf = Map<string, Set<string>>().asMutable();
+
+    this.interfaces.forEach((i, t) => {
+      fbt.concat({[t]: this._scalarsObjects(i.fields)});
+    });
+    this.objectTypes.forEach((o, t) => {
+      fbt.concat({[t]: this._scalarsObjects(o.fields)});
+      o.interfaces.forEach(i => {
+        tbi.update(i, Set(), s => s.add(t));
+      });
+      o.fields.map(fd => fd.name).forEach(f => {
+        otf.update(f, Set(), s => s.add(t));
       });
     });
+
+    this.fieldsByType = fbt.asImmutable();
+    this.typesByInterface = tbi.asImmutable();
+    this.objectTypesForField = otf.asImmutable();
+
   }
 
   public getTypeName(t: string | GQLTypeDefinition): string {
@@ -274,32 +257,27 @@ export class GQLSchema implements IGQLSchema {
     }
 
     return types
-      .map(somePossibleSet => {
-        if (this.isScalarObjectType(somePossibleSet)) {
+      .map(p => {
+        if (this.isScalarObjectType(t)) {
           // This probably won't work..
-          return this.objectTypes.get(somePossibleSet).fields.map(f => {
+          return this.objectTypes.get(p).fields.map(f => {
             const key = f.gqlType.xsdType + '_' + f.name;
             const val = f.gqlType.xsdType;
             return [key, val];
           });
         } else {
-          let s;
-          let o;
-          if (this.fieldsByType.get(somePossibleSet).get('s')) {
-            s = this.fieldsByType
-              .get(somePossibleSet)
+          let s = List<[string, string]>();
+          let o = List<[string, string]>();
+          const fbt = this.fieldsByType.get(p);
+          if (fbt && fbt.has('s')) {
+            s = fbt
               .get('s')
-              .map(f => [f, this.getFieldType(f).get()]);
-          } else {
-            s = List();
+              .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
           }
-          if (this.fieldsByType.get(somePossibleSet).get('o')) {
-            o = this.fieldsByType
-              .get(somePossibleSet)
+          if (this.fieldsByType.get(p).get('o')) {
+            o = fbt
               .get('o')
-              .map(f => [f, this.getFieldType(f).get()]);
-          } else {
-            o = List();
+              .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
           }
           return s.concat(o);
         }
@@ -531,5 +509,16 @@ export class GQLSchema implements IGQLSchema {
     return typeMembersMappings().reduce((acc, item) => {
       return acc + item;
     }, Map<string, List<GQLField>>());
+  }
+
+  private _scalarsObjects(fields: List<GQLFieldDefinition>): Map<string, List<string>> {
+    return fields.map(fd => fd.name).map<[string, string]>(f => {
+      const ft = this.getFieldTypeDefinition(f);
+      if (ft.isEmpty()) {
+        throw new Error(`field type definition not found for ${f}`);
+      }
+      return [this.isScalarLike(ft.get()) ? 's' : 'o', f];
+    }).groupBy(([so]) => so).map(v => v.map(w => w[1]).toList())
+      .toMap();
   }
 }
