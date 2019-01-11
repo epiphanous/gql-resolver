@@ -561,7 +561,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
 
     const fullProjectionOrder: () => List<AliasAndName> = () =>
       fields
-        .map(x => x[0])
+        .map(x => x[1])
         .concat(objects.map(x => x[1]))
         .map(
           (x: GQLField) => new AliasAndName(x.alias.value || x.name, x.name),
@@ -581,24 +581,19 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument
     const hiddenIdFields = objects
       .map(x => x[0])
       .flatMap(typ => this.getSchema().getImplementingTypes(typ))
-      .map(it => [it, List().set(0, hiddenIdField)]).toMap;
-
+      .map(it => [it, List().set(0, hiddenIdField)]).toMap();
     console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
-
-    const projectionsByType: any = hiddenIdFields().merge(
-      mapValues(
+    const projectionsByType: any = hiddenIdFields.merge(
         queryFields
           .flatMap(tf => {
             const [t, f] = tf;
             const types = this.getSchema()
               .getImplementingTypes(t)
               .map(it => [it, f]);
-            console.log(`implementing types of ${t} = ${types}`);
             return types;
           })
-          .groupBy(x => x[0]),
-        (value: string) => value[1],
-      ),
+          .groupBy(x => x[0])
+          .mapEntries(([k, v]) => [k, v.get(0)[1]])
     );
 
     console.log(`getPlan ${name} objects = ${objects}`);
