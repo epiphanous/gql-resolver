@@ -44,9 +44,12 @@ export class Resolver {
     }
     console.log('OPERATION TYPE:', operation.value.operationType);
     switch (operation.value.operationType) {
-        case 'query': return Try.success(Map({opType: 'Query'}));
-        case 'mutation': return Try.success(Map({opType: 'Mutation'}));
-        case 'subscription': return Try.success(Map({opType: 'Subscription'}));
+      case 'query':
+        return Try.success(Map({ opType: 'Query' }));
+      case 'mutation':
+        return Try.success(Map({ opType: 'Mutation' }));
+      case 'subscription':
+        return Try.success(Map({ opType: 'Subscription' }));
     }
     return Try.failure(new NotImplementedError('not implemented'));
   }
