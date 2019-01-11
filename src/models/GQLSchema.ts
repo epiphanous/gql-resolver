@@ -269,15 +269,17 @@ export class GQLSchema implements IGQLSchema {
           let s = List<[string, string]>();
           let o = List<[string, string]>();
           const fbt = this.fieldsByType.get(p);
-          if (fbt && fbt.has('s')) {
-            s = fbt
-              .get('s')
-              .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
-          }
-          if (this.fieldsByType.get(p).get('o')) {
-            o = fbt
-              .get('o')
-              .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
+          if (fbt) {
+            if (fbt.has('s')) {
+              s = fbt
+                .get('s')
+                .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
+            }
+            if (fbt.has('o')) {
+              o = fbt
+                .get('o')
+                .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
+            }
           }
           return s.concat(o);
         }
