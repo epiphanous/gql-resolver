@@ -10,11 +10,11 @@ import {
 } from './Constants';
 import { GQLExecutionPlan, IGQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLQueryArguments } from './GQLQueryArguments';
-import AliasAndName from './NameAndAlias';
+import NameAlias from './NameAlias';
 import { QueryStrategy } from './QueryStrategy';
 
 interface IGQLSearchExecutionPlan extends IGQLExecutionPlan {
-  projectionOrder: List<AliasAndName>;
+  projectionOrder: List<NameAlias>;
   queryArguments: GQLQueryArguments;
   subjectTypes: List<string>;
   strategies: (slist: List<string>) => List<QueryStrategy>;
@@ -22,7 +22,7 @@ interface IGQLSearchExecutionPlan extends IGQLExecutionPlan {
 
 export class GQLSearchExecutionPlan extends GQLExecutionPlan
   implements IGQLSearchExecutionPlan {
-  public projectionOrder: List<AliasAndName>;
+  public projectionOrder: List<NameAlias>;
   public queryArguments: GQLQueryArguments;
   public subjectTypes: List<string>;
   public strategies: (slist: List<string>) => List<QueryStrategy> = null;
