@@ -766,16 +766,16 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
     );
   }
 
-//   public processEncopublicorUriFunc(
-//     context: QMP.EncopublicorUriFuncContext
-//   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
-//     return this.oneArgBuiltin(
-//       context,
-//       context.expression(),
-//       'ENCODE_FOR_URI',
-//       GQLObjectQueryModifierBuilderTypes.string
-//     );
-//   }
+  //   public processEncopublicorUriFunc(
+  //     context: QMP.EncopublicorUriFuncContext
+  //   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
+  //     return this.oneArgBuiltin(
+  //       context,
+  //       context.expression(),
+  //       'ENCODE_FOR_URI',
+  //       GQLObjectQueryModifierBuilderTypes.string
+  //     );
+  //   }
 
   public processExistsFunc(
     context: QMP.ExistsFuncContext
@@ -1643,9 +1643,19 @@ const GQLObjectQueryModifierBuilderTypes = {
   iri: List('xsd:ID'),
   any: List(),
 
-  rDATETIME_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.DATETIME_PATTERN),
-  rDATE_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.DATE_PATTERN),
-  rTIME_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.TIME_PATTERN),
-  rURI_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.URI_PATTERN),
-  rIRI_PATTERN: new RegExp(GQLObjectQueryModifierBuilderTypesBasePatterns.IRI_PATTERN),
+  rDATETIME_PATTERN: new RegExp(
+    GQLObjectQueryModifierBuilderTypesBasePatterns.DATETIME_PATTERN
+  ),
+  rDATE_PATTERN: new RegExp(
+    GQLObjectQueryModifierBuilderTypesBasePatterns.DATE_PATTERN
+  ),
+  rTIME_PATTERN: new RegExp(
+    GQLObjectQueryModifierBuilderTypesBasePatterns.TIME_PATTERN
+  ),
+  rURI_PATTERN: new RegExp(
+    GQLObjectQueryModifierBuilderTypesBasePatterns.URI_PATTERN
+  ),
+  rIRI_PATTERN: new RegExp(
+    GQLObjectQueryModifierBuilderTypesBasePatterns.IRI_PATTERN
+  ),
 };

@@ -69,7 +69,9 @@ const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
 
 export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   public operationTypes: Map<string, string> = Map<string, string>([
-    ['query', 'Query'], ['mutation', 'Mutation'], ['subscription', 'Subscription']
+    ['query', 'Query'],
+    ['mutation', 'Mutation'],
+    ['subscription', 'Subscription'],
   ]).asMutable();
   public scalarTypes: Set<GQLScalarType> = Set<GQLScalarType>().asMutable();
   public interfaces: Set<GQLInterface> = Set<GQLInterface>().asMutable();
@@ -77,8 +79,13 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   public inputTypes: Set<GQLInputType> = Set<GQLInputType>().asMutable();
   public unions: Set<GQLUnion> = Set<GQLUnion>().asMutable();
   public enums: Set<GQLEnum> = Set<GQLEnum>().asMutable();
-  public directives: Set<GQLDirectiveDefinition> = Set<GQLDirectiveDefinition>().asMutable();
-  public allFields: Map<string, GQLFieldDefinition> = Map<string, GQLFieldDefinition>().asMutable();
+  public directives: Set<GQLDirectiveDefinition> = Set<
+    GQLDirectiveDefinition
+  >().asMutable();
+  public allFields: Map<string, GQLFieldDefinition> = Map<
+    string,
+    GQLFieldDefinition
+  >().asMutable();
 
   public build(parser: GraphQLParser): Try<GQLSchema> {
     this.parseWith(parser);
@@ -199,17 +206,21 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
 
   public exitScalarTypeDefinition(ctx: ScalarTypeDefinitionContext) {
     const sType: string = this.textOf(ctx.scalarType().NAME());
-    // console.log({ scalar: sType });
-    const xsdToType: { [key: string]: string } = {
-      xsd_anyURI: 'ID',
-      xsd_boolean: 'Boolean',
-      xsd_float: 'Float',
-      xsd_integer: 'Int',
-      xsd_string: 'String',
-    };
-    const nType: Option<string> = Option.of(xsdToType[sType]);
+    const nativeTypes: Map<string, string> = Map([
+      ['ID', 'xsd_anyURI'],
+      ['Boolean', 'xsd_boolean'],
+      ['Float', 'xsd_float'],
+      ['Int', 'xsd_integer'],
+      ['String', 'xsd_string'],
+      ['URL', 'xsd_anyURI'],
+      ['Date', 'xsd_date'],
+      ['Time', 'xsd_time'],
+      ['DateTime', 'xsd_dateTime'],
+      ['Duration', 'xsd_duration'],
+    ]);
+    const nType: Option<string> = Option.of(nativeTypes.get(sType));
     this.scalarTypes.add(
-      new GQLScalarType(this.getComment(Option.of(ctx.COMMENT())), sType, nType)
+      new GQLScalarType(sType, this.getComment(Option.of(ctx.COMMENT())), nType)
     );
   }
 

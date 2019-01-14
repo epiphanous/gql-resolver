@@ -10,12 +10,13 @@ export class QueryStrategy {
 export class SparqlQueryStrategy extends QueryStrategy {
   constructor() {
     super();
-    this.dbConn = marklogic.createDatabaseClient({ // TODO move to a config file
-        host: 'localhost',
-        port: '8000',
-        user: 'admin',
-        password: 'admin',
-        authType: 'DIGEST'
+    this.dbConn = marklogic.createDatabaseClient({
+      // TODO move to a config file
+      host: 'localhost',
+      port: '8000',
+      user: 'admin',
+      password: 'admin',
+      authType: 'DIGEST',
     });
   }
 

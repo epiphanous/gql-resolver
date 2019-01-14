@@ -1,4 +1,5 @@
 import { assert, expect } from 'chai';
+import fs = require('fs');
 import { None, Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
@@ -7,7 +8,6 @@ import { GQLOperation } from '../models/GQLOperation';
 import { SparqlQueryStrategy } from '../models/QueryStrategy';
 import ResolverContext from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
-const fs = require('fs');
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 
@@ -35,7 +35,7 @@ describe('Resolver', () => {
   //   expect(result.value).to.be.an.instanceOf(NotImplementedError);
   // });
 
-  it('db connection has property \'documents\'', () => {
+  it("db connection has property 'documents'", () => {
     const dbconn = resolver.context.strategies.get('sparql').dbConn;
     expect(dbconn).to.haveOwnProperty('documents');
   });
@@ -44,9 +44,9 @@ describe('Resolver', () => {
     const result = resolver.resolve(
       'query test { user(id: "user/1") { s_name }}',
       Map(),
-      Some('query'));
+      Some('query')
+    );
     console.log(result);
     assert(result.isSuccess());
   });
-
 });
