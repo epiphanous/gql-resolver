@@ -11,11 +11,11 @@ import {
 } from './Constants';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLField } from './GQLSelection';
-import AliasAndName from './NameAndAlias';
+import NameAlias from './NameAlias';
 import { QueryStrategy } from './QueryStrategy';
 
 export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
-  public projectionOrder: List<AliasAndName> = List<AliasAndName>();
+  public projectionOrder: List<NameAlias> = List<NameAlias>();
   public projectionsByType: Map<string, List<GQLField>> = Map<
     string,
     List<GQLField>
@@ -29,7 +29,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
     key: string,
     subPlans: List<GQLExecutionPlan> = List(),
     errors: List<Error> = List(),
-    projectionOrder: List<AliasAndName> = List<AliasAndName>(),
+    projectionOrder: List<NameAlias> = List<NameAlias>(),
     projectionsByType: Map<string, List<GQLField>> = Map<
       string,
       List<GQLField>
@@ -111,7 +111,7 @@ export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
 
         const unsortedAliased: Map<string, any> = this.projectionOrder.reduce<
           Map<string, any>
-        >((acc: Map<string, any>, an: AliasAndName) => {
+        >((acc: Map<string, any>, an: NameAlias) => {
           if (unsorted.has(an.name)) {
             acc.set(an.alias, unsorted.get(an.name));
           }

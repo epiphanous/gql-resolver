@@ -73,7 +73,7 @@ import {
 } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import AliasAndName from '../../models/NameAndAlias';
+import NameAlias from '../../models/NameAlias';
 import { QueryStrategy } from '../../models/QueryStrategy';
 import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
@@ -579,12 +579,12 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     const queryFields: List<[string, GQLField]> = scalars;
     console.log(`queryFields for plan ${name} = ${queryFields}`);
 
-    const fullProjectionOrder: () => List<AliasAndName> = () =>
+    const fullProjectionOrder: () => List<NameAlias> = () =>
       fields
-        .map(x => x[0])
-        .concat(objects.map(x => x[1]))
+        .map(([_, field]) => field)
+        .concat(objects.map((_, field) => field))
         .map(
-          (x: GQLField) => new AliasAndName(x.alias.value || x.name, x.name)
+          (x: GQLField) => new NameAlias(x.alias.value || x.name, x.name),
         );
 
     const hiddenIdField = new GQLField({
@@ -598,28 +598,25 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
 
     // request hidden id field for objects we are requesting objects
     // from but maybe arent requesting scalars from
-    const hiddenIdFields = objects
-      .map(x => x[0])
-      .flatMap(typ => this.getSchema().getImplementingTypes(typ))
-      .map(it => [it, List().set(0, hiddenIdField)]).toMap;
-
-    console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
-
-    const projectionsByType: any = hiddenIdFields().merge(
-      mapValues(
-        queryFields
-          .flatMap(tf => {
-            const [t, f] = tf;
-            const types = this.getSchema()
-              .getImplementingTypes(t)
-              .map(it => [it, f]);
-            console.log(`implementing types of ${t} = ${types}`);
-            return types;
-          })
-          .groupBy(x => x[0]),
-        (value: string) => value[1]
-      )
+    const hiddenIdFields =  Map(
+      objects
+        .map(([t]) => t)
+        .flatMap(t => this.getSchema().getImplementingTypes(t))
+        .map<[string, List<GQLField>]>(it => [it, List([hiddenIdField])])
     );
+    console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
+    const projectionsByType = hiddenIdFields.merge(queryFields
+      .flatMap(tf => {
+        const t = tf[0];
+        const f = tf[1];
+        const types = this.getSchema()
+          .getImplementingTypes(t)
+          .map<[string, GQLField]>(it => [it, f]);
+        console.log(`implementing types of ${t} = ${types}`);
+        return types;
+      })
+      .groupBy(([x]) => x)
+      .map(v => v.map(w => w[1]).toList()));
 
     console.log(`getPlan ${name} objects = ${objects}`);
     console.log(`getPlan ${name} projectionsByType = ${projectionsByType}`);
