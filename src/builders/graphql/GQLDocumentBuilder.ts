@@ -31,11 +31,11 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
     );
   }
 
-  public parseWith(parser: GraphQLParser) {
-    parser.document();
+  public enterDocument(ctx: DocumentContext) {
+    console.log('start parse');
   }
 
-  public enterDocument(ctx: DocumentContext) {
-    console.log('start parse'); // tslint:disable-line
+  public parseWith(parser: GraphQLParser): DocumentContext {
+    return parser.document();
   }
 }

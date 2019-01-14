@@ -1,12 +1,11 @@
-import {ANTLRInputStream, Lexer, Parser, TokenStream} from 'antlr4ts';
-import {ParserRuleContext} from 'antlr4ts/ParserRuleContext';
-import {ParseTreeListener} from 'antlr4ts/tree/ParseTreeListener';
-import {TerminalNode} from 'antlr4ts/tree/TerminalNode';
-import {NotImplementedError, Option, Try} from 'funfix';
-import {List} from 'immutable';
+import { ANTLRInputStream, Lexer, Parser, TokenStream } from 'antlr4ts';
+import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
+import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
+import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
+import { NotImplementedError, Option, Try } from 'funfix';
 import BuilderError from './BuilderError';
+import { BuildErrorReport } from './BuildErrorReport';
 import IBuilder from './IBuilder';
-import {BuildErrorReport} from "./BuildErrorReport";
 
 export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   public errors: BuilderError[] = [];
@@ -24,11 +23,11 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   }
 
   get errorCount() {
-    return this.errors.filter((e) => e.isError()).size;
+    return this.errors.filter(e => e.isError()).length;
   }
 
   get warningCount() {
-    return this.errors.filter((e) => e.isWarning()).size;
+    return this.errors.filter(e => e.isWarning()).length;
   }
 
   get errorReport() {
@@ -39,7 +38,7 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
     this.errors.push(error);
   }
 
-  public textOf(t: TerminalNode, stripQuotes: boolean = false): string {
+  public textOf(t: TerminalNode, stripQuotes: boolean = true): string {
     return stripQuotes
       ? t.text.replace(/^['"]/, '').replace(/['"]$/, '')
       : t.text;
@@ -49,16 +48,16 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
     ok: boolean,
     message: string,
     ctx: ParserRuleContext,
-    isError: boolean = true,
+    isError: boolean = true
   ) {
     if (!ok) {
       const start = ctx.start;
-      const error = new BuilderError({
-        exception: Option.of(ctx.exception),
-        line: start.line,
+      const error = new BuilderError(
         message,
-        position: start.charPositionInLine,
-      });
+        start.line,
+        start.charPositionInLine,
+        Option.of(ctx.exception)
+      );
       this.addError(error);
     }
   }

@@ -1,9 +1,8 @@
-import { None, Option } from 'funfix';
-import id64 from 'id64';
+import { Option } from 'funfix';
+import * as id64 from 'id64';
 import { List } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
-import {assign} from 'lodash';
 
 interface IGQLSelection {
   name: string;
@@ -32,24 +31,17 @@ export class GQLField extends GQLSelection implements IGQLField {
   public selections: List<GQLSelection>;
   public fields: List<[string, GQLField]>;
 
-  constructor(
-    name: string,
-    alias: Option<string> = None,
-    args = List<GQLArgument>(),
-    directives = List<GQLDirective>(),
-    selections = List<GQLSelection>(),
-    fields = List<[string, GQLField]>()
-  ) {
-    super(name);
-    this.alias = alias;
-    this.args = args;
-    this.directives = directives;
-    this.selections = selections;
-    this.fields = fields;
+  constructor(data: Partial<IGQLField> = {}) {
+    super(data.name);
+    this.alias = data.alias;
+    this.args = data.args;
+    this.directives = data.directives;
+    this.selections = data.selections;
+    this.fields = data.fields;
   }
 
   public copy(fields: Partial<IGQLField>) {
-      return new GQLField({...(this as object), ...fields});
+    return new GQLField({ ...(this as object), ...fields });
   }
 }
 
@@ -71,24 +63,25 @@ export class GQLFragmentSpread extends GQLSelection
 }
 
 interface IGQLInlineFragment extends IGQLSelection {
-  typeConditions: string;
+  typeCondition: string;
   directives: List<GQLDirective>;
   selections: List<GQLSelection>;
 }
 
 export class GQLInlineFragment extends GQLSelection
   implements IGQLInlineFragment {
-  public typeConditions: string;
+  public typeCondition: string;
   public selections: List<GQLSelection>;
   public directives: List<GQLDirective>;
 
   constructor(
-    typeConditions: string,
+    typeCondition: string,
     selections: List<GQLSelection>,
     directives: List<GQLDirective> = List<GQLDirective>()
   ) {
     super(id64.gen());
-    this.typeConditions = typeConditions;
+    this.typeCondition = typeCondition;
     this.selections = selections;
+    this.directives = directives;
   }
 }

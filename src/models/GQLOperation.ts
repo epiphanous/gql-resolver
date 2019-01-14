@@ -7,9 +7,11 @@ import { GQLField, GQLSelection } from './GQLSelection';
 import { GQLVariableDefinition } from './GQLVariableDefinition';
 
 export interface IGQLOperation {
+  [key: string]: any;
   name: string;
   description: Option<string>;
-  operationType: 'query' | 'mutation' | 'subscription';
+  // operationType: 'query' | 'mutation' | 'subscription';
+  operationType: string;
   variables: List<GQLVariableDefinition>;
   directives: List<GQLDirective>;
   selections: List<GQLSelection>;
@@ -18,8 +20,10 @@ export interface IGQLOperation {
 }
 
 export class GQLOperation implements IGQLOperation {
+  [key: string]: any;
   public name: string;
-  public operationType: 'query' | 'mutation' | 'subscription';
+  // public operationType: 'query' | 'mutation' | 'subscription';
+  public operationType: string;
   public fields: List<[string, GQLField]>;
   public executionPlan: Option<GQLExecutionPlan>;
   public description: Option<string> = None;
@@ -37,6 +41,6 @@ export class GQLOperation implements IGQLOperation {
   }
 
   public copy(fields: Partial<IGQLOperation>) {
-    return new GQLOperation({...(this as object), ...fields});
+    return new GQLOperation({ ...(this as object), ...fields });
   }
 }

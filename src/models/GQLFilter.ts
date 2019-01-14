@@ -1,5 +1,5 @@
 import { Set } from 'immutable';
-import {GQLObjectQueryModifierDisjunction} from './GQLObjectQueryModifierExpression';
+import { GQLObjectQueryModifierDisjunction } from './GQLObjectQueryModifierExpression';
 
 interface IGQLFilter {
   expression: GQLObjectQueryModifierDisjunction;
