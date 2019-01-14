@@ -11,33 +11,30 @@ import {
 } from './Constants';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLField } from './GQLSelection';
-import AliasAndName from './NameAndAlias';
+import NameAndAlias from './NameAndAlias';
 import { QueryStrategy } from './QueryStrategy';
 
 export class GQLFieldsExecutionPlan extends GQLExecutionPlan {
-  public projectionOrder: List<AliasAndName> = List<AliasAndName>();
-  public projectionsByType: Map<string, List<GQLField>> = Map<
-    string,
-    List<GQLField>
-  >();
-  public strategies: (slist: List<string>) => List<QueryStrategy> = null;
+  public projectionOrder: List<AliasAndName>;
+  public projectionsByType: Map<string, List<GQLField>>;
+  public strategies: (slist: List<string>) => List<QueryStrategy>;
+
   public nameToPrefix = Map(_.invert(DEFAULT_PREFIXES.toObject()));
 
   constructor(
     parentTypes: Set<string>,
     name: string,
     key: string,
-    subPlans: List<GQLExecutionPlan> = List(),
-    errors: List<Error> = List(),
-    projectionOrder: List<AliasAndName> = List<AliasAndName>(),
-    projectionsByType: Map<string, List<GQLField>> = Map<
-      string,
-      List<GQLField>
-    >()
+    projectionOrder = List<NameAndAlias>(),
+    projectionsByType = Map<string, List<GQLField>>(),
+    strategies: (slist: List<string>) => List<QueryStrategy> = null,
+    subPlans = List<GQLExecutionPlan>(),
+    errors = List<Error>()
   ) {
     super(parentTypes, name, key, subPlans, errors);
     this.projectionOrder = projectionOrder;
     this.projectionsByType = projectionsByType;
+    this.strategies = strategies;
   }
 
   /**

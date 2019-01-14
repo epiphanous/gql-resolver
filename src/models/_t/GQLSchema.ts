@@ -188,6 +188,6 @@ describe('GQLSchema', () => {
 
   it('has fields by type', () => {
     loadSchema();
-    console.log(schema.fieldsByType.toJS());
+    console.log(schema.objectTypesForField.toJS());
   });
 });
