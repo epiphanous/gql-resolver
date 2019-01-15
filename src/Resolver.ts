@@ -30,29 +30,25 @@ export class Resolver {
           doc.operations.find(
             o => o.name === opName && o.executionPlan.nonEmpty()
           )
-        )
+        ),
+        vars
       );
     });
   }
 
   public executeOperation(
-    operation: Option<GQLOperation>
+    operation: Option<GQLOperation>,
+    vars: Map<string, any>
   ): Try<Map<string, any>> {
     if (operation.isEmpty()) {
       return Try.failure(
         new QueryExecutionException('no executable operation found in request')
       );
     }
-    console.log('OPERATION TYPE:', operation.value.operationType);
-    switch (operation.value.operationType) {
-      case 'query':
-        return Try.success(Map({ opType: 'Query' }));
-      case 'mutation':
-        return Try.success(Map({ opType: 'Mutation' }));
-      case 'subscription':
-        return Try.success(Map({ opType: 'Subscription' }));
-    }
-    return Try.failure(new NotImplementedError('not implemented'));
+    const op = operation.value;
+    console.log('OPERATION TYPE:', op.operationType);
+    op.executionPlan.get().execute();
+
   }
 
   // public executeQueryOperation(operation: GQLOperation) {

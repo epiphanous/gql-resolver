@@ -1,6 +1,5 @@
 import { Either, Left, None, Option, Right, Some, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
-import { mapValues } from 'lodash';
 import {
   ArgumentContext,
   ArgumentsContext,
@@ -43,7 +42,6 @@ import {
   GQLNameDirective,
   GQLValueDirective,
 } from '../../models/GQLDirective';
-import { GQLExecutionPlan } from '../../models/GQLExecutionPlan';
 import { GQLFieldsExecutionPlan } from '../../models/GQLFieldsExecutionPlan';
 import { GQLFilter } from '../../models/GQLFilter';
 import { GQLFragmentDefinition } from '../../models/GQLFragmentDefinition';
@@ -85,26 +83,13 @@ import GQLFilterBuilder from './GQLFilterBuilder';
 import GQLOrderByBuilder from './GQLOrderByBuilder';
 import GQLPatternsBuilder from './GQLPatternsBuilder';
 import GQLTransformsBuilder from './GQLTransformsBuilder';
+import { RDFQueryService } from '../../models/RDFQueryService';
 
 class UnknownFieldException extends Error {
   constructor() {
     super('Field not in type');
   }
 }
-
-class SpecialObjectField {
-  public returnType: string;
-  public generator: (args: GQLQueryArguments) => List<QueryStrategy>;
-
-  constructor(
-    returnType: string,
-    generator: (args: GQLQueryArguments) => List<QueryStrategy>
-  ) {
-    this.generator = generator;
-  }
-}
-
-const ignoredObjectFields = Set(['schema_item']);
 
 const ARG_TYPES = {
   ARG_BINDINGS: 'bindings',
@@ -245,8 +230,8 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       this.variables.forEach(vd => {
         const isRequired = vd.gqlType.isRequired;
         const defVoV = vd.defaultValue;
-        if (defVoV.nonEmpty) {
-          if (defVoV.get().isLeft) {
+        if (defVoV.nonEmpty()) {
+          if (defVoV.get().isLeft()) {
             const defValue = defVoV.get()._L.value;
             map.update(vd.name, defValue);
           }
@@ -539,32 +524,6 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     ); // TODO other fields?
   }
 
-  public specialObjectFields(): Map<string, SpecialObjectField> {
-    return Map(List());
-
-    // TODO Legacy code here, need to implement for Jubel
-    // return Map({
-    //   athlinks_steps: new SpecialObjectField(
-    //     'athlinks_StepAction',
-    //     (args: GQLQueryArguments) =>
-    //       RDFQueryService.createStepsStrategies(
-    //         args,
-    //         Set(this.getPrefixes().keys()),
-    //         this.getSchema()
-    //       )
-    //   ),
-    //   schema_dataFeedElement: new SpecialObjectField(
-    //     'schema_DataFeedItem',
-    //     (args: GQLQueryArguments) =>
-    //       RDFQueryService.createDataFeedStrategy(
-    //         args,
-    //         Set(this.getPrefixes().keys()),
-    //         this.getSchema()
-    //       )
-    //   ),
-    // });
-  }
-
   public getSearchPlan(
     parentType: string,
     name: string,
@@ -579,13 +538,9 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     const queryFields: List<[string, GQLField]> = scalars;
     console.log(`queryFields for plan ${name} = ${queryFields}`);
 
-    const fullProjectionOrder: () => List<NameAlias> = () =>
-      fields
-        .map(([_, field]) => field)
-        .concat(objects.map((_, field) => field))
-        .map(
-          (x: GQLField) => new NameAlias(x.alias.value || x.name, x.name),
-        );
+    const fullProjectionOrder = fields
+      .concat(objects)
+      .map(([_, d]) => new NameAlias(d.alias.value || d.name, d.name));
 
     const hiddenIdField = new GQLField({
       name: 'id',
@@ -598,11 +553,26 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
 
     // request hidden id field for objects we are requesting objects
     // from but maybe arent requesting scalars from
-    const hiddenIdFields =  Map(
+    const hiddenIdFields = Map(
       objects
         .map(([t]) => t)
         .flatMap(t => this.getSchema().getImplementingTypes(t))
-        .map<[string, List<GQLField>]>(it => [it, List([hiddenIdField])])
+        .map<[string, List<GQLField>]>(it => [it, List(hiddenIdField)])
+    );
+
+    console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
+
+    const projectionsByType = hiddenIdFields.merge(
+      queryFields
+        .flatMap(([t, f]) => {
+          const types = this.getSchema()
+            .getImplementingTypes(t)
+            .map<[string, GQLField]>(it => [it, f]);
+          console.log(`implementing types of ${t} = ${types}`);
+          return types;
+        })
+        .groupBy(([x]) => x)
+        .map(v => v.map(w => w[1]).toList())
     );
     console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
     const projectionsByType = hiddenIdFields.merge(queryFields
@@ -621,100 +591,64 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     console.log(`getPlan ${name} objects = ${objects}`);
     console.log(`getPlan ${name} projectionsByType = ${projectionsByType}`);
 
-    const subjectTypes: List<string> = List(projectionsByType.keys());
+    const subjectTypes = projectionsByType.keySeq().toSet();
 
-    const ptype: string = this.getSchema()
+    const ptype = this.getSchema()
       .getFieldType(name)
       .getOrElse(parentType);
+
     const queryArgs = this.processArgs(
       args,
       this.getSchema().validFieldsForType(ptype)
     ); // TODO Add method to schema
 
-    const fieldsPlanParentTypes = subjectTypes.filterNot(x =>
-      x.startsWith('O_xsd')
+    const fieldsPlanParentTypes = subjectTypes.filterNot(
+      x => x.startsWith('O_xsd') // TODO: might need to change this?
     );
-    const fieldsPlan = () => {
-      return List(); // for now
-      // if (fieldsPlanParentTypes.isEmpty()) {
-      //   return List().clear();
-      // } else {
-      //   return List().set(
-      //     0,
-      //     new GQLFieldsExecutionPlan(
-      //       fieldsPlanParentTypes.toSet(),
-      //       name,
-      //       key,
-      //       RDFQueryService.createFieldsStrategyCreator(
-      //         subjectTypes.toSet,
-      //         projectionsByType,
-      //         this.getPrefixes().keys(),
-      //         this.getSchema()
-      //       ),
-      //       List().clear(),
-      //       fullProjectionOrder(),
-      //       projectionsByType
-      //     )
-      //   );
-      // }
-    };
-    const specialObjects = objects.filter(x =>
-      Set(Object.keys(this.specialObjectFields())).contains(x[1].name)
-    );
-    const normalObjects = objects.filter(
-      x => !Set(Object.keys(this.specialObjectFields())).contains(x[1].name)
-    );
-    const specialPlans: List<GQLFieldsExecutionPlan> = specialObjects.map(
-      (o: [string, GQLField]) => {
-        const arg = this.processArgs(
-          o[1].args,
-          this.getSchema().validFieldsForType(
-            this.specialObjectFields().get(o[1].name).returnType
+
+    const fieldsPlan = fieldsPlanParentTypes.isEmpty()
+      ? List<GQLFieldsExecutionPlan>()
+      : List(
+          new GQLFieldsExecutionPlan(
+            fieldsPlanParentTypes.toSet(),
+            name,
+            key,
+            fullProjectionOrder,
+            projectionsByType,
+            // TODO: list of strategies
+            RDFQueryService.createFieldsStrategyCreator(
+              subjectTypes,
+              projectionsByType,
+              RDFQueryService.prefixes,
+              this.getSchema()
+            )
           )
         );
-        return new GQLFieldsExecutionPlan(
-          Set(parentType),
-          o[1].name,
-          key,
-          // this.specialObjectFields().get(o[1].name).generator(arg)),
-          List<GQLExecutionPlan>(),
-          List().clear(),
-          fullProjectionOrder().filter(
-            a => a.alias === o[1].alias.getOrElse(o[1].name)
-          ),
-          projectionsByType
-        );
-      }
+
+    const subPlans = this.getSearchSubPlans(name, selections, objects).concat(
+      fieldsPlan
+
     );
-    console.info(`specialObjects = ${specialObjects}`);
-    console.info(`normalObjects = ${normalObjects}`);
-    console.info(`fields plan ${fieldsPlan}`);
-    const nonIgnoredNormalObjects = List(
-      normalObjects.filter(f => !ignoredObjectFields.contains(f[1].name))
-    );
-    const mySubPlans = List<GQLExecutionPlan>();
-    // const mySubPlans: List<GQLExecutionPlan> = fieldsPlan().unshift(
-    //   specialPlans.unshift(
-    //     ...this.getSearchSubPlans(name, selections, nonIgnoredNormalObjects)
-    //   )
-    // );
+
     const plan = new GQLSearchExecutionPlan({
       parentTypes: Set(parentType),
       name,
       key,
-      subPlans: mySubPlans,
+      subPlans,
       errors,
-      projectionOrder: fullProjectionOrder(),
+      projectionOrder: fullProjectionOrder,
       queryArguments: queryArgs,
       subjectTypes,
     });
-    // plan.copy({
-    //   strategies: RDFQueryService.createSearchStrategyCreator(
-    //     plan,
-    //     this.getPrefixes().keys(),
-    //     this.getSchema()
-    //   ),
-    // });
+
+    plan.copy({
+      strategies: RDFQueryService.createSearchStrategyCreator(
+        plan,
+        this.getPrefixes().keys(),
+        this.getSchema()
+      ),
+    });
+
     return plan;
   }
 

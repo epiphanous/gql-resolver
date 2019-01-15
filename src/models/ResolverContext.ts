@@ -5,22 +5,27 @@ import { GQLSchema } from './GQLSchema';
 import { QueryStrategy } from './QueryStrategy';
 
 export default class ResolverContext {
+  public static buildSchema(schemaText: string): GQLSchema {
+    const builder = new GQLSchemaBuilder();
+    return Builder.parse<GQLSchema>(builder, schemaText).get();
+  }
+
   public schema: GQLSchema;
   public strategies: Map<string, QueryStrategy>;
-  public defaultStrategy: string;
+  public defaultStrategy: QueryStrategy;
 
   constructor(
     schemaText: string,
     strategies: Map<string, QueryStrategy>,
-    defaultStrategy: string
+    defaultStrategyName: string
   ) {
-    this.schema = this.buildSchema(schemaText);
+    if (!strategies.has(defaultStrategyName)) {
+      throw new Error(
+        `default query strategy '${defaultStrategyName} not provided in strategies initializer`
+      );
+    }
+    this.schema = ResolverContext.buildSchema(schemaText);
     this.strategies = strategies;
-    this.defaultStrategy = defaultStrategy;
-  }
-
-  public buildSchema(schemaText: string): GQLSchema {
-    const builder = new GQLSchemaBuilder();
-    return Builder.parse<GQLSchema>(builder, schemaText).get();
+    this.defaultStrategy = this.strategies.get(defaultStrategyName);
   }
 }
