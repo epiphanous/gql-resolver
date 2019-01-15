@@ -22,7 +22,8 @@ export class Resolver {
     console.log(`Query ${q}, vars: ${vars}, operation:${operation.value}`);
     const builder = new GQLQueryBuilder(this.context, vars);
     return Builder.parse<GQLQueryDocument>(builder, q).flatMap(doc => {
-      const opName = operation.getOrElse(doc.operations.first());
+      const firstOp: GQLOperation = doc.operations.first();
+      const opName = operation.getOrElse(firstOp.name);
       console.log('OPERATION NAME: ', opName);
       return this.executeOperation(
         Option.of(
@@ -47,6 +48,7 @@ export class Resolver {
     const op = operation.value;
     console.log('OPERATION TYPE:', op.operationType);
     op.executionPlan.get().execute();
+
   }
 
   // public executeQueryOperation(operation: GQLOperation) {
