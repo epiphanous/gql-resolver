@@ -1,5 +1,5 @@
 import { Option } from 'funfix';
-import { List, Map } from 'immutable';
+import { Map, Set } from 'immutable';
 import SimpleNamespace from './Namespace';
 
 export class RDFPrefixes {
@@ -93,7 +93,7 @@ export class RDFPrefixes {
 
   public sparqlHandler: QueryHandler;
   public namespaces: Map<string, SimpleNamespace>;
-  public prefixes: List<string>;
+  public prefixes: Set<string>;
   public prefixesFromNS: Map<string, string>;
   public sparqlPrefixes: Map<string, string>;
 
@@ -132,7 +132,7 @@ export class RDFPrefixes {
   }
 
   public prefixOk(prefix: string) {
-    return this.prefixes.contains(prefix);
+    return this.prefixes.has(prefix);
   }
 
   public togglePrefix(name: string) {

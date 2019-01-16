@@ -72,7 +72,7 @@ import {
 import { GQLVariable } from '../../models/GQLVariable';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import NameAlias from '../../models/NameAlias';
-import { QueryStrategy } from '../../models/QueryStrategy';
+import QueryStrategy from '../../models/QueryStrategy';
 import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
 import BuilderError from '../BuilderError';
@@ -557,7 +557,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       objects
         .map(([t]) => t)
         .flatMap(t => this.getSchema().getImplementingTypes(t))
-        .map<[string, List<GQLField>]>(it => [it, List(hiddenIdField)])
+        .map<[string, List<GQLField>]>(it => [it, List([hiddenIdField])])
     );
 
     console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
@@ -574,19 +574,20 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
         .groupBy(([x]) => x)
         .map(v => v.map(w => w[1]).toList())
     );
-    console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
-    const projectionsByType = hiddenIdFields.merge(queryFields
-      .flatMap(tf => {
-        const t = tf[0];
-        const f = tf[1];
-        const types = this.getSchema()
-          .getImplementingTypes(t)
-          .map<[string, GQLField]>(it => [it, f]);
-        console.log(`implementing types of ${t} = ${types}`);
-        return types;
-      })
-      .groupBy(([x]) => x)
-      .map(v => v.map(w => w[1]).toList()));
+
+    // console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
+    // const projectionsByType = hiddenIdFields.merge(queryFields
+    //   .flatMap(tf => {
+    //     const t = tf[0];
+    //     const f = tf[1];
+    //     const types = this.getSchema()
+    //       .getImplementingTypes(t)
+    //       .map<[string, GQLField]>(it => [it, f]);
+    //     console.log(`implementing types of ${t} = ${types}`);
+    //     return types;
+    //   })
+    //   .groupBy(([x]) => x)
+    //   .map(v => v.map(w => w[1]).toList()));
 
     console.log(`getPlan ${name} objects = ${objects}`);
     console.log(`getPlan ${name} projectionsByType = ${projectionsByType}`);
@@ -608,7 +609,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
 
     const fieldsPlan = fieldsPlanParentTypes.isEmpty()
       ? List<GQLFieldsExecutionPlan>()
-      : List(
+      : List([
           new GQLFieldsExecutionPlan(
             fieldsPlanParentTypes.toSet(),
             name,
@@ -623,7 +624,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
               this.getSchema()
             )
           )
-        );
+        ]);
 
     const subPlans = this.getSearchSubPlans(name, selections, objects).concat(
       fieldsPlan
@@ -638,7 +639,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       errors,
       projectionOrder: fullProjectionOrder,
       queryArguments: queryArgs,
-      subjectTypes,
+      subjectTypes: subjectTypes.toList(),
     });
 
     plan.copy({

@@ -1,9 +1,9 @@
 import { NotImplementedError } from 'funfix';
-import { List } from 'immutable';
+import { List, Set, Map } from 'immutable';
 import { GQLSchema } from './GQLSchema';
 import { GQLSearchExecutionPlan } from './GQLSearchExecutionPlan';
 import { GQLField } from './GQLSelection';
-import { QueryStrategy } from './QueryStrategy';
+import QueryStrategy from './QueryStrategy';
 import { RDFPrefixes } from './RDFPrefixes';
 
 export class RDFQueryService {
