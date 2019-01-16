@@ -36,21 +36,6 @@ describe('GQLSchema', () => {
     expect(schema).is.not.equal(undefined);
   });
 
-  // public allFields: Map<string, GQLFieldDefinition>;
-  // public allTypes: Map<string, GQLTypeDefinition>;
-  // public directives: Map<string, GQLDirectiveDefinition>;
-  // public enums: Map<string, GQLEnum>;
-  // public inputTypes: Map<string, GQLInputType>;
-  // public interfaces: Map<string, GQLInterface>;
-  // public objectTypes: Map<string, GQLObjectType>;
-  // public operationTypes: Map<string, string>;
-  // public scalarTypes: Map<string, GQLScalarType>;
-  // public unions: Map<string, GQLUnion>;
-  //
-  // public fieldsByType: Map<string, Map<string, List<string>>> = Map();
-  // public typesByInterface: Map<string, Set<string>> = Map();
-  // public objectTypesForField: Map<string, Set<string>> = Map();
-
   it('has allFields', () => {
     loadSchema();
     expect(schema.allFields.size).to.equal(570);

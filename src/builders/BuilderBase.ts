@@ -11,15 +11,15 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   public errors: BuilderError[] = [];
 
   public parser(tokenStream: TokenStream): Parser {
-    throw NotImplementedError;
+    throw new NotImplementedError('not implemented');
   }
 
   public lexer(inputStream: ANTLRInputStream): Lexer {
-    throw NotImplementedError;
+    throw new NotImplementedError('not implemented');
   }
 
   public build(parser: Parser): Try<T> {
-    throw NotImplementedError;
+    throw new NotImplementedError('not implemented');
   }
 
   get errorCount() {
