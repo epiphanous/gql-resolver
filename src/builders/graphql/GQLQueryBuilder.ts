@@ -50,8 +50,8 @@ import { GQLOrderBy } from '../../models/GQLOrderBy';
 import { GQLPattern } from '../../models/GQLPattern';
 import { GQLQueryArguments } from '../../models/GQLQueryArguments';
 import { GQLQueryDocument } from '../../models/GQLQueryDocument';
-import { GQLRootExecutionPlan } from '../../models/GQLRootExecutionPlan';
-import { GQLSearchExecutionPlan } from '../../models/GQLSearchExecutionPlan';
+// import { GQLRootExecutionPlan } from '../../models/GQLRootExecutionPlan';
+// import { GQLSearchExecutionPlan } from '../../models/GQLSearchExecutionPlan';
 import {
   GQLField,
   GQLFragmentSpread,
@@ -84,6 +84,7 @@ import GQLOrderByBuilder from './GQLOrderByBuilder';
 import GQLPatternsBuilder from './GQLPatternsBuilder';
 import GQLTransformsBuilder from './GQLTransformsBuilder';
 import { RDFQueryService } from '../../models/RDFQueryService';
+import {GQLExecutionPlan} from "../../models/GQLExecutionPlan";
 
 class UnknownFieldException extends Error {
   constructor() {
@@ -114,7 +115,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   public fragmentDefinitions: Set<GQLFragmentDefinition> = Set().asMutable();
   public variables: Set<GQLVariableDefinition> = Set().asMutable();
 
-  public GQLRootExecutionPlan: GQLRootExecutionPlan;
+  // public GQLRootExecutionPlan: GQLRootExecutionPlan;
 
   constructor(context: ResolverContext, vars: Map<string, any>) {
     super();
@@ -399,7 +400,8 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     objects: List<[string, GQLField]>
   ) {
     console.log(`subPlans name = ${name} objects = ${objects}`);
-    const plans: List<GQLSearchExecutionPlan> = objects.map(
+    // const plans: List<GQLSearchExecutionPlan> = objects.map(
+    const plans: List<GQLExecutionPlan> = objects.map(
       (tf: [string, GQLField]) => {
         const [t, f] = tf;
         console.log(`creating subplan ${f.name} from fields ${f.fields}`);
@@ -514,8 +516,8 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     errors: List<Error>
   ) {
     const mySubPlans = this.getSearchSubPlans(name, selections, objects);
-
-    return new GQLRootExecutionPlan(
+    // return new GQLRootExecutionPlan(
+    return new GQLExecutionPlan(
       Set<string>(),
       name,
       'key',
@@ -608,9 +610,11 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     );
 
     const fieldsPlan = fieldsPlanParentTypes.isEmpty()
-      ? List<GQLFieldsExecutionPlan>()
+      // ? List<GQLFieldsExecutionPlan>()
+      ? List<GQLExecutionPlan>()
       : List([
-          new GQLFieldsExecutionPlan(
+          // new GQLFieldsExecutionPlan(
+          new GQLExecutionPlan(
             fieldsPlanParentTypes.toSet(),
             name,
             key,
@@ -628,10 +632,10 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
 
     const subPlans = this.getSearchSubPlans(name, selections, objects).concat(
       fieldsPlan
-
     );
 
-    const plan = new GQLSearchExecutionPlan({
+    // const plan = new GQLSearchExecutionPlan({
+    const plan = new GQLExecutionPlan({
       parentTypes: Set(parentType),
       name,
       key,
