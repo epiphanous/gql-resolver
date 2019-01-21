@@ -150,7 +150,7 @@ fieldDefinition
   : COMMENT* (
     NAMETYPE
     | NAME
-  ) deprecated? argumentsDefinition? ':' type
+  ) deprecated? argumentsDefinition? ':' type directives?
   ;
 
 deprecated
