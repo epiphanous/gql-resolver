@@ -1,4 +1,6 @@
+import { Option } from 'funfix';
 import { List } from 'immutable';
+import { GQLVariable } from './GQLVariable';
 
 interface IGQLValue {
   value: any;
@@ -12,22 +14,37 @@ export class GQLValue implements IGQLValue {
   }
 }
 
+export class GQLVariableValue implements GQLValue {
+  public value: GQLVariable;
+
+  constructor(value: GQLVariable) {
+    this.value = value;
+  }
+
+  public resolve(vars: Map<string, any>): any {
+    return vars.get(this.value.name);
+  }
+}
+
 export class GQLBooleanValue extends GQLValue {
   public value: boolean;
 }
 
-export class GQLArrayValue extends GQLValue {
-  public value: List<any>;
+export class GQLNullValue extends GQLValue {
+  public constructor() {
+    super(null);
+  }
+}
+export class GQLValueList extends GQLValue {
+  public value: List<GQLValue>;
 }
 
-export class GQLNumberValue extends GQLValue {
-  public value: number;
+export class GQLKeyedValueList extends GQLValue {
+  public value: Map<string, GQLValue>;
 }
 
-export class GQLDoubleValue extends GQLNumberValue {}
-export class GQLIntValue extends GQLNumberValue {}
-export class GQLLongValue extends GQLNumberValue {}
-export class GQLFloatValue extends GQLNumberValue {}
+export class GQLIntValue extends GQLValue {}
+export class GQLFloatValue extends GQLValue {}
 export class GQLEnumValue extends GQLValue {
   public value: string;
 }

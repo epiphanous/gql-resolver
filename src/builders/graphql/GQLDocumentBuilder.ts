@@ -6,9 +6,11 @@ import {
   DocumentContext,
   GraphQLParser,
   TypeContext,
+  NamedTypeContext,
 } from '../../antlr4/generated/GraphQLParser';
 import { GQLType } from '../../models/GQLType';
 import BuilderBase from '../BuilderBase';
+import { ListTypeContext } from '../../antlr4/generated/GraphQLParser';
 
 export default class GQLDocumentBuilder<T> extends BuilderBase<T>
   implements GraphQLListener {
@@ -20,12 +22,12 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
     return new GraphQLParser(tokenStream);
   }
 
-  public getType(ctx: TypeContext) {
+  public getType(ctx: TypeContext, req: boolean = false, lst: boolean = false) {
     const lt = Option.of(ctx.listType());
     const isList = lt.nonEmpty();
     const typ = lt.map(t => t.type()).getOrElse(ctx);
     return new GQLType(
-      this.textOf(typ.typeName().NAME()),
+      this.textOf(typ.namedType().NAME()),
       isList,
       Option.of(ctx.nonNullType()).nonEmpty()
     );
