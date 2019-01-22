@@ -122,6 +122,7 @@ describe('GQLSchema', () => {
   it('enums has TripRole with correct members', () => {
     loadSchema();
     const tripRoleEnum = schema.enums.get('j_TripRole');
+    console.log('ENUM', tripRoleEnum.values);
     expect(tripRoleEnum).is.an.instanceOf(GQLEnum);
     const tripRoleMembers = [
       'j_Organizer',

@@ -21,6 +21,7 @@ import {
   UnionTypeDefinitionContext,
   ValueContext,
   FieldsDefinitionContext,
+  ArgumentsDefinitionContext,
 } from '../../antlr4/generated/GraphQLParser';
 import {
   EmptyObjectValueContext,
@@ -62,7 +63,10 @@ import {
 } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
-import { DescriptionContext } from '../../antlr4/generated/GraphQLParser';
+import {
+  DescriptionContext,
+  InputValueDefinitionContext,
+} from '../../antlr4/generated/GraphQLParser';
 
 const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
   bindings:
@@ -249,7 +253,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   }
 
   public exitEnumTypeDefinition(ctx: EnumTypeDefinitionContext) {
-    // console.log({ enum: this.textOf(ctx.enumType().NAME()) });
+    // console.log({ enum: this.textOf(ctx.NAME()) });
     const values = Option.of(ctx.enumValuesDefinition())
       .map(evds =>
         List(
@@ -257,6 +261,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
             const name = this.textOf(evd.ENUM_VALUE());
             const desc = this.getDescription(Option.of(evd.description()));
 
+            // console.log({ name });
             // todo: process directives
             const [isDeprecated, deprecationReason] = [false, None];
             return new GQLEnumValueDefinition(
@@ -280,20 +285,10 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   }
 
   public exitDirectiveDefinition(ctx: DirectiveDefinitionContext) {
-    const args = List(
-      ctx
-        .argumentsDefinition()
-        .inputValueDefinition()
-        .map(
-          a =>
-            new GQLArgumentDefinition(
-              this.textOf(a.NAME()),
-              this.getDescription(Option.of(a.description())),
-              this.getType(a.type()),
-              this.processDefaultValue(Option.of(a.defaultValue()))
-            )
-        )
-    );
+    const inputs = Option.of(ctx.argumentsDefinition())
+      .map(ad => List(ad.inputValueDefinition()))
+      .getOrElse(List<InputValueDefinitionContext>());
+
     const locations = List(
       ctx
         .directiveLocations()
@@ -305,7 +300,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
       new GQLDirectiveDefinition(
         this.textOf(ctx.NAME()),
         this.getDescription(Option.of(ctx.description())),
-        args,
+        this.getArgumentDefinitions(inputs),
         locations
       )
     );
@@ -314,26 +309,30 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   public exitInputObjectTypeDefinition(ctx: InputObjectTypeDefinitionContext) {
     const name = this.textOf(ctx.NAME());
     // console.log({ inputObject: name });
-    const args = Option.of(ctx.inputFieldsDefinition())
-      .map(ifd =>
-        List(
-          ifd
-            .inputValueDefinition()
-            .map(
-              a =>
-                new GQLArgumentDefinition(
-                  this.textOf(a.NAME()),
-                  this.getDescription(Option.of(a.description())),
-                  this.getType(a.type()),
-                  this.processDefaultValue(Option.of(a.defaultValue()))
-                )
-            )
-        )
-      )
-      .getOrElse(List<GQLArgumentDefinition>());
+    const inputs = Option.of(ctx.inputFieldsDefinition())
+      .map(ifdc => List(ifdc.inputValueDefinition()))
+      .getOrElse(List<InputValueDefinitionContext>());
 
     const desc = this.getDescription(Option.of(ctx.description()));
-    this.inputTypes.add(new GQLInputType(name, desc, args));
+    this.inputTypes.add(
+      new GQLInputType(name, desc, this.getArgumentDefinitions(inputs))
+    );
+  }
+
+  public getArgumentDefinitions(ctx: List<InputValueDefinitionContext>) {
+    return ctx.map(a => {
+      const argName = this.textOf(a.NAME());
+      let argDesc = this.getDescription(Option.of(a.description()));
+      if (argDesc.length === 0) {
+        argDesc = STANDARD_ARG_DESCRIPTION[argName] || '';
+      }
+      return new GQLArgumentDefinition(
+        argName,
+        argDesc,
+        this.getType(a.type()),
+        this.processDefaultValue(Option.of(a.defaultValue()))
+      );
+    });
   }
 
   public getFieldDefinition(ctx: FieldDefinitionContext) {
@@ -341,25 +340,10 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     // console.log({ field: fieldName });
 
     const fieldType = this.getType(ctx.type());
-    const args = Option.of(ctx.argumentsDefinition())
-      .map(ad =>
-        List(
-          ad.inputValueDefinition().map(a => {
-            const argName = this.textOf(a.NAME());
-            let argDesc = this.getDescription(Option.of(a.description()));
-            if (argDesc.length === 0) {
-              argDesc = STANDARD_ARG_DESCRIPTION[argName] || '';
-            }
-            return new GQLArgumentDefinition(
-              argName,
-              argDesc,
-              this.getType(a.type()),
-              this.processDefaultValue(Option.of(a.defaultValue()))
-            );
-          })
-        )
-      )
-      .getOrElse(List<GQLArgumentDefinition>());
+
+    const inputs = Option.of(ctx.argumentsDefinition())
+      .map(ad => List(ad.inputValueDefinition()))
+      .getOrElse(List<InputValueDefinitionContext>());
 
     // todo: process directives
     const [isDeprecated, deprecationReason] = [false, None];
@@ -370,7 +354,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
       fieldType,
       isDeprecated,
       deprecationReason,
-      args
+      this.getArgumentDefinitions(inputs)
     );
     this.allFields.set(fieldName, fd);
     return fd;
