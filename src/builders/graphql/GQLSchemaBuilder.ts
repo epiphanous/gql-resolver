@@ -1,40 +1,20 @@
-import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { None, Option, Try } from 'funfix';
 import { Map, Set } from 'immutable';
 import { List } from 'immutable';
 import {
-  BooleanValueContext,
-  DefaultValueContext,
   DirectiveDefinitionContext,
-  EmptyListValueContext,
   EnumTypeDefinitionContext,
-  EnumValueValueContext,
   FieldDefinitionContext,
+  FieldsDefinitionContext,
   GraphQLParser,
   InputObjectTypeDefinitionContext,
   InterfaceTypeDefinitionContext,
-  IntValueContext,
   ObjectTypeDefinitionContext,
   ScalarTypeDefinitionContext,
   SchemaDefinitionContext,
-  StringValueContext,
   UnionTypeDefinitionContext,
-  ValueContext,
-  FieldsDefinitionContext,
-  ArgumentsDefinitionContext,
 } from '../../antlr4/generated/GraphQLParser';
-import {
-  EmptyObjectValueContext,
-  NonEmptyListValueContext,
-} from '../../antlr4/generated/GraphQLParser';
-import {
-  FloatValueContext,
-  VariableValueContext,
-} from '../../antlr4/generated/GraphQLParser';
-import {
-  NonEmptyObjectValueContext,
-  NullValueContext,
-} from '../../antlr4/generated/GraphQLParser';
+import { InputValueDefinitionContext } from '../../antlr4/generated/GraphQLParser';
 import { GQLSchema } from '../../models/GQLSchema';
 import {
   GQLArgumentDefinition,
@@ -49,24 +29,7 @@ import {
   GQLTypeDefinition,
   GQLUnion,
 } from '../../models/GQLTypeDefinition';
-import {
-  GQLBooleanValue,
-  GQLEnumValue,
-  GQLFloatValue,
-  GQLIntValue,
-  GQLKeyedValueList,
-  GQLNullValue,
-  GQLStringValue,
-  GQLValue,
-  GQLValueList,
-  GQLVariableValue,
-} from '../../models/GQLValue';
-import { GQLVariable } from '../../models/GQLVariable';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
-import {
-  DescriptionContext,
-  InputValueDefinitionContext,
-} from '../../antlr4/generated/GraphQLParser';
 
 const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
   bindings:
@@ -163,10 +126,6 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
       );
       return Try.success(schema);
     }
-  }
-
-  public getDescription(ctxOpt: Option<DescriptionContext>) {
-    return ctxOpt.map(dc => this.textOf(dc.STRING_VALUE())).getOrElse('');
   }
 
   public exitSchemaDefinition(ctx: SchemaDefinitionContext) {
@@ -358,78 +317,5 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     );
     this.allFields.set(fieldName, fd);
     return fd;
-  }
-
-  public processDefaultValue(ctxOpt: Option<DefaultValueContext>) {
-    return ctxOpt.map(dv => this.processValue(dv.value()));
-  }
-
-  public processValue(ctx: ValueContext): GQLValue {
-    if (ctx instanceof VariableValueContext) {
-      const varName = this.textOf(
-        (ctx as VariableValueContext).variable().NAME()
-      );
-      return new GQLVariableValue(new GQLVariable(varName));
-    }
-    if (ctx instanceof IntValueContext) {
-      return new GQLIntValue(
-        parseInt(this.textOf((ctx as IntValueContext).INT_VALUE()), 10)
-      );
-    }
-    if (ctx instanceof FloatValueContext) {
-      return new GQLFloatValue(
-        parseFloat(this.textOf((ctx as FloatValueContext).FLOAT_VALUE()))
-      );
-    }
-    if (ctx instanceof StringValueContext) {
-      return new GQLStringValue(
-        this.textOf((ctx as StringValueContext).STRING_VALUE())
-      );
-    }
-    if (ctx instanceof BooleanValueContext) {
-      return new GQLBooleanValue(
-        this.textOf((ctx as BooleanValueContext).BOOLEAN_VALUE()) === 'true'
-      );
-    }
-
-    if (ctx instanceof NullValueContext) {
-      return new GQLNullValue();
-    }
-
-    if (ctx instanceof EnumValueValueContext) {
-      return new GQLEnumValue(
-        this.textOf((ctx as EnumValueValueContext).ENUM_VALUE())
-      );
-    }
-
-    if (ctx instanceof EmptyListValueContext) {
-      return new GQLValueList(List<GQLValue>());
-    }
-
-    if (ctx instanceof NonEmptyListValueContext) {
-      return new GQLValueList(
-        List(
-          (ctx as NonEmptyListValueContext)
-            .value()
-            .map(vc => this.processValue(vc))
-        )
-      );
-    }
-
-    if (ctx instanceof EmptyObjectValueContext) {
-      return new GQLKeyedValueList(Map<string, GQLValue>());
-    }
-
-    if (ctx instanceof NonEmptyObjectValueContext) {
-      return new GQLKeyedValueList(
-        Map(
-          (ctx as NonEmptyObjectValueContext)
-            .objectField()
-            .map<[string, GQLValue]>(of => {
-              return [this.textOf(of.NAME()), this.processValue(of.value())];
-            })
-        )
-      );
-    }
   }
 }

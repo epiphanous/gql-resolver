@@ -1,37 +1,27 @@
-import { Either } from 'funfix';
+import { Option } from 'funfix';
 import { Map } from 'immutable';
 import { GQLValue } from './GQLValue';
-import { GQLVariable } from './GQLVariable';
 
 interface IGQLArgument {
   name: string;
-  value: Either<GQLValue, GQLVariable>;
+  value: GQLValue;
+  resolve(vars: Map<string, any>, directives: Map<string, any>): Option<any>;
 }
 
 export class GQLArgument implements IGQLArgument {
   public name: string;
-  public value: Either<GQLValue, GQLVariable>;
+  public value: GQLValue;
 
-  constructor(name: string, value: Either<GQLValue, GQLVariable>) {
+  constructor(name: string, value: GQLValue) {
     this.name = name;
     this.value = value;
   }
 
-  public resolve(vars: Map<string, any>) {
-    const x = this.value.fold<string>(
-      v => v.value,
-      v => {
-        if (!vars.has(v.name)) {
-          throw new Error(
-            `value not provided for variable ${
-              v.name
-            } in context of argument '${name}'`
-          );
-        }
-        return vars.get(v.name);
-      }
-    );
-    return x.toString();
+  public resolve(
+    vars: Map<string, any>,
+    directives: Map<string, any> = Map<string, any>()
+  ) {
+    return this.value.resolve(vars, this.name, directives);
   }
 }
 
