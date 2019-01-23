@@ -49,7 +49,6 @@ export class Resolver {
     const op = operation.value;
     console.log('OPERATION TYPE:', op.operationType);
     op.executionPlan.get().execute();
-
   }
 
   // public executeQueryOperation(operation: GQLOperation) {

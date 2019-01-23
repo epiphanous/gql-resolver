@@ -9,7 +9,7 @@ import { GQLPattern } from './GQLPattern';
 import { GQLTransform } from './GQLTransform';
 
 interface IGQLQueryArguments {
-  any: Option<GQLAny>;
+  any: List<GQLAny>;
   bindings: List<GQLBinding>;
   boosters: List<GQLBooster>;
   filter: Option<GQLFilter>;
@@ -23,7 +23,7 @@ interface IGQLQueryArguments {
 }
 
 export class GQLQueryArguments implements IGQLQueryArguments {
-  public any: Option<GQLAny>;
+  public any: List<GQLAny>;
   public bindings: List<GQLBinding>;
   public boosters: List<GQLBooster>;
   public filter: Option<GQLFilter>;
@@ -36,7 +36,7 @@ export class GQLQueryArguments implements IGQLQueryArguments {
   public transforms: List<GQLTransform>;
 
   constructor(data: Partial<IGQLQueryArguments> = {}) {
-    this.any = data.any || None;
+    this.any = data.any || List();
     this.bindings = data.bindings || List();
     this.boosters = data.boosters || List();
     this.filter = data.filter || None;

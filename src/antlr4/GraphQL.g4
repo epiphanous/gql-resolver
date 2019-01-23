@@ -1,28 +1,20 @@
-/*
- The MIT License (MIT)
- 
- Copyright (c) 2015 Joseph T. McBride
- 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to
- deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- IN THE SOFTWARE.
- 
- GraphQL grammar derived from:
- 
- GraphQL Draft Specification - July 2015
- 
- http://facebook.github.io/graphql/ https://github.com/facebook/graphql
- */
-
-/**
- * Updated to include schema language idl GraphQL Draft Spec August 2017 Bob Lyons <nextdude@gmail.com>
+/***********************************************************************
+ * Copyright 2019 Epiphanous Consulting, Inc.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ * 
+ * Generated from https://facebook.github.io/graphql/draft/#sec-Appendix-Grammar-Summary on 2019-01-22T03:35:49.836Z
+ * 
+ * The GraphQL spec is (C)opyright 2012-2019 Facebook.
  */
 
 grammar GraphQL
@@ -33,26 +25,29 @@ document
   ;
 
 definition
+  : executableDefinition
+  | typeSystemDefinition
+  | typeSystemExtension
+  ;
+
+executableDefinition
   : operationDefinition
   | fragmentDefinition
-  | typeSystemDefinition
   ;
 
 operationDefinition
-  : COMMENT* selectionSet                                                     # selectionOnlyOperationDefinition
-  | COMMENT* operationType NAME variableDefinitions? directives? selectionSet # fullOperationDefinition
-  ;
-
-selectionSet
-  : '{' selection (
-    ','? selection
-  )* '}'
+  : selectionSet                                                      # selectionOnlyOperationDefinition
+  | operationType NAME? variableDefinitions? directives? selectionSet # fullOperationDefinition
   ;
 
 operationType
   : 'query'
   | 'mutation'
   | 'subscription'
+  ;
+
+selectionSet
+  : '{' selection+ '}'
   ;
 
 selection
@@ -62,27 +57,19 @@ selection
   ;
 
 field
-  : COMMENT* fieldName arguments? directives? selectionSet?
-  ;
-
-fieldName
-  : NAMETYPE
-  | alias
-  | NAME
+  : alias? NAME arguments? directives? selectionSet?
   ;
 
 alias
-  : NAME ':' NAME
+  : NAME ':'
   ;
 
 arguments
-  : '(' argument (
-    ','? argument
-  )* ')'
+  : '(' argument+ ')'
   ;
 
 argument
-  : COMMENT* NAME ':' valueOrVariable
+  : NAME ':' value
   ;
 
 fragmentSpread
@@ -90,177 +77,45 @@ fragmentSpread
   ;
 
 inlineFragment
-  : '...' 'on' typeCondition directives? selectionSet
+  : '...' typeCondition? directives? selectionSet
   ;
 
 fragmentDefinition
-  : COMMENT* 'fragment' fragmentName 'on' typeCondition directives? selectionSet
+  : 'fragment' fragmentName typeCondition directives? selectionSet
   ;
 
 fragmentName
   : NAME
   ;
 
-typeSystemDefinition
-  : typeDefinition
-  | typeExtensionDefinition
-  | directiveDefinition
-  | schemaDefinition
-  ;
-
-typeDefinition
-  : scalarTypeDefinition
-  | objectTypeDefinition
-  | interfaceTypeDefinition
-  | unionTypeDefinition
-  | enumTypeDefinition
-  | inputObjectTypeDefinition
-  ;
-
-scalarType
-  : NAME
-  ;
-
-scalarTypeDefinition
-  : COMMENT* 'scalar' scalarType
-  ;
-
-objectType
-  : NAME
-  ;
-
-objectTypeDefinition
-  : COMMENT* 'type' objectType implementsInterfaces? '{' fieldDefinition+ '}'
-  ;
-
-implementsInterfaces
-  : 'implements' implementsList
-  ;
-
-implementsList
-  : interfaceType (
-    (
-      ','
-      | '&'
-    )? interfaceType+
-  )?
-  ;
-
-fieldDefinition
-  : COMMENT* (
-    NAMETYPE
-    | NAME
-  ) deprecated? argumentsDefinition? ':' type directives?
-  ;
-
-deprecated
-  : '@' 'deprecated' (
-    '(' deprecationReason ')'
-  )?
-  ;
-
-deprecationReason
-  : STRING
-  ;
-
-argumentsDefinition
-  : '(' inputValueDefinition (
-    ','? inputValueDefinition
-  )* ')'
-  ;
-
-inputValueDefinition
-  : COMMENT* NAME ':' type defaultValue? directives?
-  ;
-
-interfaceType
-  : NAME
-  ;
-
-interfaceTypeDefinition
-  : COMMENT* 'interface' interfaceType directives? '{' fieldDefinition+ '}'
-  ;
-
-unionType
-  : NAME
-  ;
-
-unionTypeDefinition
-  : COMMENT* 'union' unionType directives? '=' unionMembers
-  ;
-
-unionMembers
-  : typeName '|' (
-    typeName (
-      '|' typeName
-    )*
-  )
+typeCondition
+  : 'on' namedType
   ;
 
 value
-  : STRING    # stringValue
-  | NUMBER    # numberValue
-  | BOOLEAN   # booleanValue
-  | array     # arrayValue
-  | enumValue # enumValueValue
+  : variable             # variableValue
+  | INT_VALUE            # intValue
+  | FLOAT_VALUE          # floatValue
+  | STRING_VALUE         # stringValue
+  | BOOLEAN_VALUE        # booleanValue
+  | NULL_VALUE           # nullValue
+  | NAME                 # enumValue
+  | '[' ']'              # emptyListValue
+  | '[' value+ ']'       # nonEmptyListValue
+  | '{' '}'              # emptyObjectValue
+  | '{' objectField+ '}' # nonEmptyObjectValue
   ;
 
-enumType
-  : NAME
-  ;
-
-enumTypeDefinition
-  : COMMENT* 'enum' enumType directives? '{' enumValueDefinition (
-    ','? enumValueDefinition
-  )* '}'
-  ;
-
-enumValueDefinition
-  : enumValue
-  ;
-
-enumValue
-  : COMMENT* NAME deprecated?
-  ;
-
-inputObjectTypeDefinition
-  : COMMENT* 'input' NAME '{' inputValueDefinition+ '}'
-  ;
-
-typeExtensionDefinition
-  : 'extend' objectTypeDefinition
-  ;
-
-directiveDefinition
-  : COMMENT* 'directive' '@' NAME argumentsDefinition? 'on' directiveLocations
-  ;
-
-directiveLocations
-  : NAME+
-  ;
-
-directives
-  : directive+
-  ;
-
-directive
-  : '@' NAME ':' valueOrVariable # valueDirective
-  | '@' NAME                     # nameDirective
-  | '@' NAME '(' argument ')'    # argumentDirective
-  ;
-
-typeCondition
-  : typeName
+objectField
+  : NAME ':' value
   ;
 
 variableDefinitions
-  : '(' variableDefinition (
-    ','? variableDefinition
-  )* ')'
+  : '(' variableDefinition+ ')'
   ;
 
 variableDefinition
-  : COMMENT* variable ':' type defaultValue?
+  : variable ':' type defaultValue? directives?
   ;
 
 variable
@@ -268,20 +123,15 @@ variable
   ;
 
 defaultValue
-  : '=' valueOrVariable
-  ;
-
-valueOrVariable
-  : value
-  | variable
+  : '=' value
   ;
 
 type
-  : typeName nonNullType?
+  : namedType nonNullType?
   | listType nonNullType?
   ;
 
-typeName
+namedType
   : NAME
   ;
 
@@ -293,95 +143,292 @@ nonNullType
   : '!'
   ;
 
-array
-  : '[' value (
-    ',' value
-  )* ']'
-  | '[' ']'
+directives
+  : directive+
+  ;
+
+directive
+  : '@' NAME arguments?
+  ;
+
+typeSystemDefinition
+  : schemaDefinition
+  | typeDefinition
+  | directiveDefinition
+  ;
+
+typeSystemExtension
+  : schemaExtension
+  | typeExtension
   ;
 
 schemaDefinition
-  : COMMENT* 'schema' '{' (
-    schemaQueryDefinition
-    | schemaMutationDefinition
-    | schemaSubscriptionDefinition
-  )+ '}'
+  : 'schema' directives? '{' operationTypeDefinition+ '}'
   ;
 
-schemaQueryDefinition
-  : COMMENT* 'query' ':' type
+schemaExtension
+  : 'extend' 'schema' directives? '{' operationTypeDefinition+ '}' # schemaExtensionWithOperations
+  | 'extend' 'schema' directives                                   # schemaExtensionWithoutOperations
   ;
 
-schemaMutationDefinition
-  : COMMENT* 'mutation' ':' type
+operationTypeDefinition
+  : operationType ':' namedType
   ;
 
-schemaSubscriptionDefinition
-  : COMMENT* 'subscription' ':' type
+description
+  : STRING_VALUE
   ;
 
-BOOLEAN
-  : 'true'
-  | 'false'
+typeDefinition
+  : scalarTypeDefinition
+  | objectTypeDefinition
+  | interfaceTypeDefinition
+  | unionTypeDefinition
+  | enumTypeDefinition
+  | inputObjectTypeDefinition
   ;
 
-NAMETYPE
-  : 'type'
+typeExtension
+  : scalarTypeExtension
+  | objectTypeExtension
+  | interfaceTypeExtension
+  | unionTypeExtension
+  | enumTypeExtension
+  | inputObjectTypeExtension
   ;
+
+scalarTypeDefinition
+  : description? 'scalar' NAME directives?
+  ;
+
+scalarTypeExtension
+  : 'extend' 'scalar' NAME directives
+  ;
+
+objectTypeDefinition
+  : description? 'type' NAME implementsInterfaces? directives? fieldsDefinition?
+  ;
+
+objectTypeExtension
+  : 'extend' 'type' NAME implementsInterfaces? directives? fieldsDefinition # objectTypeExtensionWithFields
+  | 'extend' 'type' NAME implementsInterfaces? directives                   # objectTypeExtensionWithDirectives
+  | 'extend' 'type' NAME implementsInterfaces                               # objectTypeExtensionWithInterfaces
+  ;
+
+implementsInterfaces
+  : 'implements' '&'? namedType (
+    '&'? namedType
+  )*
+  ;
+
+fieldsDefinition
+  : '{' fieldDefinition+ '}'
+  ;
+
+fieldDefinition
+  : description? NAME argumentsDefinition? ':' type directives?
+  ;
+
+argumentsDefinition
+  : '(' inputValueDefinition+ ')'
+  ;
+
+inputValueDefinition
+  : description? NAME ':' type defaultValue? directives?
+  ;
+
+interfaceTypeDefinition
+  : description? 'interface' NAME directives? fieldsDefinition?
+  ;
+
+interfaceTypeExtension
+  : 'extend' 'interface' NAME directives? fieldsDefinition # interfaceTypeExtensionWithFields
+  | 'extend' 'interface' NAME directives                   # interfaceTypeExtensionWithDirectives
+  ;
+
+unionTypeDefinition
+  : description? 'union' NAME directives? unionMemberTypes?
+  ;
+
+unionMemberTypes
+  : '=' '|'? namedType (
+    '|'? namedType
+  )*
+  ;
+
+unionTypeExtension
+  : 'extend' 'union' NAME directives? unionMemberTypes # unionTypeExtensionWithMembers
+  | 'extend' 'union' NAME directives                   # unionTypeExtensionWithDirectives
+  ;
+
+enumTypeDefinition
+  : description? 'enum' NAME directives? enumValuesDefinition?
+  ;
+
+enumValuesDefinition
+  : '{' enumValueDefinition+ '}'
+  ;
+
+enumValueDefinition
+  : description? NAME directives?
+  ;
+
+enumTypeExtension
+  : 'extend' 'enum' NAME directives? enumValuesDefinition # enumTypeExtensionWithValues
+  | 'extend' 'enum' NAME directives                       # enumTypeExtensionWithDirectives
+  ;
+
+inputObjectTypeDefinition
+  : description? 'input' NAME directives? inputFieldsDefinition?
+  ;
+
+inputFieldsDefinition
+  : '{' inputValueDefinition+ '}'
+  ;
+
+inputObjectTypeExtension
+  : 'extend' 'input' NAME directives? inputFieldsDefinition # inputObjectTypeExtensionWithFields
+  | 'extend' 'input' NAME directives                        # inputObjectTypeExtensionWithDirectives
+  ;
+
+directiveDefinition
+  : description? 'directive' '@' NAME argumentsDefinition? directiveLocations
+  ;
+
+directiveLocations
+  : 'on' '|'? directiveLocation (
+    '|'? directiveLocation
+  )
+  ;
+
+directiveLocation
+  : executableDirectiveLocation
+  | typeSystemDirectiveLocation
+  ;
+
+executableDirectiveLocation
+  : 'QUERY'
+  | 'MUTATION'
+  | 'SUBSCRIPTION'
+  | 'FIELD'
+  | 'FRAGMENT_DEFINITION'
+  | 'FRAGMENT_SPREAD'
+  | 'INLINE_FRAGMENT'
+  | 'VARIABLE_DEFINITION'
+  ;
+
+typeSystemDirectiveLocation
+  : 'SCHEMA'
+  | 'SCALAR'
+  | 'OBJECT'
+  | 'FIELD_DEFINITION'
+  | 'ARGUMENT_DEFINITION'
+  | 'INTERFACE'
+  | 'UNION'
+  | 'ENUM'
+  | 'ENUM_VALUE'
+  | 'INPUT_OBJECT'
+  | 'INPUT_FIELD_DEFINITION'
+  ;
+
+//----------------[ LEXICAL TOKENS]----------------
 
 NAME
   : [_A-Za-z] [_0-9A-Za-z]*
   ;
 
-STRING
-  : '"' (
-    ESC
-    | ~ ["\\]
-  )* '"'
+INT_VALUE
+  : INTEGER_PART
   ;
 
-COMMENT
-  : '#' InputCharacter*
+fragment INTEGER_PART
+  : NEGATIVE_SIGN? '0'
+  | NEGATIVE_SIGN? NON_ZERO_DIGIT DIGIT*
   ;
 
-fragment InputCharacter
-  : ~[\r\n\u0085\u2028\u2029]
+fragment NEGATIVE_SIGN
+  : '-'
   ;
 
-fragment ESC
-  : '\\' (
-    ["\\/bfnrt]
-    | UNICODE
-  )
+fragment DIGIT
+  : [0-9]
   ;
 
-fragment UNICODE
-  : 'u' HEX HEX HEX HEX
+fragment NON_ZERO_DIGIT
+  : [1-9]
+  ;
+
+FLOAT_VALUE
+  : INTEGER_PART FRACTIONAL_PART
+  | INTEGER_PART EXPONENT_PART
+  | INTEGER_PART FRACTIONAL_PART EXPONENT_PART
+  ;
+
+fragment FRACTIONAL_PART
+  : '.' DIGIT+
+  ;
+
+fragment EXPONENT_PART
+  : EXPONENT_INDICATOR SIGN? DIGIT+
+  ;
+
+fragment EXPONENT_INDICATOR
+  : 'e'
+  | 'E'
+  ;
+
+fragment SIGN
+  : '+'
+  | '-'
+  ;
+
+STRING_VALUE
+  : '"' STRING_CHARACTER* '"'
+  | '"""' BLOCK_STRING_CHARACTER* '"""'
+  ;
+
+fragment STRING_CHARACTER
+  : ~["'\r\n\f\\]
+  | '\\u' ESCAPED_UNICODE
+  | '\\' ESCAPED_CHARACTER
   ;
 
 fragment HEX
-  : [0-9a-fA-F]
+  : [A-Fa-f0-9]
   ;
 
-NUMBER
-  : '-'? INT '.' [0-9]+ EXP?
-  | '-'? INT EXP
-  | '-'? INT
+fragment ESCAPED_UNICODE
+  : HEX HEX HEX HEX
   ;
 
-fragment INT
-  : '0'
-  | [1-9] [0-9]*
+fragment ESCAPED_CHARACTER
+  : ["'/bfnrt]
   ;
 
-// no leading zeros
-
-fragment EXP
-  : [Ee] [+\-]? INT
+fragment BLOCK_STRING_CHARACTER
+  : ~["'\\]
+  | '\\u' ESCAPED_UNICODE
+  | '\\' ESCAPED_CHARACTER
   ;
 
-// \- since - means "range" inside [...]
-
-WS
-  : [ \t\n\r]+ -> skip
+BOOLEAN_VALUE
+  : 'true'
+  | 'false'
   ;
+
+NULL_VALUE
+  : 'null'
+  ;
+
+COMMENT
+  : '#' COMMENT_CHAR* -> skip
+  ;
+
+fragment COMMENT_CHAR
+  : ~[\r\n\f]
+  ;
+
+IGNORED
+  : [ ,\t\r\n\ufeff]+ -> skip
+  ;
+

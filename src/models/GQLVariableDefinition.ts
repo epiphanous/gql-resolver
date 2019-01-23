@@ -1,29 +1,30 @@
-import { Either, None, Option } from 'funfix';
+import { None, Option } from 'funfix';
+import { List } from 'immutable';
+import { GQLDirective } from './GQLDirective';
 import { GQLType } from './GQLType';
 import { GQLValue } from './GQLValue';
-import { GQLVariable } from './GQLVariable';
 
 interface IGQLVariableDefinition {
   name: string;
   gqlType: GQLType;
-  description: Option<string>;
-  defaultValue: Option<Either<GQLValue, GQLVariable>>;
+  defaultValue: Option<GQLValue>;
+  directives: List<GQLDirective>;
 }
 export class GQLVariableDefinition implements IGQLVariableDefinition {
   public name: string;
   public gqlType: GQLType;
-  public description: Option<string>;
-  public defaultValue: Option<Either<GQLValue, GQLVariable>>;
+  public defaultValue: Option<GQLValue>;
+  public directives: List<GQLDirective>;
 
   constructor(
     name: string,
     gqlType: GQLType,
-    description: Option<string> = None,
-    defaultValue: Option<Either<GQLValue, GQLVariable>> = None
+    defaultValue: Option<GQLValue> = None,
+    directives: List<GQLDirective> = List<GQLDirective>()
   ) {
     this.name = name;
     this.gqlType = gqlType;
-    this.description = description;
     this.defaultValue = defaultValue;
+    this.directives = directives;
   }
 }
