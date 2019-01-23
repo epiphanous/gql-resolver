@@ -20,8 +20,8 @@ import { UnionTypeExtensionWithMembersContext } from "./GraphQLParser";
 import { SchemaExtensionWithoutOperationsContext } from "./GraphQLParser";
 import { SchemaExtensionWithOperationsContext } from "./GraphQLParser";
 import { StringValueContext } from "./GraphQLParser";
-import { EnumValueValueContext } from "./GraphQLParser";
 import { NonEmptyObjectValueContext } from "./GraphQLParser";
+import { EnumValueContext } from "./GraphQLParser";
 import { VariableValueContext } from "./GraphQLParser";
 import { IntValueContext } from "./GraphQLParser";
 import { EmptyListValueContext } from "./GraphQLParser";
@@ -323,19 +323,6 @@ export interface GraphQLListener extends ParseTreeListener {
 	exitStringValue?: (ctx: StringValueContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `enumValueValue`
-	 * labeled alternative in `GraphQLParser.value`.
-	 * @param ctx the parse tree
-	 */
-	enterEnumValueValue?: (ctx: EnumValueValueContext) => void;
-	/**
-	 * Exit a parse tree produced by the `enumValueValue`
-	 * labeled alternative in `GraphQLParser.value`.
-	 * @param ctx the parse tree
-	 */
-	exitEnumValueValue?: (ctx: EnumValueValueContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `nonEmptyObjectValue`
 	 * labeled alternative in `GraphQLParser.value`.
 	 * @param ctx the parse tree
@@ -347,6 +334,19 @@ export interface GraphQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitNonEmptyObjectValue?: (ctx: NonEmptyObjectValueContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `enumValue`
+	 * labeled alternative in `GraphQLParser.value`.
+	 * @param ctx the parse tree
+	 */
+	enterEnumValue?: (ctx: EnumValueContext) => void;
+	/**
+	 * Exit a parse tree produced by the `enumValue`
+	 * labeled alternative in `GraphQLParser.value`.
+	 * @param ctx the parse tree
+	 */
+	exitEnumValue?: (ctx: EnumValueContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `variableValue`

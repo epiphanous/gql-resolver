@@ -252,7 +252,6 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   // ------------[ OUTPUT TYPES ]------------
 
   public exitObjectTypeDefinition(ctx: ObjectTypeDefinitionContext) {
-    // console.log({ object: this.textOf(ctx.objectType().NAME()) });
     const name = this.textOf(ctx.NAME());
     const def = this.objectTypes.find(d => d.name === name);
     if (!def) {
@@ -434,9 +433,11 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   // ------------[ ENUM TYPES ]------------
 
   public exitEnumTypeDefinition(ctx: EnumTypeDefinitionContext) {
+    // console.log('exitEnumTypeDefinition', ctx.enumValuesDefinition());
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
     if (!def) {
+      const values = this.getEnumValues(Option.of(ctx.enumValuesDefinition()));
       this.enums.add(
         new GQLEnum(
           name,
@@ -617,7 +618,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         List(
           evds.enumValueDefinition().map(evd => {
             return new GQLEnumValueDefinition(
-              this.textOf(evd.ENUM_VALUE()),
+              this.textOf(evd.NAME()),
               this.getDescription(Option.of(evd.description())),
               this.getDirectives(Option.of(evd.directives()))
             );

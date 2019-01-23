@@ -99,7 +99,7 @@ value
   | STRING_VALUE         # stringValue
   | BOOLEAN_VALUE        # booleanValue
   | NULL_VALUE           # nullValue
-  | ENUM_VALUE           # enumValueValue
+  | NAME                 # enumValue
   | '[' ']'              # emptyListValue
   | '[' value+ ']'       # nonEmptyListValue
   | '{' '}'              # emptyObjectValue
@@ -270,7 +270,7 @@ enumValuesDefinition
   ;
 
 enumValueDefinition
-  : description? ENUM_VALUE directives?
+  : description? NAME directives?
   ;
 
 enumTypeExtension
@@ -420,9 +420,9 @@ NULL_VALUE
   : 'null'
   ;
 
-ENUM_VALUE
-  : NAME
-  ;
+//ENUM_VALUE
+//  : NAME
+//  ;
 
 COMMENT
   : '#' COMMENT_CHAR* -> skip

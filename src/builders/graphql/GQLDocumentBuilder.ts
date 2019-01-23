@@ -8,7 +8,7 @@ import {
   DocumentContext,
   EmptyListValueContext,
   EmptyObjectValueContext,
-  EnumValueValueContext,
+  EnumValueContext,
   FloatValueContext,
   GraphQLParser,
   IntValueContext,
@@ -102,10 +102,8 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
       return new GQLNullValue();
     }
 
-    if (ctx instanceof EnumValueValueContext) {
-      return new GQLEnumValue(
-        this.textOf((ctx as EnumValueValueContext).ENUM_VALUE())
-      );
+    if (ctx instanceof EnumValueContext) {
+      return new GQLEnumValue(this.textOf((ctx as EnumValueContext).NAME()));
     }
 
     if (ctx instanceof EmptyListValueContext) {

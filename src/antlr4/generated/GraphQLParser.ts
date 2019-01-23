@@ -80,9 +80,8 @@ export class GraphQLParser extends Parser {
 	public static readonly STRING_VALUE = 52;
 	public static readonly BOOLEAN_VALUE = 53;
 	public static readonly NULL_VALUE = 54;
-	public static readonly ENUM_VALUE = 55;
-	public static readonly COMMENT = 56;
-	public static readonly IGNORED = 57;
+	public static readonly COMMENT = 55;
+	public static readonly IGNORED = 56;
 	public static readonly RULE_document = 0;
 	public static readonly RULE_definition = 1;
 	public static readonly RULE_executableDefinition = 2;
@@ -186,7 +185,7 @@ export class GraphQLParser extends Parser {
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		"NAME", "INT_VALUE", "FLOAT_VALUE", "STRING_VALUE", "BOOLEAN_VALUE", "NULL_VALUE", 
-		"ENUM_VALUE", "COMMENT", "IGNORED",
+		"COMMENT", "IGNORED",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(GraphQLParser._LITERAL_NAMES, GraphQLParser._SYMBOLIC_NAMES, []);
 
@@ -965,11 +964,11 @@ export class GraphQLParser extends Parser {
 				break;
 
 			case 7:
-				_localctx = new EnumValueValueContext(_localctx);
+				_localctx = new EnumValueContext(_localctx);
 				this.enterOuterAlt(_localctx, 7);
 				{
 				this.state = 231;
-				this.match(GraphQLParser.ENUM_VALUE);
+				this.match(GraphQLParser.NAME);
 				}
 				break;
 
@@ -1003,7 +1002,7 @@ export class GraphQLParser extends Parser {
 					this.state = 238;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
-				} while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << GraphQLParser.T__3) | (1 << GraphQLParser.T__11) | (1 << GraphQLParser.T__13))) !== 0) || ((((_la - 50)) & ~0x1F) === 0 && ((1 << (_la - 50)) & ((1 << (GraphQLParser.INT_VALUE - 50)) | (1 << (GraphQLParser.FLOAT_VALUE - 50)) | (1 << (GraphQLParser.STRING_VALUE - 50)) | (1 << (GraphQLParser.BOOLEAN_VALUE - 50)) | (1 << (GraphQLParser.NULL_VALUE - 50)) | (1 << (GraphQLParser.ENUM_VALUE - 50)))) !== 0));
+				} while ((((_la) & ~0x1F) === 0 && ((1 << _la) & ((1 << GraphQLParser.T__3) | (1 << GraphQLParser.T__11) | (1 << GraphQLParser.T__13))) !== 0) || ((((_la - 49)) & ~0x1F) === 0 && ((1 << (_la - 49)) & ((1 << (GraphQLParser.NAME - 49)) | (1 << (GraphQLParser.INT_VALUE - 49)) | (1 << (GraphQLParser.FLOAT_VALUE - 49)) | (1 << (GraphQLParser.STRING_VALUE - 49)) | (1 << (GraphQLParser.BOOLEAN_VALUE - 49)) | (1 << (GraphQLParser.NULL_VALUE - 49)))) !== 0));
 				this.state = 240;
 				this.match(GraphQLParser.T__12);
 				}
@@ -2762,7 +2761,7 @@ export class GraphQLParser extends Parser {
 				this.state = 551;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
-			} while (_la === GraphQLParser.STRING_VALUE || _la === GraphQLParser.ENUM_VALUE);
+			} while (_la === GraphQLParser.NAME || _la === GraphQLParser.STRING_VALUE);
 			this.state = 553;
 			this.match(GraphQLParser.T__4);
 			}
@@ -2800,7 +2799,7 @@ export class GraphQLParser extends Parser {
 			}
 
 			this.state = 558;
-			this.match(GraphQLParser.ENUM_VALUE);
+			this.match(GraphQLParser.NAME);
 			this.state = 560;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
@@ -3291,7 +3290,7 @@ export class GraphQLParser extends Parser {
 
 	private static readonly _serializedATNSegments: number = 2;
 	private static readonly _serializedATNSegment0: string =
-		"\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x03;\u027F\x04\x02" +
+		"\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x03:\u027F\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
 		"\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04" +
 		"\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04" +
@@ -3417,7 +3416,7 @@ export class GraphQLParser extends Parser {
 		"\x07\x02\xDD\x1D\x03\x02\x02\x02\xDE\xDF\x073\x02\x02\xDF\x1F\x03\x02" +
 		"\x02\x02\xE0\xE1\x07\r\x02\x02\xE1\xE2\x050\x19\x02\xE2!\x03\x02\x02\x02" +
 		"\xE3\xFF\x05*\x16\x02\xE4\xFF\x074\x02\x02\xE5\xFF\x075\x02\x02\xE6\xFF" +
-		"\x076\x02\x02\xE7\xFF\x077\x02\x02\xE8\xFF\x078\x02\x02\xE9\xFF\x079\x02" +
+		"\x076\x02\x02\xE7\xFF\x077\x02\x02\xE8\xFF\x078\x02\x02\xE9\xFF\x073\x02" +
 		"\x02\xEA\xEB\x07\x0E\x02\x02\xEB\xFF\x07\x0F\x02\x02\xEC\xEE\x07\x0E\x02" +
 		"\x02\xED\xEF\x05\"\x12\x02\xEE\xED\x03\x02\x02\x02\xEF\xF0\x03\x02\x02" +
 		"\x02\xF0\xEE\x03\x02\x02\x02\xF0\xF1\x03\x02\x02\x02\xF1\xF2\x03\x02\x02" +
@@ -3568,7 +3567,7 @@ export class GraphQLParser extends Parser {
 		"\x02\x02\u0229\u022A\x03\x02\x02\x02\u022A\u022B\x03\x02\x02\x02\u022B" +
 		"\u022C\x07\x07\x02\x02\u022Ci\x03\x02\x02\x02\u022D\u022F\x05D#\x02\u022E" +
 		"\u022D\x03\x02\x02\x02\u022E\u022F\x03\x02\x02\x02\u022F\u0230\x03\x02" +
-		"\x02\x02\u0230\u0232\x079\x02\x02\u0231\u0233\x056\x1C\x02\u0232\u0231" +
+		"\x02\x02\u0230\u0232\x073\x02\x02\u0231\u0233\x056\x1C\x02\u0232\u0231" +
 		"\x03\x02\x02\x02\u0232\u0233\x03\x02\x02\x02\u0233k\x03\x02\x02\x02\u0234" +
 		"\u0235\x07\x15\x02\x02\u0235\u0236\x07\x1D\x02\x02\u0236\u0238\x073\x02" +
 		"\x02\u0237\u0239\x056\x1C\x02\u0238\u0237\x03\x02\x02\x02\u0238\u0239" +
@@ -4181,25 +4180,6 @@ export class StringValueContext extends ValueContext {
 		}
 	}
 }
-export class EnumValueValueContext extends ValueContext {
-	public ENUM_VALUE(): TerminalNode { return this.getToken(GraphQLParser.ENUM_VALUE, 0); }
-	constructor(ctx: ValueContext) {
-		super(ctx.parent, ctx.invokingState);
-		this.copyFrom(ctx);
-	}
-	// @Override
-	public enterRule(listener: GraphQLListener): void {
-		if (listener.enterEnumValueValue) {
-			listener.enterEnumValueValue(this);
-		}
-	}
-	// @Override
-	public exitRule(listener: GraphQLListener): void {
-		if (listener.exitEnumValueValue) {
-			listener.exitEnumValueValue(this);
-		}
-	}
-}
 export class NonEmptyObjectValueContext extends ValueContext {
 	public objectField(): ObjectFieldContext[];
 	public objectField(i: number): ObjectFieldContext;
@@ -4224,6 +4204,25 @@ export class NonEmptyObjectValueContext extends ValueContext {
 	public exitRule(listener: GraphQLListener): void {
 		if (listener.exitNonEmptyObjectValue) {
 			listener.exitNonEmptyObjectValue(this);
+		}
+	}
+}
+export class EnumValueContext extends ValueContext {
+	public NAME(): TerminalNode { return this.getToken(GraphQLParser.NAME, 0); }
+	constructor(ctx: ValueContext) {
+		super(ctx.parent, ctx.invokingState);
+		this.copyFrom(ctx);
+	}
+	// @Override
+	public enterRule(listener: GraphQLListener): void {
+		if (listener.enterEnumValue) {
+			listener.enterEnumValue(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: GraphQLListener): void {
+		if (listener.exitEnumValue) {
+			listener.exitEnumValue(this);
 		}
 	}
 }
@@ -5559,7 +5558,7 @@ export class EnumValuesDefinitionContext extends ParserRuleContext {
 
 
 export class EnumValueDefinitionContext extends ParserRuleContext {
-	public ENUM_VALUE(): TerminalNode { return this.getToken(GraphQLParser.ENUM_VALUE, 0); }
+	public NAME(): TerminalNode { return this.getToken(GraphQLParser.NAME, 0); }
 	public description(): DescriptionContext | undefined {
 		return this.tryGetRuleContext(0, DescriptionContext);
 	}
