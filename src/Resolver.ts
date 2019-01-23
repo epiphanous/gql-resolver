@@ -5,6 +5,7 @@ import GQLQueryBuilder from './builders/graphql/GQLQueryBuilder';
 import QueryExecutionException from './models/exceptions/QueryExecutionException';
 import { GQLOperation } from './models/GQLOperation';
 import { GQLQueryDocument } from './models/GQLQueryDocument';
+import QueryStrategySparql from './models/QueryStrategySparql';
 import ResolverContext from './models/ResolverContext';
 
 export class Resolver {

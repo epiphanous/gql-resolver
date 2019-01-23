@@ -420,10 +420,6 @@ NULL_VALUE
   : 'null'
   ;
 
-//ENUM_VALUE
-//  : NAME
-//  ;
-
 COMMENT
   : '#' COMMENT_CHAR* -> skip
   ;

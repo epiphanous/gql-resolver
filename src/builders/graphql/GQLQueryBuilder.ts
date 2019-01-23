@@ -1,4 +1,4 @@
-import { None, Option, Some, Try } from 'funfix';
+import { Option, Some, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
 import {
   ArgumentContext,
@@ -21,7 +21,7 @@ import {
   VariableDefinitionContext,
   VariableDefinitionsContext,
 } from '../../antlr4/generated/GraphQLParser';
-import { DEFAULT_PREFIXES, INTERNAL_ID_KEY } from '../../models/Constants';
+import { DEFAULT_PREFIXES } from '../../models/Constants';
 import { GQLAny } from '../../models/GQLAny';
 import {
   GQLAnyArgument,
@@ -41,7 +41,6 @@ import {
 import { GQLBinding } from '../../models/GQLBinding';
 import { GQLBooster } from '../../models/GQLBooster';
 import { GQLDirective } from '../../models/GQLDirective';
-import { GQLFieldsExecutionPlan } from '../../models/GQLFieldsExecutionPlan';
 import { GQLFilter } from '../../models/GQLFilter';
 import { GQLFragmentDefinition } from '../../models/GQLFragmentDefinition';
 import { GQLOperation } from '../../models/GQLOperation';
@@ -49,8 +48,8 @@ import { GQLOrderBy } from '../../models/GQLOrderBy';
 import { GQLPattern } from '../../models/GQLPattern';
 import { GQLQueryArguments } from '../../models/GQLQueryArguments';
 import { GQLQueryDocument } from '../../models/GQLQueryDocument';
-import { GQLRootExecutionPlan } from '../../models/GQLRootExecutionPlan';
-import { GQLSearchExecutionPlan } from '../../models/GQLSearchExecutionPlan';
+// import { GQLRootExecutionPlan } from '../../models/GQLRootExecutionPlan';
+// import { GQLSearchExecutionPlan } from '../../models/GQLSearchExecutionPlan';
 import {
   GQLField,
   GQLFragmentSpread,
@@ -66,8 +65,6 @@ import {
 import { GQLStringValue, GQLVariableValue } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import NameAlias from '../../models/NameAlias';
-import { RDFQueryService } from '../../models/RDFQueryService';
 import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
 import GQLBindingsBuilder from './GQLBindingsBuilder';
@@ -77,12 +74,6 @@ import GQLFilterBuilder from './GQLFilterBuilder';
 import GQLOrderByBuilder from './GQLOrderByBuilder';
 import GQLPatternsBuilder from './GQLPatternsBuilder';
 import GQLTransformsBuilder from './GQLTransformsBuilder';
-
-class UnknownFieldException extends Error {
-  constructor() {
-    super('Field not in type');
-  }
-}
 
 const ARG_TYPES = {
   ARG_BINDINGS: 'bindings',
@@ -107,7 +98,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   public fragmentDefinitions: Set<GQLFragmentDefinition> = Set().asMutable();
   public variables: Set<GQLVariableDefinition> = Set().asMutable();
 
-  public GQLRootExecutionPlan: GQLRootExecutionPlan;
+  // public GQLRootExecutionPlan: GQLRootExecutionPlan;
 
   constructor(
     context: ResolverContext,
@@ -359,252 +350,6 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       new GQLTransformsBuilder(Set(this.getPrefixes().keys())),
       transformsExpr
     ).get();
-  }
-
-  public getSearchSubPlans(
-    name: string,
-    selections: List<GQLSelection>,
-    objects: List<[string, GQLField]>
-  ) {
-    console.log(`subPlans name = ${name} objects = ${objects}`);
-    const plans: List<GQLSearchExecutionPlan> = objects.map(
-      (tf: [string, GQLField]) => {
-        const [t, f] = tf;
-        console.log(`creating subplan ${f.name} from fields ${f.fields}`);
-        return this.getQueryExecutionPlan(
-          t,
-          f.name,
-          f.alias.getOrElse(f.name),
-          f.fields,
-          selections,
-          f.args
-        ).value;
-      }
-    );
-    console.log(`subplans for ${name} = ${plans}`);
-    return plans;
-  }
-
-  public getRootExecutionPlan(
-    name: string,
-    fields: List<[string, GQLField]>,
-    selections: List<GQLSelection>
-  ) {
-    // console.log(`plan ${name}: partitioning fields ${JSON.stringify(fields, null, 2)}`);
-    const [, objects, errors] = this.getSchema().partitionFields(fields);
-    if (errors.size > 0) {
-      console.error(`Errors in field partitioning: ${errors}`);
-    }
-    if (objects.isEmpty()) {
-      console.log(`no plan for ${name}`);
-      return None;
-    } else {
-      return Some(this.getRootPlan(name, selections, objects, errors));
-    }
-  }
-
-  public getQueryExecutionPlan(
-    parentType: string,
-    name: string,
-    key: string,
-    fields: List<[string, GQLField]>,
-    selections: List<GQLSelection>,
-    args: List<GQLArgument>
-  ) {
-    console.log(`plan ${name}: partitioning fields ${fields}`);
-    const [scalars, objects, errors] = this.getSchema().partitionFields(fields);
-
-    console.log(`plan ${name}: scalars    = ${scalars}`);
-    console.log(`plan ${name}: objects    = ${objects}`);
-    console.log(`plan ${name}: errors     = ${errors}`);
-    console.log(`plan ${name}: args       = ${args}`);
-    console.log(`plan ${name}: selections = ${selections}`);
-
-    if (scalars.isEmpty() && objects.isEmpty()) {
-      const fieldsFromFragment = this.getSchema()
-        .inlineFragmentChildFieldMappingsOf(selections, name)
-        .filter((a: any) => typeof a[1] !== 'undefined')
-        .reduce((acc, item: any) => {
-          acc.push(
-            item[1].map((field: any) => [
-              this.getSchema()
-                .getFieldType(name)
-                .getOrElse(name),
-              field,
-            ])
-          );
-          return acc;
-        }, []);
-
-      console.log(
-        `*** plan ${name} has fieldsFromFragment : ${fieldsFromFragment}`
-      );
-
-      if (fieldsFromFragment.length > 0) {
-        return Some(
-          this.getSearchPlan(
-            parentType,
-            name,
-            key,
-            selections,
-            args,
-            fields,
-            List(fieldsFromFragment),
-            objects,
-            errors
-          )
-        );
-      } else {
-        console.info(`no plan for ${name}`);
-        return None;
-      }
-    } else {
-      return Some(
-        this.getSearchPlan(
-          parentType,
-          name,
-          key,
-          selections,
-          args,
-          fields,
-          scalars,
-          objects,
-          errors
-        )
-      );
-    }
-  }
-
-  public getRootPlan(
-    name: string,
-    selections: List<GQLSelection>,
-    objects: List<[string, GQLField]>,
-    errors: List<Error>
-  ) {
-    const mySubPlans = this.getSearchSubPlans(name, selections, objects);
-
-    return new GQLRootExecutionPlan(
-      Set<string>(),
-      name,
-      'key',
-      mySubPlans,
-      errors
-    ); // TODO other fields?
-  }
-
-  public getSearchPlan(
-    parentType: string,
-    name: string,
-    key: string,
-    selections: List<GQLSelection>,
-    args: List<GQLArgument>,
-    fields: List<[string, GQLField]>,
-    scalars: List<[string, GQLField]>,
-    objects: List<[string, GQLField]>,
-    errors: List<UnknownFieldException>
-  ) {
-    const queryFields: List<[string, GQLField]> = scalars;
-    console.log(`queryFields for plan ${name} = ${queryFields}`);
-
-    const fullProjectionOrder = fields
-      .concat(objects)
-      .map(([_, d]) => new NameAlias(d.alias.value || d.name, d.name));
-
-    const hiddenIdField = new GQLField({
-      name: 'id',
-      alias: Some(INTERNAL_ID_KEY),
-      args: List(),
-      directives: List(),
-      selections: List(),
-      fields: List(),
-    });
-
-    // request hidden id field for objects we are requesting objects
-    // from but maybe arent requesting scalars from
-    const hiddenIdFields = Map(
-      objects
-        .map(([t]) => t)
-        .flatMap(t => this.getSchema().getImplementingTypes(t))
-        .map<[string, List<GQLField>]>(it => [it, List([hiddenIdField])])
-    );
-
-    console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
-
-    const projectionsByType = hiddenIdFields.merge(
-      queryFields
-        .flatMap(([t, f]) => {
-          const types = this.getSchema()
-            .getImplementingTypes(t)
-            .map<[string, GQLField]>(it => [it, f]);
-          console.log(`implementing types of ${t} = ${types}`);
-          return types;
-        })
-        .groupBy(([x]) => x)
-        .map(v => v.map(w => w[1]).toList())
-    );
-
-    console.log(`getPlan ${name} hiddenIdFields = ${hiddenIdFields}`);
-    console.log(`getPlan ${name} objects = ${objects}`);
-    console.log(`getPlan ${name} projectionsByType = ${projectionsByType}`);
-
-    const subjectTypes = projectionsByType.keySeq().toSet();
-
-    const ptype = this.getSchema()
-      .getFieldType(name)
-      .getOrElse(parentType);
-
-    const queryArgs = this.processArgs(
-      args,
-      this.getSchema().validFieldsForType(ptype)
-    ); // TODO Add method to schema
-
-    const fieldsPlanParentTypes = subjectTypes.filterNot(
-      x => x.startsWith('O_xsd') // TODO: might need to change this?
-    );
-
-    const fieldsPlan = fieldsPlanParentTypes.isEmpty()
-      ? List<GQLFieldsExecutionPlan>()
-      : List<GQLFieldsExecutionPlan>([
-          new GQLFieldsExecutionPlan(
-            fieldsPlanParentTypes.toSet(),
-            name,
-            key,
-            fullProjectionOrder,
-            projectionsByType,
-            // TODO: list of strategies
-            RDFQueryService.createFieldsStrategyCreator(
-              subjectTypes,
-              projectionsByType,
-              RDFQueryService.prefixes,
-              this.getSchema()
-            )
-          ),
-        ]);
-
-    const subPlans = this.getSearchSubPlans(name, selections, objects).concat(
-      fieldsPlan
-    );
-
-    const plan = new GQLSearchExecutionPlan({
-      parentTypes: Set(parentType),
-      name,
-      key,
-      subPlans,
-      errors,
-      projectionOrder: fullProjectionOrder,
-      queryArguments: queryArgs,
-      subjectTypes,
-    });
-
-    plan.copy({
-      strategies: RDFQueryService.createSearchStrategyCreator(
-        plan,
-        this.getPrefixes().keys(),
-        this.getSchema()
-      ),
-    });
-
-    return plan;
   }
 
   public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
