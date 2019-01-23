@@ -433,22 +433,6 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
 
   // ------------[ ENUM TYPES ]------------
 
-  public getEnumValues(ctxOpt: Option<EnumValuesDefinitionContext>) {
-    return ctxOpt
-      .map(evds =>
-        List(
-          evds.enumValueDefinition().map(evd => {
-            return new GQLEnumValueDefinition(
-              this.textOf(evd.ENUM_VALUE()),
-              this.getDescription(Option.of(evd.description())),
-              this.getDirectives(Option.of(evd.directives()))
-            );
-          })
-        )
-      )
-      .getOrElse(List<GQLEnumValueDefinition>());
-  }
-
   public exitEnumTypeDefinition(ctx: EnumTypeDefinitionContext) {
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
@@ -625,6 +609,22 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         List(fds.fieldDefinition().map(fd => this.getFieldDefinition(fd)))
       )
       .getOrElse(List<GQLFieldDefinition>());
+  }
+
+  public getEnumValues(ctxOpt: Option<EnumValuesDefinitionContext>) {
+    return ctxOpt
+      .map(evds =>
+        List(
+          evds.enumValueDefinition().map(evd => {
+            return new GQLEnumValueDefinition(
+              this.textOf(evd.ENUM_VALUE()),
+              this.getDescription(Option.of(evd.description())),
+              this.getDirectives(Option.of(evd.directives()))
+            );
+          })
+        )
+      )
+      .getOrElse(List<GQLEnumValueDefinition>());
   }
 
   public getFieldDefinition(ctx: FieldDefinitionContext) {
