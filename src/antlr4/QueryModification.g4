@@ -14,28 +14,25 @@ filter
 
 patterns
   : pattern (
-    ';' pattern
+    LIST_SEP pattern
   )* EOF
   ;
 
 boosters
   : boost (
-    ';' boost
+    LIST_SEP boost
   )* EOF
   ;
 
 bindings
   : binding (
-    ';' binding
+    LIST_SEP binding
   )* EOF
   ;
 
 orderBys
   : orderBy (
-    (
-      ','
-      | ';'
-    ) orderBy
+    LIST_SEP orderBy
   )* EOF
   ;
 
@@ -48,10 +45,7 @@ orderBy
 
 transforms
   : transform (
-    (
-      '|'
-      | ';'
-    ) transform
+    LIST_SEP transform
   )* EOF
   ;
 
@@ -184,7 +178,7 @@ pattern
     | GEOMATCH
   ) stringLiteralOrVarRef (
     '(' textMatchParam (
-      ',' textMatchParam
+      LIST_SEP textMatchParam
     )* ')'
   )?                                                  # textMatchPattern
   | fieldRef? WITHIN proximitySpec OF featureOrLatLon # geoNearbyPattern
@@ -239,7 +233,7 @@ numericLiteral
 
 expressionList
   : '(' expression (
-    ',' expression
+    LIST_SEP expression
   )* ')'
   ;
 
@@ -512,10 +506,6 @@ OR
   | 'or'
   | '||'
   ;
-RACE_COUNT
-  : 'RACE_COUNT'
-  | 'raceCount'
-  ;
 RAND
   : 'RAND'
   | 'rand'
@@ -634,10 +624,6 @@ UUID
   : 'UUID'
   | 'uuid'
   ;
-WIN_TO
-  : 'WIN_TO'
-  | 'win_to'
-  ;
 WITHIN
   : 'WITHIN'
   | 'within'
@@ -750,11 +736,11 @@ ECHAR
   ;
 
 EMPTY_PARENS
-  : '(' WS* ')'
+  : '(' ')'
   ;
 
 ANON
-  : '[' WS* ']'
+  : '[' ']'
   ;
 
 VARNAME
@@ -800,8 +786,6 @@ fragment PN_CHARS
   : PN_CHARS_U
   | '-'
   | DIGIT
-  /*| '\u00B7' | '\u0300'..'\u036F' | '\u203F'..'\u2040'
-   */
   ;
 
 fragment PN_CHARS_BASE
@@ -821,14 +805,13 @@ fragment PN_CHARS_BASE
   ;
 
 fragment DIGIT
-  : '0' ..'9'
+  : [0-9]
+  ;
+
+LIST_SEP
+  : [,;]
   ;
 
 WS
-  : (
-    ' '
-    | '\t'
-    | '\n'
-    | '\r'
-  )+ -> skip
+  : [ \t\r\n\f]+ -> skip
   ;

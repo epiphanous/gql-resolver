@@ -1,34 +1,52 @@
-import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
-import { None, Option, Try } from 'funfix';
-import { Map, Set } from 'immutable';
+import { Option, Try } from 'funfix';
 import { List } from 'immutable';
+import { Map, Set } from 'immutable';
 import {
-  ArrayValueContext,
-  BooleanValueContext,
-  DefaultValueContext,
-  DeprecatedContext,
+  ArgumentContext,
+  ArgumentsContext,
+  DirectiveContext,
   DirectiveDefinitionContext,
   EnumTypeDefinitionContext,
-  EnumValueValueContext,
+  EnumTypeExtensionWithDirectivesContext,
+  EnumTypeExtensionWithValuesContext,
   FieldDefinitionContext,
+  FieldsDefinitionContext,
   GraphQLParser,
+  InputFieldsDefinitionContext,
   InputObjectTypeDefinitionContext,
+  InputObjectTypeExtensionWithDirectivesContext,
+  InputObjectTypeExtensionWithFieldsContext,
   InterfaceTypeDefinitionContext,
-  NumberValueContext,
+  InterfaceTypeExtensionWithDirectivesContext,
+  InterfaceTypeExtensionWithFieldsContext,
   ObjectTypeDefinitionContext,
+  ObjectTypeExtensionWithDirectivesContext,
+  ObjectTypeExtensionWithInterfacesContext,
   ScalarTypeDefinitionContext,
   SchemaDefinitionContext,
-  SchemaMutationDefinitionContext,
-  SchemaQueryDefinitionContext,
-  SchemaSubscriptionDefinitionContext,
-  StringValueContext,
+  UnionMemberTypesContext,
   UnionTypeDefinitionContext,
-  ValueContext,
-  ValueOrVariableContext,
+  UnionTypeExtensionWithDirectivesContext,
+  UnionTypeExtensionWithMembersContext,
 } from '../../antlr4/generated/GraphQLParser';
+import {
+  DirectivesContext,
+  InputValueDefinitionContext,
+} from '../../antlr4/generated/GraphQLParser';
+import { ImplementsInterfacesContext } from '../../antlr4/generated/GraphQLParser';
+import {
+  ArgumentsDefinitionContext,
+  EnumValuesDefinitionContext,
+} from '../../antlr4/generated/GraphQLParser';
+import {
+  ObjectTypeExtensionWithFieldsContext,
+  ScalarTypeExtensionContext,
+  SchemaExtensionWithOperationsContext,
+  SchemaExtensionWithoutOperationsContext,
+} from '../../antlr4/generated/GraphQLParser';
+import { GQLAnyArgument, GQLArgument } from '../../models/GQLArgument';
 import { GQLDirective } from '../../models/GQLDirective';
 import { GQLSchema } from '../../models/GQLSchema';
-import { GQLType } from '../../models/GQLType';
 import {
   GQLArgumentDefinition,
   GQLDirectiveDefinition,
@@ -42,43 +60,42 @@ import {
   GQLTypeDefinition,
   GQLUnion,
 } from '../../models/GQLTypeDefinition';
-import {
-  GQLArrayValue,
-  GQLBooleanValue,
-  GQLDoubleValue,
-  GQLEnumValue,
-  GQLIntValue,
-  GQLStringValue,
-  GQLValue,
-} from '../../models/GQLValue';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
 
 const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
   bindings:
-    'Optional semi-colon separated list of one or more additional computed values to generate in results',
+    'Optional list of one or more additional computed values to generate in results',
   boosters:
-    'Optional semi-colon separated list of one or more followsUser, followedByUser, or sameRaceAs boosts',
+    "Optional list of one or more 'if_follows' or 'is_followed_by' boosts",
   filter: 'Optional boolean expression to filter our results',
   limit: 'Optional integer number to limit result set size',
   offset: 'Optional integer number of objects to skip before returning results',
-  order:
-    'Optional comma or semi-colon separated list of one or more fields to order results by',
+  order: 'Optional list of one or more fields to order results by',
   patterns:
-    'Optional semi-colon separated list of one or more textmatch, geomatch or geonearby patterns to match against',
+    "Optional list of one or more 'textmatch', 'geomatch' or 'geonearby' patterns to match against",
 };
 
 export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
-  public operationTypes: Map<string, string> = Map<string, string>([
+  public operationTypes = Map<string, string>([
     ['query', 'Query'],
     ['mutation', 'Mutation'],
     ['subscription', 'Subscription'],
   ]).asMutable();
-  public scalarTypes: Set<GQLScalarType> = Set<GQLScalarType>().asMutable();
-  public interfaces: Set<GQLInterface> = Set<GQLInterface>().asMutable();
-  public objectTypes: Set<GQLObjectType> = Set<GQLObjectType>().asMutable();
-  public inputTypes: Set<GQLInputType> = Set<GQLInputType>().asMutable();
-  public unions: Set<GQLUnion> = Set<GQLUnion>().asMutable();
-  public enums: Set<GQLEnum> = Set<GQLEnum>().asMutable();
+  public scalarTypes = Set<GQLScalarType>(
+    ['ID', 'String', 'Boolean', 'Int', 'Float'].map(
+      t =>
+        new GQLScalarType(
+          t,
+          Option.of(t),
+          Option.of('Built-in GraphQL type $t')
+        )
+    )
+  ).asMutable();
+  public interfaces = Set<GQLInterface>().asMutable();
+  public objectTypes = Set<GQLObjectType>().asMutable();
+  public inputTypes = Set<GQLInputType>().asMutable();
+  public unions = Set<GQLUnion>().asMutable();
+  public enums = Set<GQLEnum>().asMutable();
   public directives: Set<GQLDirectiveDefinition> = Set<
     GQLDirectiveDefinition
   >().asMutable();
@@ -86,19 +103,13 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     string,
     GQLFieldDefinition
   >().asMutable();
+  public schemaDirectives = Set<GQLDirective>().asMutable();
 
   public build(parser: GraphQLParser): Try<GQLSchema> {
     this.parseWith(parser);
     if (this.errorCount) {
       Try.failure(this.errorReport.asThrowable());
     } else {
-      this.scalarTypes.withMutations(set =>
-        ['ID', 'String', 'Boolean', 'Int', 'Float'].forEach(t =>
-          set.add(
-            new GQLScalarType(t, 'Built-in GraphQL type $t', Option.of(t))
-          )
-        )
-      );
       const s = Map<string, GQLScalarType>(
         this.scalarTypes
           .map<[string, GQLScalarType]>(x => [x.name, x])
@@ -150,308 +161,514 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     }
   }
 
-  public getComment(comments: Option<TerminalNode[]>) {
-    return comments
-      .map(nodes =>
-        nodes.map(t => this.textOf(t).replace('#\\s*', '')).join('\n')
-      )
-      .getOrElse('');
-  }
+  // ------------[ SCHEMA / OPERATION TYPES ]------------
 
-  public exitSchemaQueryDefinition(ctx: SchemaQueryDefinitionContext) {
-    this.operationTypes.set(
-      'query',
-      this.textOf(
-        ctx
-          .type()
-          .typeName()
-          .NAME()
-      )
-    );
-  }
-
-  public exitSchemaMutationDefinition(ctx: SchemaMutationDefinitionContext) {
-    this.operationTypes.set(
-      'mutation',
-      this.textOf(
-        ctx
-          .type()
-          .typeName()
-          .NAME()
-      )
-    );
-  }
-
-  public exitSchemaSubscriptionDefinition(
-    ctx: SchemaSubscriptionDefinitionContext
+  public exitSchemaDefinition(
+    ctx: SchemaDefinitionContext | SchemaExtensionWithOperationsContext
   ) {
-    this.operationTypes.set(
-      'subscription',
-      this.textOf(
-        ctx
-          .type()
-          .typeName()
-          .NAME()
-      )
+    ctx.operationTypeDefinition().forEach(otd => {
+      const opNamedType = this.textOf(otd.namedType().NAME());
+      const opType = otd.operationType().text;
+      if (this.operationTypes.has(opType)) {
+        const oldNamedType = this.operationTypes.get(opType);
+        this.check(
+          false,
+          `warning: operation type ${opType} changed from ${oldNamedType} to ${opNamedType}`,
+          ctx,
+          false
+        );
+      }
+      this.operationTypes.set(opType, opNamedType);
+    });
+    this.getDirectives(Option.of(ctx.directives())).forEach(d =>
+      this.schemaDirectives.add(d)
     );
   }
 
-  public exitSchemaDefinition(ctx: SchemaDefinitionContext) {
-    this.check(
-      ctx.schemaQueryDefinition().length === 1,
-      'missing query definition',
-      ctx
+  public exitSchemaExtensionWithOperations(
+    ctx: SchemaExtensionWithOperationsContext
+  ) {
+    this.exitSchemaDefinition(ctx);
+  }
+
+  public exitSchemaExtensionWithoutOperations(
+    ctx: SchemaExtensionWithoutOperationsContext
+  ) {
+    this.getDirectives(Option.of(ctx.directives())).forEach(d =>
+      this.schemaDirectives.add(d)
     );
   }
+
+  // ------------[ SCALAR TYPES ]------------
 
   public exitScalarTypeDefinition(ctx: ScalarTypeDefinitionContext) {
-    const sType: string = this.textOf(ctx.scalarType().NAME());
-    const nativeTypes: Map<string, string> = Map([
-      ['ID', 'xsd_anyURI'],
-      ['Boolean', 'xsd_boolean'],
-      ['Float', 'xsd_float'],
-      ['Int', 'xsd_integer'],
-      ['String', 'xsd_string'],
-      ['URL', 'xsd_anyURI'],
-      ['Date', 'xsd_date'],
-      ['Time', 'xsd_time'],
-      ['DateTime', 'xsd_dateTime'],
-      ['Duration', 'xsd_duration'],
-    ]);
-    const nType: Option<string> = Option.of(nativeTypes.get(sType));
-    this.scalarTypes.add(
-      new GQLScalarType(sType, this.getComment(Option.of(ctx.COMMENT())), nType)
-    );
+    const name = this.textOf(ctx.NAME());
+    const def = this.scalarTypes.find(d => d.name === name);
+    if (!def) {
+      const xsdType: Map<string, string> = Map([
+        ['ID', 'xsd_anyURI'],
+        ['Boolean', 'xsd_boolean'],
+        ['Float', 'xsd_float'],
+        ['Int', 'xsd_integer'],
+        ['String', 'xsd_string'],
+        ['URL', 'xsd_anyURI'],
+        ['URI', 'xsd_anyURI'],
+        ['Date', 'xsd_date'],
+        ['Time', 'xsd_time'],
+        ['DateTime', 'xsd_dateTime'],
+        ['Duration', 'xsd_duration'],
+      ]);
+      const t = Option.of(xsdType.get(name));
+      this.scalarTypes.add(
+        new GQLScalarType(
+          name,
+          t,
+          this.getDescription(Option.of(ctx.description())),
+          this.getDirectives(Option.of(ctx.directives()))
+        )
+      );
+    } else {
+      this.check(false, `duplicate scalar type definition ${name}`, ctx, true);
+    }
   }
 
-  public exitInterfaceTypeDefinition(ctx: InterfaceTypeDefinitionContext) {
-    // console.log({ interface: this.textOf(ctx.interfaceType().NAME()) });
-    this.interfaces.add(
-      new GQLInterface(
-        this.textOf(ctx.interfaceType().NAME()),
-        this.getComment(Option.of(ctx.COMMENT())),
-        List(ctx.fieldDefinition().map(fd => this.getFieldDefinition(fd))) ||
-          List<GQLFieldDefinition>()
-      )
-    );
+  public exitScalarTypeExtension(ctx: ScalarTypeExtensionContext) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.scalarTypes.find(d => d.name === name);
+    if (def) {
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(
+        false,
+        `can't extend non-existent scalar type ${name}`,
+        ctx,
+        true
+      );
+    }
   }
+
+  // ------------[ OUTPUT TYPES ]------------
 
   public exitObjectTypeDefinition(ctx: ObjectTypeDefinitionContext) {
-    // console.log({ object: this.textOf(ctx.objectType().NAME()) });
-    this.objectTypes.add(
-      new GQLObjectType(
-        this.textOf(ctx.objectType().NAME()),
-        this.getComment(Option.of(ctx.COMMENT())),
-        List(ctx.fieldDefinition().map(fdc => this.getFieldDefinition(fdc))),
-        Option.of(ctx.implementsInterfaces())
-          .map(il => {
-            return List(
-              il
-                .implementsList()
-                .interfaceType()
-                .map(i => this.textOf(i.NAME()))
-            );
-          })
-          .getOrElse(List<string>())
-      )
-    );
+    const name = this.textOf(ctx.NAME());
+    const def = this.objectTypes.find(d => d.name === name);
+    if (!def) {
+      this.objectTypes.add(
+        new GQLObjectType(
+          name,
+          this.getFieldDefinitions(Option.of(ctx.fieldsDefinition())),
+          this.getInterfaces(Option.of(ctx.implementsInterfaces())),
+          this.getDescription(Option.of(ctx.description())),
+          this.getDirectives(Option.of(ctx.directives()))
+        )
+      );
+    } else {
+      this.check(false, `duplicate type definition ${name}`, ctx, true);
+    }
   }
+
+  public exitObjectTypeExtensionWithFields(
+    ctx: ObjectTypeExtensionWithFieldsContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.objectTypes.find(d => d.name === name);
+    if (def) {
+      def.interfaces.withMutations(i =>
+        i.merge(this.getInterfaces(Option.of(ctx.implementsInterfaces())))
+      );
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+      def.fields.withMutations(f =>
+        f.merge(this.getFieldDefinitions(Option.of(ctx.fieldsDefinition())))
+      );
+    } else {
+      this.check(false, `can't extend non-existent type ${name}`, ctx, false);
+    }
+  }
+
+  public exitObjectTypeExtensionWithDirectives(
+    ctx: ObjectTypeExtensionWithDirectivesContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.objectTypes.find(d => d.name === name);
+    if (def) {
+      def.interfaces.withMutations(i =>
+        i.merge(this.getInterfaces(Option.of(ctx.implementsInterfaces())))
+      );
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(false, `can't extend non-existent type ${name}`, ctx, false);
+    }
+  }
+
+  public exitObjectTypeExtensionWithInterfaces(
+    ctx: ObjectTypeExtensionWithInterfacesContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.objectTypes.find(d => d.name === name);
+    if (def) {
+      def.interfaces.withMutations(i =>
+        i.merge(this.getInterfaces(Option.of(ctx.implementsInterfaces())))
+      );
+    } else {
+      this.check(false, `can't extend non-existent type ${name}`, ctx, false);
+    }
+  }
+
+  // ------------[ INTERFACE TYPES ]------------
+
+  public exitInterfaceTypeDefinition(ctx: InterfaceTypeDefinitionContext) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.interfaces.find(d => d.name === name);
+    if (!def) {
+      this.interfaces.add(
+        new GQLInterface(
+          name,
+          this.getFieldDefinitions(Option.of(ctx.fieldsDefinition())),
+          this.getDescription(Option.of(ctx.description())),
+          this.getDirectives(Option.of(ctx.directives()))
+        )
+      );
+    } else {
+      this.check(false, `duplicate interface definition ${name}`, ctx, true);
+    }
+  }
+
+  public exitInterfaceTypeExtensionWithFields(
+    ctx: InterfaceTypeExtensionWithFieldsContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.interfaces.find(d => d.name === name);
+    if (def) {
+      def.fields.withMutations(f =>
+        f.merge(this.getFieldDefinitions(Option.of(ctx.fieldsDefinition())))
+      );
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(
+        false,
+        `can't extend non-existent interface ${name}`,
+        ctx,
+        true
+      );
+    }
+  }
+
+  public exitInterfaceTypeExtensionWithDirectives(
+    ctx: InterfaceTypeExtensionWithDirectivesContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.interfaces.find(d => d.name === name);
+    if (def) {
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(
+        false,
+        `can't extend non-existent interface ${name}`,
+        ctx,
+        true
+      );
+    }
+  }
+
+  // ------------[ UNION TYPES ]------------
 
   public exitUnionTypeDefinition(ctx: UnionTypeDefinitionContext) {
-    // console.log({ union: this.textOf(ctx.unionType().NAME()) });
-    this.unions.add(
-      new GQLUnion(
-        this.textOf(ctx.unionType().NAME()),
-        this.getComment(Option.of(ctx.COMMENT())),
-        List(
-          ctx
-            .unionMembers()
-            .typeName()
-            .map(t => this.textOf(t.NAME()))
+    const name = this.textOf(ctx.NAME());
+    const def = this.unions.find(d => d.name === name);
+    if (!def) {
+      this.unions.add(
+        new GQLUnion(
+          name,
+          this.getUnionMembers(Option.of(ctx.unionMemberTypes())),
+          this.getDescription(Option.of(ctx.description())),
+          this.getDirectives(Option.of(ctx.directives()))
         )
-      )
-    );
+      );
+    } else {
+      this.check(false, `duplicate union definition ${name}`, ctx, true);
+    }
   }
+
+  public exitUnionTypeExtensionWithMembers(
+    ctx: UnionTypeExtensionWithMembersContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.unions.find(d => d.name === name);
+    if (def) {
+      def.gqlTypes.withMutations(u =>
+        u.merge(this.getUnionMembers(Option.of(ctx.unionMemberTypes())))
+      );
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(false, `can't extend non-existent union ${name}`, ctx, true);
+    }
+  }
+
+  public exitUnionTypeExtensionWithDirectives(
+    ctx: UnionTypeExtensionWithDirectivesContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.unions.find(d => d.name === name);
+    if (def) {
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(false, `can't extend non-existent union ${name}`, ctx, true);
+    }
+  }
+
+  // ------------[ ENUM TYPES ]------------
 
   public exitEnumTypeDefinition(ctx: EnumTypeDefinitionContext) {
-    // console.log({ enum: this.textOf(ctx.enumType().NAME()) });
-    this.enums.add(
-      new GQLEnum(
-        this.textOf(ctx.enumType().NAME()),
-        this.getComment(Option.of(ctx.COMMENT())),
-        List(
-          ctx.enumValueDefinition().map(ev => {
-            const evc = ev.enumValue();
-            const name = this.textOf(evc.NAME());
-            const desc = this.getComment(Option.of(evc.COMMENT()));
-            const [isDeprecated, deprecationReason] = this.getDeprecation(
-              Option.of(evc.deprecated())
-            );
-            return new GQLEnumValueDefinition(
-              name,
-              desc,
-              isDeprecated,
-              deprecationReason
-            );
-          })
+    const name = this.textOf(ctx.NAME());
+    const def = this.enums.find(d => d.name === name);
+    if (!def) {
+      const values = this.getEnumValues(Option.of(ctx.enumValuesDefinition()));
+      this.enums.add(
+        new GQLEnum(
+          name,
+          this.getEnumValues(Option.of(ctx.enumValuesDefinition())),
+          this.getDescription(Option.of(ctx.description())),
+          this.getDirectives(Option.of(ctx.directives()))
         )
-      )
-    );
+      );
+    } else {
+      this.check(false, `duplicate enum definition ${name}`, ctx, true);
+    }
   }
 
-  public exitDirectiveDefinition(ctx: DirectiveDefinitionContext) {
-    const args = Option.of(ctx.argumentsDefinition())
-      .map(ad =>
-        List(
-          ad
-            .inputValueDefinition()
-            .map(
-              a =>
-                new GQLArgumentDefinition(
-                  this.textOf(a.NAME()),
-                  this.getComment(Option.of(a.COMMENT())),
-                  this.getType(a.type()),
-                  this.processDefaultValue(Option.of(a.defaultValue()))
-                )
-            )
-        )
-      )
-      .getOrElse(List<GQLArgumentDefinition>());
-    const locations = Option.of(ctx.directiveLocations())
-      .map(l => List(l.NAME().map(n => this.textOf(n))))
-      .getOrElse(List<string>());
-    this.directives.add(
-      new GQLDirectiveDefinition(
-        this.textOf(ctx.NAME()),
-        this.getComment(Option.of(ctx.COMMENT())),
-        args,
-        locations
-      )
-    );
+  public exitEnumTypeExtensionWithValues(
+    ctx: EnumTypeExtensionWithValuesContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.enums.find(d => d.name === name);
+    if (!def) {
+      def.values.withMutations(v =>
+        v.merge(this.getEnumValues(Option.of(ctx.enumValuesDefinition())))
+      );
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(false, `can't extend non-existant enum ${name}`, ctx, true);
+    }
   }
+
+  public exitEnumTypeExtensionWithDirectives(
+    ctx: EnumTypeExtensionWithDirectivesContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.enums.find(d => d.name === name);
+    if (!def) {
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(false, `can't extend non-existant enum ${name}`, ctx, true);
+    }
+  }
+
+  // ------------[ INPUT TYPES ]------------
 
   public exitInputObjectTypeDefinition(ctx: InputObjectTypeDefinitionContext) {
     const name = this.textOf(ctx.NAME());
-    // console.log({ inputObject: name });
-    const desc = this.getComment(Option.of(ctx.COMMENT()));
-    const args = Option.of(
-      List(
-        ctx
-          .inputValueDefinition()
-          .map(
-            a =>
-              new GQLArgumentDefinition(
-                this.textOf(a.NAME()),
-                this.getComment(Option.of(a.COMMENT())),
-                this.getType(a.type()),
-                this.processDefaultValue(Option.of(a.defaultValue()))
-              )
-          )
-      )
-    ).getOrElse(List<GQLArgumentDefinition>());
-    this.inputTypes.add(new GQLInputType(name, desc, args));
+    const def = this.inputTypes.find(d => d.name === name);
+    if (!def) {
+      this.inputTypes.add(
+        new GQLInputType(
+          name,
+          this.getArgumentDefinitions(Option.of(ctx.inputFieldsDefinition())),
+          this.getDescription(Option.of(ctx.description())),
+          this.getDirectives(Option.of(ctx.directives()))
+        )
+      );
+    } else {
+      this.check(false, `duplicate input type definition ${name}`, ctx, true);
+    }
   }
 
-  public getFieldDefinition(ctx: FieldDefinitionContext) {
-    const fieldName = this.textOf(
-      Option.of(ctx.NAMETYPE()).getOrElse(ctx.NAME())
-    );
-    // console.log({ field: fieldName });
-    const fieldType = this.getType(ctx.type());
-    const args = Option.of(ctx.argumentsDefinition())
-      .map(ad =>
+  public exitInputObjectTypeExtensionWithFields(
+    ctx: InputObjectTypeExtensionWithFieldsContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.inputTypes.find(d => d.name === name);
+    if (!def) {
+      def.args.withMutations(a =>
+        a.merge(
+          this.getArgumentDefinitions(Option.of(ctx.inputFieldsDefinition()))
+        )
+      );
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(
+        false,
+        `can't extend non-existent input type ${name}`,
+        ctx,
+        true
+      );
+    }
+  }
+
+  public exitInputObjectTypeExtensionWithDirectives(
+    ctx: InputObjectTypeExtensionWithDirectivesContext
+  ) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.inputTypes.find(d => d.name === name);
+    if (!def) {
+      def.directives.withMutations(d =>
+        d.merge(this.getDirectives(Option.of(ctx.directives())))
+      );
+    } else {
+      this.check(
+        false,
+        `can't extend non-existent input type ${name}`,
+        ctx,
+        true
+      );
+    }
+  }
+
+  // ------------[ DIRECTIVES ]------------
+
+  public exitDirectiveDefinition(ctx: DirectiveDefinitionContext) {
+    const name = this.textOf(ctx.NAME());
+    const def = this.directives.find(d => d.name === name);
+
+    if (!def) {
+      const locations = List(
+        ctx
+          .directiveLocations()
+          .directiveLocation()
+          .map(dl => dl.typeSystemDirectiveLocation().text)
+      );
+
+      this.directives.add(
+        new GQLDirectiveDefinition(
+          name,
+          this.getArgumentDefinitions(Option.of(ctx.argumentsDefinition())),
+          locations,
+          this.getDescription(Option.of(ctx.description()))
+        )
+      );
+    } else {
+      this.check(false, `duplicate directive definition ${name}`, ctx, true);
+    }
+  }
+
+  // -----[SUPPORTING METHODS]-----
+
+  public getArgumentDefinitions(
+    ctxOpt: Option<ArgumentsDefinitionContext | InputFieldsDefinitionContext>
+  ) {
+    return ctxOpt
+      .map(aid => List(aid.inputValueDefinition()))
+      .getOrElse(List<InputValueDefinitionContext>())
+      .map(a => {
+        const argName = this.textOf(a.NAME());
+        let argDesc = this.getDescription(Option.of(a.description()));
+        if (
+          argDesc.isEmpty() &&
+          STANDARD_ARG_DESCRIPTION.hasOwnProperty(argName)
+        ) {
+          argDesc = Option.of(STANDARD_ARG_DESCRIPTION[argName]);
+        }
+        return new GQLArgumentDefinition(
+          argName,
+          this.getType(a.type()),
+          this.processDefaultValue(Option.of(a.defaultValue())),
+          argDesc,
+          this.getDirectives(Option.of(a.directives()))
+        );
+      });
+  }
+
+  public getInterfaces(ctxOpt: Option<ImplementsInterfacesContext>) {
+    return ctxOpt
+      .map(iic => List(iic.namedType().map(nt => this.textOf(nt.NAME()))))
+      .getOrElse(List<string>());
+  }
+
+  public getFieldDefinitions(ctxOpt: Option<FieldsDefinitionContext>) {
+    return ctxOpt
+      .map(fds =>
+        List(fds.fieldDefinition().map(fd => this.getFieldDefinition(fd)))
+      )
+      .getOrElse(List<GQLFieldDefinition>());
+  }
+
+  public getEnumValues(ctxOpt: Option<EnumValuesDefinitionContext>) {
+    return ctxOpt
+      .map(evds =>
         List(
-          ad.inputValueDefinition().map(a => {
-            try {
-              const aname = this.textOf(a.NAME());
-            } catch (e) {
-              console.log(e);
-            }
-            const argName = this.textOf(a.NAME());
-            // console.log({ arg: argName });
-            let argDesc = this.getComment(Option.of(a.COMMENT()));
-            if (argDesc.length === 0) {
-              argDesc = STANDARD_ARG_DESCRIPTION[argName] || '';
-            }
-            return new GQLArgumentDefinition(
-              this.textOf(a.NAME()),
-              argDesc,
-              this.getType(a.type()),
-              this.processDefaultValue(Option.of(a.defaultValue()))
+          evds.enumValueDefinition().map(evd => {
+            return new GQLEnumValueDefinition(
+              this.textOf(evd.NAME()),
+              this.getDescription(Option.of(evd.description())),
+              this.getDirectives(Option.of(evd.directives()))
             );
           })
         )
       )
-      .getOrElse(List<GQLArgumentDefinition>());
-    const [isDeprecated, deprecationReason] = this.getDeprecation(
-      Option.of(ctx.deprecated())
-    );
+      .getOrElse(List<GQLEnumValueDefinition>());
+  }
+
+  public getFieldDefinition(ctx: FieldDefinitionContext) {
+    const fieldName = this.textOf(ctx.NAME());
+    const fieldType = this.getType(ctx.type());
+
     const fd = new GQLFieldDefinition(
       fieldName,
-      this.getComment(Option.of(ctx.COMMENT())),
       fieldType,
-      isDeprecated,
-      deprecationReason,
-      args
+      this.getArgumentDefinitions(Option.of(ctx.argumentsDefinition())),
+      this.getDescription(Option.of(ctx.description())),
+      this.getDirectives(Option.of(ctx.directives()))
     );
     this.allFields.set(fieldName, fd);
     return fd;
   }
 
-  public getDeprecation(
-    ctxOpt: Option<DeprecatedContext>
-  ): [boolean, Option<string>] {
-    if (!ctxOpt.isEmpty()) {
-      const drcOpt = Option.of(ctxOpt.get().deprecationReason());
-      if (!drcOpt.isEmpty()) {
-        const dr = this.textOf(drcOpt.get().STRING());
-        return [true, Option.of(dr)];
-      }
-      return [true, None];
-    } else {
-      return [false, None];
-    }
+  public getUnionMembers(ctxOpt: Option<UnionMemberTypesContext>) {
+    return ctxOpt
+      .map(umt => List(umt.namedType().map(t => this.textOf(t.NAME()))))
+      .getOrElse(List<string>());
   }
 
-  public processDefaultValue(ctxOpt: Option<DefaultValueContext>) {
-    return ctxOpt.map(dv => this.processValueOrVariable(dv.valueOrVariable()));
+  public getDirectives(ctxOpt: Option<DirectivesContext>): List<GQLDirective> {
+    return ctxOpt
+      .map(dcs => List(dcs.directive().map(dc => this.getDirective(dc))))
+      .getOrElse(List<GQLDirective>());
   }
 
-  public processValueOrVariable(ctx: ValueOrVariableContext) {
-    const valueOpt = Option.of(ctx.value());
-    const varOpt = Option.of(ctx.variable());
-    // console.log({ variable: varOpt, value: valueOpt });
-    if (!valueOpt.isEmpty() && varOpt.isEmpty()) {
-      return this.processValue(valueOpt.get());
-    }
-    throw new Error('wat?');
+  public getDirective(ctx: DirectiveContext): GQLDirective {
+    const name = this.textOf(ctx.NAME());
+    const args = this.getArguments(Option.of(ctx.arguments()));
+    return new GQLDirective(name, args);
   }
 
-  public processValue(ctx: ValueContext): GQLValue {
-    if (ctx instanceof StringValueContext) {
-      return new GQLStringValue(this.textOf(ctx.STRING()));
-    }
-    if (ctx instanceof NumberValueContext) {
-      const numText = ctx.NUMBER().text;
-      if (numText.indexOf('.') > -1) {
-        return new GQLDoubleValue(parseFloat(numText));
-      } else {
-        return new GQLIntValue(parseInt(numText, 10));
-      }
-    }
-    if (ctx instanceof BooleanValueContext) {
-      return new GQLBooleanValue(this.textOf(ctx.BOOLEAN()));
-    }
-    if (ctx instanceof ArrayValueContext) {
-      return new GQLArrayValue(
-        ctx
-          .array()
-          .value()
-          .map(this.processValue)
-      );
-    }
-    if (ctx instanceof EnumValueValueContext) {
-      return new GQLEnumValue(this.textOf(ctx.enumValue().NAME()));
-    }
+  public getArguments(ctxOpt: Option<ArgumentsContext>): List<GQLArgument> {
+    return ctxOpt
+      .map(args => List(args.argument().map(arg => this.getArgument(arg))))
+      .getOrElse(List<GQLArgument>());
+  }
+
+  public getArgument(ctx: ArgumentContext): GQLArgument {
+    const name = this.textOf(ctx.NAME());
+    const value = this.processValue(ctx.value());
+    return new GQLAnyArgument(name, value);
   }
 }

@@ -7,22 +7,38 @@ import { FullOperationDefinitionContext } from './GraphQLParser';
 import { FragmentSpreadSelectionContext } from './GraphQLParser';
 import { FieldSelectionContext } from './GraphQLParser';
 import { InlineFragmentSelectionContext } from './GraphQLParser';
+import { InputObjectTypeExtensionWithDirectivesContext } from './GraphQLParser';
+import { InputObjectTypeExtensionWithFieldsContext } from './GraphQLParser';
+import { InterfaceTypeExtensionWithFieldsContext } from './GraphQLParser';
+import { InterfaceTypeExtensionWithDirectivesContext } from './GraphQLParser';
+import { ObjectTypeExtensionWithDirectivesContext } from './GraphQLParser';
+import { ObjectTypeExtensionWithFieldsContext } from './GraphQLParser';
+import { ObjectTypeExtensionWithInterfacesContext } from './GraphQLParser';
+import { UnionTypeExtensionWithDirectivesContext } from './GraphQLParser';
+import { UnionTypeExtensionWithMembersContext } from './GraphQLParser';
+import { SchemaExtensionWithoutOperationsContext } from './GraphQLParser';
+import { SchemaExtensionWithOperationsContext } from './GraphQLParser';
 import { StringValueContext } from './GraphQLParser';
-import { EnumValueValueContext } from './GraphQLParser';
+import { NonEmptyObjectValueContext } from './GraphQLParser';
+import { EnumValueContext } from './GraphQLParser';
+import { VariableValueContext } from './GraphQLParser';
+import { IntValueContext } from './GraphQLParser';
+import { EmptyListValueContext } from './GraphQLParser';
+import { FloatValueContext } from './GraphQLParser';
 import { BooleanValueContext } from './GraphQLParser';
-import { NumberValueContext } from './GraphQLParser';
-import { ArrayValueContext } from './GraphQLParser';
-import { ArgumentDirectiveContext } from './GraphQLParser';
-import { NameDirectiveContext } from './GraphQLParser';
-import { ValueDirectiveContext } from './GraphQLParser';
+import { NonEmptyListValueContext } from './GraphQLParser';
+import { NullValueContext } from './GraphQLParser';
+import { EmptyObjectValueContext } from './GraphQLParser';
+import { EnumTypeExtensionWithDirectivesContext } from './GraphQLParser';
+import { EnumTypeExtensionWithValuesContext } from './GraphQLParser';
 import { DocumentContext } from './GraphQLParser';
 import { DefinitionContext } from './GraphQLParser';
+import { ExecutableDefinitionContext } from './GraphQLParser';
 import { OperationDefinitionContext } from './GraphQLParser';
-import { SelectionSetContext } from './GraphQLParser';
 import { OperationTypeContext } from './GraphQLParser';
+import { SelectionSetContext } from './GraphQLParser';
 import { SelectionContext } from './GraphQLParser';
 import { FieldContext } from './GraphQLParser';
-import { FieldNameContext } from './GraphQLParser';
 import { AliasContext } from './GraphQLParser';
 import { ArgumentsContext } from './GraphQLParser';
 import { ArgumentContext } from './GraphQLParser';
@@ -30,50 +46,53 @@ import { FragmentSpreadContext } from './GraphQLParser';
 import { InlineFragmentContext } from './GraphQLParser';
 import { FragmentDefinitionContext } from './GraphQLParser';
 import { FragmentNameContext } from './GraphQLParser';
-import { TypeSystemDefinitionContext } from './GraphQLParser';
-import { TypeDefinitionContext } from './GraphQLParser';
-import { ScalarTypeContext } from './GraphQLParser';
-import { ScalarTypeDefinitionContext } from './GraphQLParser';
-import { ObjectTypeContext } from './GraphQLParser';
-import { ObjectTypeDefinitionContext } from './GraphQLParser';
-import { ImplementsInterfacesContext } from './GraphQLParser';
-import { ImplementsListContext } from './GraphQLParser';
-import { FieldDefinitionContext } from './GraphQLParser';
-import { DeprecatedContext } from './GraphQLParser';
-import { DeprecationReasonContext } from './GraphQLParser';
-import { ArgumentsDefinitionContext } from './GraphQLParser';
-import { InputValueDefinitionContext } from './GraphQLParser';
-import { InterfaceTypeContext } from './GraphQLParser';
-import { InterfaceTypeDefinitionContext } from './GraphQLParser';
-import { UnionTypeContext } from './GraphQLParser';
-import { UnionTypeDefinitionContext } from './GraphQLParser';
-import { UnionMembersContext } from './GraphQLParser';
-import { ValueContext } from './GraphQLParser';
-import { EnumTypeContext } from './GraphQLParser';
-import { EnumTypeDefinitionContext } from './GraphQLParser';
-import { EnumValueDefinitionContext } from './GraphQLParser';
-import { EnumValueContext } from './GraphQLParser';
-import { InputObjectTypeDefinitionContext } from './GraphQLParser';
-import { TypeExtensionDefinitionContext } from './GraphQLParser';
-import { DirectiveDefinitionContext } from './GraphQLParser';
-import { DirectiveLocationsContext } from './GraphQLParser';
-import { DirectivesContext } from './GraphQLParser';
-import { DirectiveContext } from './GraphQLParser';
 import { TypeConditionContext } from './GraphQLParser';
+import { ValueContext } from './GraphQLParser';
+import { ObjectFieldContext } from './GraphQLParser';
 import { VariableDefinitionsContext } from './GraphQLParser';
 import { VariableDefinitionContext } from './GraphQLParser';
 import { VariableContext } from './GraphQLParser';
 import { DefaultValueContext } from './GraphQLParser';
-import { ValueOrVariableContext } from './GraphQLParser';
 import { TypeContext } from './GraphQLParser';
-import { TypeNameContext } from './GraphQLParser';
+import { NamedTypeContext } from './GraphQLParser';
 import { ListTypeContext } from './GraphQLParser';
 import { NonNullTypeContext } from './GraphQLParser';
-import { ArrayContext } from './GraphQLParser';
+import { DirectivesContext } from './GraphQLParser';
+import { DirectiveContext } from './GraphQLParser';
+import { TypeSystemDefinitionContext } from './GraphQLParser';
+import { TypeSystemExtensionContext } from './GraphQLParser';
 import { SchemaDefinitionContext } from './GraphQLParser';
-import { SchemaQueryDefinitionContext } from './GraphQLParser';
-import { SchemaMutationDefinitionContext } from './GraphQLParser';
-import { SchemaSubscriptionDefinitionContext } from './GraphQLParser';
+import { SchemaExtensionContext } from './GraphQLParser';
+import { OperationTypeDefinitionContext } from './GraphQLParser';
+import { DescriptionContext } from './GraphQLParser';
+import { TypeDefinitionContext } from './GraphQLParser';
+import { TypeExtensionContext } from './GraphQLParser';
+import { ScalarTypeDefinitionContext } from './GraphQLParser';
+import { ScalarTypeExtensionContext } from './GraphQLParser';
+import { ObjectTypeDefinitionContext } from './GraphQLParser';
+import { ObjectTypeExtensionContext } from './GraphQLParser';
+import { ImplementsInterfacesContext } from './GraphQLParser';
+import { FieldsDefinitionContext } from './GraphQLParser';
+import { FieldDefinitionContext } from './GraphQLParser';
+import { ArgumentsDefinitionContext } from './GraphQLParser';
+import { InputValueDefinitionContext } from './GraphQLParser';
+import { InterfaceTypeDefinitionContext } from './GraphQLParser';
+import { InterfaceTypeExtensionContext } from './GraphQLParser';
+import { UnionTypeDefinitionContext } from './GraphQLParser';
+import { UnionMemberTypesContext } from './GraphQLParser';
+import { UnionTypeExtensionContext } from './GraphQLParser';
+import { EnumTypeDefinitionContext } from './GraphQLParser';
+import { EnumValuesDefinitionContext } from './GraphQLParser';
+import { EnumValueDefinitionContext } from './GraphQLParser';
+import { EnumTypeExtensionContext } from './GraphQLParser';
+import { InputObjectTypeDefinitionContext } from './GraphQLParser';
+import { InputFieldsDefinitionContext } from './GraphQLParser';
+import { InputObjectTypeExtensionContext } from './GraphQLParser';
+import { DirectiveDefinitionContext } from './GraphQLParser';
+import { DirectiveLocationsContext } from './GraphQLParser';
+import { DirectiveLocationContext } from './GraphQLParser';
+import { ExecutableDirectiveLocationContext } from './GraphQLParser';
+import { TypeSystemDirectiveLocationContext } from './GraphQLParser';
 
 /**
  * This interface defines a complete listener for a parse tree produced by
@@ -150,6 +169,193 @@ export interface GraphQLListener extends ParseTreeListener {
   exitInlineFragmentSelection?: (ctx: InlineFragmentSelectionContext) => void;
 
   /**
+   * Enter a parse tree produced by the `inputObjectTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterInputObjectTypeExtensionWithDirectives?: (
+    ctx: InputObjectTypeExtensionWithDirectivesContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `inputObjectTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitInputObjectTypeExtensionWithDirectives?: (
+    ctx: InputObjectTypeExtensionWithDirectivesContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `inputObjectTypeExtensionWithFields`
+   * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterInputObjectTypeExtensionWithFields?: (
+    ctx: InputObjectTypeExtensionWithFieldsContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `inputObjectTypeExtensionWithFields`
+   * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitInputObjectTypeExtensionWithFields?: (
+    ctx: InputObjectTypeExtensionWithFieldsContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `interfaceTypeExtensionWithFields`
+   * labeled alternative in `GraphQLParser.interfaceTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterInterfaceTypeExtensionWithFields?: (
+    ctx: InterfaceTypeExtensionWithFieldsContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `interfaceTypeExtensionWithFields`
+   * labeled alternative in `GraphQLParser.interfaceTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitInterfaceTypeExtensionWithFields?: (
+    ctx: InterfaceTypeExtensionWithFieldsContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `interfaceTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.interfaceTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterInterfaceTypeExtensionWithDirectives?: (
+    ctx: InterfaceTypeExtensionWithDirectivesContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `interfaceTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.interfaceTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitInterfaceTypeExtensionWithDirectives?: (
+    ctx: InterfaceTypeExtensionWithDirectivesContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `objectTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterObjectTypeExtensionWithDirectives?: (
+    ctx: ObjectTypeExtensionWithDirectivesContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `objectTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitObjectTypeExtensionWithDirectives?: (
+    ctx: ObjectTypeExtensionWithDirectivesContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `objectTypeExtensionWithFields`
+   * labeled alternative in `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterObjectTypeExtensionWithFields?: (
+    ctx: ObjectTypeExtensionWithFieldsContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `objectTypeExtensionWithFields`
+   * labeled alternative in `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitObjectTypeExtensionWithFields?: (
+    ctx: ObjectTypeExtensionWithFieldsContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `objectTypeExtensionWithInterfaces`
+   * labeled alternative in `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterObjectTypeExtensionWithInterfaces?: (
+    ctx: ObjectTypeExtensionWithInterfacesContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `objectTypeExtensionWithInterfaces`
+   * labeled alternative in `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitObjectTypeExtensionWithInterfaces?: (
+    ctx: ObjectTypeExtensionWithInterfacesContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `unionTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.unionTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterUnionTypeExtensionWithDirectives?: (
+    ctx: UnionTypeExtensionWithDirectivesContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `unionTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.unionTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitUnionTypeExtensionWithDirectives?: (
+    ctx: UnionTypeExtensionWithDirectivesContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `unionTypeExtensionWithMembers`
+   * labeled alternative in `GraphQLParser.unionTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterUnionTypeExtensionWithMembers?: (
+    ctx: UnionTypeExtensionWithMembersContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `unionTypeExtensionWithMembers`
+   * labeled alternative in `GraphQLParser.unionTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitUnionTypeExtensionWithMembers?: (
+    ctx: UnionTypeExtensionWithMembersContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `schemaExtensionWithoutOperations`
+   * labeled alternative in `GraphQLParser.schemaExtension`.
+   * @param ctx the parse tree
+   */
+  enterSchemaExtensionWithoutOperations?: (
+    ctx: SchemaExtensionWithoutOperationsContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `schemaExtensionWithoutOperations`
+   * labeled alternative in `GraphQLParser.schemaExtension`.
+   * @param ctx the parse tree
+   */
+  exitSchemaExtensionWithoutOperations?: (
+    ctx: SchemaExtensionWithoutOperationsContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by the `schemaExtensionWithOperations`
+   * labeled alternative in `GraphQLParser.schemaExtension`.
+   * @param ctx the parse tree
+   */
+  enterSchemaExtensionWithOperations?: (
+    ctx: SchemaExtensionWithOperationsContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by the `schemaExtensionWithOperations`
+   * labeled alternative in `GraphQLParser.schemaExtension`.
+   * @param ctx the parse tree
+   */
+  exitSchemaExtensionWithOperations?: (
+    ctx: SchemaExtensionWithOperationsContext
+  ) => void;
+
+  /**
    * Enter a parse tree produced by the `stringValue`
    * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
@@ -163,17 +369,82 @@ export interface GraphQLListener extends ParseTreeListener {
   exitStringValue?: (ctx: StringValueContext) => void;
 
   /**
-   * Enter a parse tree produced by the `enumValueValue`
+   * Enter a parse tree produced by the `nonEmptyObjectValue`
    * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  enterEnumValueValue?: (ctx: EnumValueValueContext) => void;
+  enterNonEmptyObjectValue?: (ctx: NonEmptyObjectValueContext) => void;
   /**
-   * Exit a parse tree produced by the `enumValueValue`
+   * Exit a parse tree produced by the `nonEmptyObjectValue`
    * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  exitEnumValueValue?: (ctx: EnumValueValueContext) => void;
+  exitNonEmptyObjectValue?: (ctx: NonEmptyObjectValueContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `enumValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  enterEnumValue?: (ctx: EnumValueContext) => void;
+  /**
+   * Exit a parse tree produced by the `enumValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  exitEnumValue?: (ctx: EnumValueContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `variableValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  enterVariableValue?: (ctx: VariableValueContext) => void;
+  /**
+   * Exit a parse tree produced by the `variableValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  exitVariableValue?: (ctx: VariableValueContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `intValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  enterIntValue?: (ctx: IntValueContext) => void;
+  /**
+   * Exit a parse tree produced by the `intValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  exitIntValue?: (ctx: IntValueContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `emptyListValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  enterEmptyListValue?: (ctx: EmptyListValueContext) => void;
+  /**
+   * Exit a parse tree produced by the `emptyListValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  exitEmptyListValue?: (ctx: EmptyListValueContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `floatValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  enterFloatValue?: (ctx: FloatValueContext) => void;
+  /**
+   * Exit a parse tree produced by the `floatValue`
+   * labeled alternative in `GraphQLParser.value`.
+   * @param ctx the parse tree
+   */
+  exitFloatValue?: (ctx: FloatValueContext) => void;
 
   /**
    * Enter a parse tree produced by the `booleanValue`
@@ -189,69 +460,77 @@ export interface GraphQLListener extends ParseTreeListener {
   exitBooleanValue?: (ctx: BooleanValueContext) => void;
 
   /**
-   * Enter a parse tree produced by the `numberValue`
+   * Enter a parse tree produced by the `nonEmptyListValue`
    * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  enterNumberValue?: (ctx: NumberValueContext) => void;
+  enterNonEmptyListValue?: (ctx: NonEmptyListValueContext) => void;
   /**
-   * Exit a parse tree produced by the `numberValue`
+   * Exit a parse tree produced by the `nonEmptyListValue`
    * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  exitNumberValue?: (ctx: NumberValueContext) => void;
+  exitNonEmptyListValue?: (ctx: NonEmptyListValueContext) => void;
 
   /**
-   * Enter a parse tree produced by the `arrayValue`
+   * Enter a parse tree produced by the `nullValue`
    * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  enterArrayValue?: (ctx: ArrayValueContext) => void;
+  enterNullValue?: (ctx: NullValueContext) => void;
   /**
-   * Exit a parse tree produced by the `arrayValue`
+   * Exit a parse tree produced by the `nullValue`
    * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  exitArrayValue?: (ctx: ArrayValueContext) => void;
+  exitNullValue?: (ctx: NullValueContext) => void;
 
   /**
-   * Enter a parse tree produced by the `argumentDirective`
-   * labeled alternative in `GraphQLParser.directive`.
+   * Enter a parse tree produced by the `emptyObjectValue`
+   * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  enterArgumentDirective?: (ctx: ArgumentDirectiveContext) => void;
+  enterEmptyObjectValue?: (ctx: EmptyObjectValueContext) => void;
   /**
-   * Exit a parse tree produced by the `argumentDirective`
-   * labeled alternative in `GraphQLParser.directive`.
+   * Exit a parse tree produced by the `emptyObjectValue`
+   * labeled alternative in `GraphQLParser.value`.
    * @param ctx the parse tree
    */
-  exitArgumentDirective?: (ctx: ArgumentDirectiveContext) => void;
+  exitEmptyObjectValue?: (ctx: EmptyObjectValueContext) => void;
 
   /**
-   * Enter a parse tree produced by the `nameDirective`
-   * labeled alternative in `GraphQLParser.directive`.
+   * Enter a parse tree produced by the `enumTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.enumTypeExtension`.
    * @param ctx the parse tree
    */
-  enterNameDirective?: (ctx: NameDirectiveContext) => void;
+  enterEnumTypeExtensionWithDirectives?: (
+    ctx: EnumTypeExtensionWithDirectivesContext
+  ) => void;
   /**
-   * Exit a parse tree produced by the `nameDirective`
-   * labeled alternative in `GraphQLParser.directive`.
+   * Exit a parse tree produced by the `enumTypeExtensionWithDirectives`
+   * labeled alternative in `GraphQLParser.enumTypeExtension`.
    * @param ctx the parse tree
    */
-  exitNameDirective?: (ctx: NameDirectiveContext) => void;
+  exitEnumTypeExtensionWithDirectives?: (
+    ctx: EnumTypeExtensionWithDirectivesContext
+  ) => void;
 
   /**
-   * Enter a parse tree produced by the `valueDirective`
-   * labeled alternative in `GraphQLParser.directive`.
+   * Enter a parse tree produced by the `enumTypeExtensionWithValues`
+   * labeled alternative in `GraphQLParser.enumTypeExtension`.
    * @param ctx the parse tree
    */
-  enterValueDirective?: (ctx: ValueDirectiveContext) => void;
+  enterEnumTypeExtensionWithValues?: (
+    ctx: EnumTypeExtensionWithValuesContext
+  ) => void;
   /**
-   * Exit a parse tree produced by the `valueDirective`
-   * labeled alternative in `GraphQLParser.directive`.
+   * Exit a parse tree produced by the `enumTypeExtensionWithValues`
+   * labeled alternative in `GraphQLParser.enumTypeExtension`.
    * @param ctx the parse tree
    */
-  exitValueDirective?: (ctx: ValueDirectiveContext) => void;
+  exitEnumTypeExtensionWithValues?: (
+    ctx: EnumTypeExtensionWithValuesContext
+  ) => void;
 
   /**
    * Enter a parse tree produced by `GraphQLParser.document`.
@@ -276,6 +555,17 @@ export interface GraphQLListener extends ParseTreeListener {
   exitDefinition?: (ctx: DefinitionContext) => void;
 
   /**
+   * Enter a parse tree produced by `GraphQLParser.executableDefinition`.
+   * @param ctx the parse tree
+   */
+  enterExecutableDefinition?: (ctx: ExecutableDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.executableDefinition`.
+   * @param ctx the parse tree
+   */
+  exitExecutableDefinition?: (ctx: ExecutableDefinitionContext) => void;
+
+  /**
    * Enter a parse tree produced by `GraphQLParser.operationDefinition`.
    * @param ctx the parse tree
    */
@@ -287,17 +577,6 @@ export interface GraphQLListener extends ParseTreeListener {
   exitOperationDefinition?: (ctx: OperationDefinitionContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.selectionSet`.
-   * @param ctx the parse tree
-   */
-  enterSelectionSet?: (ctx: SelectionSetContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.selectionSet`.
-   * @param ctx the parse tree
-   */
-  exitSelectionSet?: (ctx: SelectionSetContext) => void;
-
-  /**
    * Enter a parse tree produced by `GraphQLParser.operationType`.
    * @param ctx the parse tree
    */
@@ -307,6 +586,17 @@ export interface GraphQLListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitOperationType?: (ctx: OperationTypeContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.selectionSet`.
+   * @param ctx the parse tree
+   */
+  enterSelectionSet?: (ctx: SelectionSetContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.selectionSet`.
+   * @param ctx the parse tree
+   */
+  exitSelectionSet?: (ctx: SelectionSetContext) => void;
 
   /**
    * Enter a parse tree produced by `GraphQLParser.selection`.
@@ -329,17 +619,6 @@ export interface GraphQLListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitField?: (ctx: FieldContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.fieldName`.
-   * @param ctx the parse tree
-   */
-  enterFieldName?: (ctx: FieldNameContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.fieldName`.
-   * @param ctx the parse tree
-   */
-  exitFieldName?: (ctx: FieldNameContext) => void;
 
   /**
    * Enter a parse tree produced by `GraphQLParser.alias`.
@@ -419,202 +698,15 @@ export interface GraphQLListener extends ParseTreeListener {
   exitFragmentName?: (ctx: FragmentNameContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.typeSystemDefinition`.
+   * Enter a parse tree produced by `GraphQLParser.typeCondition`.
    * @param ctx the parse tree
    */
-  enterTypeSystemDefinition?: (ctx: TypeSystemDefinitionContext) => void;
+  enterTypeCondition?: (ctx: TypeConditionContext) => void;
   /**
-   * Exit a parse tree produced by `GraphQLParser.typeSystemDefinition`.
+   * Exit a parse tree produced by `GraphQLParser.typeCondition`.
    * @param ctx the parse tree
    */
-  exitTypeSystemDefinition?: (ctx: TypeSystemDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.typeDefinition`.
-   * @param ctx the parse tree
-   */
-  enterTypeDefinition?: (ctx: TypeDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.typeDefinition`.
-   * @param ctx the parse tree
-   */
-  exitTypeDefinition?: (ctx: TypeDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.scalarType`.
-   * @param ctx the parse tree
-   */
-  enterScalarType?: (ctx: ScalarTypeContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.scalarType`.
-   * @param ctx the parse tree
-   */
-  exitScalarType?: (ctx: ScalarTypeContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.scalarTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  enterScalarTypeDefinition?: (ctx: ScalarTypeDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.scalarTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  exitScalarTypeDefinition?: (ctx: ScalarTypeDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.objectType`.
-   * @param ctx the parse tree
-   */
-  enterObjectType?: (ctx: ObjectTypeContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.objectType`.
-   * @param ctx the parse tree
-   */
-  exitObjectType?: (ctx: ObjectTypeContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.objectTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  enterObjectTypeDefinition?: (ctx: ObjectTypeDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.objectTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  exitObjectTypeDefinition?: (ctx: ObjectTypeDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.implementsInterfaces`.
-   * @param ctx the parse tree
-   */
-  enterImplementsInterfaces?: (ctx: ImplementsInterfacesContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.implementsInterfaces`.
-   * @param ctx the parse tree
-   */
-  exitImplementsInterfaces?: (ctx: ImplementsInterfacesContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.implementsList`.
-   * @param ctx the parse tree
-   */
-  enterImplementsList?: (ctx: ImplementsListContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.implementsList`.
-   * @param ctx the parse tree
-   */
-  exitImplementsList?: (ctx: ImplementsListContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.fieldDefinition`.
-   * @param ctx the parse tree
-   */
-  enterFieldDefinition?: (ctx: FieldDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.fieldDefinition`.
-   * @param ctx the parse tree
-   */
-  exitFieldDefinition?: (ctx: FieldDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.deprecated`.
-   * @param ctx the parse tree
-   */
-  enterDeprecated?: (ctx: DeprecatedContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.deprecated`.
-   * @param ctx the parse tree
-   */
-  exitDeprecated?: (ctx: DeprecatedContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.deprecationReason`.
-   * @param ctx the parse tree
-   */
-  enterDeprecationReason?: (ctx: DeprecationReasonContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.deprecationReason`.
-   * @param ctx the parse tree
-   */
-  exitDeprecationReason?: (ctx: DeprecationReasonContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.argumentsDefinition`.
-   * @param ctx the parse tree
-   */
-  enterArgumentsDefinition?: (ctx: ArgumentsDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.argumentsDefinition`.
-   * @param ctx the parse tree
-   */
-  exitArgumentsDefinition?: (ctx: ArgumentsDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.inputValueDefinition`.
-   * @param ctx the parse tree
-   */
-  enterInputValueDefinition?: (ctx: InputValueDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.inputValueDefinition`.
-   * @param ctx the parse tree
-   */
-  exitInputValueDefinition?: (ctx: InputValueDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.interfaceType`.
-   * @param ctx the parse tree
-   */
-  enterInterfaceType?: (ctx: InterfaceTypeContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.interfaceType`.
-   * @param ctx the parse tree
-   */
-  exitInterfaceType?: (ctx: InterfaceTypeContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.interfaceTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  enterInterfaceTypeDefinition?: (ctx: InterfaceTypeDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.interfaceTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  exitInterfaceTypeDefinition?: (ctx: InterfaceTypeDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.unionType`.
-   * @param ctx the parse tree
-   */
-  enterUnionType?: (ctx: UnionTypeContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.unionType`.
-   * @param ctx the parse tree
-   */
-  exitUnionType?: (ctx: UnionTypeContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.unionTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  enterUnionTypeDefinition?: (ctx: UnionTypeDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.unionTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  exitUnionTypeDefinition?: (ctx: UnionTypeDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.unionMembers`.
-   * @param ctx the parse tree
-   */
-  enterUnionMembers?: (ctx: UnionMembersContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.unionMembers`.
-   * @param ctx the parse tree
-   */
-  exitUnionMembers?: (ctx: UnionMembersContext) => void;
+  exitTypeCondition?: (ctx: TypeConditionContext) => void;
 
   /**
    * Enter a parse tree produced by `GraphQLParser.value`.
@@ -628,129 +720,15 @@ export interface GraphQLListener extends ParseTreeListener {
   exitValue?: (ctx: ValueContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.enumType`.
+   * Enter a parse tree produced by `GraphQLParser.objectField`.
    * @param ctx the parse tree
    */
-  enterEnumType?: (ctx: EnumTypeContext) => void;
+  enterObjectField?: (ctx: ObjectFieldContext) => void;
   /**
-   * Exit a parse tree produced by `GraphQLParser.enumType`.
+   * Exit a parse tree produced by `GraphQLParser.objectField`.
    * @param ctx the parse tree
    */
-  exitEnumType?: (ctx: EnumTypeContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.enumTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  enterEnumTypeDefinition?: (ctx: EnumTypeDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.enumTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  exitEnumTypeDefinition?: (ctx: EnumTypeDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.enumValueDefinition`.
-   * @param ctx the parse tree
-   */
-  enterEnumValueDefinition?: (ctx: EnumValueDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.enumValueDefinition`.
-   * @param ctx the parse tree
-   */
-  exitEnumValueDefinition?: (ctx: EnumValueDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.enumValue`.
-   * @param ctx the parse tree
-   */
-  enterEnumValue?: (ctx: EnumValueContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.enumValue`.
-   * @param ctx the parse tree
-   */
-  exitEnumValue?: (ctx: EnumValueContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.inputObjectTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  enterInputObjectTypeDefinition?: (
-    ctx: InputObjectTypeDefinitionContext
-  ) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.inputObjectTypeDefinition`.
-   * @param ctx the parse tree
-   */
-  exitInputObjectTypeDefinition?: (
-    ctx: InputObjectTypeDefinitionContext
-  ) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.typeExtensionDefinition`.
-   * @param ctx the parse tree
-   */
-  enterTypeExtensionDefinition?: (ctx: TypeExtensionDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.typeExtensionDefinition`.
-   * @param ctx the parse tree
-   */
-  exitTypeExtensionDefinition?: (ctx: TypeExtensionDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.directiveDefinition`.
-   * @param ctx the parse tree
-   */
-  enterDirectiveDefinition?: (ctx: DirectiveDefinitionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.directiveDefinition`.
-   * @param ctx the parse tree
-   */
-  exitDirectiveDefinition?: (ctx: DirectiveDefinitionContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.directiveLocations`.
-   * @param ctx the parse tree
-   */
-  enterDirectiveLocations?: (ctx: DirectiveLocationsContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.directiveLocations`.
-   * @param ctx the parse tree
-   */
-  exitDirectiveLocations?: (ctx: DirectiveLocationsContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.directives`.
-   * @param ctx the parse tree
-   */
-  enterDirectives?: (ctx: DirectivesContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.directives`.
-   * @param ctx the parse tree
-   */
-  exitDirectives?: (ctx: DirectivesContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.directive`.
-   * @param ctx the parse tree
-   */
-  enterDirective?: (ctx: DirectiveContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.directive`.
-   * @param ctx the parse tree
-   */
-  exitDirective?: (ctx: DirectiveContext) => void;
-
-  /**
-   * Enter a parse tree produced by `GraphQLParser.typeCondition`.
-   * @param ctx the parse tree
-   */
-  enterTypeCondition?: (ctx: TypeConditionContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.typeCondition`.
-   * @param ctx the parse tree
-   */
-  exitTypeCondition?: (ctx: TypeConditionContext) => void;
+  exitObjectField?: (ctx: ObjectFieldContext) => void;
 
   /**
    * Enter a parse tree produced by `GraphQLParser.variableDefinitions`.
@@ -797,17 +775,6 @@ export interface GraphQLListener extends ParseTreeListener {
   exitDefaultValue?: (ctx: DefaultValueContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.valueOrVariable`.
-   * @param ctx the parse tree
-   */
-  enterValueOrVariable?: (ctx: ValueOrVariableContext) => void;
-  /**
-   * Exit a parse tree produced by `GraphQLParser.valueOrVariable`.
-   * @param ctx the parse tree
-   */
-  exitValueOrVariable?: (ctx: ValueOrVariableContext) => void;
-
-  /**
    * Enter a parse tree produced by `GraphQLParser.type`.
    * @param ctx the parse tree
    */
@@ -819,15 +786,15 @@ export interface GraphQLListener extends ParseTreeListener {
   exitType?: (ctx: TypeContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.typeName`.
+   * Enter a parse tree produced by `GraphQLParser.namedType`.
    * @param ctx the parse tree
    */
-  enterTypeName?: (ctx: TypeNameContext) => void;
+  enterNamedType?: (ctx: NamedTypeContext) => void;
   /**
-   * Exit a parse tree produced by `GraphQLParser.typeName`.
+   * Exit a parse tree produced by `GraphQLParser.namedType`.
    * @param ctx the parse tree
    */
-  exitTypeName?: (ctx: TypeNameContext) => void;
+  exitNamedType?: (ctx: NamedTypeContext) => void;
 
   /**
    * Enter a parse tree produced by `GraphQLParser.listType`.
@@ -852,15 +819,48 @@ export interface GraphQLListener extends ParseTreeListener {
   exitNonNullType?: (ctx: NonNullTypeContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.array`.
+   * Enter a parse tree produced by `GraphQLParser.directives`.
    * @param ctx the parse tree
    */
-  enterArray?: (ctx: ArrayContext) => void;
+  enterDirectives?: (ctx: DirectivesContext) => void;
   /**
-   * Exit a parse tree produced by `GraphQLParser.array`.
+   * Exit a parse tree produced by `GraphQLParser.directives`.
    * @param ctx the parse tree
    */
-  exitArray?: (ctx: ArrayContext) => void;
+  exitDirectives?: (ctx: DirectivesContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.directive`.
+   * @param ctx the parse tree
+   */
+  enterDirective?: (ctx: DirectiveContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.directive`.
+   * @param ctx the parse tree
+   */
+  exitDirective?: (ctx: DirectiveContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.typeSystemDefinition`.
+   * @param ctx the parse tree
+   */
+  enterTypeSystemDefinition?: (ctx: TypeSystemDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.typeSystemDefinition`.
+   * @param ctx the parse tree
+   */
+  exitTypeSystemDefinition?: (ctx: TypeSystemDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.typeSystemExtension`.
+   * @param ctx the parse tree
+   */
+  enterTypeSystemExtension?: (ctx: TypeSystemExtensionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.typeSystemExtension`.
+   * @param ctx the parse tree
+   */
+  exitTypeSystemExtension?: (ctx: TypeSystemExtensionContext) => void;
 
   /**
    * Enter a parse tree produced by `GraphQLParser.schemaDefinition`.
@@ -874,41 +874,357 @@ export interface GraphQLListener extends ParseTreeListener {
   exitSchemaDefinition?: (ctx: SchemaDefinitionContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.schemaQueryDefinition`.
+   * Enter a parse tree produced by `GraphQLParser.schemaExtension`.
    * @param ctx the parse tree
    */
-  enterSchemaQueryDefinition?: (ctx: SchemaQueryDefinitionContext) => void;
+  enterSchemaExtension?: (ctx: SchemaExtensionContext) => void;
   /**
-   * Exit a parse tree produced by `GraphQLParser.schemaQueryDefinition`.
+   * Exit a parse tree produced by `GraphQLParser.schemaExtension`.
    * @param ctx the parse tree
    */
-  exitSchemaQueryDefinition?: (ctx: SchemaQueryDefinitionContext) => void;
+  exitSchemaExtension?: (ctx: SchemaExtensionContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.schemaMutationDefinition`.
+   * Enter a parse tree produced by `GraphQLParser.operationTypeDefinition`.
    * @param ctx the parse tree
    */
-  enterSchemaMutationDefinition?: (
-    ctx: SchemaMutationDefinitionContext
-  ) => void;
+  enterOperationTypeDefinition?: (ctx: OperationTypeDefinitionContext) => void;
   /**
-   * Exit a parse tree produced by `GraphQLParser.schemaMutationDefinition`.
+   * Exit a parse tree produced by `GraphQLParser.operationTypeDefinition`.
    * @param ctx the parse tree
    */
-  exitSchemaMutationDefinition?: (ctx: SchemaMutationDefinitionContext) => void;
+  exitOperationTypeDefinition?: (ctx: OperationTypeDefinitionContext) => void;
 
   /**
-   * Enter a parse tree produced by `GraphQLParser.schemaSubscriptionDefinition`.
+   * Enter a parse tree produced by `GraphQLParser.description`.
    * @param ctx the parse tree
    */
-  enterSchemaSubscriptionDefinition?: (
-    ctx: SchemaSubscriptionDefinitionContext
+  enterDescription?: (ctx: DescriptionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.description`.
+   * @param ctx the parse tree
+   */
+  exitDescription?: (ctx: DescriptionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.typeDefinition`.
+   * @param ctx the parse tree
+   */
+  enterTypeDefinition?: (ctx: TypeDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.typeDefinition`.
+   * @param ctx the parse tree
+   */
+  exitTypeDefinition?: (ctx: TypeDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.typeExtension`.
+   * @param ctx the parse tree
+   */
+  enterTypeExtension?: (ctx: TypeExtensionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.typeExtension`.
+   * @param ctx the parse tree
+   */
+  exitTypeExtension?: (ctx: TypeExtensionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.scalarTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  enterScalarTypeDefinition?: (ctx: ScalarTypeDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.scalarTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  exitScalarTypeDefinition?: (ctx: ScalarTypeDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.scalarTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterScalarTypeExtension?: (ctx: ScalarTypeExtensionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.scalarTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitScalarTypeExtension?: (ctx: ScalarTypeExtensionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.objectTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  enterObjectTypeDefinition?: (ctx: ObjectTypeDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.objectTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  exitObjectTypeDefinition?: (ctx: ObjectTypeDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterObjectTypeExtension?: (ctx: ObjectTypeExtensionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.objectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitObjectTypeExtension?: (ctx: ObjectTypeExtensionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.implementsInterfaces`.
+   * @param ctx the parse tree
+   */
+  enterImplementsInterfaces?: (ctx: ImplementsInterfacesContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.implementsInterfaces`.
+   * @param ctx the parse tree
+   */
+  exitImplementsInterfaces?: (ctx: ImplementsInterfacesContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.fieldsDefinition`.
+   * @param ctx the parse tree
+   */
+  enterFieldsDefinition?: (ctx: FieldsDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.fieldsDefinition`.
+   * @param ctx the parse tree
+   */
+  exitFieldsDefinition?: (ctx: FieldsDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.fieldDefinition`.
+   * @param ctx the parse tree
+   */
+  enterFieldDefinition?: (ctx: FieldDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.fieldDefinition`.
+   * @param ctx the parse tree
+   */
+  exitFieldDefinition?: (ctx: FieldDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.argumentsDefinition`.
+   * @param ctx the parse tree
+   */
+  enterArgumentsDefinition?: (ctx: ArgumentsDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.argumentsDefinition`.
+   * @param ctx the parse tree
+   */
+  exitArgumentsDefinition?: (ctx: ArgumentsDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.inputValueDefinition`.
+   * @param ctx the parse tree
+   */
+  enterInputValueDefinition?: (ctx: InputValueDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.inputValueDefinition`.
+   * @param ctx the parse tree
+   */
+  exitInputValueDefinition?: (ctx: InputValueDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.interfaceTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  enterInterfaceTypeDefinition?: (ctx: InterfaceTypeDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.interfaceTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  exitInterfaceTypeDefinition?: (ctx: InterfaceTypeDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.interfaceTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterInterfaceTypeExtension?: (ctx: InterfaceTypeExtensionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.interfaceTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitInterfaceTypeExtension?: (ctx: InterfaceTypeExtensionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.unionTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  enterUnionTypeDefinition?: (ctx: UnionTypeDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.unionTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  exitUnionTypeDefinition?: (ctx: UnionTypeDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.unionMemberTypes`.
+   * @param ctx the parse tree
+   */
+  enterUnionMemberTypes?: (ctx: UnionMemberTypesContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.unionMemberTypes`.
+   * @param ctx the parse tree
+   */
+  exitUnionMemberTypes?: (ctx: UnionMemberTypesContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.unionTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterUnionTypeExtension?: (ctx: UnionTypeExtensionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.unionTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitUnionTypeExtension?: (ctx: UnionTypeExtensionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.enumTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  enterEnumTypeDefinition?: (ctx: EnumTypeDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.enumTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  exitEnumTypeDefinition?: (ctx: EnumTypeDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.enumValuesDefinition`.
+   * @param ctx the parse tree
+   */
+  enterEnumValuesDefinition?: (ctx: EnumValuesDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.enumValuesDefinition`.
+   * @param ctx the parse tree
+   */
+  exitEnumValuesDefinition?: (ctx: EnumValuesDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.enumValueDefinition`.
+   * @param ctx the parse tree
+   */
+  enterEnumValueDefinition?: (ctx: EnumValueDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.enumValueDefinition`.
+   * @param ctx the parse tree
+   */
+  exitEnumValueDefinition?: (ctx: EnumValueDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.enumTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterEnumTypeExtension?: (ctx: EnumTypeExtensionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.enumTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitEnumTypeExtension?: (ctx: EnumTypeExtensionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.inputObjectTypeDefinition`.
+   * @param ctx the parse tree
+   */
+  enterInputObjectTypeDefinition?: (
+    ctx: InputObjectTypeDefinitionContext
   ) => void;
   /**
-   * Exit a parse tree produced by `GraphQLParser.schemaSubscriptionDefinition`.
+   * Exit a parse tree produced by `GraphQLParser.inputObjectTypeDefinition`.
    * @param ctx the parse tree
    */
-  exitSchemaSubscriptionDefinition?: (
-    ctx: SchemaSubscriptionDefinitionContext
+  exitInputObjectTypeDefinition?: (
+    ctx: InputObjectTypeDefinitionContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.inputFieldsDefinition`.
+   * @param ctx the parse tree
+   */
+  enterInputFieldsDefinition?: (ctx: InputFieldsDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.inputFieldsDefinition`.
+   * @param ctx the parse tree
+   */
+  exitInputFieldsDefinition?: (ctx: InputFieldsDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.inputObjectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  enterInputObjectTypeExtension?: (
+    ctx: InputObjectTypeExtensionContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.inputObjectTypeExtension`.
+   * @param ctx the parse tree
+   */
+  exitInputObjectTypeExtension?: (ctx: InputObjectTypeExtensionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.directiveDefinition`.
+   * @param ctx the parse tree
+   */
+  enterDirectiveDefinition?: (ctx: DirectiveDefinitionContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.directiveDefinition`.
+   * @param ctx the parse tree
+   */
+  exitDirectiveDefinition?: (ctx: DirectiveDefinitionContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.directiveLocations`.
+   * @param ctx the parse tree
+   */
+  enterDirectiveLocations?: (ctx: DirectiveLocationsContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.directiveLocations`.
+   * @param ctx the parse tree
+   */
+  exitDirectiveLocations?: (ctx: DirectiveLocationsContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.directiveLocation`.
+   * @param ctx the parse tree
+   */
+  enterDirectiveLocation?: (ctx: DirectiveLocationContext) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.directiveLocation`.
+   * @param ctx the parse tree
+   */
+  exitDirectiveLocation?: (ctx: DirectiveLocationContext) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.executableDirectiveLocation`.
+   * @param ctx the parse tree
+   */
+  enterExecutableDirectiveLocation?: (
+    ctx: ExecutableDirectiveLocationContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.executableDirectiveLocation`.
+   * @param ctx the parse tree
+   */
+  exitExecutableDirectiveLocation?: (
+    ctx: ExecutableDirectiveLocationContext
+  ) => void;
+
+  /**
+   * Enter a parse tree produced by `GraphQLParser.typeSystemDirectiveLocation`.
+   * @param ctx the parse tree
+   */
+  enterTypeSystemDirectiveLocation?: (
+    ctx: TypeSystemDirectiveLocationContext
+  ) => void;
+  /**
+   * Exit a parse tree produced by `GraphQLParser.typeSystemDirectiveLocation`.
+   * @param ctx the parse tree
+   */
+  exitTypeSystemDirectiveLocation?: (
+    ctx: TypeSystemDirectiveLocationContext
   ) => void;
 }

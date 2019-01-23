@@ -1,22 +1,10 @@
 import { expect } from 'chai';
 import fs = require('fs');
 import 'mocha';
-import { GQLGeoNearFeaturePattern } from '../GQLPattern';
-import GQLSchemaBuilder from '../../builders/graphql/GQLSchemaBuilder';
 import Builder from '../../builders/Builder';
+import GQLSchemaBuilder from '../../builders/graphql/GQLSchemaBuilder';
 import { GQLSchema } from '../GQLSchema';
-import { List, Map, Set } from 'immutable';
-import {
-  GQLDirectiveDefinition,
-  GQLEnum,
-  GQLFieldDefinition,
-  GQLInputType,
-  GQLInterface,
-  GQLObjectType,
-  GQLScalarType,
-  GQLTypeDefinition,
-  GQLUnion,
-} from '../GQLTypeDefinition';
+import { GQLEnum, GQLObjectType } from '../GQLTypeDefinition';
 
 describe('GQLSchema', () => {
   let schema: GQLSchema = null;
@@ -134,6 +122,7 @@ describe('GQLSchema', () => {
   it('enums has TripRole with correct members', () => {
     loadSchema();
     const tripRoleEnum = schema.enums.get('j_TripRole');
+    console.log('ENUM', tripRoleEnum.values);
     expect(tripRoleEnum).is.an.instanceOf(GQLEnum);
     const tripRoleMembers = [
       'j_Organizer',
