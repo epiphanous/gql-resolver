@@ -1,4 +1,4 @@
-import { Left, None, Option, Some, Try } from 'funfix';
+import { None, Option, Some, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
 import {
   ArgumentContext,
@@ -24,21 +24,20 @@ import {
 import { DEFAULT_PREFIXES, INTERNAL_ID_KEY } from '../../models/Constants';
 import { GQLAny } from '../../models/GQLAny';
 import {
-  GQLArgument,
   GQLAnyArgument,
-  GQLFilterArgument,
-  GQLPatternsArgument,
-  GQLBoostersArgument,
+  GQLArgument,
   GQLBindingsArgument,
-  GQLOrderArgument,
-  GQLTransformsArgument,
-  GQLLimitArgument,
-  GQLOffsetArgument,
-  GQLNameArgument,
+  GQLBoostersArgument,
+  GQLFilterArgument,
   GQLIncludeDeprecatedArgument,
   GQLInvalidArgument,
+  GQLLimitArgument,
+  GQLNameArgument,
+  GQLOffsetArgument,
+  GQLOrderArgument,
+  GQLPatternsArgument,
+  GQLTransformsArgument,
 } from '../../models/GQLArgument';
-import * as GQLArg from '../../models/GQLArgument';
 import { GQLBinding } from '../../models/GQLBinding';
 import { GQLBooster } from '../../models/GQLBooster';
 import { GQLDirective } from '../../models/GQLDirective';
@@ -60,9 +59,9 @@ import {
 } from '../../models/GQLSelection';
 import { GQLTransform } from '../../models/GQLTransform';
 import {
-  GQLFieldDefinition,
   GQLDirectiveDefinition,
-  GQLTypeDefinition,
+  GQLFieldDefinition,
+  GQLInputType,
 } from '../../models/GQLTypeDefinition';
 import { GQLStringValue, GQLVariableValue } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
@@ -71,7 +70,6 @@ import NameAlias from '../../models/NameAlias';
 import { RDFQueryService } from '../../models/RDFQueryService';
 import ResolverContext from '../../models/ResolverContext';
 import Builder from '../Builder';
-import BuilderError from '../BuilderError';
 import GQLBindingsBuilder from './GQLBindingsBuilder';
 import GQLBoostersBuilder from './GQLBoostersBuilder';
 import GQLDocumentBuilder from './GQLDocumentBuilder';
@@ -652,22 +650,6 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     return new GQLVariable(this.textOf(ctx.NAME()));
   }
 
-  public processDirectives(
-    ctxOpt: Option<DirectivesContext>
-  ): List<GQLDirective> {
-    return ctxOpt
-      .map(dcs => List(dcs.directive().map(dc => this.processDirective(dc))))
-      .getOrElse(List<GQLDirective>());
-  }
-
-  public processDirective(ctx: DirectiveContext): GQLDirective {
-    const name = this.textOf(ctx.NAME());
-    // should pass this for validation: this.getSchema().getDirectiveDefinition(name);
-    //                                +-----------------------------v
-    const args = this.processArguments(Option.of(ctx.arguments()), None);
-    return new GQLDirective(name, args);
-  }
-
   public exitSelectionOnlyOperationDefinition(
     ctx: SelectionOnlyOperationDefinitionContext
   ): void {
@@ -727,28 +709,43 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     return new GQLField({
       name,
       alias,
-      args: this.processArguments(Option.of(ctx.arguments()), fdOpt),
+      args: this.getArguments(Option.of(ctx.arguments()), fdOpt),
       directives: this.processDirectives(Option.of(ctx.directives())),
       selections: this.processSelectionSet(ctx.selectionSet()),
     });
   }
 
-  public processArguments(
-    ctxOpt: Option<ArgumentsContext>,
-    fdOpt: Option<GQLFieldDefinition>
-  ): List<GQLArgument> {
-    if (ctxOpt.nonEmpty()) {
-      return List(ctxOpt.get().argument()).map(arg =>
-        this.processArgument(arg, fdOpt)
-      );
-    } else {
-      return List<GQLArgument>();
-    }
+  public processDirectives(
+    ctxOpt: Option<DirectivesContext>
+  ): List<GQLDirective> {
+    return ctxOpt
+      .map(dcs => List(dcs.directive().map(dc => this.processDirective(dc))))
+      .getOrElse(List<GQLDirective>());
   }
 
-  public processArgument(
+  public processDirective(ctx: DirectiveContext): GQLDirective {
+    const name = this.textOf(ctx.NAME());
+    const typeDefOpt = this.getSchema().getDirectiveDefinition(name);
+    const args = this.getArguments(Option.of(ctx.arguments()), typeDefOpt);
+    return new GQLDirective(name, args);
+  }
+
+  public getArguments(
+    ctxOpt: Option<ArgumentsContext>,
+    typeDefOpt: Option<
+      GQLFieldDefinition | GQLDirectiveDefinition | GQLInputType
+    >
+  ): List<GQLArgument> {
+    return ctxOpt
+      .map(args =>
+        List(args.argument().map(arg => this.getArgument(arg, typeDefOpt)))
+      )
+      .getOrElse(List<GQLArgument>());
+  }
+
+  public getArgument(
     ctx: ArgumentContext,
-    typeDef: Option<GQLFieldDefinition | GQLDirectiveDefinition>
+    typeDef: Option<GQLFieldDefinition | GQLDirectiveDefinition | GQLInputType>
   ): GQLArgument {
     const name = this.textOf(ctx.NAME());
     const typeDefName = typeDef.map(d => d.name).getOrElse('unknown');

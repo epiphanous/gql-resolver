@@ -12,7 +12,6 @@ import {
   FloatValueContext,
   GraphQLParser,
   IntValueContext,
-  NamedTypeContext,
   NonEmptyListValueContext,
   NonEmptyObjectValueContext,
   NullValueContext,
@@ -21,10 +20,8 @@ import {
   ValueContext,
   VariableValueContext,
 } from '../../antlr4/generated/GraphQLParser';
-import {
-  DefaultValueContext,
-  ListTypeContext,
-} from '../../antlr4/generated/GraphQLParser';
+import { DefaultValueContext } from '../../antlr4/generated/GraphQLParser';
+import { DescriptionContext } from '../../antlr4/generated/GraphQLParser';
 import { GQLType } from '../../models/GQLType';
 import {
   GQLBooleanValue,
@@ -40,19 +37,17 @@ import {
 } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
 import BuilderBase from '../BuilderBase';
-import { DescriptionContext } from '../../antlr4/generated/GraphQLParser';
 
 export default class GQLDocumentBuilder<T> extends BuilderBase<T>
   implements GraphQLListener {
   public lexer(inputStream: ANTLRInputStream) {
     return new GraphQLLexer(inputStream);
   }
-
   public parser(tokenStream: TokenStream) {
     return new GraphQLParser(tokenStream);
   }
 
-  public getType(ctx: TypeContext, req: boolean = false, lst: boolean = false) {
+  public getType(ctx: TypeContext) {
     const lt = Option.of(ctx.listType());
     const isList = lt.nonEmpty();
     const typ = lt.map(t => t.type()).getOrElse(ctx);
@@ -72,7 +67,7 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
   }
 
   public getDescription(ctxOpt: Option<DescriptionContext>) {
-    return ctxOpt.map(dc => this.textOf(dc.STRING_VALUE())).getOrElse('');
+    return ctxOpt.map(dc => this.textOf(dc.STRING_VALUE()));
   }
 
   public processValue(ctx: ValueContext): GQLValue {

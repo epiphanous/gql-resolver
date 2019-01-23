@@ -274,7 +274,7 @@ enumValueDefinition
   ;
 
 enumTypeExtension
-  : 'extend' 'enum' NAME directives? enumValuesDefinition # enumTypeExtensionWithoutDirectives
+  : 'extend' 'enum' NAME directives? enumValuesDefinition # enumTypeExtensionWithValues
   | 'extend' 'enum' NAME directives                       # enumTypeExtensionWithDirectives
   ;
 
@@ -287,7 +287,7 @@ inputFieldsDefinition
   ;
 
 inputObjectTypeExtension
-  : 'extend' 'input' NAME directives? inputFieldsDefinition # inputObjectTypeExtensionWithInputFields
+  : 'extend' 'input' NAME directives? inputFieldsDefinition # inputObjectTypeExtensionWithFields
   | 'extend' 'input' NAME directives                        # inputObjectTypeExtensionWithDirectives
   ;
 

@@ -8,8 +8,8 @@ import { FullOperationDefinitionContext } from "./GraphQLParser";
 import { FragmentSpreadSelectionContext } from "./GraphQLParser";
 import { FieldSelectionContext } from "./GraphQLParser";
 import { InlineFragmentSelectionContext } from "./GraphQLParser";
-import { InputObjectTypeExtensionWithInputFieldsContext } from "./GraphQLParser";
 import { InputObjectTypeExtensionWithDirectivesContext } from "./GraphQLParser";
+import { InputObjectTypeExtensionWithFieldsContext } from "./GraphQLParser";
 import { InterfaceTypeExtensionWithFieldsContext } from "./GraphQLParser";
 import { InterfaceTypeExtensionWithDirectivesContext } from "./GraphQLParser";
 import { ObjectTypeExtensionWithDirectivesContext } from "./GraphQLParser";
@@ -31,7 +31,7 @@ import { NonEmptyListValueContext } from "./GraphQLParser";
 import { NullValueContext } from "./GraphQLParser";
 import { EmptyObjectValueContext } from "./GraphQLParser";
 import { EnumTypeExtensionWithDirectivesContext } from "./GraphQLParser";
-import { EnumTypeExtensionWithoutDirectivesContext } from "./GraphQLParser";
+import { EnumTypeExtensionWithValuesContext } from "./GraphQLParser";
 import { DocumentContext } from "./GraphQLParser";
 import { DefinitionContext } from "./GraphQLParser";
 import { ExecutableDefinitionContext } from "./GraphQLParser";
@@ -167,19 +167,6 @@ export interface GraphQLListener extends ParseTreeListener {
 	exitInlineFragmentSelection?: (ctx: InlineFragmentSelectionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `inputObjectTypeExtensionWithInputFields`
-	 * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
-	 * @param ctx the parse tree
-	 */
-	enterInputObjectTypeExtensionWithInputFields?: (ctx: InputObjectTypeExtensionWithInputFieldsContext) => void;
-	/**
-	 * Exit a parse tree produced by the `inputObjectTypeExtensionWithInputFields`
-	 * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
-	 * @param ctx the parse tree
-	 */
-	exitInputObjectTypeExtensionWithInputFields?: (ctx: InputObjectTypeExtensionWithInputFieldsContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `inputObjectTypeExtensionWithDirectives`
 	 * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
 	 * @param ctx the parse tree
@@ -191,6 +178,19 @@ export interface GraphQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitInputObjectTypeExtensionWithDirectives?: (ctx: InputObjectTypeExtensionWithDirectivesContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `inputObjectTypeExtensionWithFields`
+	 * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
+	 * @param ctx the parse tree
+	 */
+	enterInputObjectTypeExtensionWithFields?: (ctx: InputObjectTypeExtensionWithFieldsContext) => void;
+	/**
+	 * Exit a parse tree produced by the `inputObjectTypeExtensionWithFields`
+	 * labeled alternative in `GraphQLParser.inputObjectTypeExtension`.
+	 * @param ctx the parse tree
+	 */
+	exitInputObjectTypeExtensionWithFields?: (ctx: InputObjectTypeExtensionWithFieldsContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `interfaceTypeExtensionWithFields`
@@ -466,17 +466,17 @@ export interface GraphQLListener extends ParseTreeListener {
 	exitEnumTypeExtensionWithDirectives?: (ctx: EnumTypeExtensionWithDirectivesContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `enumTypeExtensionWithoutDirectives`
+	 * Enter a parse tree produced by the `enumTypeExtensionWithValues`
 	 * labeled alternative in `GraphQLParser.enumTypeExtension`.
 	 * @param ctx the parse tree
 	 */
-	enterEnumTypeExtensionWithoutDirectives?: (ctx: EnumTypeExtensionWithoutDirectivesContext) => void;
+	enterEnumTypeExtensionWithValues?: (ctx: EnumTypeExtensionWithValuesContext) => void;
 	/**
-	 * Exit a parse tree produced by the `enumTypeExtensionWithoutDirectives`
+	 * Exit a parse tree produced by the `enumTypeExtensionWithValues`
 	 * labeled alternative in `GraphQLParser.enumTypeExtension`.
 	 * @param ctx the parse tree
 	 */
-	exitEnumTypeExtensionWithoutDirectives?: (ctx: EnumTypeExtensionWithoutDirectivesContext) => void;
+	exitEnumTypeExtensionWithValues?: (ctx: EnumTypeExtensionWithValuesContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `GraphQLParser.document`.

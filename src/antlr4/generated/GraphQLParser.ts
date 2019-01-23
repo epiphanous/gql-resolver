@@ -2837,7 +2837,7 @@ export class GraphQLParser extends Parser {
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 79, this._ctx) ) {
 			case 1:
-				_localctx = new EnumTypeExtensionWithoutDirectivesContext(_localctx);
+				_localctx = new EnumTypeExtensionWithValuesContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
 				this.state = 562;
@@ -3001,7 +3001,7 @@ export class GraphQLParser extends Parser {
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 85, this._ctx) ) {
 			case 1:
-				_localctx = new InputObjectTypeExtensionWithInputFieldsContext(_localctx);
+				_localctx = new InputObjectTypeExtensionWithFieldsContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
 				this.state = 594;
@@ -5618,7 +5618,7 @@ export class EnumTypeExtensionWithDirectivesContext extends EnumTypeExtensionCon
 		}
 	}
 }
-export class EnumTypeExtensionWithoutDirectivesContext extends EnumTypeExtensionContext {
+export class EnumTypeExtensionWithValuesContext extends EnumTypeExtensionContext {
 	public NAME(): TerminalNode { return this.getToken(GraphQLParser.NAME, 0); }
 	public enumValuesDefinition(): EnumValuesDefinitionContext {
 		return this.getRuleContext(0, EnumValuesDefinitionContext);
@@ -5632,14 +5632,14 @@ export class EnumTypeExtensionWithoutDirectivesContext extends EnumTypeExtension
 	}
 	// @Override
 	public enterRule(listener: GraphQLListener): void {
-		if (listener.enterEnumTypeExtensionWithoutDirectives) {
-			listener.enterEnumTypeExtensionWithoutDirectives(this);
+		if (listener.enterEnumTypeExtensionWithValues) {
+			listener.enterEnumTypeExtensionWithValues(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: GraphQLListener): void {
-		if (listener.exitEnumTypeExtensionWithoutDirectives) {
-			listener.exitEnumTypeExtensionWithoutDirectives(this);
+		if (listener.exitEnumTypeExtensionWithValues) {
+			listener.exitEnumTypeExtensionWithValues(this);
 		}
 	}
 }
@@ -5716,31 +5716,6 @@ export class InputObjectTypeExtensionContext extends ParserRuleContext {
 		super.copyFrom(ctx);
 	}
 }
-export class InputObjectTypeExtensionWithInputFieldsContext extends InputObjectTypeExtensionContext {
-	public NAME(): TerminalNode { return this.getToken(GraphQLParser.NAME, 0); }
-	public inputFieldsDefinition(): InputFieldsDefinitionContext {
-		return this.getRuleContext(0, InputFieldsDefinitionContext);
-	}
-	public directives(): DirectivesContext | undefined {
-		return this.tryGetRuleContext(0, DirectivesContext);
-	}
-	constructor(ctx: InputObjectTypeExtensionContext) {
-		super(ctx.parent, ctx.invokingState);
-		this.copyFrom(ctx);
-	}
-	// @Override
-	public enterRule(listener: GraphQLListener): void {
-		if (listener.enterInputObjectTypeExtensionWithInputFields) {
-			listener.enterInputObjectTypeExtensionWithInputFields(this);
-		}
-	}
-	// @Override
-	public exitRule(listener: GraphQLListener): void {
-		if (listener.exitInputObjectTypeExtensionWithInputFields) {
-			listener.exitInputObjectTypeExtensionWithInputFields(this);
-		}
-	}
-}
 export class InputObjectTypeExtensionWithDirectivesContext extends InputObjectTypeExtensionContext {
 	public NAME(): TerminalNode { return this.getToken(GraphQLParser.NAME, 0); }
 	public directives(): DirectivesContext {
@@ -5760,6 +5735,31 @@ export class InputObjectTypeExtensionWithDirectivesContext extends InputObjectTy
 	public exitRule(listener: GraphQLListener): void {
 		if (listener.exitInputObjectTypeExtensionWithDirectives) {
 			listener.exitInputObjectTypeExtensionWithDirectives(this);
+		}
+	}
+}
+export class InputObjectTypeExtensionWithFieldsContext extends InputObjectTypeExtensionContext {
+	public NAME(): TerminalNode { return this.getToken(GraphQLParser.NAME, 0); }
+	public inputFieldsDefinition(): InputFieldsDefinitionContext {
+		return this.getRuleContext(0, InputFieldsDefinitionContext);
+	}
+	public directives(): DirectivesContext | undefined {
+		return this.tryGetRuleContext(0, DirectivesContext);
+	}
+	constructor(ctx: InputObjectTypeExtensionContext) {
+		super(ctx.parent, ctx.invokingState);
+		this.copyFrom(ctx);
+	}
+	// @Override
+	public enterRule(listener: GraphQLListener): void {
+		if (listener.enterInputObjectTypeExtensionWithFields) {
+			listener.enterInputObjectTypeExtensionWithFields(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: GraphQLListener): void {
+		if (listener.exitInputObjectTypeExtensionWithFields) {
+			listener.exitInputObjectTypeExtensionWithFields(this);
 		}
 	}
 }
