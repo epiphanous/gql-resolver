@@ -433,7 +433,6 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   // ------------[ ENUM TYPES ]------------
 
   public exitEnumTypeDefinition(ctx: EnumTypeDefinitionContext) {
-    // console.log('exitEnumTypeDefinition', ctx.enumValuesDefinition());
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
     if (!def) {
