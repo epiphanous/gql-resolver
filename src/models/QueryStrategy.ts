@@ -1,26 +1,22 @@
-import * as marklogic from 'marklogic';
+import { List } from 'immutable';
+import { GQLField } from './GQLSelection';
+import QueryResult from './QueryResult';
+import { GQLExecutionPlan } from './GQLExecutionPlan';
 
-export class QueryStrategy {
+export default class QueryStrategy {
+  public isPlan: boolean;
   public dbConn: any = null;
+
+  constructor(isPlan) {
+    this.isPlan = isPlan;
+  }
+
   public withLimitOffset(limit: number, offset: number): QueryStrategy {
     return this;
   }
-}
 
-export class SparqlQueryStrategy extends QueryStrategy {
-  constructor() {
-    super();
-    this.dbConn = marklogic.createDatabaseClient({
-      // TODO move to a config file
-      host: 'localhost',
-      port: '8000',
-      user: 'admin',
-      password: 'admin',
-      authType: 'DIGEST',
-    });
-  }
-
-  public withLimitOffset(limit: number, offset: number): SparqlQueryStrategy {
-    return this;
+  public resolve(fields: List<GQLField>, parent: GQLExecutionPlan): Promise<QueryResult> {
+    // TODO Execute query
+    return;
   }
 }

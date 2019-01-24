@@ -1,14 +1,15 @@
 import { NotImplementedError } from 'funfix';
-import { List } from 'immutable';
+import { List, Set, Map } from 'immutable';
 import { GQLSchema } from './GQLSchema';
-import { GQLSearchExecutionPlan } from './GQLSearchExecutionPlan';
+// import { GQLSearchExecutionPlan } from './GQLSearchExecutionPlan';
+import {GQLExecutionPlan} from './GQLExecutionPlan';
 import { GQLField } from './GQLSelection';
-import { QueryStrategy } from './QueryStrategy';
+import QueryStrategy from './QueryStrategy';
 import { RDFPrefixes } from './RDFPrefixes';
 
 export class RDFQueryService {
   public static createSearchStrategyCreator(
-    plan: GQLSearchExecutionPlan,
+    plan: GQLExecutionPlan,
     prefixes: RDFPrefixes,
     schema: GQLSchema
   ): (parentIRIs: List<string>) => List<QueryStrategy> {

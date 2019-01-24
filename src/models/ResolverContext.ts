@@ -2,7 +2,7 @@ import { Map } from 'immutable';
 import Builder from '../builders/Builder';
 import GQLSchemaBuilder from '../builders/graphql/GQLSchemaBuilder';
 import { GQLSchema } from './GQLSchema';
-import { QueryStrategy } from './QueryStrategy';
+import QueryStrategy from './QueryStrategy';
 
 export default class ResolverContext {
   public static buildSchema(schemaText: string): GQLSchema {

@@ -1,20 +1,36 @@
 import { None, Option } from 'funfix';
 import { List } from 'immutable';
+import { GQLDirective } from './GQLDirective';
 import { GQLType } from './GQLType';
 import { GQLValue } from './GQLValue';
 
 interface IGQLTypeDefinition {
   name: string;
-  description: string;
+  description?: Option<string>;
+  directives?: List<GQLDirective>;
+  deprecated(): Option<string>;
 }
 
 export class GQLTypeDefinition implements IGQLTypeDefinition {
   public name: string;
-  public description: string;
+  public description?: Option<string>;
+  public directives?: List<GQLDirective>;
 
-  constructor(name: string, description: string) {
+  constructor(
+    name: string,
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
+  ) {
     this.name = name;
     this.description = description;
+    this.directives = directives;
+  }
+
+  public deprecated() {
+    return Option.of(this.directives.find(d => d.name === 'deprecated'))
+      .map(d => d.arguments.find(arg => arg.name === 'reason'))
+      .map(arg => arg.value)
+      .map(v => v.value as string);
   }
 }
 
@@ -27,10 +43,11 @@ export class GQLInterface extends GQLTypeDefinition implements IGQLInterface {
 
   constructor(
     name: string,
-    description: string,
-    fields: List<GQLFieldDefinition>
+    fields: List<GQLFieldDefinition>,
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
   ) {
-    super(name, description);
+    super(name, description, directives);
     this.fields = fields;
   }
 }
@@ -46,11 +63,12 @@ export class GQLObjectType extends GQLTypeDefinition implements IGQLObjectType {
 
   constructor(
     name: string,
-    description: string,
     fields: List<GQLFieldDefinition>,
-    interfaces: List<string>
+    interfaces: List<string>,
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
   ) {
-    super(name, description);
+    super(name, description, directives);
     this.fields = fields;
     this.interfaces = interfaces;
   }
@@ -58,39 +76,33 @@ export class GQLObjectType extends GQLTypeDefinition implements IGQLObjectType {
   public copy(newProps: Partial<IGQLObjectType>): GQLObjectType {
     return new GQLObjectType(
       newProps.name || this.name,
-      newProps.description || this.description,
       newProps.fields || this.fields,
-      newProps.interfaces || this.interfaces
+      newProps.interfaces || this.interfaces,
+      newProps.description || this.description,
+      newProps.directives || this.directives
     );
   }
 }
 
 interface IGQLFieldDefinition extends IGQLTypeDefinition {
   gqlType: GQLType;
-  isDeprecated?: boolean;
-  deprecationReason?: Option<string>;
   args: List<GQLArgumentDefinition>;
 }
 
 export class GQLFieldDefinition extends GQLTypeDefinition
   implements IGQLFieldDefinition {
   public gqlType: GQLType;
-  public isDeprecated: boolean;
-  public deprecationReason: Option<string>;
   public args: List<GQLArgumentDefinition>;
 
   constructor(
     name: string,
-    description: string,
     gqlType: GQLType,
-    isDeprecated: boolean = false,
-    deprecationReason: Option<string> = None,
-    args: List<GQLArgumentDefinition> = List<GQLArgumentDefinition>()
+    args: List<GQLArgumentDefinition> = List<GQLArgumentDefinition>(),
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
   ) {
-    super(name, description);
+    super(name, description, directives);
     this.gqlType = gqlType;
-    this.isDeprecated = isDeprecated;
-    this.deprecationReason = deprecationReason;
     this.args = args;
   }
 }
@@ -107,11 +119,12 @@ export class GQLArgumentDefinition extends GQLTypeDefinition
 
   constructor(
     name: string,
-    description: string,
     gqlType: GQLType,
-    defaultValue: Option<GQLValue> = None
+    defaultValue: Option<GQLValue> = None,
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
   ) {
-    super(name, description);
+    super(name, description, directives);
     this.gqlType = gqlType;
     this.defaultValue = defaultValue;
   }
@@ -126,10 +139,11 @@ export class GQLInputType extends GQLTypeDefinition implements IGQLInputType {
 
   constructor(
     name: string,
-    description: string,
-    args: List<GQLArgumentDefinition> = List<GQLArgumentDefinition>()
+    args = List<GQLArgumentDefinition>(),
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
   ) {
-    super(name, description);
+    super(name, description, directives);
     this.args = args;
   }
 }
@@ -146,9 +160,9 @@ export class GQLDirectiveDefinition extends GQLTypeDefinition
 
   constructor(
     name: string,
-    description: string,
-    args: List<GQLArgumentDefinition> = List<GQLArgumentDefinition>(),
-    locations: List<string> = List<string>()
+    args = List<GQLArgumentDefinition>(),
+    locations = List<string>(),
+    description: Option<string> = None
   ) {
     super(name, description);
     this.args = args;
@@ -163,31 +177,24 @@ interface IGQLUnion extends IGQLTypeDefinition {
 export class GQLUnion extends GQLTypeDefinition implements IGQLUnion {
   public gqlTypes: List<string>;
 
-  constructor(name: string, description: string, gqlTypes: List<string>) {
-    super(name, description);
+  constructor(
+    name: string,
+    gqlTypes: List<string>,
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
+  ) {
+    super(name, description, directives);
     this.gqlTypes = gqlTypes;
   }
 }
 
-interface IGQLEnumValueDefinition extends IGQLTypeDefinition {
-  isDeprecated: boolean;
-  deprecationReason: Option<string>;
-}
-
-export class GQLEnumValueDefinition extends GQLTypeDefinition
-  implements IGQLEnumValueDefinition {
-  public isDeprecated: boolean;
-  public deprecationReason: Option<string>;
-
+export class GQLEnumValueDefinition extends GQLTypeDefinition {
   constructor(
     name: string,
-    description: string,
-    isDeprecated: boolean = false,
-    deprecationReason: Option<string> = None
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
   ) {
-    super(name, description);
-    this.isDeprecated = isDeprecated;
-    this.deprecationReason = deprecationReason;
+    super(name, description, directives);
   }
 }
 interface IGQLEnum extends IGQLTypeDefinition {
@@ -199,10 +206,11 @@ export class GQLEnum extends GQLTypeDefinition implements IGQLEnum {
 
   constructor(
     name: string,
-    description: string,
-    values: List<GQLEnumValueDefinition>
+    values: List<GQLEnumValueDefinition>,
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
   ) {
-    super(name, description);
+    super(name, description, directives);
     this.values = values;
   }
 }
@@ -214,8 +222,13 @@ interface IGQLScalarType extends IGQLTypeDefinition {
 export class GQLScalarType extends GQLTypeDefinition implements IGQLScalarType {
   public nativeType: Option<string>;
 
-  constructor(name: string, description: string, nativeType: Option<string>) {
-    super(name, description);
+  constructor(
+    name: string,
+    nativeType: Option<string>,
+    description: Option<string> = None,
+    directives = List<GQLDirective>()
+  ) {
+    super(name, description, directives);
     this.nativeType = nativeType;
   }
 }

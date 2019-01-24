@@ -1,4 +1,4 @@
-import { QueryStrategy } from './QueryStrategy';
+import QueryStrategy from './QueryStrategy';
 
 interface IGQLSubjectLimit {
   maxSubjects: number;
