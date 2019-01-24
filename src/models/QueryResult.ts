@@ -10,7 +10,19 @@ export default class QueryResult {
   public ok: boolean;
   public errors: List<string>;
 
+  constructor(data: Partial<QueryResult> = {}) {
+    this.values = data.values || List([]);
+    this.startTime = data.startTime || Date.now();
+    this.duration = data.duration || ( Date.now() - this.startTime );
+    this.bytes = data.bytes;
+    this.count = data.count || this.values.size;
+    this.done = data.done || false;
+    this.ok = data.ok || false;
+    this.errors = data.errors.size ? data.errors : List([]);
+  }
+
   public bps() {
     return (this.bytes / this.duration) * 1000;
   }
+
 }
