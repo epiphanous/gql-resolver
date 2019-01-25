@@ -14,6 +14,7 @@ import {
   GQLTypeDefinition,
   GQLUnion,
 } from './GQLTypeDefinition';
+import { GQLDirective } from './GQLDirective';
 
 interface IGQLSchema {
   allFields: Map<string, GQLFieldDefinition>;
@@ -42,6 +43,7 @@ export class GQLSchema implements IGQLSchema {
   public operationTypes: Map<string, string>;
   public scalarTypes: Map<string, GQLScalarType>;
   public unions: Map<string, GQLUnion>;
+  public schemaDirectives: List<GQLDirective>;
 
   public fieldsByType = Map<string, Map<string, List<string>>>();
   public typesByInterface = Map<string, Set<string>>();
@@ -57,7 +59,8 @@ export class GQLSchema implements IGQLSchema {
     objectTypes: Map<string, GQLObjectType>,
     operationTypes: Map<string, string>,
     scalarTypes: Map<string, GQLScalarType>,
-    unions: Map<string, GQLUnion>
+    unions: Map<string, GQLUnion>,
+    schemaDirectives: Set<GQLDirective>
   ) {
     this.allFields = allFields;
     this.allTypes = allTypes;
@@ -69,6 +72,7 @@ export class GQLSchema implements IGQLSchema {
     this.operationTypes = operationTypes;
     this.scalarTypes = scalarTypes;
     this.unions = unions;
+    this.schemaDirectives = schemaDirectives.toList();
     this.init();
   }
 

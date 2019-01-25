@@ -1,50 +1,48 @@
 import { assert, expect } from 'chai';
-import fs = require('fs');
-import { None, Some } from 'funfix';
+import { Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
-import QueryExecutionException from '../models/exceptions/QueryExecutionException';
-import { GQLOperation } from '../models/GQLOperation';
-import { SparqlQueryStrategy } from '../models/QueryStrategy';
 import ResolverContext from '../models/ResolverContext';
+import QueryStrategySparql from '../models/QueryStrategySparql';
 import { Resolver } from '../Resolver';
+import fs = require('fs');
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 
 describe('Resolver', () => {
   const rc = new ResolverContext(
     schema,
-    Map({ sparql: new SparqlQueryStrategy() }),
+    Map({ sparql: new QueryStrategySparql() }),
     'sparql'
   );
   it('creates a resolver context', () => {
     expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
   });
   const resolver = new Resolver(rc);
-  const op = new GQLOperation({ name: 'test', operationType: 'query' });
-
-  it('throws no op exception on empty op', () => {
-    const result = resolver.executeOperation(None);
-    assert(result.isFailure, 'operation failed');
-    expect(result.value).to.be.an.instanceOf(QueryExecutionException);
-  });
-
-  // it('should throw not implemented exception on real op', () => {
-  //   const result = resolver.executeOperation(Some(op));
-  //   assert(result.isFailure, 'operation failed');
-  //   expect(result.value).to.be.an.instanceOf(NotImplementedError);
-  // });
-
-  it("db connection has property 'documents'", () => {
-    const dbconn = resolver.context.strategies.get('sparql').dbConn;
-    expect(dbconn).to.haveOwnProperty('documents');
-  });
 
   it('resolves a query', () => {
     const result = resolver.resolve(
-      'query test { user(id: "user/1") { s_name }}',
+      `query test ($personID:ID = 'nextdude', $placeID:ID) {
+      person: user(id: $personID) {
+        s_id
+        s_name
+        j_person {
+          s_givenName
+          s_familyName
+          s_email
+          s_gender
+          s_birthDate
+        }
+      }
+      home: curatedPlace(id: $placeID) {
+        s_id
+        s_name
+        geo_lat
+        geo_long
+      }
+    }`,
       Map(),
-      Some('query')
+      Some('test')
     );
     console.log(result);
     assert(result.isSuccess());

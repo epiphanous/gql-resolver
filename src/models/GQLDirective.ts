@@ -1,4 +1,5 @@
-import { List } from 'immutable';
+import { Option } from 'funfix';
+import { List, Map } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 
 interface IGQLDirective {
@@ -13,5 +14,11 @@ export class GQLDirective implements IGQLDirective {
   constructor(name: string, args: List<GQLArgument> = List<GQLArgument>()) {
     this.name = name;
     this.arguments = args;
+  }
+
+  public arg(name: string, vars = Map<string, any>()) {
+    return Option.of(this.arguments.find(a => a.name === name)).map(a =>
+      a.resolve(vars)
+    );
   }
 }
