@@ -73,12 +73,14 @@ describe('fetchResults', () => {
           .catch(err => reject(err))
       );
     };
-    resolveQuery().then((result) => {
-      ['values', 'startTime', 'duration', 'count', 'bytes', 'done', 'ok'].forEach(key => {
-        expect(result).to.haveOwnProperty(key);
-      });
-      expect(result.count).to.be.greaterThan(0);
-    });
+    resolveQuery()
+      .then((result: QueryResult) => {
+        ['values', 'startTime', 'duration', 'count', 'bytes', 'done', 'ok'].forEach(key => {
+          expect(result).to.haveOwnProperty(key);
+        });
+        expect(result.values.count()).to.be.greaterThan(0);
+      })
+      .catch(err => console.error(err));
   });
 });
 
