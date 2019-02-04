@@ -60,6 +60,7 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
       );
       this.addError(error);
     }
+    return ok;
   }
 
   // keeps typescript happy

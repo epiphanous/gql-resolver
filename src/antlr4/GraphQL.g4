@@ -384,7 +384,9 @@ fragment SIGN
 
 STRING_VALUE
   : '"' STRING_CHARACTER* '"'
+  | '\'' STRING_CHARACTER* '\''
   | '"""' BLOCK_STRING_CHARACTER* '"""'
+  | '\'\'\'' BLOCK_STRING_CHARACTER* '\'\'\''
   ;
 
 fragment STRING_CHARACTER

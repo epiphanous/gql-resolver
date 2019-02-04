@@ -5,6 +5,23 @@ interface IGQLType {
 }
 
 export class GQLType implements IGQLType {
+  public static _xsdType(name: string) {
+    return (
+      {
+        ID: 'xsd:anyURI',
+        Boolean: 'xsd:boolean',
+        Float: 'xsd:float',
+        Int: 'xsd:integer',
+        String: 'xsd:string',
+        URL: 'xsd:anyURI',
+        URI: 'xsd:anyURI',
+        Date: 'xsd:date',
+        Time: 'xsd:time',
+        DateTime: 'xsd:dateTime',
+        Duration: 'xsd:duration',
+      }[name] || name
+    );
+  }
   public name: string;
   public isList: boolean;
   public isRequired: boolean;
@@ -20,15 +37,6 @@ export class GQLType implements IGQLType {
   }
 
   public xsdType() {
-    return (
-      {
-        ID: 'iri',
-        string: 'xsd:string',
-        Int: 'xsd:integer',
-        Float: 'xsd:float',
-        Double: 'xsd:decimal',
-        Boolean: 'xsd:boolean',
-      }[this.name] || this.name
-    );
+    return GQLType._xsdType(this.name);
   }
 }

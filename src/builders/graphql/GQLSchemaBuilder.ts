@@ -1,48 +1,41 @@
 import { Option, Try } from 'funfix';
-import { List } from 'immutable';
-import { Map, Set } from 'immutable';
+import { List, Map, Set } from 'immutable';
 import {
   ArgumentContext,
   ArgumentsContext,
+  ArgumentsDefinitionContext,
   DirectiveContext,
   DirectiveDefinitionContext,
+  DirectivesContext,
   EnumTypeDefinitionContext,
   EnumTypeExtensionWithDirectivesContext,
   EnumTypeExtensionWithValuesContext,
+  EnumValuesDefinitionContext,
   FieldDefinitionContext,
   FieldsDefinitionContext,
   GraphQLParser,
+  ImplementsInterfacesContext,
   InputFieldsDefinitionContext,
   InputObjectTypeDefinitionContext,
   InputObjectTypeExtensionWithDirectivesContext,
   InputObjectTypeExtensionWithFieldsContext,
+  InputValueDefinitionContext,
   InterfaceTypeDefinitionContext,
   InterfaceTypeExtensionWithDirectivesContext,
   InterfaceTypeExtensionWithFieldsContext,
   ObjectTypeDefinitionContext,
   ObjectTypeExtensionWithDirectivesContext,
+  ObjectTypeExtensionWithFieldsContext,
   ObjectTypeExtensionWithInterfacesContext,
   ScalarTypeDefinitionContext,
+  ScalarTypeExtensionContext,
   SchemaDefinitionContext,
+  SchemaExtensionWithOperationsContext,
+  SchemaExtensionWithoutOperationsContext,
   UnionMemberTypesContext,
   UnionTypeDefinitionContext,
   UnionTypeExtensionWithDirectivesContext,
   UnionTypeExtensionWithMembersContext,
-} from '../../antlr4/generated/GraphQLParser';
-import {
-  DirectivesContext,
-  InputValueDefinitionContext,
-} from '../../antlr4/generated/GraphQLParser';
-import { ImplementsInterfacesContext } from '../../antlr4/generated/GraphQLParser';
-import {
-  ArgumentsDefinitionContext,
-  EnumValuesDefinitionContext,
-} from '../../antlr4/generated/GraphQLParser';
-import {
-  ObjectTypeExtensionWithFieldsContext,
-  ScalarTypeExtensionContext,
-  SchemaExtensionWithOperationsContext,
-  SchemaExtensionWithoutOperationsContext,
 } from '../../antlr4/generated/GraphQLParser';
 import { GQLAnyArgument, GQLArgument } from '../../models/GQLArgument';
 import { GQLDirective } from '../../models/GQLDirective';
@@ -83,12 +76,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   ]).asMutable();
   public scalarTypes = Set<GQLScalarType>(
     ['ID', 'String', 'Boolean', 'Int', 'Float'].map(
-      t =>
-        new GQLScalarType(
-          t,
-          Option.of(t),
-          Option.of('Built-in GraphQL type $t')
-        )
+      t => new GQLScalarType(t, Option.of('Built-in GraphQL type $t'))
     )
   ).asMutable();
   public interfaces = Set<GQLInterface>().asMutable();
@@ -155,7 +143,8 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         o,
         this.operationTypes,
         s,
-        u
+        u,
+        this.schemaDirectives.asImmutable()
       );
       return Try.success(schema);
     }
@@ -205,24 +194,9 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     const name = this.textOf(ctx.NAME());
     const def = this.scalarTypes.find(d => d.name === name);
     if (!def) {
-      const xsdType: Map<string, string> = Map([
-        ['ID', 'xsd_anyURI'],
-        ['Boolean', 'xsd_boolean'],
-        ['Float', 'xsd_float'],
-        ['Int', 'xsd_integer'],
-        ['String', 'xsd_string'],
-        ['URL', 'xsd_anyURI'],
-        ['URI', 'xsd_anyURI'],
-        ['Date', 'xsd_date'],
-        ['Time', 'xsd_time'],
-        ['DateTime', 'xsd_dateTime'],
-        ['Duration', 'xsd_duration'],
-      ]);
-      const t = Option.of(xsdType.get(name));
       this.scalarTypes.add(
         new GQLScalarType(
           name,
-          t,
           this.getDescription(Option.of(ctx.description())),
           this.getDirectives(Option.of(ctx.directives()))
         )

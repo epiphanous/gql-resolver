@@ -2,7 +2,7 @@ import { NotImplementedError } from 'funfix';
 import { List, Set, Map } from 'immutable';
 import { GQLSchema } from './GQLSchema';
 // import { GQLSearchExecutionPlan } from './GQLSearchExecutionPlan';
-import {GQLExecutionPlan} from './GQLExecutionPlan';
+import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLField } from './GQLSelection';
 import QueryStrategy from './QueryStrategy';
 import { RDFPrefixes } from './RDFPrefixes';
