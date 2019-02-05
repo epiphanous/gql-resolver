@@ -123,12 +123,14 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       this.parseWith(parser);
 
       if (this.errorCount > 0) {
-        throw this.errorReport;
+        throw this.errorReport.asThrowable();
       }
 
       if (this.warningCount > 0) {
         this.errors.forEach(w => console.warn(w));
       }
+
+      console.log(this.vars.toJS());
 
       return new GQLQueryDocument(
         this.operations,
@@ -316,17 +318,27 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   }
 
   public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
-    this.operations.push(
-      new GQLOperation({
-        name: this.textOf(ctx.NAME()),
-        operationType: ctx.operationType().text,
-        variables: this.processVariableDefinitions(
-          Option.of(ctx.variableDefinitions())
-        ),
-        directives: this.processDirectives(Option.of(ctx.directives())),
-        selections: this.processSelectionSet(ctx.selectionSet()),
-      })
+    const operation = new GQLOperation({
+      name: this.textOf(ctx.NAME()),
+      operationType: ctx.operationType().text,
+      variables: this.processVariableDefinitions(
+        Option.of(ctx.variableDefinitions())
+      ),
+      directives: this.processDirectives(Option.of(ctx.directives())),
+      selections: this.processSelectionSet(ctx.selectionSet()),
+    });
+    const unresolved = operation.findUnresolvedVariables(this.vars);
+    this.check(
+      unresolved.isEmpty(),
+      `variable${unresolved.size > 1 ? 's' : ''} ${unresolved
+        .map(u => u.name)
+        .join(', ')} ${
+        unresolved.size > 1 ? 'have no values' : 'has no value'
+      } provided`,
+      ctx,
+      true
     );
+    this.operations.push(operation);
   }
 
   public exitSelectionOnlyOperationDefinition(
