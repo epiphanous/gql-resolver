@@ -1,4 +1,6 @@
+import { None, Option } from 'funfix';
 import { List, Map } from 'immutable';
+import { GQLArgumentDefinition } from './GQLTypeDefinition';
 import { GQLVariable } from './GQLVariable';
 
 interface IGQLValue {
@@ -14,7 +16,7 @@ export class GQLValue implements IGQLValue {
 
   public resolve(
     vars: Map<string, any>,
-    argName: string,
+    argDef: Option<GQLArgumentDefinition> = None,
     directives: Map<string, any>
   ) {
     return this.value;
@@ -30,17 +32,26 @@ export class GQLVariableValue implements GQLValue {
 
   public resolve(
     vars: Map<string, any>,
-    argName: string,
+    argDefOpt: Option<GQLArgumentDefinition> = None,
     directives: Map<string, any> = Map<string, any>()
   ): any {
-    if (!vars.has(this.value.name)) {
-      throw new Error(
-        `value not provided for variable ${
-          this.value.name
-        } in context of argument '${argName}'`
-      );
+    const fromVars = Option.of(vars.get(this.value.name));
+    if (fromVars.isEmpty()) {
+      const defaultValue = argDefOpt
+        .flatMap(a => a.defaultValue)
+        .map(v => v.resolve(vars, None, Map()));
+      if (defaultValue.isEmpty()) {
+        throw new Error(
+          `value not provided for variable $${this.value.name}${argDefOpt
+            .map(a => ` in the context of argument ${a.name}`)
+            .getOrElse('')}`
+        );
+      } else {
+        return defaultValue.get();
+      }
+    } else {
+      return vars.get(this.value.name);
     }
-    return vars.get(this.value.name);
   }
 }
 
@@ -58,12 +69,10 @@ export class GQLValueList extends GQLValue {
 
   public resolve(
     vars: Map<string, any>,
-    argName: string,
-    directives: Map<string, any>
+    argDefOpt: Option<GQLArgumentDefinition> = None,
+    directives: Map<string, any> = Map<string, any>()
   ) {
-    return this.value.map((v, k) =>
-      v.resolve(vars, `${argName}[${k}]`, directives)
-    );
+    return this.value.map((v, k) => v.resolve(vars, argDefOpt, directives));
   }
 }
 
@@ -72,12 +81,10 @@ export class GQLKeyedValueList extends GQLValue {
 
   public resolve(
     vars: Map<string, any>,
-    argName: string,
+    argDefOpt: Option<GQLArgumentDefinition> = None,
     directives: Map<string, any>
   ) {
-    return this.value.map((v, k) =>
-      v.resolve(vars, `${argName}[${k}]`, directives)
-    );
+    return this.value.map((v, k) => v.resolve(vars, argDefOpt, directives));
   }
 }
 

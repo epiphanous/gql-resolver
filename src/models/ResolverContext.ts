@@ -12,20 +12,26 @@ export default class ResolverContext {
 
   public schema: GQLSchema;
   public strategies: Map<string, QueryStrategy>;
-  public defaultStrategy: QueryStrategy;
+  public defaultStrategy: string;
 
   constructor(
     schemaText: string,
     strategies: Map<string, QueryStrategy>,
-    defaultStrategyName: string
+    defaultStrategy: string
   ) {
-    if (!strategies.has(defaultStrategyName)) {
+    if (!strategies.has(defaultStrategy)) {
       throw new Error(
-        `default query strategy '${defaultStrategyName} not provided in strategies initializer`
+        `default query strategy '${defaultStrategy} not provided in strategies initializer`
       );
     }
     this.schema = ResolverContext.buildSchema(schemaText);
     this.strategies = strategies;
-    this.defaultStrategy = this.strategies.get(defaultStrategyName);
+    this.defaultStrategy = defaultStrategy;
+  }
+
+  public getStrategy(name: string) {
+    return this.strategies.has(name)
+      ? this.strategies.get(name)
+      : this.strategies.get(this.defaultStrategy);
   }
 }

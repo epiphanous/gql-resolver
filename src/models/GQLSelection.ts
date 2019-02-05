@@ -3,6 +3,8 @@ import * as id64 from 'id64';
 import { List } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
+import ResolverContext from './ResolverContext';
+import { GQLTypeDefinition } from './GQLTypeDefinition';
 
 interface IGQLSelection {
   name: string;
@@ -21,7 +23,8 @@ interface IGQLField extends IGQLSelection {
   args: List<GQLArgument>;
   directives: List<GQLDirective>;
   selections: List<GQLSelection>;
-  fields: List<[string, GQLField]>;
+  outputType: string;
+  fields: List<GQLField>;
 }
 
 export class GQLField extends GQLSelection implements IGQLField {
@@ -29,7 +32,8 @@ export class GQLField extends GQLSelection implements IGQLField {
   public args: List<GQLArgument>;
   public directives: List<GQLDirective>;
   public selections: List<GQLSelection>;
-  public fields: List<[string, GQLField]>;
+  public outputType: string;
+  public fields: List<GQLField>;
 
   constructor(data: Partial<IGQLField> = {}) {
     super(data.name);
@@ -37,11 +41,18 @@ export class GQLField extends GQLSelection implements IGQLField {
     this.args = data.args;
     this.directives = data.directives;
     this.selections = data.selections;
+    this.outputType = data.outputType;
     this.fields = data.fields;
   }
 
-  public copy(fields: Partial<IGQLField>) {
-    return new GQLField({ ...(this as object), ...fields });
+  public copy(data: Partial<IGQLField>) {
+    return new GQLField({ ...(this as object), ...data });
+  }
+
+  public isObject() {
+    return Option.of(this.fields)
+      .map(fl => fl.size > 0)
+      .getOrElse(false);
   }
 }
 

@@ -216,19 +216,18 @@ export class GQLEnum extends GQLTypeDefinition implements IGQLEnum {
 }
 
 interface IGQLScalarType extends IGQLTypeDefinition {
-  nativeType: Option<string>;
+  nativeType: string;
 }
 
 export class GQLScalarType extends GQLTypeDefinition implements IGQLScalarType {
-  public nativeType: Option<string>;
+  public nativeType: string;
 
   constructor(
     name: string,
-    nativeType: Option<string>,
     description: Option<string> = None,
     directives = List<GQLDirective>()
   ) {
     super(name, description, directives);
-    this.nativeType = nativeType;
+    this.nativeType = GQLType._xsdType(name);
   }
 }

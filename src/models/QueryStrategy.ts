@@ -1,22 +1,23 @@
-import { List } from 'immutable';
-import { GQLField } from './GQLSelection';
-import QueryResult from './QueryResult';
+import { List, Map } from 'immutable';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
+import { GQLField } from './GQLSelection';
+import { QueryResultCache, QueryResultMemoryCache } from './QueryResultCache';
+import QueryResult from "./QueryResult";
 
 export default class QueryStrategy {
-  public isPlan: boolean;
-  public dbConn: any = null;
+  public cache: QueryResultCache;
 
-  constructor(isPlan) {
-    this.isPlan = isPlan;
+  constructor(cache = new QueryResultMemoryCache()) {
+    this.cache = cache;
   }
 
-  public withLimitOffset(limit: number, offset: number): QueryStrategy {
-    return this;
+  public resolve(fields: List<GQLField>, plan: GQLExecutionPlan): Promise<QueryResult> {
+    throw new Error('not implemented');
   }
 
-  public resolve(fields: List<GQLField>, parent: GQLExecutionPlan): Promise<QueryResult> {
-    // TODO Execute query
-    return;
+  protected getArgs(plan: GQLExecutionPlan) {
+    return Map(
+      plan.args.map<[string, any]>(arg => [arg.name, arg.resolve(plan.vars)])
+    );
   }
 }
