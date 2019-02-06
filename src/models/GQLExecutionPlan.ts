@@ -4,8 +4,10 @@ import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLField } from './GQLSelection';
 import QueryResult from './QueryResult';
-import QueryStrategy from './QueryStrategy';
+import QueryStrategy from '../strategies/QueryStrategy';
 import ResolverContext from './ResolverContext';
+import { GQLTypeDefinition } from './GQLTypeDefinition';
+import { QueryStrategyFactory } from '../strategies/QueryStrategyFactory';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -39,7 +41,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public args: List<GQLArgument>;
   public directives: List<GQLDirective>;
   public fields: List<GQLField>;
-  public resultType: string;
+  public resultType: Option<GQLTypeDefinition>;
 
   public plans: List<GQLExecutionPlan>;
   public scalars: List<QueryResult>;
@@ -80,7 +82,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.directives = directives;
     this.allFields = fields;
     this.fields = fields.filter(f => !f.isObject());
-    this.resultType = resultType;
+    this.resultType = context.schema.getTypeDefinition(resultType);
 
     this.plans = fields
       .filter(f => f.isObject())
@@ -115,6 +117,10 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.result;
   }
 
+  public getSubjectIds(): Map<string, any> {
+    return Map<string, any>();
+  }
+
   /**
    * Resolves our fields by query strategy and returns a combined promise of
    * their query results.
@@ -124,7 +130,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     // Promise.all<QueryResult>(
     return List(
       this.fieldsByStrategy()
-        .map((fields, strategy) => strategy.resolve(fields, this))
+        .map((fields, strategy) => strategy.resolve())
         .valueSeq()
     );
     // );
@@ -170,15 +176,17 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   }
 
   /**
-   * Compute a map of fields by query strategy.
-   * @returns Map<QueryStrategy, List<GQLField>>
+   * Compute a list of strategies to resolve our fields.
+   * @returns Map<QueryStrategy>
    */
-  protected fieldsByStrategy(): Map<QueryStrategy, List<GQLField>> {
-    return Map(
-      this.fields
-        .groupBy(f => this.getStrategyFor(f))
-        .mapEntries(([qs, c]) => [this.context.getStrategy(qs), c.toList()])
-    );
+  protected strategies() {
+    return this.fields
+      .groupBy(f => this.getStrategyFor(f))
+      .map((fields, qs) =>
+        this.context.getStrategyFactory(qs).create(fields.toList(), this)
+      )
+      .valueSeq()
+      .toList();
   }
 
   /**
