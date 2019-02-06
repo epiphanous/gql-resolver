@@ -4,8 +4,9 @@ import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLField } from './GQLSelection';
 import QueryResult from './QueryResult';
-import QueryStrategy from './QueryStrategy';
+import QueryStrategy from '../strategies/QueryStrategy';
 import ResolverContext from './ResolverContext';
+import { GQLTypeDefinition } from './GQLTypeDefinition';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -16,7 +17,7 @@ export interface IGQLExecutionPlan {
   args: List<GQLArgument>;
   directives: List<GQLDirective>;
   fields: List<GQLField>;
-  resultType: string;
+  resultType: Option<GQLTypeDefinition>;
   plans: List<GQLExecutionPlan>;
   scalars: List<QueryResult>;
   objects: List<QueryResult>;
@@ -39,7 +40,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public args: List<GQLArgument>;
   public directives: List<GQLDirective>;
   public fields: List<GQLField>;
-  public resultType: string;
+  public resultType: Option<GQLTypeDefinition>;
 
   public plans: List<GQLExecutionPlan>;
   public scalars: List<QueryResult>;
@@ -80,7 +81,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.directives = directives;
     this.allFields = fields;
     this.fields = fields.filter(f => !f.isObject());
-    this.resultType = resultType;
+    this.resultType = context.schema.getTypeDefinition(resultType);
 
     this.plans = fields
       .filter(f => f.isObject())
@@ -112,8 +113,11 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.objects = List(await Promise.all(this.resolvePlans()));
     // this.scalars = await this.resolveFields();
     // this.objects = await this.resolvePlans();
-    console.log('makeplanres value', this.makePlanResult());
     return this.makePlanResult();
+  }
+
+  public getSubjectIds(): Map<string, any> {
+    return Map<string, any>();
   }
 
   /**
@@ -122,10 +126,11 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @returns Promise<QueryResult[]>
    */
   protected resolveFields() {
+    console.log('strats', this.strategies());
     // Promise.all<QueryResult>(
     return List(
-      this.fieldsByStrategy()
-        .map((fields, strategy) => strategy.resolve(fields, this))
+      this.strategies()
+        .map((strategy) => strategy.resolve())
         .valueSeq()
     );
     // );
@@ -147,13 +152,11 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   protected makePlanResult() {
     const pr = this.result;
     const qrs = this.scalars.concat(this.objects);
-    const values = qrs.flatMap(qr => qr.values).get(0);
-    if (values) {
-      pr.values = this.fields.map(f => {
-        const alias = f.alias.getOrElse(f.name);
-        return values.find(v => v[0] === alias);
-      });
-    }
+    const values = qrs.flatMap(qr => qr.values).flatten(true);
+    pr.values = this.fields.map(f => {
+      const alias = f.alias.getOrElse(f.name);
+      return values.find(v => v[0] === alias);
+    });
     const reduced = qrs.reduce(
       (r, qr) => ({
         bytes: r.bytes + qr.bytes,
@@ -173,15 +176,17 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   }
 
   /**
-   * Compute a map of fields by query strategy.
-   * @returns Map<QueryStrategy, List<GQLField>>
+   * Compute a list of strategies to resolve our fields.
+   * @returns List<QueryStrategy>
    */
-  protected fieldsByStrategy(): Map<QueryStrategy, List<GQLField>> {
-    return Map(
-      this.fields
-        .groupBy(f => this.getStrategyFor(f))
-        .mapEntries(([qs, c]) => [this.context.getStrategy(qs), c.toList()])
-    );
+  protected strategies() {
+    return this.fields
+      .groupBy(f => this.getStrategyFor(f))
+      .map((fields, qs) =>
+        this.context.getStrategyFactory(qs).create(fields.toList(), this)
+      )
+      .valueSeq()
+      .toList();
   }
 
   /**
@@ -209,7 +214,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     parent = this as GQLExecutionPlan;
     while (parent && strategy.isEmpty()) {
       strategy = this.context.schema
-        .getTypeDefinition(parent.resultType)
+        .getTypeDefinition(parent.resultType.get().name)
         .flatMap(td => this.resolveWith(td.directives));
       parent = parent.parent;
     }

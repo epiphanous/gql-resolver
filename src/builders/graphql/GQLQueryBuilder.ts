@@ -123,12 +123,14 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       this.parseWith(parser);
 
       if (this.errorCount > 0) {
-        throw this.errorReport;
+        throw this.errorReport.asThrowable();
       }
 
       if (this.warningCount > 0) {
         this.errors.forEach(w => console.warn(w));
       }
+
+      console.log(this.vars.toJS());
 
       return new GQLQueryDocument(
         this.operations,
@@ -316,17 +318,27 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   }
 
   public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
-    this.operations.push(
-      new GQLOperation({
-        name: this.textOf(ctx.NAME()),
-        operationType: ctx.operationType().text,
-        variables: this.processVariableDefinitions(
-          Option.of(ctx.variableDefinitions())
-        ),
-        directives: this.processDirectives(Option.of(ctx.directives())),
-        selections: this.processSelectionSet(ctx.selectionSet()),
-      })
+    const operation = new GQLOperation({
+      name: this.textOf(ctx.NAME()),
+      operationType: ctx.operationType().text,
+      variables: this.processVariableDefinitions(
+        Option.of(ctx.variableDefinitions())
+      ),
+      directives: this.processDirectives(Option.of(ctx.directives())),
+      selections: this.processSelectionSet(ctx.selectionSet()),
+    });
+    const unresolved = operation.findUnresolvedVariables(this.vars);
+    this.check(
+      unresolved.isEmpty(),
+      `variable${unresolved.size > 1 ? 's' : ''} ${unresolved
+        .map(u => u.name)
+        .join(', ')} ${
+        unresolved.size > 1 ? 'have no values' : 'has no value'
+      } provided`,
+      ctx,
+      true
     );
+    this.operations.push(operation);
   }
 
   public exitSelectionOnlyOperationDefinition(
@@ -466,8 +478,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       );
       return new GQLInvalidArgument(
         name,
-        new GQLStringValue('error'),
-        argDefOpt
+        new GQLStringValue('error')
       );
     } else {
       const argDef = argDefOpt.get();
@@ -501,33 +512,32 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       if (typeOk) {
         switch (name) {
           case ARG_TYPES.ARG_FILTER:
-            return new GQLFilterArgument(name, v, argDefOpt);
+            return new GQLFilterArgument(name, v);
           case ARG_TYPES.ARG_ORDER:
-            return new GQLOrderArgument(name, v, argDefOpt);
+            return new GQLOrderArgument(name, v);
           case ARG_TYPES.ARG_LIMIT:
-            return new GQLLimitArgument(name, v, argDefOpt);
+            return new GQLLimitArgument(name, v);
           case ARG_TYPES.ARG_OFFSET:
-            return new GQLOffsetArgument(name, v, argDefOpt);
+            return new GQLOffsetArgument(name, v);
           case ARG_TYPES.ARG_TRANSFORMS:
-            return new GQLTransformsArgument(name, v, argDefOpt);
+            return new GQLTransformsArgument(name, v);
           case ARG_TYPES.ARG_PATTERNS:
-            return new GQLPatternsArgument(name, v, argDefOpt);
+            return new GQLPatternsArgument(name, v);
           case ARG_TYPES.ARG_BOOSTERS:
-            return new GQLBoostersArgument(name, v, argDefOpt);
+            return new GQLBoostersArgument(name, v);
           case ARG_TYPES.ARG_BINDINGS:
-            return new GQLBindingsArgument(name, v, argDefOpt);
+            return new GQLBindingsArgument(name, v);
           case ARG_TYPES.ARG_INCLUDE_DEPRECATED:
-            return new GQLIncludeDeprecatedArgument(name, v, argDefOpt);
+            return new GQLIncludeDeprecatedArgument(name, v);
           case ARG_TYPES.ARG_NAME:
-            return new GQLNameArgument(name, v, argDefOpt);
+            return new GQLNameArgument(name, v);
           default:
-            return new GQLAnyArgument(name, v, argDefOpt);
+            return new GQLAnyArgument(name, v);
         }
       } else {
         return new GQLInvalidArgument(
           name,
-          new GQLStringValue('error'),
-          argDefOpt
+          new GQLStringValue('error')
         );
       }
     }

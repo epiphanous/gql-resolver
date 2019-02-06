@@ -3,7 +3,7 @@ import { Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
 import ResolverContext from '../models/ResolverContext';
-import QueryStrategySparql from '../models/QueryStrategySparql';
+import SparqlQueryStrategy from '../strategies/SparqlQueryStrategy';
 import { Resolver } from '../Resolver';
 import fs = require('fs');
 
@@ -12,7 +12,7 @@ const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
   const rc = new ResolverContext(
     schema,
-    Map({ sparql: new QueryStrategySparql() }),
+    Map({ sparql: new SparqlQueryStrategy() }),
     'sparql'
   );
   it('creates a resolver context', () => {
@@ -41,7 +41,7 @@ describe('Resolver', () => {
         geo_long
       }
     }`,
-      Map(),
+      Map({ placeID: '17' }),
       Some('test')
     );
     console.log(result);

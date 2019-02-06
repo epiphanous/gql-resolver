@@ -2,7 +2,7 @@ import { Map } from 'immutable';
 import Builder from '../builders/Builder';
 import GQLSchemaBuilder from '../builders/graphql/GQLSchemaBuilder';
 import { GQLSchema } from './GQLSchema';
-import QueryStrategy from './QueryStrategy';
+import { QueryStrategyFactory } from '../strategies/QueryStrategyFactory';
 
 export default class ResolverContext {
   public static buildSchema(schemaText: string): GQLSchema {
@@ -11,17 +11,17 @@ export default class ResolverContext {
   }
 
   public schema: GQLSchema;
-  public strategies: Map<string, QueryStrategy>;
+  public strategies: Map<string, QueryStrategyFactory>;
   public defaultStrategy: string;
 
   constructor(
     schemaText: string,
-    strategies: Map<string, QueryStrategy>,
+    strategies: Map<string, QueryStrategyFactory>,
     defaultStrategy: string
   ) {
     if (!strategies.has(defaultStrategy)) {
       throw new Error(
-        `default query strategy '${defaultStrategy} not provided in strategies initializer`
+        `default query strategy factory '${defaultStrategy} not provided in strategies initializer`
       );
     }
     this.schema = ResolverContext.buildSchema(schemaText);
@@ -29,9 +29,20 @@ export default class ResolverContext {
     this.defaultStrategy = defaultStrategy;
   }
 
-  public getStrategy(name: string) {
-    return this.strategies.has(name)
-      ? this.strategies.get(name)
-      : this.strategies.get(this.defaultStrategy);
+  public getStrategyFactory(name: string): QueryStrategyFactory {
+    if (this.strategies.has(name)) {
+      return this.strategies.get(name);
+    } else {
+      console.warn(
+        `unknown strategy factory '${name}' requested (returning default '${
+          this.defaultStrategy
+        }' instead)`
+      );
+      return this.strategies.get(this.defaultStrategy);
+    }
+  }
+
+  public availableStrategies() {
+    return this.strategies.keySeq().toArray();
   }
 }

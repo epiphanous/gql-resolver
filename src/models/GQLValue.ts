@@ -1,6 +1,4 @@
-import { None, Option } from 'funfix';
 import { List, Map } from 'immutable';
-import { GQLArgumentDefinition } from './GQLTypeDefinition';
 import { GQLVariable } from './GQLVariable';
 
 interface IGQLValue {
@@ -14,11 +12,7 @@ export class GQLValue implements IGQLValue {
     this.value = value;
   }
 
-  public resolve(
-    vars: Map<string, any>,
-    argDef: Option<GQLArgumentDefinition> = None,
-    directives: Map<string, any>
-  ) {
+  public resolve(vars: Map<string, any>) {
     return this.value;
   }
 }
@@ -30,28 +24,8 @@ export class GQLVariableValue implements GQLValue {
     this.value = value;
   }
 
-  public resolve(
-    vars: Map<string, any>,
-    argDefOpt: Option<GQLArgumentDefinition> = None,
-    directives: Map<string, any> = Map<string, any>()
-  ): any {
-    const fromVars = Option.of(vars.get(this.value.name));
-    if (fromVars.isEmpty()) {
-      const defaultValue = argDefOpt
-        .flatMap(a => a.defaultValue)
-        .map(v => v.resolve(vars, None, Map()));
-      if (defaultValue.isEmpty()) {
-        throw new Error(
-          `value not provided for variable $${this.value.name}${argDefOpt
-            .map(a => ` in the context of argument ${a.name}`)
-            .getOrElse('')}`
-        );
-      } else {
-        return defaultValue.get();
-      }
-    } else {
-      return vars.get(this.value.name);
-    }
+  public resolve(vars: Map<string, any>): any {
+    return vars.get(this.value.name);
   }
 }
 
@@ -67,24 +41,16 @@ export class GQLNullValue extends GQLValue {
 export class GQLValueList extends GQLValue {
   public value: List<GQLValue>;
 
-  public resolve(
-    vars: Map<string, any>,
-    argDefOpt: Option<GQLArgumentDefinition> = None,
-    directives: Map<string, any> = Map<string, any>()
-  ) {
-    return this.value.map((v, k) => v.resolve(vars, argDefOpt, directives));
+  public resolve(vars: Map<string, any>) {
+    return this.value.map((v, k) => v.resolve(vars));
   }
 }
 
 export class GQLKeyedValueList extends GQLValue {
   public value: Map<string, GQLValue>;
 
-  public resolve(
-    vars: Map<string, any>,
-    argDefOpt: Option<GQLArgumentDefinition> = None,
-    directives: Map<string, any>
-  ) {
-    return this.value.map((v, k) => v.resolve(vars, argDefOpt, directives));
+  public resolve(vars: Map<string, any>) {
+    return this.value.map((v, k) => v.resolve(vars));
   }
 }
 

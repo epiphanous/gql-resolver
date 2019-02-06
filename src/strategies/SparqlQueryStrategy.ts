@@ -1,23 +1,28 @@
-import {SparqlEndpointFetcher} from 'fetch-sparql-endpoint';
-import {List, Map} from 'immutable';
-import {GQLExecutionPlan} from './GQLExecutionPlan';
-import {GQLField} from './GQLSelection';
-import QueryResult from './QueryResult';
+import { List, Map } from 'immutable';
+import QueryResult from '../models/QueryResult';
 import QueryStrategy from './QueryStrategy';
-import {RDFPrefixes} from "./RDFPrefixes";
+import {RDFPrefixes} from '../models/RDFPrefixes';
 import sizeof = require('object-sizeof');
+import {GQLField} from '../models/GQLSelection';
+import {GQLExecutionPlan} from '../models/GQLExecutionPlan';
+import {SparqlEndpointFetcher} from 'fetch-sparql-endpoint';
 
-export default class QueryStrategySparql extends QueryStrategy {
-  public fetcher: SparqlEndpointFetcher;
-  public defaultURL: string;
-  constructor(isPlan) {
-    super(isPlan);
-    this.fetcher = new SparqlEndpointFetcher();
-    this.defaultURL = 'http://localhost:7200/repositories/jubel-test';
-  }
+const prefixify = (name: string) => name.replace(/_/, ':');
+
+export default class SparqlQueryStrategy extends QueryStrategy {
+  private endpoint: string;
+  private fetcher: SparqlEndpointFetcher = new SparqlEndpointFetcher();
 
   private normalizePrefix(prefix: string) {
     return prefix.split(']').join('');
+  }
+
+  public constructor(fields: List<GQLField>,
+                     plan: GQLExecutionPlan,
+                     endpoint: string
+  ) {
+    super(fields, plan);
+    this.endpoint = endpoint;
   }
 
   public getPrefixes() {
@@ -27,9 +32,9 @@ export default class QueryStrategySparql extends QueryStrategy {
       .join('\n');
   }
 
-  protected getProjections(fields: List<GQLField>) {
-    return fields.map<{ name: string; projection: string }>(f => ({
-      name: this.prefixify(f.name),
+  protected getProjections() {
+    return this.fields.map<{ name: string; projection: string }>(f => ({
+      name: prefixify(f.name),
       projection: f.alias.getOrElse(f.name),
     }));
   }
@@ -45,7 +50,7 @@ export default class QueryStrategySparql extends QueryStrategy {
     const entriesArray = args.entrySeq();
     const entriesLen = entriesArray.size;
     return entriesArray.reduce((acc, [argName, argValue], i) => {
-      acc += `?s ${this.prefixify(argName)} '${argValue}' ${this.addConditionalPeriod(entriesLen, i)}\n`;
+      acc += `?s ${prefixify(argName)} '${argValue}' ${this.addConditionalPeriod(entriesLen, i)}\n`;
       return acc;
     }, '');
   }
@@ -56,13 +61,8 @@ export default class QueryStrategySparql extends QueryStrategy {
       .join(' ');
   }
 
-  protected prefixify(name: string) {
-    return name.replace(/_/, ':');
-  }
-
   /**
    * TODO add jubel, schema org prefixes to default RDFPrefixes list
-   * TODO move & rename getPrefixes to RDFPrefixes?
    * @param {string} objectType
    * @param {Map<string, any>} args
    * @param {List<any>} projections
@@ -81,24 +81,23 @@ export default class QueryStrategySparql extends QueryStrategy {
       }`;
   }
 
-  public async resolve(fields: List<GQLField>, plan: GQLExecutionPlan): Promise<QueryResult> {
-    const objectType = this.prefixify(plan.resultType);
-    const args = this.getArgs(plan);
-    const projections = this.getProjections(fields);
-    // console.log(
-    //   'resolving',
-    //   objectType,
-    //   '{',
-    //   projections.toJS(),
-    //   '}',
-    //   args.toJS()
-    // );
-    const startTime = Date.now();
+  public async resolve(): Promise<QueryResult> {
+    const objectType = prefixify(this.plan.resultType.get().name);
+    const args = this.getArgs(this.plan);
+    const projections = this.getProjections();
+    console.log(
+      'resolving',
+      objectType,
+      '{',
+      projections.toJS(),
+      '}',
+      args.toJS()
+    );
     let count;
     console.log(this.constructSparqlQuery(objectType, args, projections));
     return new Promise((resolve, reject) => {
       this.fetcher.fetchBindings(
-        this.defaultURL,
+        this.endpoint,
         this.constructSparqlQuery(objectType, args, projections)
       ).then((stream) => {
         const resultArr: any[] = []; // todo replace any with a proper type
@@ -111,7 +110,7 @@ export default class QueryStrategySparql extends QueryStrategy {
           errors.push(error);
         });
         stream.on('end', () => {
-          /** Extracts 'value' string from each Literal{} query result so that it ends up as an array of [key,value]
+          /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
            * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _}, {...}}, {...}] => [['geo_lat': 123],...]]
            * @type {{}[]}
            */
@@ -119,22 +118,17 @@ export default class QueryStrategySparql extends QueryStrategy {
             return Object.keys(entry).reduce((acc, key) => {
               acc.push([key, entry[key]['value']]);
               return acc;
-            }, []);
+            }, List().asMutable());
           });
-          const result = new QueryResult({
-            values: List(resultArrValues),
-            startTime,
-            duration: Date.now() - startTime,
-            count,
-            bytes: sizeof(resultArr),
-            done: true,
-            ok: true,
-            errors: List(errors)
-          });
+          const result = new QueryResult();
+          result.addValues(List(resultArrValues));
           return resolve(result);
         });
       })
-        .catch(err => { console.error(err); reject(err); });
+        .catch(err => {
+          console.error(err);
+          reject(err);
+        });
     });
   }
 }
