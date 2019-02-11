@@ -7,6 +7,7 @@ import QueryResult from './QueryResult';
 import QueryStrategy from '../strategies/QueryStrategy';
 import ResolverContext from './ResolverContext';
 import { GQLTypeDefinition } from './GQLTypeDefinition';
+import {inspect} from 'util';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -111,13 +112,24 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.result.startTime = new Date().getTime();
     this.scalars = List(await Promise.all(this.resolveFields()));
     this.objects = List(await Promise.all(this.resolvePlans()));
-    // this.scalars = await this.resolveFields();
-    // this.objects = await this.resolvePlans();
     return this.makePlanResult();
   }
 
   public getSubjectIds(): Map<string, any> {
-    return Map<string, any>();
+    const fields = this.scalars
+      .flatMap(scalarQr => scalarQr.values)
+      .flatten(true)
+
+    let id;
+    if (fields.get(0)) {
+      id = fields.get(0)[1];
+    } else {
+      return Map<string, any>();
+    }
+
+    return fields.reduce((acc, field) => {
+      return acc.set(field[0], id);
+    }, Map<string, any>().asMutable());
   }
 
   /**
@@ -126,7 +138,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @returns Promise<QueryResult[]>
    */
   protected resolveFields() {
-    console.log('strats', this.strategies());
     // Promise.all<QueryResult>(
     return List(
       this.strategies()
@@ -152,11 +163,12 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   protected makePlanResult() {
     const pr = this.result;
     const qrs = this.scalars.concat(this.objects);
-    const values = qrs.flatMap(qr => qr.values).flatten(true);
-    pr.values = this.fields.map(f => {
-      const alias = f.alias.getOrElse(f.name);
-      return values.find(v => v[0] === alias);
-    });
+    const values = qrs.map(qr => qr.values);
+    pr.values = List.of(('ox_' + this.name), values);
+    // pr.values = this.fields.map(f => {
+    //   const alias = f.alias.getOrElse(f.name);
+    //   return values.flatten(true).find(v => v[0] === alias);
+    // })
     const reduced = qrs.reduce(
       (r, qr) => ({
         bytes: r.bytes + qr.bytes,

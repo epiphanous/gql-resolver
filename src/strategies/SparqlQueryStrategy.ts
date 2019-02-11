@@ -40,25 +40,61 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   /**
+   * Determines whether the plan has an actual parent object
+   * @returns {GQLExecutionPlan}
+   */
+  protected hasProperParent() {
+    return !!this.plan.parent.getSubjectIds().get('s');
+  }
+  /**
    * In case of multiple SparQL statements
    */
-  protected addConditionalPeriod(len, index) {
-    return index === (len - 1) ? '' : '.';
+  protected addConditionalOperator(len: number, index: number, operator: string) {
+    return index === (len - 1) ? '' : operator;
   }
 
   protected spreadArguments(args: Map<string, any>) {
-    const entriesArray = args.entrySeq();
+    const entriesArray = this.args.entrySeq();
     const entriesLen = entriesArray.size;
-    return entriesArray.reduce((acc, [argName, argValue], i) => {
-      acc += `?s ${prefixify(argName)} '${argValue}' ${this.addConditionalPeriod(entriesLen, i)}\n`;
+    let withArgs = entriesArray.reduce((acc, [argName, _], i) => {
+      acc += `?s ${prefixify(argName)} ?${argName} ${ this.addConditionalOperator(entriesLen, i, '.')}\n`;
       return acc;
     }, '');
+    if (this.hasProperParent()) {
+      withArgs += '.\n';
+      withArgs += `?s ${prefixify(this.plan.name)} ?${this.plan.name}`;
+    }
+    return withArgs;
   }
 
   protected spreadProjections(projections: List<any>) {
     const projLen = projections.size;
-    return projections.map((a, i) => '?s ' + a['name'] + ' ?' + a['projection'] + this.addConditionalPeriod(projLen, i))
+    return projections.map((a, i) => '?s ' + a['name'] + ' ?' + a['projection'] + this.addConditionalOperator(projLen, i, '.'))
       .join(' ');
+  }
+
+  // Connect this query with parent object's ID
+  protected addParentFilter(parentBinding: string) {
+    const parentID = this.plan.parent.getSubjectIds().get('s');
+    return `?${parentBinding} = '${parentID}'`; // todo might not need quotes around value here, check if numeric
+  }
+
+  // todo enable for more complex filtering expressions in graphql
+  protected addFilters() {
+    let filterString: string = '';
+    const entriesArray = this.args.entrySeq();
+    const entriesLen = entriesArray.size;
+    if (!this.args.isEmpty()) {
+      filterString += entriesArray.reduce((acc, [argName, value], i) => {
+        // todo other operators besides = in filter: string, add ardering & pagination as separate methods
+        acc += `?${argName} = '${value}' ${this.addConditionalOperator(entriesLen, i, '&&')}`;
+        return acc;
+      }, '');
+    }
+    if (this.hasProperParent()) {
+      filterString += this.addParentFilter(this.plan.name);
+    }
+    return filterString;
   }
 
   /**
@@ -69,15 +105,15 @@ export default class SparqlQueryStrategy extends QueryStrategy {
    * @returns {string}
    */
   public constructSparqlQuery(objectType: string, args: Map<string, any>, projections: List<any>) {
-    console.log('args: ', args);
     return `${this.getPrefixes()}
       PREFIX j: <https://jubel.co/jtv/>
       PREFIX s: <http://schema.org/>
-      SELECT ${projections.map(a => `?${a['projection']}`).join(' ') }
+      SELECT ?s ${projections.map(a => `?${a['projection']}`).join(' ') }
       WHERE {
         ?s a ${objectType}.
-        ${this.spreadProjections(projections)} ${args.isEmpty() ? '' : '.'}
+        ${ this.spreadProjections(projections)} ${args.isEmpty() ? '' : '.' }
         ${ this.spreadArguments(args) }
+        ${ (!this.args.isEmpty() || this.hasProperParent()) ? `FILTER ( ${this.addFilters()} )` : ''}
       }`;
   }
 
@@ -94,7 +130,6 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       args.toJS()
     );
     let count;
-    console.log(this.constructSparqlQuery(objectType, args, projections));
     return new Promise((resolve, reject) => {
       this.fetcher.fetchBindings(
         this.endpoint,
