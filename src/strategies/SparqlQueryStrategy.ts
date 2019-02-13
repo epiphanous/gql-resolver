@@ -1,21 +1,17 @@
-import { List, Map } from 'immutable';
-import QueryResult from '../models/QueryResult';
-import QueryStrategy from './QueryStrategy';
-import {RDFPrefixes} from '../models/RDFPrefixes';
-import sizeof = require('object-sizeof');
-import {GQLField} from '../models/GQLSelection';
-import {GQLExecutionPlan} from '../models/GQLExecutionPlan';
 import {SparqlEndpointFetcher} from 'fetch-sparql-endpoint';
+import { List, Map } from 'immutable';
+import sizeof = require('object-sizeof');
+import {GQLExecutionPlan} from '../models/GQLExecutionPlan';
+import {GQLField} from '../models/GQLSelection';
+import QueryResult from '../models/QueryResult';
+import {RDFPrefixes} from '../models/RDFPrefixes';
+import QueryStrategy from './QueryStrategy';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 
 export default class SparqlQueryStrategy extends QueryStrategy {
   private endpoint: string;
   private fetcher: SparqlEndpointFetcher = new SparqlEndpointFetcher();
-
-  private normalizePrefix(prefix: string) {
-    return prefix.split(']').join('');
-  }
 
   public constructor(fields: List<GQLField>,
                      plan: GQLExecutionPlan,
@@ -30,6 +26,77 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       .valueSeq()
       .map(sn => `PREFIX ${sn.getPrefix()}: <${this.normalizePrefix(sn.getName())}>`)
       .join('\n');
+  }
+
+  /**
+   * TODO add jubel, schema org prefixes to default RDFPrefixes list
+   * @param {string} objectType
+   * @param {Map<string, any>} args
+   * @param {List<any>} projections
+   * @returns {string}
+   */
+  public constructSparqlQuery(objectType: string, args: Map<string, any>, projections: List<any>) {
+    return `${this.getPrefixes()}
+      PREFIX j: <https://jubel.co/jtv/>
+      PREFIX s: <http://schema.org/>
+      SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ') }
+      WHERE {
+        ?s a ${objectType}.
+        ${ this.spreadProjections(projections)} ${args.isEmpty() ? '' : '.' }
+        ${ this.spreadArguments(args) }
+        ${ (!this.args.isEmpty() || this.hasProperParent()) ? `FILTER ( ${this.addFilters()} )` : ''}
+      }`;
+  }
+
+  public async resolve(): Promise<QueryResult> {
+    const objectType = prefixify(this.plan.resultType.get().name);
+    const args = this.getArgs(this.plan);
+    const projections = this.getProjections();
+    console.log('Trying to execute: ', this.constructSparqlQuery(objectType, args, projections));
+    console.log(
+      'resolving',
+      objectType,
+      '{',
+      projections.toJS(),
+      '}',
+      args.toJS()
+    );
+    let count;
+    return new Promise((resolve, reject) => {
+      this.fetcher.fetchBindings(
+        this.endpoint,
+        this.constructSparqlQuery(objectType, args, projections)
+      ).then((stream) => {
+        const resultArr: List<any> = List().asMutable();
+        const errors: any[] = [];
+        stream.on('data', data => {
+          count++;
+          resultArr.push(data);
+        });
+        stream.on('error', error => {
+          errors.push(error);
+        });
+        stream.on('end', () => {
+          /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
+           * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _}, {...}}, {...}] => [['geo_lat': 123],...]]
+           * @type {{}[]}
+           */
+          const resultArrValues: List<List<any>> = resultArr.flatMap(entry => {
+            return Object.keys(entry).reduce((acc, key) => {
+              acc.push([key, entry[key].value]);
+              return acc;
+            }, List<[string, any]>().asMutable());
+          });
+          const result = new QueryResult();
+          result.addValues(resultArrValues); // List [reusltarrvaleus]
+          return resolve(result);
+        });
+      })
+        .catch(err => {
+          console.error(err);
+          reject(err);
+        });
+    });
   }
 
   protected getProjections() {
@@ -69,14 +136,14 @@ export default class SparqlQueryStrategy extends QueryStrategy {
 
   protected spreadProjections(projections: List<any>) {
     const projLen = projections.size;
-    return projections.map((a, i) => '?s ' + a['name'] + ' ?' + a['projection'] + this.addConditionalOperator(projLen, i, '.'))
+    return projections.map((a, i) => 'optional {?s ' + a.name + ' ?' + a.projection + '}' + this.addConditionalOperator(projLen, i, '.'))
       .join(' ');
   }
 
   // Connect this query with parent object's ID
   protected addParentFilter(parentBinding: string) {
     const parentID = this.plan.parent.getSubjectIds().get('s');
-    return `?${parentBinding} = '${parentID}'`; // todo might not need quotes around value here, check if numeric
+    return `?${parentBinding} = '${parentID}'`;
   }
 
   // todo enable for more complex filtering expressions in graphql
@@ -97,73 +164,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     return filterString;
   }
 
-  /**
-   * TODO add jubel, schema org prefixes to default RDFPrefixes list
-   * @param {string} objectType
-   * @param {Map<string, any>} args
-   * @param {List<any>} projections
-   * @returns {string}
-   */
-  public constructSparqlQuery(objectType: string, args: Map<string, any>, projections: List<any>) {
-    return `${this.getPrefixes()}
-      PREFIX j: <https://jubel.co/jtv/>
-      PREFIX s: <http://schema.org/>
-      SELECT ?s ${projections.map(a => `?${a['projection']}`).join(' ') }
-      WHERE {
-        ?s a ${objectType}.
-        ${ this.spreadProjections(projections)} ${args.isEmpty() ? '' : '.' }
-        ${ this.spreadArguments(args) }
-        ${ (!this.args.isEmpty() || this.hasProperParent()) ? `FILTER ( ${this.addFilters()} )` : ''}
-      }`;
-  }
-
-  public async resolve(): Promise<QueryResult> {
-    const objectType = prefixify(this.plan.resultType.get().name);
-    const args = this.getArgs(this.plan);
-    const projections = this.getProjections();
-    console.log(
-      'resolving',
-      objectType,
-      '{',
-      projections.toJS(),
-      '}',
-      args.toJS()
-    );
-    let count;
-    return new Promise((resolve, reject) => {
-      this.fetcher.fetchBindings(
-        this.endpoint,
-        this.constructSparqlQuery(objectType, args, projections)
-      ).then((stream) => {
-        const resultArr: any[] = []; // todo replace any with a proper type
-        const errors: any[] = [];
-        stream.on('data', data => {
-          count++;
-          resultArr.push(data);
-        });
-        stream.on('error', error => {
-          errors.push(error);
-        });
-        stream.on('end', () => {
-          /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
-           * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _}, {...}}, {...}] => [['geo_lat': 123],...]]
-           * @type {{}[]}
-           */
-          const resultArrValues: any[] = resultArr.map(entry => {
-            return Object.keys(entry).reduce((acc, key) => {
-              acc.push([key, entry[key]['value']]);
-              return acc;
-            }, List().asMutable());
-          });
-          const result = new QueryResult();
-          result.addValues(List(resultArrValues));
-          return resolve(result);
-        });
-      })
-        .catch(err => {
-          console.error(err);
-          reject(err);
-        });
-    });
+  private normalizePrefix(prefix: string) {
+    return prefix.split(']').join('');
   }
 }

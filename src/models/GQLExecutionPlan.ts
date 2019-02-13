@@ -117,14 +117,14 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
 
   public getSubjectIds(): Map<string, any> {
     const fields = this.scalars
-      .flatMap(scalarQr => scalarQr.values)
-      .flatten(true)
+      .flatMap(scalarQr => scalarQr.values);
 
     let id;
-    if (fields.get(0)) {
-      id = fields.get(0)[1];
-    } else {
+    if (fields.isEmpty()) {
       return Map<string, any>();
+    } else {
+      const idTuple = fields.find((keyValTuple: [string, any]) => keyValTuple[0] === 's');
+      id = idTuple ? idTuple[1] : null;
     }
 
     return fields.reduce((acc, field) => {

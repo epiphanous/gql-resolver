@@ -31,7 +31,7 @@ export default class QueryResult {
     this.count++;
   }
 
-  public addValues(values: List<[string, any]>) {
+  public addValues(values: List<List<[string, any]>>) {
     values.map(v => this.addValue(v));
   }
 
@@ -53,18 +53,43 @@ export default class QueryResult {
         array.forEach((element, index) => {
           if (Array.isArray(element[0])) {
             if (Array.isArray(element[0][0])) {
-              const howManyLevelsToDeepen = this.getDepth(element, 1) - 3;
-              const flattened = flattenDepth(element, (howManyLevelsToDeepen > 0 ? howManyLevelsToDeepen : 0));
+              /** The element contains a (nested) array of scalar values at the deepest level
+               * Figures out how many levels it needs to be flattened until we get an array of arrays of scalar values,
+               * (a single group of scalar values), flattens the list up to that level
+               * then it goes back and recurses with that flattened array to pick out the scalar values and map them
+               */
               if (lastPathToFollowForScalars !== pathToFollow.join('.')) {
+                const howManyLevelsToDeepen = this.getDepth(element, 1) - 3;
+                const flattened = flattenDepth(element, (howManyLevelsToDeepen > 0 ? howManyLevelsToDeepen : 0));
                 lastPathToFollowForScalars = pathToFollow.join('.');
                 resolveLevel(flattened, pathToFollow);
               }
             } else {
+              /** The element is a list of scalar values,
+               * i.e. [['s_id, 'some_identifier_value'], ['geo_lat', '42.2141'], ['geo_lon', '12.4214']]
+               * Basically formulates an object which nested objects would be appended to, inside the resulting object.
+               * This is the only place where values are actually written to the result object.
+               */
               const prev = get(obj, pathToFollow.join('.'), []);
               set(obj, pathToFollow.join('.'), prev.concat(this.addScalars(element)));
+              /**
+               * premise: this gets invoked whenever we only have resolved scalar fields for one single object
+               * issue faced before: list of scalar values were accessed first, then looped back onto a higher-level array,
+               * came back to a list of scalar values, then stopped, effectively doubling the results already in the object.
+               *
+               * TEST !
+               */
+              if (!lastPathToFollowForScalars) {
+                throw {'status': 'done', lastPath: pathToFollow};
+              }
             }
           } else {
-            if (this.isObj(element[0])) {
+            /**
+             * If the first value of the current array is an object AND if we haven't already passed through this array,
+             * update the lastPathToFollow and iterate again.
+             * If we've already passed through the array, we consider it done as there isn't a deeper level to go to.
+             */
+            if (element[0] && this.isObj(element[0])) {
               if (lastPathToFollow !== pathToFollow.join('.')) {
                 lastPathToFollow = pathToFollow.join('.');
                 resolveLevel(element, pathToFollow);
@@ -73,6 +98,11 @@ export default class QueryResult {
               }
             }
             if (this.isObj(element)) {
+              /**
+               * The current object is an element, therefore we update the current path and resume onwards into a new
+               * iteration. If the path to follow ends with a number, it means that this is a 2nd or nth object inside
+               * the higher-level object and we should append to that object instead of the first one.
+               */
               console.log('Object', element);
               if (pathToFollow.length > 0) {
                 if (Number(pathToFollow[pathToFollow.length - 1])) {
@@ -94,14 +124,14 @@ export default class QueryResult {
     try {
       resolveLevel(arrayOfResults, []);
     } catch (message) {
-      if (message['status'] === 'done') {
+      if (message.status === 'done') {
         return resolve(obj);
       } else {
         console.warn(message);
         return reject(message);
       }
     }
-  });
+  })
 
   /**
    * Returns an object of resolved scalar values
