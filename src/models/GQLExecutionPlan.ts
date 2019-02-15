@@ -115,21 +115,20 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.makePlanResult();
   }
 
-  public getSubjectIds(): Map<string, any> {
+  public getSubjectIds(): List<Map<string, any>> {
     const fields = this.scalars
       .flatMap(scalarQr => scalarQr.values);
 
-    let id;
     if (fields.isEmpty()) {
       return Map<string, any>();
-    } else {
-      const idTuple = fields.find((keyValTuple: [string, any]) => keyValTuple[0] === 's');
-      id = idTuple ? idTuple[1] : null;
     }
 
     return fields.reduce((acc, field) => {
-      return acc.set(field[0], id);
-    }, Map<string, any>().asMutable());
+      if (field[0] === 's') {
+        return acc.push(Map({[field[0]]: field[1]}));
+      }
+      return acc;
+    }, List<Map<string, any>>().asMutable());
   }
 
   /**
@@ -165,10 +164,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     const qrs = this.scalars.concat(this.objects);
     const values = qrs.map(qr => qr.values);
     pr.values = List.of(('ox_' + this.name), values);
-    // pr.values = this.fields.map(f => {
-    //   const alias = f.alias.getOrElse(f.name);
-    //   return values.flatten(true).find(v => v[0] === alias);
-    // })
     const reduced = qrs.reduce(
       (r, qr) => ({
         bytes: r.bytes + qr.bytes,

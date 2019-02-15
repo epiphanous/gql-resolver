@@ -24,9 +24,11 @@ describe('Resolver', () => {
   it('resolves a query', async () => {
     const result = await resolver.resolve(
       `query test {
-      home: feature(gn_name: 'Pic de Font Blanca') {
-        geo_lat
-        geo_long
+      home: curatedDestination(first: 2, s_name: 'yerevan') {
+        s_name
+        s_amenityFeature {
+          s_name
+        }
       }
     }`,
       Map(),

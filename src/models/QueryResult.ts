@@ -65,22 +65,14 @@ export default class QueryResult {
                 resolveLevel(flattened, pathToFollow);
               }
             } else {
-              /** The element is a list of scalar values,
+              /** The element is an array of scalar values,
                * i.e. [['s_id, 'some_identifier_value'], ['geo_lat', '42.2141'], ['geo_lon', '12.4214']]
                * Basically formulates an object which nested objects would be appended to, inside the resulting object.
                * This is the only place where values are actually written to the result object.
                */
-              const prev = get(obj, pathToFollow.join('.'), []);
-              set(obj, pathToFollow.join('.'), prev.concat(this.addScalars(element)));
-              /**
-               * premise: this gets invoked whenever we only have resolved scalar fields for one single object
-               * issue faced before: list of scalar values were accessed first, then looped back onto a higher-level array,
-               * came back to a list of scalar values, then stopped, effectively doubling the results already in the object.
-               *
-               * TEST !
-               */
-              if (!lastPathToFollowForScalars) {
-                throw {'status': 'done', lastPath: pathToFollow};
+              if (lastPathToFollowForScalars !== pathToFollow.join('.')) {
+                const prev = get(obj, pathToFollow.join('.'), []);
+                set(obj, pathToFollow.join('.'), prev.concat(this.addScalars(element)));
               }
             }
           } else {
@@ -139,11 +131,10 @@ export default class QueryResult {
    * @returns {{}}
    */
   public addScalars = (scalarArray) => {
-    const objOfScalars = {};
-    scalarArray.forEach(([fieldName, value]) => {
-      objOfScalars[fieldName] = value;
-    });
-    return objOfScalars;
+    return scalarArray.reduce((acc, [fieldName, value]) => {
+      acc[fieldName] = value;
+      return acc;
+    }, {});
   }
 
   /**

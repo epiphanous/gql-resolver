@@ -41,11 +41,14 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       PREFIX s: <http://schema.org/>
       SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ') }
       WHERE {
-        ?s a ${objectType}.
+        ${ !this.hasProperParent() ? ` ?s a ${objectType}.` : '' }
+        ${ this.addParentConstraints() }
         ${ this.spreadProjections(projections)} ${args.isEmpty() ? '' : '.' }
-        ${ this.spreadArguments(args) }
-        ${ (!this.args.isEmpty() || this.hasProperParent()) ? `FILTER ( ${this.addFilters()} )` : ''}
-      }`;
+        ${ this.spreadArguments() }
+        ${ (!this.argsWithoutReservedKeywords().isEmpty()) ? `FILTER ( ${this.addFilters()} )` : ''}
+      }
+      ${ this.addLimit() }
+    `;
   }
 
   public async resolve(): Promise<QueryResult> {
@@ -81,6 +84,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
            * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _}, {...}}, {...}] => [['geo_lat': 123],...]]
            * @type {{}[]}
            */
+            // TODO fix faulty flattening, merge scalars and objects appropriately
           const resultArrValues: List<List<any>> = resultArr.flatMap(entry => {
             return Object.keys(entry).reduce((acc, key) => {
               acc.push([key, entry[key].value]);
@@ -88,7 +92,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
             }, List<[string, any]>().asMutable());
           });
           const result = new QueryResult();
-          result.addValues(resultArrValues); // List [reusltarrvaleus]
+          result.addValues(resultArrValues);
           return resolve(result);
         });
       })
@@ -97,6 +101,14 @@ export default class SparqlQueryStrategy extends QueryStrategy {
           reject(err);
         });
     });
+  }
+
+  // TODO this will be modified to enable filtering via 'filter' keyword..
+  protected argsWithoutReservedKeywords() {
+    const reserved = List(['limit', 'offset', 'order', 'filter', 'first', 'last']); // todo add all
+    let argsWithoutReserved = this.args.asMutable();
+    reserved.forEach(keyword => { argsWithoutReserved = argsWithoutReserved.remove(keyword); });
+    return argsWithoutReserved;
   }
 
   protected getProjections() {
@@ -111,7 +123,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
    * @returns {GQLExecutionPlan}
    */
   protected hasProperParent() {
-    return !!this.plan.parent.getSubjectIds().get('s');
+    return !this.plan.parent.getSubjectIds().isEmpty();
   }
   /**
    * In case of multiple SparQL statements
@@ -120,18 +132,13 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     return index === (len - 1) ? '' : operator;
   }
 
-  protected spreadArguments(args: Map<string, any>) {
-    const entriesArray = this.args.entrySeq();
+  protected spreadArguments() {
+    const entriesArray = this.argsWithoutReservedKeywords().entrySeq();
     const entriesLen = entriesArray.size;
-    let withArgs = entriesArray.reduce((acc, [argName, _], i) => {
+    return entriesArray.reduce((acc, [argName, _], i) => {
       acc += `?s ${prefixify(argName)} ?${argName} ${ this.addConditionalOperator(entriesLen, i, '.')}\n`;
       return acc;
     }, '');
-    if (this.hasProperParent()) {
-      withArgs += '.\n';
-      withArgs += `?s ${prefixify(this.plan.name)} ?${this.plan.name}`;
-    }
-    return withArgs;
   }
 
   protected spreadProjections(projections: List<any>) {
@@ -140,28 +147,47 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       .join(' ');
   }
 
-  // Connect this query with parent object's ID
-  protected addParentFilter(parentBinding: string) {
-    const parentID = this.plan.parent.getSubjectIds().get('s');
-    return `?${parentBinding} = '${parentID}'`;
-  }
-
-  // todo enable for more complex filtering expressions in graphql
   protected addFilters() {
     let filterString: string = '';
-    const entriesArray = this.args.entrySeq();
+    const entriesArray = this.argsWithoutReservedKeywords().entrySeq();
     const entriesLen = entriesArray.size;
-    if (!this.args.isEmpty()) {
+    if (!this.argsWithoutReservedKeywords().isEmpty()) {
       filterString += entriesArray.reduce((acc, [argName, value], i) => {
         // todo other operators besides = in filter: string, add ardering & pagination as separate methods
         acc += `?${argName} = '${value}' ${this.addConditionalOperator(entriesLen, i, '&&')}`;
         return acc;
       }, '');
     }
-    if (this.hasProperParent()) {
-      filterString += this.addParentFilter(this.plan.name);
-    }
     return filterString;
+  }
+
+  /**
+   * Using the VALUES keyword
+   */
+  protected addParentConstraints() {
+    if (this.hasProperParent()) {
+      // todo add supp for multiple parents
+      const ids = this.plan.parent.getSubjectIds().reduce((acc, sidMap) => {
+        return acc += `<${sidMap.get('s')}> \n`;
+      }, '');
+      return `VALUES ?p {
+        ${ids}
+      }
+      ?p ${prefixify(this.plan.name)} ?s
+      `;
+    } else {
+      return '';
+    }
+  }
+
+  protected addLimit() {
+    if (this.args.get('first')) {
+      return `LIMIT ${this.args.get('first')}`;
+    } else if (this.args.get('last')) {
+      return `LIMIT ${this.args.get('last')}`;
+    } else {
+      return '';
+    }
   }
 
   private normalizePrefix(prefix: string) {
