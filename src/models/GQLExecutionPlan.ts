@@ -165,24 +165,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     const mappedObjects = this.objects.map(sc => sc.data).has(0) ? this.objects.map(sc => sc.data).get(0) : new OrderedMap({});
     this.result.merge(mappedScalars);
     this.result.merge(mappedObjects);
-    // const reduced = qrs.reduce(
-    //   (r, qr) => ({
-    //     bytes: r.bytes + qr.bytes,
-    //     count: r.count + qr.count,
-    //     ok: r.ok && qr.ok,
-    //     errors: r.errors.concat(qr.errors),
-    //   }),
-    //   { bytes: 0, count: 0, ok: true, errors: List<string>() }
-    // );
     this.finalizeResults();
-    const pr = this.result;
-    // pr.bytes = reduced.bytes;
-    // pr.count = reduced.count;
-    // pr.ok = reduced.ok;
-    // pr.errors = reduced.errors;
-    // pr.duration = new Date().getTime() - this.result.startTime;
-    // pr.done = true;
-    return pr;
+    return this.result;
   }
   protected finalizeResults() {
     const newResArr = List().asMutable();
