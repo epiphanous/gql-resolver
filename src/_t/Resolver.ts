@@ -24,8 +24,7 @@ describe('Resolver', () => {
   it('resolves a query', async () => {
     const result = await resolver.resolve(
       `query test {
-      home: curatedDestination(first: 2, s_name: 'yerevan') {
-        s_name
+      home: curatedDestination(first: 2) {
         s_amenityFeature {
           s_name
         }
@@ -36,7 +35,6 @@ describe('Resolver', () => {
     );
     const resValue = await result.get();
     const resValueObject = await resValue.getResult();
-    console.log(inspect(resValueObject, false, null, true));
     expect(resValueObject).to.be.an('object');
   });
 });

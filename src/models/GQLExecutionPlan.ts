@@ -1,5 +1,5 @@
 import { None, Option } from 'funfix';
-import { List, Map } from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLField } from './GQLSelection';
@@ -7,7 +7,6 @@ import QueryResult from './QueryResult';
 import QueryStrategy from '../strategies/QueryStrategy';
 import ResolverContext from './ResolverContext';
 import { GQLTypeDefinition } from './GQLTypeDefinition';
-import {inspect} from 'util';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -117,18 +116,19 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
 
   public getSubjectIds(): List<Map<string, any>> {
     const fields = this.scalars
-      .flatMap(scalarQr => scalarQr.values);
-
+      .map(scalarQr => scalarQr.data);
     if (fields.isEmpty()) {
-      return Map<string, any>();
+      return List<Map<string, any>>();
     }
 
-    return fields.reduce((acc, field) => {
-      if (field[0] === 's') {
-        return acc.push(Map({[field[0]]: field[1]}));
-      }
-      return acc;
-    }, List<Map<string, any>>().asMutable());
+    return fields.has(0) ? fields.get(0).keySeq() : List();
+
+    // return fields.reduce((acc, field) => {
+    //   if (field[0] === 's') {
+    //     return acc.push(Map({[field[0]]: field[1]}));
+    //   }
+    //   return acc;
+    // }, List<Map<string, any>>().asMutable());
   }
 
   /**
@@ -160,26 +160,59 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
+    // TODO drop the scalars & objects approach altogether?
+    const mappedScalars = this.scalars.map(sc => sc.data).has(0) ? this.scalars.map(sc => sc.data).get(0) : new OrderedMap({});
+    const mappedObjects = this.objects.map(sc => sc.data).has(0) ? this.objects.map(sc => sc.data).get(0) : new OrderedMap({});
+    this.result.merge(mappedScalars);
+    this.result.merge(mappedObjects);
+    // const reduced = qrs.reduce(
+    //   (r, qr) => ({
+    //     bytes: r.bytes + qr.bytes,
+    //     count: r.count + qr.count,
+    //     ok: r.ok && qr.ok,
+    //     errors: r.errors.concat(qr.errors),
+    //   }),
+    //   { bytes: 0, count: 0, ok: true, errors: List<string>() }
+    // );
+    this.finalizeResults();
     const pr = this.result;
-    const qrs = this.scalars.concat(this.objects);
-    const values = qrs.map(qr => qr.values);
-    pr.values = List.of(('ox_' + this.name), values);
-    const reduced = qrs.reduce(
-      (r, qr) => ({
-        bytes: r.bytes + qr.bytes,
-        count: r.count + qr.count,
-        ok: r.ok && qr.ok,
-        errors: r.errors.concat(qr.errors),
-      }),
-      { bytes: 0, count: 0, ok: true, errors: List<string>() }
-    );
-    pr.bytes = reduced.bytes;
-    pr.count = reduced.count;
-    pr.ok = reduced.ok;
-    pr.errors = reduced.errors;
-    pr.duration = new Date().getTime() - this.result.startTime;
-    pr.done = true;
+    // pr.bytes = reduced.bytes;
+    // pr.count = reduced.count;
+    // pr.ok = reduced.ok;
+    // pr.errors = reduced.errors;
+    // pr.duration = new Date().getTime() - this.result.startTime;
+    // pr.done = true;
     return pr;
+  }
+  protected finalizeResults() {
+    const newResArr = List().asMutable();
+    this.result.data.valueSeq().forEach(value => {
+      /*
+        TODO
+        We might have resolved values with more fields inside them than we expect here!
+        i.e. we only have 's_name' in fields for this level, but our actual fields have an additional s_amenityFeature
+        object inside them, this would effectively filter that (needed) part out..
+       */
+      const valueMap = value;
+      // const valueMap = this.fields.reduce((acc, field) => {
+      //   const key = field.alias.getOrElse(field.name);
+      //   acc.set(key, value.get(key));
+      //   return acc;
+      // }, OrderedMap().asMutable());
+      newResArr.push(valueMap);
+    });
+    if (newResArr.count() > 1) {
+      if (this.parent.scalars.isEmpty()) {
+        this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: newResArr});
+      } else {
+        // we want each value to be mapped to its proper parent via parent's ID, TODO will this be correct in all cases?
+        this.result.data.map(value => {
+          return OrderedMap({[this.alias.getOrElse(this.name)]: value});
+        });
+      }
+    } else {
+      this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: this.result.data});
+    }
   }
 
   /**

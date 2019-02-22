@@ -1,5 +1,5 @@
 import {SparqlEndpointFetcher} from 'fetch-sparql-endpoint';
-import { List, Map } from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import sizeof = require('object-sizeof');
 import {GQLExecutionPlan} from '../models/GQLExecutionPlan';
 import {GQLField} from '../models/GQLSelection';
@@ -39,7 +39,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     return `${this.getPrefixes()}
       PREFIX j: <https://jubel.co/jtv/>
       PREFIX s: <http://schema.org/>
-      SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ') }
+      SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ') } ${this.hasProperParent() ? '?parentId' : ''}
       WHERE {
         ${ !this.hasProperParent() ? ` ?s a ${objectType}.` : '' }
         ${ this.addParentConstraints() }
@@ -70,7 +70,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
         this.endpoint,
         this.constructSparqlQuery(objectType, args, projections)
       ).then((stream) => {
-        const resultArr: List<any> = List().asMutable();
+        const resultArr: [] = [];
         const errors: any[] = [];
         stream.on('data', data => {
           count++;
@@ -84,15 +84,22 @@ export default class SparqlQueryStrategy extends QueryStrategy {
            * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _}, {...}}, {...}] => [['geo_lat': 123],...]]
            * @type {{}[]}
            */
-            // TODO fix faulty flattening, merge scalars and objects appropriately
-          const resultArrValues: List<List<any>> = resultArr.flatMap(entry => {
+          const resultArrValues: Array<{}> = resultArr.map(entry => {
             return Object.keys(entry).reduce((acc, key) => {
-              acc.push([key, entry[key].value]);
+              acc[key] = entry[key]['value'];
               return acc;
-            }, List<[string, any]>().asMutable());
+            }, {});
           });
+          const om = new OrderedMap<string, OrderedMap<string, any>>(
+            resultArrValues.map(row =>
+              [this.hasProperParent() ? row.parentId : row.s, OrderedMap<string, any>(this.fields.map(f => {
+                const key = f.alias.getOrElse(f.name);
+                return [key, row[key]];
+              }))]
+            )
+          );
           const result = new QueryResult();
-          result.addValues(resultArrValues);
+          result.data = om;
           return resolve(result);
         });
       })
@@ -167,13 +174,13 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   protected addParentConstraints() {
     if (this.hasProperParent()) {
       // todo add supp for multiple parents
-      const ids = this.plan.parent.getSubjectIds().reduce((acc, sidMap) => {
-        return acc += `<${sidMap.get('s')}> \n`;
+      const ids = this.plan.parent.getSubjectIds().reduce((acc, sid) => {
+        return acc += `<${sid}> \n`;
       }, '');
-      return `VALUES ?p {
+      return `VALUES ?parentId {
         ${ids}
       }
-      ?p ${prefixify(this.plan.name)} ?s
+      ?parentId ${prefixify(this.plan.name)} ?s
       `;
     } else {
       return '';
