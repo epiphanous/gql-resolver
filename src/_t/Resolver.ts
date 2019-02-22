@@ -25,9 +25,7 @@ describe('Resolver', () => {
     const result = await resolver.resolve(
       `query test {
       home: curatedDestination(first: 2) {
-        s_amenityFeature {
-          s_name
-        }
+        s_name
       }
     }`,
       Map(),

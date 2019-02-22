@@ -201,15 +201,15 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       // }, OrderedMap().asMutable());
       newResArr.push(valueMap);
     });
-    if (newResArr.count() > 1) {
-      if (this.parent.scalars.isEmpty()) {
-        this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: newResArr});
-      } else {
-        // we want each value to be mapped to its proper parent via parent's ID, TODO will this be correct in all cases?
-        this.result.data.map(value => {
-          return OrderedMap({[this.alias.getOrElse(this.name)]: value});
-        });
-      }
+    if (this.parent) {
+        if (this.parent.scalars.isEmpty()) {
+          this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: newResArr});
+        } else {
+          // we want each value to be mapped to its proper parent via parent's ID, TODO will this work in all cases?
+          this.result.data.map(value => {
+            return OrderedMap({[this.alias.getOrElse(this.name)]: value});
+          });
+        }
     } else {
       this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: this.result.data});
     }
