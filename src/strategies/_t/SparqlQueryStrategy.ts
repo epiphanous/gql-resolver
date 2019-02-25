@@ -2,12 +2,13 @@ import { expect } from 'chai';
 import {List} from 'immutable';
 import 'mocha';
 import sizeof = require('object-sizeof');
-import QueryResult from '../QueryResult';
-import QueryStrategySparql from '../QueryStrategySparql';
+import {GQLExecutionPlan} from '../../models/GQLExecutionPlan';
+import QueryResult from '../../models/QueryResult';
+import SparqlQueryStrategy from '../SparqlQueryStrategy';
 
 describe('fetchResults', () => {
-  const QSSparql = new QueryStrategySparql(false);
   const endpointURL = 'http://localhost:7200/repositories/jubel-test';
+  const QSSparql = new SparqlQueryStrategy(); // TODO fix
   const prefixes = 'PREFIX gn: <http://sws.geonames.org/>';
   const query = 'SELECT ?o WHERE { ?s ?p ?o. ?s a gn:Feature } LIMIT 10';
   it('should return a results stream', () => {
@@ -83,5 +84,3 @@ describe('fetchResults', () => {
       .catch(err => console.error(err));
   });
 });
-
-// todo: plug in the strategy's actual resolve() method

@@ -120,7 +120,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     if (fields.isEmpty()) {
       return List<Map<string, any>>();
     }
-
     return fields.has(0) ? fields.get(0).keySeq() : List();
 
     // return fields.reduce((acc, field) => {
@@ -161,30 +160,15 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    */
   protected makePlanResult() {
     // TODO drop the scalars & objects approach altogether?
-    const mappedScalars = this.scalars.map(sc => sc.data).has(0) ? this.scalars.map(sc => sc.data).get(0) : new OrderedMap({});
-    const mappedObjects = this.objects.map(sc => sc.data).has(0) ? this.objects.map(sc => sc.data).get(0) : new OrderedMap({});
+    const mappedScalars = this.scalars.map(sc => sc.data).has(0) ? this.scalars.map(sc => sc.data).get(0) : OrderedMap({});
+    const mappedObjects = this.objects.map(sc => sc.data).has(0) ? this.objects.map(sc => sc.data).get(0) : OrderedMap({});
     this.result.merge(mappedScalars);
     this.result.merge(mappedObjects);
     this.finalizeResults();
     return this.result;
   }
   protected finalizeResults() {
-    const newResArr = List().asMutable();
-    this.result.data.valueSeq().forEach(value => {
-      /*
-        TODO
-        We might have resolved values with more fields inside them than we expect here!
-        i.e. we only have 's_name' in fields for this level, but our actual fields have an additional s_amenityFeature
-        object inside them, this would effectively filter that (needed) part out..
-       */
-      const valueMap = value;
-      // const valueMap = this.fields.reduce((acc, field) => {
-      //   const key = field.alias.getOrElse(field.name);
-      //   acc.set(key, value.get(key));
-      //   return acc;
-      // }, OrderedMap().asMutable());
-      newResArr.push(valueMap);
-    });
+    const newResArr = this.result.data.valueSeq().toList();
     if (this.parent) {
         if (this.parent.scalars.isEmpty()) {
           this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: newResArr});
