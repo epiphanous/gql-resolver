@@ -2,7 +2,6 @@ import { expect } from 'chai';
 import {List} from 'immutable';
 import 'mocha';
 import sizeof = require('object-sizeof');
-import {GQLExecutionPlan} from '../../models/GQLExecutionPlan';
 import QueryResult from '../../models/QueryResult';
 import SparqlQueryStrategy from '../SparqlQueryStrategy';
 

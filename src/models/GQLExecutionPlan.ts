@@ -114,20 +114,38 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.makePlanResult();
   }
 
-  public getSubjectIds(): List<Map<string, any>> {
+  public getSubjectIds(): List<any> {
     const fields = this.scalars
       .map(scalarQr => scalarQr.data);
     if (fields.isEmpty()) {
-      return List<Map<string, any>>();
+      return List<string>();
     }
-    return fields.has(0) ? fields.get(0).keySeq() : List();
 
-    // return fields.reduce((acc, field) => {
-    //   if (field[0] === 's') {
-    //     return acc.push(Map({[field[0]]: field[1]}));
-    //   }
-    //   return acc;
-    // }, List<Map<string, any>>().asMutable());
+    const fieldWithIdDirective = this.fields.find(field =>
+      field.directives.some(directive =>
+        directive.name === 'id'
+      )
+    );
+
+    if (fieldWithIdDirective) {
+      const fieldName = fieldWithIdDirective.name;
+      return fields
+        .get(0)
+        .valueSeq()
+        .reduce((acc, value: OrderedMap<string, any>) => acc.push(value.get(fieldName)), List().asMutable());
+    }
+
+    const fieldsMarkedId = fields
+      .get(0)
+      .valueSeq()
+      .filter((field: GQLField) => field.name === 'id')
+      .toList();
+
+    if (!fieldsMarkedId.isEmpty()) {
+      return fieldsMarkedId;
+    }
+
+    return fields.get(0).keySeq().toList();
   }
 
   /**

@@ -11,7 +11,7 @@ const prefixify = (name: string) => name.replace(/_/, ':');
 
 export default class SparqlQueryStrategy extends QueryStrategy {
   private endpoint: string;
-  private fetcher: SparqlEndpointFetcher = new SparqlEndpointFetcher();
+  public fetcher: SparqlEndpointFetcher = new SparqlEndpointFetcher();
 
   public constructor(fields: List<GQLField>,
                      plan: GQLExecutionPlan,
@@ -70,7 +70,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
         this.endpoint,
         this.constructSparqlQuery(objectType, args, projections)
       ).then((stream) => {
-        const resultArr: [] = [];
+        const resultArr: any[] = [];
         const errors: any[] = [];
         stream.on('data', data => {
           count++;
