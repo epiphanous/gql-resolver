@@ -478,8 +478,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       );
       return new GQLInvalidArgument(
         name,
-        new GQLStringValue('error'),
-        argDefOpt
+        new GQLStringValue('error')
       );
     } else {
       const argDef = argDefOpt.get();
@@ -513,33 +512,32 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       if (typeOk) {
         switch (name) {
           case ARG_TYPES.ARG_FILTER:
-            return new GQLFilterArgument(name, v, argDefOpt);
+            return new GQLFilterArgument(name, v);
           case ARG_TYPES.ARG_ORDER:
-            return new GQLOrderArgument(name, v, argDefOpt);
+            return new GQLOrderArgument(name, v);
           case ARG_TYPES.ARG_LIMIT:
-            return new GQLLimitArgument(name, v, argDefOpt);
+            return new GQLLimitArgument(name, v);
           case ARG_TYPES.ARG_OFFSET:
-            return new GQLOffsetArgument(name, v, argDefOpt);
+            return new GQLOffsetArgument(name, v);
           case ARG_TYPES.ARG_TRANSFORMS:
-            return new GQLTransformsArgument(name, v, argDefOpt);
+            return new GQLTransformsArgument(name, v);
           case ARG_TYPES.ARG_PATTERNS:
-            return new GQLPatternsArgument(name, v, argDefOpt);
+            return new GQLPatternsArgument(name, v);
           case ARG_TYPES.ARG_BOOSTERS:
-            return new GQLBoostersArgument(name, v, argDefOpt);
+            return new GQLBoostersArgument(name, v);
           case ARG_TYPES.ARG_BINDINGS:
-            return new GQLBindingsArgument(name, v, argDefOpt);
+            return new GQLBindingsArgument(name, v);
           case ARG_TYPES.ARG_INCLUDE_DEPRECATED:
-            return new GQLIncludeDeprecatedArgument(name, v, argDefOpt);
+            return new GQLIncludeDeprecatedArgument(name, v);
           case ARG_TYPES.ARG_NAME:
-            return new GQLNameArgument(name, v, argDefOpt);
+            return new GQLNameArgument(name, v);
           default:
-            return new GQLAnyArgument(name, v, argDefOpt);
+            return new GQLAnyArgument(name, v);
         }
       } else {
         return new GQLInvalidArgument(
           name,
-          new GQLStringValue('error'),
-          argDefOpt
+          new GQLStringValue('error')
         );
       }
     }

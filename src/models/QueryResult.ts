@@ -1,7 +1,7 @@
-import { List } from 'immutable';
+import {List, OrderedMap} from 'immutable';
 
 export default class QueryResult {
-  public values = List<[string, any]>().asMutable();
+  public data = OrderedMap().asMutable();
   public startTime; // ms since unix epoch (Timezone: UTC)
   public duration = 0;
   public bytes = 0;
@@ -11,11 +11,9 @@ export default class QueryResult {
   public errors = List<string>();
 
   constructor(
-    values: List<[string, any]> = List<[string, any]>(),
     startTime: number = 0,
     duration: number = 0
   ) {
-    values.forEach(v => this.addValue(v));
     this.startTime = startTime || new Date().getTime();
     this.duration = duration;
   }
@@ -24,13 +22,16 @@ export default class QueryResult {
     return (this.bytes / (this.duration + 1)) * 1000;
   }
 
-  public addValue(value: [string, any]) {
-    this.values.push(value);
-    this.bytes += `${value.join('')}`.length;
-    this.count++;
+  public async getResult() {
+    try {
+      console.log('got to resolve: ', JSON.stringify(this.data));
+      return this.data.toJS();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
-  public addValues(values: List<[string, any]>) {
-    values.map(v => this.addValue(v));
+  public merge(that: OrderedMap<string, any>) {
+    this.data.mergeDeep(that);
   }
 }

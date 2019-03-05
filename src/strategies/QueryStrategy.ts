@@ -13,7 +13,7 @@ interface IQueryStrategy {
   fields: List<GQLField>;
   plan: GQLExecutionPlan;
 
-  resolve(): QueryResult;
+  resolve(): Promise<QueryResult>;
 }
 
 export default abstract class QueryStrategy implements IQueryStrategy {
@@ -23,7 +23,7 @@ export default abstract class QueryStrategy implements IQueryStrategy {
   public subjectIds: Map<string, any>;
   public args: Map<string, any>;
 
-  protected constructor(fields: List<GQLField>, plan: GQLExecutionPlan) {
+  public constructor(fields: List<GQLField>, plan: GQLExecutionPlan) {
     this.fields = fields;
     this.plan = plan;
     this.subjectIds = Option.of(this.plan.parent)
@@ -37,5 +37,11 @@ export default abstract class QueryStrategy implements IQueryStrategy {
     );
   }
 
-  public abstract resolve(): QueryResult;
+  protected getArgs(plan: GQLExecutionPlan) {
+    return Map(
+      plan.args.map<[string, any]>(arg => [arg.name, arg.resolve(plan.vars)])
+    );
+  }
+
+  public abstract resolve(): Promise<QueryResult>;
 }

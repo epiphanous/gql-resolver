@@ -7,7 +7,9 @@ import SparqlQueryStrategy from './SparqlQueryStrategy';
 export class SparqlQueryStrategyFactory extends QueryStrategyFactory {
   public endpoint: string;
 
-  constructor(endpoint: string) {
+  // todo config file for storing these default values
+  constructor(endpoint: string = 'http://localhost:7200/repositories/jubel-test') {
+    super();
     this.endpoint = endpoint;
   }
 
@@ -15,6 +17,6 @@ export class SparqlQueryStrategyFactory extends QueryStrategyFactory {
     fields: List<GQLField>,
     plan: GQLExecutionPlan
   ): SparqlQueryStrategy {
-    return new SparqlQueryStrategy(fields, plan);
+    return new SparqlQueryStrategy(fields, plan, this.endpoint);
   }
 }

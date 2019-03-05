@@ -1,5 +1,5 @@
 import { None, Option } from 'funfix';
-import { List, Map } from 'immutable';
+import {List, Map, OrderedMap} from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLField } from './GQLSelection';
@@ -7,7 +7,6 @@ import QueryResult from './QueryResult';
 import QueryStrategy from '../strategies/QueryStrategy';
 import ResolverContext from './ResolverContext';
 import { GQLTypeDefinition } from './GQLTypeDefinition';
-import { QueryStrategyFactory } from '../strategies/QueryStrategyFactory';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -18,7 +17,7 @@ export interface IGQLExecutionPlan {
   args: List<GQLArgument>;
   directives: List<GQLDirective>;
   fields: List<GQLField>;
-  resultType: string;
+  resultType: Option<GQLTypeDefinition>;
   plans: List<GQLExecutionPlan>;
   scalars: List<QueryResult>;
   objects: List<QueryResult>;
@@ -26,7 +25,7 @@ export interface IGQLExecutionPlan {
   allFields: List<GQLField>;
   defaultStrategy: string;
 
-  execute(): QueryResult; // Promise
+  execute(): Promise<QueryResult>; // Promise
 }
 
 /**
@@ -100,7 +99,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
             f.outputType
           )
       );
-
     this.resolveDefaultStrategy();
   }
 
@@ -109,16 +107,45 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * all sub plans, then stiches the results together and returns it.
    * @return Promise<QueryResult>
    */
-  public execute() {
+  public async execute() {
     this.result.startTime = new Date().getTime();
-    this.scalars = List(this.resolveFields());
-    this.objects = List(this.resolvePlans());
-    this.makePlanResult();
-    return this.result;
+    this.scalars = List(await Promise.all(this.resolveFields()));
+    this.objects = List(await Promise.all(this.resolvePlans()));
+    return this.makePlanResult();
   }
 
-  public getSubjectIds(): Map<string, any> {
-    return Map<string, any>();
+  public getSubjectIds(): List<any> {
+    const fields = this.scalars
+      .map(scalarQr => scalarQr.data);
+    if (fields.isEmpty()) {
+      return List<string>();
+    }
+
+    const fieldWithIdDirective = this.fields.find(field =>
+      field.directives.some(directive =>
+        directive.name === 'id'
+      )
+    );
+
+    if (fieldWithIdDirective) {
+      const fieldName = fieldWithIdDirective.name;
+      return fields
+        .get(0)
+        .valueSeq()
+        .reduce((acc, value: OrderedMap<string, any>) => acc.push(value.get(fieldName)), List().asMutable());
+    }
+
+    const fieldsMarkedId = fields
+      .get(0)
+      .valueSeq()
+      .filter((field: GQLField) => field.name === 'id')
+      .toList();
+
+    if (!fieldsMarkedId.isEmpty()) {
+      return fieldsMarkedId;
+    }
+
+    return fields.get(0).keySeq().toList();
   }
 
   /**
@@ -129,8 +156,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   protected resolveFields() {
     // Promise.all<QueryResult>(
     return List(
-      this.fieldsByStrategy()
-        .map((fields, strategy) => strategy.resolve())
+      this.strategies()
+        .map((strategy) => strategy.resolve())
         .valueSeq()
     );
     // );
@@ -150,34 +177,33 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
-    const pr = this.result;
-    const qrs = this.scalars.concat(this.objects);
-    const values = qrs.flatMap(qr => qr.values);
-    pr.values = this.fields.map(f => {
-      const alias = f.alias || f.name;
-      return values.find(v => v[0] === alias);
-    });
-    const reduced = qrs.reduce(
-      (r, qr) => ({
-        bytes: r.bytes + qr.bytes,
-        count: r.count + qr.count,
-        ok: r.ok && qr.ok,
-        errors: r.errors.concat(qr.errors),
-      }),
-      { bytes: 0, count: 0, ok: true, errors: List<string>() }
-    );
-
-    pr.bytes = reduced.bytes;
-    pr.count = reduced.count;
-    pr.ok = reduced.ok;
-    pr.errors = reduced.errors;
-    pr.duration = new Date().getTime() - this.result.startTime;
-    pr.done = true;
+    // TODO drop the scalars & objects approach altogether?
+    const mappedScalars = this.scalars.map(sc => sc.data).has(0) ? this.scalars.map(sc => sc.data).get(0) : OrderedMap({});
+    const mappedObjects = this.objects.map(sc => sc.data).has(0) ? this.objects.map(sc => sc.data).get(0) : OrderedMap({});
+    this.result.merge(mappedScalars);
+    this.result.merge(mappedObjects);
+    this.finalizeResults();
+    return this.result;
+  }
+  protected finalizeResults() {
+    const newResArr = this.result.data.valueSeq().toList();
+    if (this.parent) {
+        if (this.parent.scalars.isEmpty()) {
+          this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: newResArr});
+        } else {
+          // we want each value to be mapped to its proper parent via parent's ID, TODO will this work in all cases?
+          this.result.data.map(value => {
+            return OrderedMap({[this.alias.getOrElse(this.name)]: value});
+          });
+        }
+    } else {
+      this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: this.result.data});
+    }
   }
 
   /**
    * Compute a list of strategies to resolve our fields.
-   * @returns Map<QueryStrategy>
+   * @returns List<QueryStrategy>
    */
   protected strategies() {
     return this.fields
@@ -214,7 +240,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     parent = this as GQLExecutionPlan;
     while (parent && strategy.isEmpty()) {
       strategy = this.context.schema
-        .getTypeDefinition(parent.resultType)
+        .getTypeDefinition(parent.resultType.get().name)
         .flatMap(td => this.resolveWith(td.directives));
       parent = parent.parent;
     }
