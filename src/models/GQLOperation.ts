@@ -1,4 +1,4 @@
-import { None } from 'funfix';
+import { None, Option } from 'funfix';
 import { List, Map } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
@@ -44,6 +44,10 @@ export class GQLOperation implements IGQLOperation {
 
   public copy(data: Partial<IGQLOperation>) {
     return new GQLOperation({ ...(this as object), ...data });
+  }
+
+  public findUnresolvedVariables(vars: Map<string, any>) {
+    return this.variables.filter(vd => !vd.resolve(vars));
   }
 
   public getExecutionPlan(context: ResolverContext, vars: Map<string, any>) {

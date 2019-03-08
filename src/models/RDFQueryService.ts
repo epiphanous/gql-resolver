@@ -4,7 +4,7 @@ import { GQLSchema } from './GQLSchema';
 // import { GQLSearchExecutionPlan } from './GQLSearchExecutionPlan';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLField } from './GQLSelection';
-import QueryStrategy from './QueryStrategy';
+import QueryStrategy from '../strategies/QueryStrategy';
 import { RDFPrefixes } from './RDFPrefixes';
 
 export class RDFQueryService {

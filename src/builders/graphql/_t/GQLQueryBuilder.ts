@@ -5,7 +5,7 @@ import Builder from '../../Builder';
 import GQLQueryBuilder from '../GQLQueryBuilder';
 import { GQLQueryDocument } from '../../../models/GQLQueryDocument';
 import ResolverContext from '../../../models/ResolverContext';
-import QueryStrategy from '../../../models/QueryStrategy';
+import QueryStrategy from '../../../strategies/QueryStrategy';
 import { Map } from 'immutable';
 
 describe('GQLQueryBuilder', () => {
