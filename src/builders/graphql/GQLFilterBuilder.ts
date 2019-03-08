@@ -35,7 +35,7 @@ export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   }
 
   public parse(parse: Parser): any {
-    return ((this.parser as unknown) as QueryModificationParser).filter();
+    return ((this.parser as unknown) as QueryModificationParser);
   }
 
   public exitSearchCondition(context: SearchConditionContext): void {

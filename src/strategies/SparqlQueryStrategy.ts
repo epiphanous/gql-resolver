@@ -1,6 +1,5 @@
 import {SparqlEndpointFetcher} from 'fetch-sparql-endpoint';
 import {List, Map, OrderedMap} from 'immutable';
-import sizeof = require('object-sizeof');
 import {GQLExecutionPlan} from '../models/GQLExecutionPlan';
 import {GQLField} from '../models/GQLSelection';
 import QueryResult from '../models/QueryResult';
@@ -11,7 +10,11 @@ const prefixify = (name: string) => name.replace(/_/, ':');
 
 export default class SparqlQueryStrategy extends QueryStrategy {
   private endpoint: string;
-  public fetcher: SparqlEndpointFetcher = new SparqlEndpointFetcher();
+  private DEFAULT_CURSOR_FIELD = 's:name';
+  private DEFAULT_CURSOR_LABEL = '?cursor';
+  private SPECIAL_PROJECTIONS = OrderedMap({
+    '_id': 'j_id'
+  });
 
   public constructor(fields: List<GQLField>,
                      plan: GQLExecutionPlan,
@@ -47,15 +50,17 @@ export default class SparqlQueryStrategy extends QueryStrategy {
         ${ this.spreadArguments() }
         ${ (!this.argsWithoutReservedKeywords().isEmpty()) ? `FILTER ( ${this.addFilters()} )` : ''}
       }
+      ${ this.addOrderBy() }
       ${ this.addLimit() }
     `;
   }
 
   public async resolve(): Promise<QueryResult> {
+    const result = new QueryResult();
     const objectType = prefixify(this.plan.resultType.get().name);
     const args = this.getArgs(this.plan);
     const projections = this.getProjections();
-    console.log('Trying to execute: ', this.constructSparqlQuery(objectType, args, projections));
+    const query = this.constructSparqlQuery(objectType, args, projections);
     console.log(
       'resolving',
       objectType,
@@ -64,16 +69,14 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       '}',
       args.toJS()
     );
-    let count;
     return new Promise((resolve, reject) => {
       this.fetcher.fetchBindings(
         this.endpoint,
-        this.constructSparqlQuery(objectType, args, projections)
+        query
       ).then((stream) => {
         const resultArr: any[] = [];
         const errors: any[] = [];
         stream.on('data', data => {
-          count++;
           resultArr.push(data);
         });
         stream.on('error', error => {
@@ -90,16 +93,30 @@ export default class SparqlQueryStrategy extends QueryStrategy {
               return acc;
             }, {});
           });
-          const om = new OrderedMap<string, OrderedMap<string, any>>(
-            resultArrValues.map(row =>
-              [this.hasProperParent() ? row.parentId : row.s, OrderedMap<string, any>(this.fields.map(f => {
-                const key = f.alias.getOrElse(f.name);
-                return [key, row[key]];
-              }))]
+          const om = OrderedMap<string, OrderedMap<string, any>>(
+            resultArrValues.map((row: { parentId: string, s: string }) => {
+              const k: string = this.hasProperParent() ? row.parentId : row.s;
+              const v = OrderedMap<any>(this.fields.map(f => {
+                const key: string = f.alias.getOrElse(f.name);
+                const rowValueByKey: any = row[key] || row[this.SPECIAL_PROJECTIONS.get(key)] || null;
+                return [key, rowValueByKey];
+              }));
+              // to prevent lint errors..
+              const returnValue: [string, OrderedMap<string, any>] = [k, v];
+              return returnValue;
+              }
             )
           );
-          const result = new QueryResult();
           result.data = om;
+          result.meta.errors.push(...errors);
+          result.addMetadata();
+          /**
+           * TODO might want to stream this to an another service later
+           */
+          console.log(JSON.stringify({
+            query,
+            ...result.meta
+          }, null, 2));
           return resolve(result);
         });
       })
@@ -112,17 +129,27 @@ export default class SparqlQueryStrategy extends QueryStrategy {
 
   // TODO this will be modified to enable filtering via 'filter' keyword..
   protected argsWithoutReservedKeywords() {
-    const reserved = List(['limit', 'offset', 'order', 'filter', 'first', 'last']); // todo add all
+    const reserved = List(['limit', 'offset', 'order', 'filter', 'first', 'last', 'after', 'before', 'sortBy']);
     let argsWithoutReserved = this.args.asMutable();
     reserved.forEach(keyword => { argsWithoutReserved = argsWithoutReserved.remove(keyword); });
     return argsWithoutReserved;
   }
 
   protected getProjections() {
-    return this.fields.map<{ name: string; projection: string }>(f => ({
-      name: prefixify(f.name),
-      projection: f.alias.getOrElse(f.name),
-    }));
+    const specialProjKeys = this.SPECIAL_PROJECTIONS.keySeq();
+    return this.fields.map<{ name: string; projection: string }>(f => {
+      if (specialProjKeys.includes(f.name)) {
+        const sp = this.SPECIAL_PROJECTIONS.get(f.name);
+        return ({
+          name: prefixify(sp),
+          projection: sp
+        });
+      }
+      return ({
+        name: prefixify(f.name),
+        projection: f.alias.getOrElse(f.name),
+      });
+    });
   }
 
   /**
@@ -195,6 +222,24 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     } else {
       return '';
     }
+  }
+
+  protected addOrderBy() {
+    if (this.args.has('sortBy')) {
+      const fieldToSortBy = this.args.get('sortBy');
+      return `ORDER BY (?${fieldToSortBy})`;
+    }
+    return '';
+  }
+
+  protected addCursorOffset() {
+    if (this.args.get('before')) {
+      return `${this.DEFAULT_CURSOR_LABEL} > '${this.args.get('before')}'`;
+    }
+    if (this.args.get('after')) {
+      return `${this.DEFAULT_CURSOR_LABEL} < '${this.args.get('after')}'`;
+    }
+    return '';
   }
 
   private normalizePrefix(prefix: string) {

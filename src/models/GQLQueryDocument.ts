@@ -32,8 +32,8 @@ export class GQLQueryDocument {
     this.makeExecutionPlan();
   }
 
-  public async execute() {
-    return await this.plan.execute();
+  public async execute(queryBuilder) {
+    return await this.plan.execute(queryBuilder);
   }
 
   protected makeExecutionPlan() {

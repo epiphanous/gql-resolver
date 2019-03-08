@@ -1,12 +1,13 @@
 import { None, Option } from 'funfix';
 import {List, Map, OrderedMap} from 'immutable';
+import QueryStrategy from '../strategies/QueryStrategy';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLField } from './GQLSelection';
-import QueryResult from './QueryResult';
-import QueryStrategy from '../strategies/QueryStrategy';
-import ResolverContext from './ResolverContext';
 import { GQLTypeDefinition } from './GQLTypeDefinition';
+import QueryResult from './QueryResult';
+import ResolverContext from './ResolverContext';
+import GQLQueryBuilder from "../builders/graphql/GQLQueryBuilder";
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -82,7 +83,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.allFields = fields;
     this.fields = fields.filter(f => !f.isObject());
     this.resultType = context.schema.getTypeDefinition(resultType);
-
     this.plans = fields
       .filter(f => f.isObject())
       .map(
@@ -107,10 +107,14 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * all sub plans, then stiches the results together and returns it.
    * @return Promise<QueryResult>
    */
-  public async execute() {
-    this.result.startTime = new Date().getTime();
+  public async execute(queryBuilder: GQLQueryBuilder) {
+    const fieldsToMap: Map<string, string> = Map<string, string>(this.allFields.reduce((acc, field) => {
+      acc[field.alias.value || field.name] = field.outputType;
+      return acc;
+    }, {}));
+    console.log('processed args:', queryBuilder.processArgs(this.args, fieldsToMap));
     this.scalars = List(await Promise.all(this.resolveFields()));
-    this.objects = List(await Promise.all(this.resolvePlans()));
+    this.objects = List(await Promise.all(this.resolvePlans(queryBuilder)));
     return this.makePlanResult();
   }
 
@@ -167,9 +171,9 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Executes all sub plans and returns a combined promise of their query results.
    * @returns Promise<QueryResult[]>
    */
-  protected resolvePlans() {
+  protected resolvePlans(queryBuilder) {
     // Promise.all<QueryResult>(
-    return this.plans.map(plan => plan.execute());
+    return this.plans.map(plan => plan.execute(queryBuilder));
     // );
   }
 
@@ -180,15 +184,21 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     // TODO drop the scalars & objects approach altogether?
     const mappedScalars = this.scalars.map(sc => sc.data).has(0) ? this.scalars.map(sc => sc.data).get(0) : OrderedMap({});
     const mappedObjects = this.objects.map(sc => sc.data).has(0) ? this.objects.map(sc => sc.data).get(0) : OrderedMap({});
-    this.result.merge(mappedScalars);
-    this.result.merge(mappedObjects);
+    this.result.merge(mappedScalars as OrderedMap<string, any>);
+    this.result.merge(mappedObjects as OrderedMap<string, any>);
     this.finalizeResults();
     return this.result;
   }
+
+  /**
+   * Handles 'hoisting', adds a key equal to this plan's name before its actual result data so that it can be
+   * properly merged with the parent object
+   */
   protected finalizeResults() {
-    const newResArr = this.result.data.valueSeq().toList();
     if (this.parent) {
-        if (this.parent.scalars.isEmpty()) {
+      // this is to handle situations where we have an array of n objects instead of just one object
+      if (this.parent.scalars.isEmpty()) {
+          const newResArr = this.result.data.valueSeq().toList();
           this.result.data = OrderedMap({[this.alias.getOrElse(this.name)]: newResArr});
         } else {
           // we want each value to be mapped to its proper parent via parent's ID, TODO will this work in all cases?
