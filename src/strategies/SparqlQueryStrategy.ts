@@ -10,6 +10,7 @@ const prefixify = (name: string) => name.replace(/_/, ':');
 
 export default class SparqlQueryStrategy extends QueryStrategy {
   private endpoint: string;
+  private fetcher = new SparqlEndpointFetcher();
   private DEFAULT_CURSOR_FIELD = 's:name';
   private DEFAULT_CURSOR_LABEL = '?cursor';
   private SPECIAL_PROJECTIONS = OrderedMap({
