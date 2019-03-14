@@ -16,7 +16,7 @@ export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   public vars: Map<string, string>;
   public prefixes: Set<string>;
   public source: string;
-  public referencedFields: Set<string>;
+  public referencedFields: Set<string> = Set<string>().asMutable();
   public result: GQLFilter;
 
   constructor(
@@ -35,7 +35,7 @@ export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   }
 
   public parse(parse: Parser): any {
-    return ((this.parser as unknown) as QueryModificationParser);
+    return (this.parser as unknown) as QueryModificationParser;
   }
 
   public exitSearchCondition(context: SearchConditionContext): void {
