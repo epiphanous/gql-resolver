@@ -15,7 +15,7 @@ describe('GQLFilterBuilder test', () => {
     const gnFeature = schema
       .getTypeDefinition('gn_Feature')
       .get() as GQLObjectType;
-    const filterString = "s_name = 'zomg'";
+    const filterString = "s_name == 'zomg'";
     const validFields = Map(
       gnFeature.fields.map<[string, string]>(fd => [fd.name, fd.gqlType.name])
     );
@@ -27,8 +27,8 @@ describe('GQLFilterBuilder test', () => {
       Set(),
       filterString
     );
-    const result = Builder.parse[GQLFilter](filterBuilder, filterString);
-    console.log({ result });
+    const result = Builder.parse<GQLFilter>(filterBuilder, filterString);
+    console.log({ expression: result.get().expression });
     // expect(GQLFilterObject.result).to.be.instanceof(GQLFilter);
   });
 });

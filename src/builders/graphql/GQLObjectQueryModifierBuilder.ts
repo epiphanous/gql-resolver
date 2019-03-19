@@ -1,22 +1,22 @@
-import { CharStream, Parser, TokenStream } from 'antlr4ts';
+import { CharStream, TokenStream } from 'antlr4ts';
 import { Failure, None, Option, Some, Success, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
 import { pickBy } from 'lodash';
 import { QueryModificationLexer } from '../../antlr4/generated/QueryModificationLexer';
+import * as QMP from '../../antlr4/generated/QueryModificationParser';
 import {
   ComparisonPredicateContext,
   InVarPredicateContext,
   ParenPredicateContext,
+  QueryModificationParser,
 } from '../../antlr4/generated/QueryModificationParser';
-import * as QMP from '../../antlr4/generated/QueryModificationParser';
 import { ID_KEY, SUBJECT_BINDING } from '../../models/Constants';
+import * as QME from '../../models/GQLObjectQueryModifierExpression';
 import {
   GQLObjectQueryModifierConjunction,
   GQLObjectQueryModifierExpression,
-  GQLObjectQueryModifierField,
   GQLObjectQueryModifierPrimitiveExpression,
 } from '../../models/GQLObjectQueryModifierExpression';
-import * as QME from '../../models/GQLObjectQueryModifierExpression';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import BuilderBase from '../BuilderBase';
 
@@ -27,18 +27,23 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
   public result: any;
   public PREFIXED_IRI_PATTERN: string;
   public rPREFIXED_IRI_PATTERN: RegExp;
-  public vars: any;
   public validFields: Map<string, string>;
   public validVariables: Set<GQLVariableDefinition>;
+  public vars: Map<any, string>;
+  public source: string;
+
   constructor(
     validFields: Map<string, string>,
     validVariables: Set<GQLVariableDefinition>,
     vars: Map<any, string>,
     prefixes: Set<string>,
-    source: string = 'filter'
+    source: string
   ) {
     super();
+    this.validFields = validFields;
+    this.validVariables = validVariables;
     this.vars = vars;
+    this.source = source;
     this.PREFIXED_IRI_PATTERN = `(${prefixes.join('|')})_(.*)`;
     this.rPREFIXED_IRI_PATTERN = new RegExp(this.PREFIXED_IRI_PATTERN);
   }
@@ -51,12 +56,13 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
     return new QueryModificationLexer(input);
   }
 
-  public parse(parser: Parser) {
+  public parseWith(parser: QueryModificationParser) {
     return null;
   }
 
-  public build(parser: Parser) {
-    const tryParse = Try.of(this.parse(parser));
+  public build(parser: QueryModificationParser) {
+    const tryParse = Try.of(this.parseWith(parser));
+
     if (tryParse.isSuccess()) {
       if (this.errorReport.hasErrors) {
         return Failure(this.errorReport.asThrowable());

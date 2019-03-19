@@ -1,5 +1,5 @@
-import { Parser } from 'antlr4ts';
 import { List, Map, Set } from 'immutable';
+import { Try } from 'funfix';
 import {
   FieldRefContext,
   QueryModificationParser,
@@ -19,23 +19,24 @@ export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   public referencedFields: Set<string> = Set<string>().asMutable();
   public result: GQLFilter;
 
-  constructor(
-    validFields: Map<string, string>,
-    validVariables: Set<GQLVariableDefinition>,
-    vars: Map<string, any>,
-    prefixes: Set<string>,
-    source: string = 'filter'
-  ) {
-    super(validFields, validVariables, vars, prefixes, source);
-    this.referencedFields = Set<string>();
-    this.result = new GQLFilter(
-      new GQLObjectQueryModifierDisjunction(List(), List()),
-      Set<string>()
-    );
+  public parseWith(parser: QueryModificationParser) {
+    return parser.filter();
   }
 
-  public parse(parse: Parser): any {
-    return (this.parser as unknown) as QueryModificationParser;
+  public build(parser: QueryModificationParser) {
+    return Try.of(() => {
+      this.parseWith(parser);
+
+      if (this.errorCount > 0) {
+        throw this.errorReport.asThrowable();
+      }
+
+      if (this.warningCount > 0) {
+        this.errors.forEach(w => console.warn(w));
+      }
+
+      return this.result;
+    });
   }
 
   public exitSearchCondition(context: SearchConditionContext): void {
@@ -49,7 +50,8 @@ export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
     const fieldExpr = super.processFieldRef(context);
     if (fieldExpr.dataType !== 'error') {
       const field = fieldExpr.expression.substring(1);
-      this.referencedFields = this.referencedFields.add(field);
+      console.log(`processFieldRef: ${field}`);
+      this.referencedFields.add(field);
     }
     return fieldExpr;
   }
