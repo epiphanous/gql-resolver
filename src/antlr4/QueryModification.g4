@@ -14,25 +14,25 @@ filter
 
 patterns
   : pattern (
-    LIST_SEP pattern
+    ',' pattern
   )* EOF
   ;
 
 boosters
   : boost (
-    LIST_SEP boost
+    ',' boost
   )* EOF
   ;
 
 bindings
   : binding (
-    LIST_SEP binding
+    ',' binding
   )* EOF
   ;
 
 orderBys
   : orderBy (
-    LIST_SEP orderBy
+    ',' orderBy
   )* EOF
   ;
 
@@ -45,7 +45,7 @@ orderBy
 
 transforms
   : transform (
-    LIST_SEP transform
+    ',' transform
   )* EOF
   ;
 
@@ -110,7 +110,6 @@ expressionAtom
 
 builtinCall
   : ABS '(' expression ')'                         # absFunc
-  | BNODE ( '(' expression ')' | EMPTY_PARENS)     # bnodeFunc
   | BOUND '(' fieldRef ')'                         # boundFunc
   | CEIL '(' expression ')'                        # ceilFunc
   | COALESCE '[' iriRefOrVarRef ']' expressionList # coalesceFunc
@@ -178,7 +177,7 @@ pattern
     | GEOMATCH
   ) stringLiteralOrVarRef (
     '(' textMatchParam (
-      LIST_SEP textMatchParam
+      ',' textMatchParam
     )* ')'
   )?                                                  # textMatchPattern
   | fieldRef? WITHIN proximitySpec OF featureOrLatLon # geoNearbyPattern
@@ -197,6 +196,12 @@ boost
 
 binding
   : BIND expression AS VARNAME
+  ;
+
+expressionList
+  : '(' expression (
+    ',' expression
+  )* ')'
   ;
 
 featureOrLatLon
@@ -229,12 +234,6 @@ numericLiteral
   : INTEGER # integerLiteral
   | DECIMAL # decimalLiteral
   | DOUBLE  # doubleLiteral
-  ;
-
-expressionList
-  : '(' expression (
-    LIST_SEP expression
-  )* ')'
   ;
 
 varRef
@@ -806,10 +805,6 @@ fragment PN_CHARS_BASE
 
 fragment DIGIT
   : [0-9]
-  ;
-
-LIST_SEP
-  : [,;]
   ;
 
 WS

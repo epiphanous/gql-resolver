@@ -72,7 +72,6 @@ import { SameTermFuncContext } from './QueryModificationParser';
 import { IsBlankFuncContext } from './QueryModificationParser';
 import { RandFuncContext } from './QueryModificationParser';
 import { StrFuncContext } from './QueryModificationParser';
-import { BnodeFuncContext } from './QueryModificationParser';
 import { HoursFuncContext } from './QueryModificationParser';
 import { Md5FuncContext } from './QueryModificationParser';
 import { ContainsFuncContext } from './QueryModificationParser';
@@ -111,12 +110,12 @@ import { PatternContext } from './QueryModificationParser';
 import { TextMatchParamContext } from './QueryModificationParser';
 import { BoostContext } from './QueryModificationParser';
 import { BindingContext } from './QueryModificationParser';
+import { ExpressionListContext } from './QueryModificationParser';
 import { FeatureOrLatLonContext } from './QueryModificationParser';
 import { ProximitySpecContext } from './QueryModificationParser';
 import { FunctionCallContext } from './QueryModificationParser';
 import { RdfLiteralContext } from './QueryModificationParser';
 import { NumericLiteralContext } from './QueryModificationParser';
-import { ExpressionListContext } from './QueryModificationParser';
 import { VarRefContext } from './QueryModificationParser';
 import { FieldRefContext } from './QueryModificationParser';
 import { ComparisonOpContext } from './QueryModificationParser';
@@ -1048,19 +1047,6 @@ export interface QueryModificationListener extends ParseTreeListener {
   exitStrFunc?: (ctx: StrFuncContext) => void;
 
   /**
-   * Enter a parse tree produced by the `bnodeFunc`
-   * labeled alternative in `QueryModificationParser.builtinCall`.
-   * @param ctx the parse tree
-   */
-  enterBnodeFunc?: (ctx: BnodeFuncContext) => void;
-  /**
-   * Exit a parse tree produced by the `bnodeFunc`
-   * labeled alternative in `QueryModificationParser.builtinCall`.
-   * @param ctx the parse tree
-   */
-  exitBnodeFunc?: (ctx: BnodeFuncContext) => void;
-
-  /**
    * Enter a parse tree produced by the `hoursFunc`
    * labeled alternative in `QueryModificationParser.builtinCall`.
    * @param ctx the parse tree
@@ -1517,6 +1503,17 @@ export interface QueryModificationListener extends ParseTreeListener {
   exitBinding?: (ctx: BindingContext) => void;
 
   /**
+   * Enter a parse tree produced by `QueryModificationParser.expressionList`.
+   * @param ctx the parse tree
+   */
+  enterExpressionList?: (ctx: ExpressionListContext) => void;
+  /**
+   * Exit a parse tree produced by `QueryModificationParser.expressionList`.
+   * @param ctx the parse tree
+   */
+  exitExpressionList?: (ctx: ExpressionListContext) => void;
+
+  /**
    * Enter a parse tree produced by `QueryModificationParser.featureOrLatLon`.
    * @param ctx the parse tree
    */
@@ -1570,17 +1567,6 @@ export interface QueryModificationListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitNumericLiteral?: (ctx: NumericLiteralContext) => void;
-
-  /**
-   * Enter a parse tree produced by `QueryModificationParser.expressionList`.
-   * @param ctx the parse tree
-   */
-  enterExpressionList?: (ctx: ExpressionListContext) => void;
-  /**
-   * Exit a parse tree produced by `QueryModificationParser.expressionList`.
-   * @param ctx the parse tree
-   */
-  exitExpressionList?: (ctx: ExpressionListContext) => void;
 
   /**
    * Enter a parse tree produced by `QueryModificationParser.varRef`.

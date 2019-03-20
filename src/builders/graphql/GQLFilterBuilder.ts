@@ -1,4 +1,4 @@
-import { List, Map, Set } from 'immutable';
+import { Map, Set } from 'immutable';
 import { Try } from 'funfix';
 import {
   FieldRefContext,
@@ -6,7 +6,6 @@ import {
   SearchConditionContext,
 } from '../../antlr4/generated/QueryModificationParser';
 import { GQLFilter } from '../../models/GQLFilter';
-import { GQLObjectQueryModifierDisjunction } from '../../models/GQLObjectQueryModifierExpression';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
 
@@ -42,7 +41,7 @@ export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   public exitSearchCondition(context: SearchConditionContext): void {
     this.result = new GQLFilter(
       this.processSearchCondition(context, true),
-      Set(this.referencedFields)
+      this.referencedFields
     );
   }
 
