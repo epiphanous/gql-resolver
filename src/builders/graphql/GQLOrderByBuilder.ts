@@ -1,5 +1,5 @@
 import { Parser } from 'antlr4ts';
-import { Option } from 'funfix';
+import { Option, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
 import {
   OrderByContext,
@@ -20,6 +20,22 @@ export default class GQLOrderByBuilder extends GQLObjectQueryModifierBuilder {
     source: string = 'order'
   ) {
     super(validFields, validVariables, vars, prefixes, source);
+  }
+
+  public build(parser: QueryModificationParser) {
+    return Try.of(() => {
+      this.parse(parser);
+
+      if (this.errorCount > 0) {
+        throw this.errorReport.asThrowable();
+      }
+
+      if (this.warningCount > 0) {
+        this.errors.forEach(w => console.warn(w));
+      }
+
+      return this.result;
+    });
   }
 
   public parse(parser: Parser) {

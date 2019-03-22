@@ -130,8 +130,6 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
         this.errors.forEach(w => console.warn(w));
       }
 
-      console.log(this.vars.toJS());
-
       return new GQLQueryDocument(
         this.operations,
         this.fragmentDefinitions.asImmutable(),
@@ -207,14 +205,17 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   }
 
   public processFilter(filterExpr: string, validFields: Map<string, string>) {
+    // For cases where we have nested str identifiers in the GQL query but need to pass onto other builders
+    const exprWithoutDoubleEscape = filterExpr.replace(/\\/g, '');
     return Builder.parse<GQLFilter>(
       new GQLFilterBuilder(
         validFields,
         this.variables,
         this.vars,
-        Set(this.getPrefixes().keys())
+        Set(this.getPrefixes().keys()),
+        exprWithoutDoubleEscape
       ),
-      filterExpr
+      exprWithoutDoubleEscape
     ).get();
   }
 
