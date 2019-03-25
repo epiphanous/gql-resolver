@@ -28,7 +28,11 @@ export class GQLObjectQueryModifierBasicExpression extends GQLObjectQueryModifie
 
 export class GQLObjectQueryModifierPrimitiveExpression extends GQLObjectQueryModifierExpression {}
 
-export class GQLObjectQueryModifierField extends GQLObjectQueryModifierPrimitiveExpression {}
+export class GQLObjectQueryModifierField extends GQLObjectQueryModifierPrimitiveExpression {
+  public toString() {
+    return this.expression.toString();
+  }
+}
 
 export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQueryModifierPrimitiveExpression {}
 
@@ -47,7 +51,7 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
   >;
   constructor(
     disjunctives: List<GQLObjectQueryModifierConjunction>,
-    values = List<
+    values: List<Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>> = List<
       Map<
         GQLObjectQueryModifierField,
         GQLObjectQueryModifierPrimitiveExpression

@@ -12,7 +12,7 @@ export class GQLOrderBy implements IGQLOrderBy {
     this.desc = desc;
   }
 
-  public toString() {
+  public toSparQLString() {
     return `${this.desc ? 'DESC(' : ''}${this.field}${this.desc ? ')' : ''}`;
   }
 }

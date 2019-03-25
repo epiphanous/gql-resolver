@@ -5,6 +5,7 @@ import {GQLField} from '../models/GQLSelection';
 import QueryResult from '../models/QueryResult';
 import {RDFPrefixes} from '../models/RDFPrefixes';
 import QueryStrategy from './QueryStrategy';
+import {GQLOrderBy} from '../models/GQLOrderBy';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 
@@ -90,7 +91,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
            */
           const resultArrValues: Array<{}> = resultArr.map(entry => {
             return Object.keys(entry).reduce((acc, key) => {
-              acc[key] = entry[key]['value'];
+              acc[key] = entry[key].value;
               return acc;
             }, {});
           });
@@ -183,17 +184,17 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addFilters() {
-    let filterString: string = '';
-    const entriesArray = this.argsWithoutReservedKeywords().entrySeq();
-    const entriesLen = entriesArray.size;
-    if (!this.argsWithoutReservedKeywords().isEmpty()) {
-      filterString += entriesArray.reduce((acc, [argName, value], i) => {
-        // todo other operators besides = in filter: string, add ardering & pagination as separate methods
-        acc += `?${argName} = '${value}' ${this.addConditionalOperator(entriesLen, i, '&&')}`;
-        return acc;
-      }, '');
+    if (!this.plan.processedArgs.filter.isEmpty()) {
+      const filter = this.plan.processedArgs.filter;
+      if (filter.value.expression.expression.length) {
+        return filter.value.expression.expression;
+      } else {
+        const filterList = filter.value.expression.values.get(0);
+        return filterList.reduce((acc, value, key) => {
+          return acc += `${key} = ${filterList.get(key).expression}`; // todo hardcoded '=' here!
+        }, '');
+      }
     }
-    return filterString;
   }
 
   /**
@@ -226,9 +227,14 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addOrderBy() {
-    if (this.args.has('sortBy')) {
-      const fieldToSortBy = this.args.get('sortBy');
-      return `ORDER BY (?${fieldToSortBy})`;
+    /**
+     * TODO will this list always have a single el ?
+     * @type {GQLOrderBy}
+     */
+    if (!this.plan.processedArgs.order.isEmpty()) {
+      return 'ORDER BY ' + this.plan.processedArgs.order
+        .get(0)
+        .toSparQLString();
     }
     return '';
   }

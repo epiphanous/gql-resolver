@@ -1,5 +1,6 @@
 import { None, Option } from 'funfix';
 import {List, Map, OrderedMap} from 'immutable';
+import GQLQueryBuilder from '../builders/graphql/GQLQueryBuilder';
 import QueryStrategy from '../strategies/QueryStrategy';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
@@ -7,7 +8,7 @@ import { GQLField } from './GQLSelection';
 import { GQLTypeDefinition } from './GQLTypeDefinition';
 import QueryResult from './QueryResult';
 import ResolverContext from './ResolverContext';
-import GQLQueryBuilder from "../builders/graphql/GQLQueryBuilder";
+import {GQLQueryArguments} from "./GQLQueryArguments";
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -42,6 +43,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public directives: List<GQLDirective>;
   public fields: List<GQLField>;
   public resultType: Option<GQLTypeDefinition>;
+  public processedArgs: GQLQueryArguments;
 
   public plans: List<GQLExecutionPlan>;
   public scalars: List<QueryResult>;
@@ -112,7 +114,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       acc[field.alias.value || field.name] = field.outputType;
       return acc;
     }, {}));
-    console.log('processed args:', queryBuilder.processArgs(this.args, fieldsToMap));
+    this.processedArgs = queryBuilder.processArgs(this.args, fieldsToMap);
     this.scalars = List(await Promise.all(this.resolveFields()));
     this.objects = List(await Promise.all(this.resolvePlans(queryBuilder)));
     return this.makePlanResult();
