@@ -1,11 +1,12 @@
 import {SparqlEndpointFetcher} from 'fetch-sparql-endpoint';
 import {List, Map, OrderedMap} from 'immutable';
+import {GQLAnyArgument} from '../models/GQLArgument';
 import {GQLExecutionPlan} from '../models/GQLExecutionPlan';
+import {GQLOrderBy} from '../models/GQLOrderBy';
 import {GQLField} from '../models/GQLSelection';
 import QueryResult from '../models/QueryResult';
 import {RDFPrefixes} from '../models/RDFPrefixes';
 import QueryStrategy from './QueryStrategy';
-import {GQLOrderBy} from '../models/GQLOrderBy';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 
@@ -17,11 +18,11 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   private SPECIAL_PROJECTIONS = OrderedMap({
     '_id': 'j_id'
   });
+  private RESERVED_KEYWORDS = List(['limit', 'offset', 'order', 'first', 'last', 'after', 'before', 'sortBy']);
 
   public constructor(fields: List<GQLField>,
                      plan: GQLExecutionPlan,
-                     endpoint: string
-  ) {
+                     endpoint: string) {
     super(fields, plan);
     this.endpoint = endpoint;
   }
@@ -50,7 +51,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
         ${ this.addParentConstraints() }
         ${ this.spreadProjections(projections)} ${args.isEmpty() ? '' : '.' }
         ${ this.spreadArguments() }
-        ${ (!this.argsWithoutReservedKeywords().isEmpty()) ? `FILTER ( ${this.addFilters()} )` : ''}
+        ${ this.hasFilters() ? `FILTER ( ${this.addFilters()} )` : ''}
       }
       ${ this.addOrderBy() }
       ${ this.addLimit() }
@@ -97,15 +98,15 @@ export default class SparqlQueryStrategy extends QueryStrategy {
           });
           const om = OrderedMap<string, OrderedMap<string, any>>(
             resultArrValues.map((row: { parentId: string, s: string }) => {
-              const k: string = this.hasProperParent() ? row.parentId : row.s;
-              const v = OrderedMap<any>(this.fields.map(f => {
-                const key: string = f.alias.getOrElse(f.name);
-                const rowValueByKey: any = row[key] || row[this.SPECIAL_PROJECTIONS.get(key)] || null;
-                return [key, rowValueByKey];
-              }));
-              // to prevent lint errors..
-              const returnValue: [string, OrderedMap<string, any>] = [k, v];
-              return returnValue;
+                const k: string = this.hasProperParent() ? row.parentId : row.s;
+                const v = OrderedMap<any>(this.fields.map(f => {
+                  const key: string = f.alias.getOrElse(f.name);
+                  const rowValueByKey: any = row[key] || row[this.SPECIAL_PROJECTIONS.get(key)] || null;
+                  return [key, rowValueByKey];
+                }));
+                // to prevent lint errors..
+                const returnValue: [string, OrderedMap<string, any>] = [k, v];
+                return returnValue;
               }
             )
           );
@@ -129,12 +130,8 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     });
   }
 
-  // TODO this will be modified to enable filtering via 'filter' keyword..
-  protected argsWithoutReservedKeywords() {
-    const reserved = List(['limit', 'offset', 'order', 'filter', 'first', 'last', 'after', 'before', 'sortBy']);
-    let argsWithoutReserved = this.args.asMutable();
-    reserved.forEach(keyword => { argsWithoutReserved = argsWithoutReserved.remove(keyword); });
-    return argsWithoutReserved;
+  protected isReservedKeyword(word: string) {
+    return this.RESERVED_KEYWORDS.contains(word);
   }
 
   protected getProjections() {
@@ -161,6 +158,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   protected hasProperParent() {
     return !this.plan.parent.getSubjectIds().isEmpty();
   }
+
   /**
    * In case of multiple SparQL statements
    */
@@ -169,10 +167,10 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected spreadArguments() {
-    const entriesArray = this.argsWithoutReservedKeywords().entrySeq();
-    const entriesLen = entriesArray.size;
-    return entriesArray.reduce((acc, [argName, _], i) => {
-      acc += `?s ${prefixify(argName)} ?${argName} ${ this.addConditionalOperator(entriesLen, i, '.')}\n`;
+    return this.plan.processedArgs.any.reduce((acc: string, anyArgument: GQLAnyArgument) => {
+      if (!this.isReservedKeyword(anyArgument.name)) {
+        return acc + `?s ${prefixify(anyArgument.name)} ${typeof anyArgument.value.value === 'string' ? `'${anyArgument.value.value}'` : anyArgument.value.value}`;
+      }
       return acc;
     }, '');
   }
@@ -184,16 +182,18 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addFilters() {
-    if (!this.plan.processedArgs.filter.isEmpty()) {
-      const filter = this.plan.processedArgs.filter;
-      if (filter.value.expression.expression.length) {
-        return filter.value.expression.expression;
-      } else {
-        const filterList = filter.value.expression.values.get(0);
-        return filterList.reduce((acc, value, key) => {
-          return acc += `${key} = ${filterList.get(key).expression}`; // todo hardcoded '=' here!
+    const filter = this.plan.processedArgs.filter;
+    const expr = filter.value.expression;
+    if (expr.expression.length) {
+      return expr.expression;
+    } else {
+      const filterList = expr.values.get(0);
+      return filterList
+        .mapEntries(([key, val], index) =>
+          [key.expression, `${val.expression} ${index !== filterList.entrySeq().size - 1 ? '&&' : ''}`])
+        .reduce((acc, value, key) => {
+          return acc + `${key} = ${value}`;
         }, '');
-      }
     }
   }
 
@@ -217,13 +217,20 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addLimit() {
-    if (this.args.get('first')) {
-      return `LIMIT ${this.args.get('first')}`;
-    } else if (this.args.get('last')) {
-      return `LIMIT ${this.args.get('last')}`;
+    const anyArgs = this.plan.processedArgs.any;
+    const maybeFirst = anyArgs.find(arg => arg.name === 'first');
+    const maybeLast = anyArgs.find(arg => arg.name === 'last');
+    if (maybeFirst) {
+      return `LIMIT ${maybeFirst.value.get()}`;
+    } else if (maybeLast) {
+      return `LIMIT ${maybeLast.value.get()}`;
     } else {
       return '';
     }
+  }
+
+  protected hasFilters() {
+    return !this.plan.processedArgs.filter.isEmpty();
   }
 
   protected addOrderBy() {
