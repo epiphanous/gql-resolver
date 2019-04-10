@@ -4,11 +4,11 @@ import GQLQueryBuilder from '../builders/graphql/GQLQueryBuilder';
 import QueryStrategy from '../strategies/QueryStrategy';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
-import { GQLField } from './GQLSelection';
-import { GQLTypeDefinition } from './GQLTypeDefinition';
+import {GQLQueryArguments} from './GQLQueryArguments';
+import {GQLField} from './GQLSelection';
+import {GQLTypeDefinition} from './GQLTypeDefinition';
 import QueryResult from './QueryResult';
 import ResolverContext from './ResolverContext';
-import {GQLQueryArguments} from "./GQLQueryArguments";
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan;
@@ -82,7 +82,18 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.alias = alias;
     this.args = args;
     this.directives = directives;
-    this.allFields = fields;
+    // Bypass the codename: 'beast' approach
+    this.allFields = fields.map(field => {
+      if (field.outputType === 'U_NodeObject') {
+        const possibleOutputTypes = field.fields
+          .reduce((acc, sf) => sf.parentType ? acc.set(sf.parentType, acc.get(sf.parentType) + 1 || 1) : acc, Map().asMutable());
+        const mostLikelyType: string = possibleOutputTypes.keySeq().reduce((acc, b) => possibleOutputTypes.get(acc) > possibleOutputTypes.get(b) ? possibleOutputTypes : b);
+        if (mostLikelyType) {
+          field.outputType = mostLikelyType;
+        }
+      }
+      return field;
+    });
     this.fields = fields.filter(f => !f.isObject());
     this.resultType = context.schema.getTypeDefinition(resultType);
     this.plans = fields

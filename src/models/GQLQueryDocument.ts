@@ -93,7 +93,7 @@ export class GQLQueryDocument {
               ft,
               field.selections
             );
-            return [parentType, List([field.copy({ outputType, fields })])];
+            return [parentType, List([field.copy({ outputType, fields, parentType })])];
           });
         if (typedFieldOpt.isEmpty()) {
           throw new Error(`can't find field definition ${field.name}`);
@@ -103,7 +103,9 @@ export class GQLQueryDocument {
       case GQLInlineFragment:
         const frag = selection as GQLInlineFragment;
         const inlineFragOpt = this.context.schema
-          .getFieldType(frag.typeCondition)
+          // .getFieldType(frag.typeCondition)
+          .getTypeDefinition(frag.typeCondition)
+          .map(a => a.name)
           .map(ft => this.flattenSelections(ft, frag.selections));
         if (inlineFragOpt.isEmpty()) {
           throw new Error(`can't find fragment type ${frag.typeCondition}`);
