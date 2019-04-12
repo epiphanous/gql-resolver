@@ -72,7 +72,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     alias: Option<string>,
     args: List<GQLArgument>,
     directives: List<GQLDirective>,
-    fields: List<GQLField>,
+    fields: List<[string, GQLField]>,
     resultType: string
   ) {
     this.parent = parent;
@@ -82,21 +82,16 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.alias = alias;
     this.args = args;
     this.directives = directives;
-    // Bypass the codename: 'beast' approach
-    this.allFields = fields.map(field => {
-      if (field.outputType === 'U_NodeObject') {
-        const possibleOutputTypes = field.fields
-          .reduce((acc, sf) => sf.parentType ? acc.set(sf.parentType, acc.get(sf.parentType) + 1 || 1) : acc, Map().asMutable());
-        const mostLikelyType: string = possibleOutputTypes.keySeq().reduce((acc, b) => possibleOutputTypes.get(acc) > possibleOutputTypes.get(b) ? possibleOutputTypes : b);
-        if (mostLikelyType) {
-          field.outputType = mostLikelyType;
-        }
-      }
-      return field;
-    });
-    this.fields = fields.filter(f => !f.isObject());
+    // TODO fields should be flattened once more in QueryDoc?
+    const fieldFromParentTypeFieldsTuple: GQLField = fields.get(0)[1];
+    if (!fieldFromParentTypeFieldsTuple.fields.isEmpty()) {
+      fieldFromParentTypeFieldsTuple.outputType = fieldFromParentTypeFieldsTuple.fields.get(0)[0];
+    }
+    const fieldsRemapped = List.of(fieldFromParentTypeFieldsTuple);
+    this.allFields = fieldsRemapped;
+    this.fields = fieldsRemapped.filter(f => !f.isObject());
     this.resultType = context.schema.getTypeDefinition(resultType);
-    this.plans = fields
+    this.plans = fieldsRemapped
       .filter(f => f.isObject())
       .map(
         f =>

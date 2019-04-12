@@ -17,7 +17,7 @@ export interface IGQLOperation {
   variables: List<GQLVariable>;
   selections: List<GQLSelection>;
   outputType: string;
-  fields: List<GQLField>;
+  fields: List<[string, GQLField]>;
   isSelected: boolean;
 }
 
@@ -27,7 +27,7 @@ export class GQLOperation implements IGQLOperation {
   // public operationType: 'query' | 'mutation' | 'subscription';
   public operationType: string;
   public outputType: string;
-  public fields: List<GQLField>;
+  public fields: List<[string, GQLField]>;
   public variables: List<GQLVariableDefinition>;
   public directives: List<GQLDirective> = List();
   public selections: List<GQLSelection> = List();

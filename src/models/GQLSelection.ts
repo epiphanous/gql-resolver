@@ -25,7 +25,7 @@ interface IGQLField extends IGQLSelection {
   selections: List<GQLSelection>;
   outputType: string;
   parentType: string; // parent field's outputType
-  fields: List<GQLField>;
+  fields: List<[string, GQLField]>;
 }
 
 export class GQLField extends GQLSelection implements IGQLField {
@@ -34,7 +34,7 @@ export class GQLField extends GQLSelection implements IGQLField {
   public directives: List<GQLDirective>;
   public selections: List<GQLSelection>;
   public outputType: string;
-  public fields: List<GQLField>;
+  public fields: List<[string, GQLField]>;
   public parentType: string;
 
   constructor(data: Partial<IGQLField> = {}) {
