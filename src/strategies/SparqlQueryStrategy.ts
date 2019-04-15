@@ -7,6 +7,7 @@ import {GQLField} from '../models/GQLSelection';
 import QueryResult from '../models/QueryResult';
 import {RDFPrefixes} from '../models/RDFPrefixes';
 import QueryStrategy from './QueryStrategy';
+import {GQLAny} from "../models/GQLAny";
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 
@@ -167,7 +168,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected spreadArguments() {
-    return this.plan.processedArgs.any.reduce((acc: string, anyArgument: GQLAnyArgument) => {
+    return this.plan.processedArgs.any.reduce((acc: string, anyArgument: GQLAny) => {
       if (!this.isReservedKeyword(anyArgument.name)) {
         return acc + `?s ${prefixify(anyArgument.name)} ${typeof anyArgument.value.value === 'string' ? `'${anyArgument.value.value}'` : anyArgument.value.value}`;
       }

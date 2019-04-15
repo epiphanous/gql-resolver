@@ -150,3 +150,10 @@ export class RDFPrefixes {
     return `${p}${joinStr}${n}`;
   }
 }
+
+// TODO
+class QueryHandler {
+  public getNamespaces() {
+    return null;
+  }
+}

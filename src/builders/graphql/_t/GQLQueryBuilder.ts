@@ -1,22 +1,24 @@
 import { expect } from 'chai';
 import fs = require('fs');
+import { Map } from 'immutable';
 import 'mocha';
-import Builder from '../../Builder';
-import GQLQueryBuilder from '../GQLQueryBuilder';
 import { GQLQueryDocument } from '../../../models/GQLQueryDocument';
 import ResolverContext from '../../../models/ResolverContext';
 import QueryStrategy from '../../../strategies/QueryStrategy';
-import { Map } from 'immutable';
+import {SparqlQueryStrategyFactory} from '../../../strategies/SparqlQueryStrategyFactory';
+import Builder from '../../Builder';
+import GQLQueryBuilder from '../GQLQueryBuilder';
 
 describe('GQLQueryBuilder', () => {
   let context: ResolverContext = null;
 
+  // TODO should add a dummy query strategy for this purpose
   const loadContext = () => {
     if (!context) {
       const schemaText = fs.readFileSync('./src/schema.graphql', 'utf8');
       context = new ResolverContext(
         schemaText,
-        Map<string, QueryStrategy>([['nothing', new QueryStrategy()]]),
+        Map({nothing: new SparqlQueryStrategyFactory()}),
         'nothing'
       );
     }

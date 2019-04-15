@@ -27,7 +27,7 @@ export interface IGQLExecutionPlan {
   allFields: List<GQLField>;
   defaultStrategy: string;
 
-  execute(): Promise<QueryResult>; // Promise
+  execute(queryBuilder: GQLQueryBuilder): Promise<QueryResult>; // Promise
 }
 
 /**
@@ -116,10 +116,10 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @return Promise<QueryResult>
    */
   public async execute(queryBuilder: GQLQueryBuilder) {
-    const fieldsToMap: Map<string, string> = Map<string, string>(this.allFields.reduce((acc, field) => {
+    const fieldsToMap: Map<string, string> = Map<string, string>(this.allFields.reduce((acc: Map<string, string>, field) => {
       acc[field.alias.value || field.name] = field.outputType;
       return acc;
-    }, {}));
+    }, Map<string, string>().asMutable()));
     this.processedArgs = queryBuilder.processArgs(this.args, fieldsToMap);
     this.scalars = List(await Promise.all(this.resolveFields()));
     this.objects = List(await Promise.all(this.resolvePlans(queryBuilder)));

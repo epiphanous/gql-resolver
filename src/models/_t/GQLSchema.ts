@@ -96,7 +96,7 @@ describe('GQLSchema', () => {
     ];
     expect(schema.scalarTypes.size).to.equal(expectedMembers.length);
     expect(actualMembers).to.have.members(expectedMembers);
-    expect(schema.scalarTypes.get('Duration').nativeType.value).to.equal(
+    expect(schema.scalarTypes.get('Duration').nativeType).to.equal(
       'xsd_duration'
     );
   });
