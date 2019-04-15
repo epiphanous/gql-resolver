@@ -9,7 +9,6 @@ import { Resolver } from '../Resolver';
 import {SparqlQueryStrategyFactory} from '../strategies/SparqlQueryStrategyFactory';
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
-
 describe('Resolver', () => {
   const rc = new ResolverContext(
     schema,
@@ -22,12 +21,25 @@ describe('Resolver', () => {
   const resolver = new Resolver(rc);
 
   it('resolves a query', async () => {
+    /**
+     * @type {Promise<QueryResult>}
+     */
     const result = await resolver.resolve(
-      `query test {
+      `
+    query test {
       home: curatedDestination(first: 2) {
-        s_name
+        gn_nearby {
+          edges {
+            node {
+              ... on j_CuratedDestination {
+                s_name
+              }
+            }
+          }
+        }
       }
-    }`,
+      }
+    `,
       Map(),
       Some('test')
     );
