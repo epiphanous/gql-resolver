@@ -1,25 +1,36 @@
+directive @id on FIELD_DEFINITION | SCHEMA
+
+directive @typename on FIELD_DEFINITION | SCHEMA
+
+type Connection {
+  totalCount: Int!
+  edges: [Edge]!
+  moreEdges(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  pageInfo: PageInfo!
+}
+
 scalar Date
 
 scalar DateTime
 
 scalar Duration
 
+type Edge {
+  cursor: String!
+  node: U_NodeObject!
+}
+
 type gn_Feature implements I_geo_SpatialThing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   gn_countryCode: String!
   gn_featureClass: String!
   gn_featureCode: String!
   gn_geonamesID: String!
-  gn_nearby(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   gn_neighbour: [gn_Feature]!
   gn_officialName: String
   gn_parentADM1: gn_Feature!
@@ -36,14 +47,7 @@ type gn_Feature implements I_geo_SpatialThing {
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -57,23 +61,9 @@ type gn_Feature implements I_geo_SpatialThing {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -86,42 +76,19 @@ type gn_Feature implements I_geo_SpatialThing {
   s_sameAs: [URL]!
 }
 
-type gn_Feature_Connection {
-  edges: [gn_Feature_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
-  pageInfo: PageInfo!
-}
-
-type gn_Feature_Edge {
-  cursor: String!
-  edge: gn_Feature!
-}
-
 interface I_geo_SpatialThing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   geo_alt: Float
   geo_lat: Float!
   geo_long: Float!
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -135,23 +102,9 @@ interface I_geo_SpatialThing {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -165,21 +118,16 @@ interface I_geo_SpatialThing {
 }
 
 interface I_gn_Feature {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   gn_countryCode: String!
   gn_featureClass: String!
   gn_featureCode: String!
   gn_geonamesID: String!
-  gn_nearby(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   gn_neighbour: [gn_Feature]!
   gn_officialName: String
   gn_parentADM1: gn_Feature!
@@ -196,14 +144,7 @@ interface I_gn_Feature {
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -217,23 +158,9 @@ interface I_gn_Feature {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -247,22 +174,17 @@ interface I_gn_Feature {
 }
 
 interface I_j_CuratedPlace {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   j_recommendedStay: j_StayRange
   gn_countryCode: String!
   gn_featureClass: String!
   gn_featureCode: String!
   gn_geonamesID: String!
-  gn_nearby(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   gn_neighbour: [gn_Feature]!
   gn_officialName: String
   gn_parentADM1: gn_Feature!
@@ -281,14 +203,7 @@ interface I_j_CuratedPlace {
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -302,23 +217,9 @@ interface I_j_CuratedPlace {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -332,30 +233,17 @@ interface I_j_CuratedPlace {
 }
 
 interface I_j_ScorableAlternative {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  j_children(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ScorableAlternative_Connection!
-  j_curatedPlace: j_CuratedPlace!
+  s_url: URL
   s_duration: Duration
+  j_endOffset: Duration
   s_estimatedCost: U_s_MonetaryAmount_OR_String
-  j_parent: j_ScorableAlternative
+  s_isPartOf: s_CreativeWork
   s_position: U_Int_OR_String
-  j_quote(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Offer_Connection!
+  j_startOffset: Duration
   s_about: owl_Thing
   s_accessMode: String
   s_accessModeSufficient: String
@@ -374,17 +262,10 @@ interface I_j_ScorableAlternative {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -397,9 +278,9 @@ interface I_j_ScorableAlternative {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -410,7 +291,6 @@ interface I_j_ScorableAlternative {
   s_isAccessibleForFree: Boolean
   s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
   s_isFamilyFriendly: Boolean
-  s_isPartOf: s_CreativeWork
   s_keywords: String
   s_learningResourceType: String
   s_license: U_s_CreativeWork_OR_URL
@@ -426,155 +306,7 @@ interface I_j_ScorableAlternative {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
-  s_schemaVersion: URL
-  s_sourceOrganization: s_Organization
-  s_spatialCoverage: s_Place
-  s_sponsor: [U_s_Organization_OR_s_Person]!
-  s_temporalCoverage: U_URL_OR_DateTime
-  s_text: String
-  s_thumbnailUrl: URL
-  s_timeRequired: Duration
-  s_translator: U_s_Organization_OR_s_Person
-  s_typicalAgeRange: String
-  s_version: Float
-  s_video: s_VideoObject
-  s_workExample: s_CreativeWork
-  s_alternateName: [String]!
-  s_disambiguatingDescription: String
-  s_identifier: [U_s_PropertyValue_OR_URL]!
-  s_image: U_s_ImageObject_OR_URL
-  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
-  s_potentialAction: [s_Action]!
-  s_sameAs: [URL]!
-}
-
-interface I_j_TripProfile {
-  s_description: String
-  s_id: URL!
-  s_name: String
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
-  j_datesFlexible: Boolean
-  j_departFrom: [s_Place]!
-  j_departOnOrAfter: Date
-  j_groupSize: Int
-  j_groupType: j_TravellerGroupType
-  j_localTransport: [j_LocalTransportType]!
-  j_parties(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_TripParty_Connection!
-  j_placesToAvoid: [s_Place]!
-  j_placesToDiscover: [s_Place]!
-  j_potentialItineraries(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ItineraryAlternative_Connection!
-  j_returnOnOrBefore: Date
-  j_surpriseLevel: j_SurpriseItineraryType
-  j_travelPace: Int
-  j_travelRadius: j_TravelRadiusType
-  s_about: owl_Thing
-  s_accessMode: String
-  s_accessModeSufficient: String
-  s_accessibilityAPI: String
-  s_accessibilityControl: String
-  s_accessibilityFeature: String
-  s_accessibilityHazard: String
-  s_accessibilitySummary: String
-  s_accountablePerson: [s_Person]!
-  s_aggregateRating: s_AggregateRating
-  s_alternativeHeadline: String
-  s_associatedMedia: s_MediaObject
-  s_audience: s_Audience
-  s_audio: s_AudioObject
-  s_author: U_s_Organization_OR_s_Person
-  s_award: String
-  s_character: s_Person
-  s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
-  s_commentCount: Int
-  s_contentLocation: s_Place
-  s_contentRating: String
-  s_contributor: [U_s_Organization_OR_s_Person]!
-  s_copyrightHolder: U_s_Organization_OR_s_Person
-  s_copyrightYear: Float
-  s_creator: [U_s_Organization_OR_s_Person]!
-  s_dateCreated: U_Date_OR_DateTime
-  s_dateModified: U_Date_OR_DateTime
-  s_datePublished: Date
-  s_discussionUrl: URL
-  s_editor: s_Person
-  s_educationalAlignment: s_AlignmentObject
-  s_educationalUse: String
-  s_encoding: s_MediaObject
-  s_exampleOfWork: s_CreativeWork
-  s_expires: Date
-  s_fileFormat: URL
-  s_funder: U_s_Organization_OR_s_Person
-  s_genre: URL
-  s_hasPart: s_CreativeWork
-  s_headline: String
-  s_inLanguage: U_s_Language_OR_String
-  s_interactionStatistic: s_InteractionCounter
-  s_interactivityType: String
-  s_isAccessibleForFree: Boolean
-  s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
-  s_isFamilyFriendly: Boolean
-  s_isPartOf: s_CreativeWork
-  s_keywords: String
-  s_learningResourceType: String
-  s_license: U_s_CreativeWork_OR_URL
-  s_locationCreated: s_Place
-  s_mainEntity: owl_Thing
-  s_material: U_s_Product_OR_URL
-  s_mentions: owl_Thing
-  s_offers: s_Offer
-  s_position: U_Int_OR_String
-  s_producer: U_s_Organization_OR_s_Person
-  s_provider: U_s_Organization_OR_s_Person
-  s_publication: s_PublicationEvent
-  s_publisher: U_s_Organization_OR_s_Person
-  s_publishingPrinciples: U_s_CreativeWork_OR_URL
-  s_recordedAt: s_Event
-  s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -598,9 +330,11 @@ interface I_j_TripProfile {
 }
 
 interface I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -611,17 +345,12 @@ interface I_owl_Thing {
 }
 
 interface I_s_Accommodation {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_url: URL
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_floorSize: s_QuantitativeValue
   s_numberOfRooms: U_s_QuantitativeValue_OR_Float
   s_permittedUsage: String
@@ -642,23 +371,9 @@ interface I_s_Accommodation {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -672,20 +387,15 @@ interface I_s_Accommodation {
 }
 
 interface I_s_AdministrativeArea {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -699,23 +409,9 @@ interface I_s_AdministrativeArea {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -729,9 +425,11 @@ interface I_s_AdministrativeArea {
 }
 
 interface I_s_Article {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_articleBody: String
   s_articleSection: String
   s_pageEnd: U_Int_OR_String
@@ -756,17 +454,10 @@ interface I_s_Article {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -779,9 +470,9 @@ interface I_s_Article {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -809,14 +500,7 @@ interface I_s_Article {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -840,9 +524,11 @@ interface I_s_Article {
 }
 
 interface I_s_Comment {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_downvoteCount: Int
   s_parentItem: s_Question
   s_upvoteCount: Int
@@ -864,17 +550,10 @@ interface I_s_Comment {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -887,9 +566,9 @@ interface I_s_Comment {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -917,14 +596,7 @@ interface I_s_Comment {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -948,9 +620,11 @@ interface I_s_Comment {
 }
 
 interface I_s_ContactPoint {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_areaServed: U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String
   s_availableLanguage: U_s_Language_OR_String
   s_contactOption: s_ContactPointOption
@@ -970,9 +644,11 @@ interface I_s_ContactPoint {
 }
 
 interface I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_about: owl_Thing
   s_accessMode: String
   s_accessModeSufficient: String
@@ -991,17 +667,10 @@ interface I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -1014,9 +683,9 @@ interface I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -1044,14 +713,7 @@ interface I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -1075,9 +737,11 @@ interface I_s_CreativeWork {
 }
 
 interface I_s_Dataset {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_distribution: s_DataDownload
   s_includedInDataCatalog: s_DataCatalog
   s_issn: String
@@ -1099,17 +763,10 @@ interface I_s_Dataset {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -1122,9 +779,9 @@ interface I_s_Dataset {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -1152,14 +809,7 @@ interface I_s_Dataset {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -1183,9 +833,11 @@ interface I_s_Dataset {
 }
 
 interface I_s_Enumeration {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -1196,9 +848,11 @@ interface I_s_Enumeration {
 }
 
 interface I_s_Event {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_about: owl_Thing
   s_actor: s_Person
   s_aggregateRating: s_AggregateRating
@@ -1222,14 +876,7 @@ interface I_s_Event {
   s_previousStartDate: Date
   s_recordedIn: s_CreativeWork
   s_remainingAttendeeCapacity: Int
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_startDate: U_Date_OR_DateTime
   s_subEvent: s_Event
@@ -1248,9 +895,11 @@ interface I_s_Event {
 }
 
 interface I_s_FinancialProduct {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_annualPercentageRate: U_s_QuantitativeValue_OR_Float
   s_feesAndCommissionsSpecification: URL
   s_interestRate: U_s_QuantitativeValue_OR_Float
@@ -1270,14 +919,7 @@ interface I_s_FinancialProduct {
   s_offers: s_Offer
   s_provider: U_s_Organization_OR_s_Person
   s_providerMobility: String
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_serviceOutput: owl_Thing
   s_serviceType: String
   s_alternateName: [String]!
@@ -1290,9 +932,11 @@ interface I_s_FinancialProduct {
 }
 
 interface I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -1303,9 +947,11 @@ interface I_s_Intangible {
 }
 
 interface I_s_Invoice {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_accountId: String
   s_billingPeriod: Duration
   s_broker: U_s_Organization_OR_s_Person
@@ -1318,7 +964,7 @@ interface I_s_Invoice {
   s_paymentMethodId: String
   s_paymentStatus: U_s_PaymentStatusType_OR_String
   s_provider: U_s_Organization_OR_s_Person
-  s_referencesOrder: s_Order
+  s_referencesOrder(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_scheduledPaymentDate: Date
   s_totalPaymentDue: U_s_MonetaryAmount_OR_s_PriceSpecification
   s_alternateName: [String]!
@@ -1331,9 +977,11 @@ interface I_s_Invoice {
 }
 
 interface I_s_ItemList {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_itemListElement: U_s_ListItem_OR_owl_Thing_OR_String
   s_itemListOrder: U_s_ItemListOrderType_OR_String
   s_numberOfItems: Int
@@ -1347,9 +995,11 @@ interface I_s_ItemList {
 }
 
 interface I_s_MediaObject {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_associatedArticle: s_NewsArticle
   s_bitrate: String
   s_contentSize: String
@@ -1357,7 +1007,7 @@ interface I_s_MediaObject {
   s_duration: Duration
   s_embedUrl: URL
   s_encodesCreativeWork: s_CreativeWork
-  s_encodingFormat: String
+  s_encodingFormat: URL
   s_height: U_s_Distance_OR_s_QuantitativeValue
   s_playerType: String
   s_productionCompany: s_Organization
@@ -1383,17 +1033,10 @@ interface I_s_MediaObject {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -1408,7 +1051,6 @@ interface I_s_MediaObject {
   s_encoding: s_MediaObject
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -1436,14 +1078,7 @@ interface I_s_MediaObject {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -1467,9 +1102,11 @@ interface I_s_MediaObject {
 }
 
 interface I_s_MusicPlaylist {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_numTracks: Int
   s_track: U_s_ItemList_OR_s_MusicRecording
   s_about: owl_Thing
@@ -1490,17 +1127,10 @@ interface I_s_MusicPlaylist {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -1513,9 +1143,9 @@ interface I_s_MusicPlaylist {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -1543,14 +1173,7 @@ interface I_s_MusicPlaylist {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -1574,9 +1197,11 @@ interface I_s_MusicPlaylist {
 }
 
 interface I_s_Organization {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
   s_alumni: s_Person
@@ -1611,14 +1236,7 @@ interface I_s_Organization {
   s_owns: U_s_OwnershipInfo_OR_s_Product
   s_parentOrganization: s_Organization
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_seeks: s_Demand
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_subOrganization: s_Organization
@@ -1635,9 +1253,11 @@ interface I_s_Organization {
 }
 
 interface I_s_PerformingGroup {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
   s_alumni: s_Person
@@ -1672,14 +1292,7 @@ interface I_s_PerformingGroup {
   s_owns: U_s_OwnershipInfo_OR_s_Product
   s_parentOrganization: s_Organization
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_seeks: s_Demand
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_subOrganization: s_Organization
@@ -1696,20 +1309,15 @@ interface I_s_PerformingGroup {
 }
 
 interface I_s_Place {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -1723,23 +1331,9 @@ interface I_s_Place {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -1753,9 +1347,11 @@ interface I_s_Place {
 }
 
 interface I_s_Product {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_aggregateRating: s_AggregateRating
   s_audience: s_Audience
@@ -1784,14 +1380,7 @@ interface I_s_Product {
   s_productionDate: Date
   s_purchaseDate: Date
   s_releaseDate: Date
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_sku: String
   s_weight: s_QuantitativeValue
   s_width: U_s_Distance_OR_s_QuantitativeValue
@@ -1805,9 +1394,11 @@ interface I_s_Product {
 }
 
 interface I_s_PropertyValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_maxValue: Float
   s_minValue: Float
   s_propertyID: URL
@@ -1825,9 +1416,11 @@ interface I_s_PropertyValue {
 }
 
 interface I_s_Quantity {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -1838,9 +1431,11 @@ interface I_s_Quantity {
 }
 
 interface I_s_Rating {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_author: U_s_Organization_OR_s_Person
   s_bestRating: Float
   s_ratingValue: Float
@@ -1855,9 +1450,11 @@ interface I_s_Rating {
 }
 
 interface I_s_Service {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_aggregateRating: s_AggregateRating
   s_areaServed: U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String
   s_audience: s_Audience
@@ -1874,14 +1471,7 @@ interface I_s_Service {
   s_offers: s_Offer
   s_provider: U_s_Organization_OR_s_Person
   s_providerMobility: String
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_serviceOutput: owl_Thing
   s_serviceType: String
   s_alternateName: [String]!
@@ -1894,9 +1484,11 @@ interface I_s_Service {
 }
 
 interface I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -1907,22 +1499,17 @@ interface I_s_StructuredValue {
 }
 
 interface I_s_TouristAttraction {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_availableLanguage: U_s_Language_OR_String
   s_touristType: U_s_Audience_OR_String
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -1936,23 +1523,9 @@ interface I_s_TouristAttraction {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -1965,11 +1538,211 @@ interface I_s_TouristAttraction {
   s_sameAs: [URL]!
 }
 
-type j_BookedTrip implements I_s_Invoice {
+type j_AccommodationElement implements I_j_ScorableAlternative {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  j_itinerary: j_ItineraryAlternative
+  s_url: URL
+  j_alternateAccommodations(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  j_curatedAccommodation: j_CuratedAccommodation!
+  s_duration: Duration
+  j_endOffset: Duration
+  s_estimatedCost: U_s_MonetaryAmount_OR_String
+  s_isPartOf: s_CreativeWork
+  s_position: U_Int_OR_String
+  j_startOffset: Duration
+  s_about: owl_Thing
+  s_accessMode: String
+  s_accessModeSufficient: String
+  s_accessibilityAPI: String
+  s_accessibilityControl: String
+  s_accessibilityFeature: String
+  s_accessibilityHazard: String
+  s_accessibilitySummary: String
+  s_accountablePerson: [s_Person]!
+  s_aggregateRating: s_AggregateRating
+  s_alternativeHeadline: String
+  s_associatedMedia: s_MediaObject
+  s_audience: s_Audience
+  s_audio: s_AudioObject
+  s_author: U_s_Organization_OR_s_Person
+  s_award: String
+  s_character: s_Person
+  s_citation: U_s_CreativeWork_OR_String
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_commentCount: Int
+  s_contentLocation: s_Place
+  s_contentRating: U_s_Rating_OR_String
+  s_contributor: [U_s_Organization_OR_s_Person]!
+  s_copyrightHolder: U_s_Organization_OR_s_Person
+  s_copyrightYear: Float
+  s_creator: [U_s_Organization_OR_s_Person]!
+  s_dateCreated: U_Date_OR_DateTime
+  s_dateModified: U_Date_OR_DateTime
+  s_datePublished: Date
+  s_discussionUrl: URL
+  s_editor: s_Person
+  s_educationalAlignment: s_AlignmentObject
+  s_educationalUse: String
+  s_encoding: s_MediaObject
+  s_encodingFormat: URL
+  s_exampleOfWork: s_CreativeWork
+  s_expires: Date
+  s_funder: U_s_Organization_OR_s_Person
+  s_genre: URL
+  s_hasPart: s_CreativeWork
+  s_headline: String
+  s_inLanguage: U_s_Language_OR_String
+  s_interactionStatistic: s_InteractionCounter
+  s_interactivityType: String
+  s_isAccessibleForFree: Boolean
+  s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
+  s_isFamilyFriendly: Boolean
+  s_keywords: String
+  s_learningResourceType: String
+  s_license: U_s_CreativeWork_OR_URL
+  s_locationCreated: s_Place
+  s_mainEntity: owl_Thing
+  s_material: U_s_Product_OR_URL
+  s_mentions: owl_Thing
+  s_offers: s_Offer
+  s_producer: U_s_Organization_OR_s_Person
+  s_provider: U_s_Organization_OR_s_Person
+  s_publication: s_PublicationEvent
+  s_publisher: U_s_Organization_OR_s_Person
+  s_publishingPrinciples: U_s_CreativeWork_OR_URL
+  s_recordedAt: s_Event
+  s_releasedEvent: s_PublicationEvent
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_schemaVersion: URL
+  s_sourceOrganization: s_Organization
+  s_spatialCoverage: s_Place
+  s_sponsor: [U_s_Organization_OR_s_Person]!
+  s_temporalCoverage: U_URL_OR_DateTime
+  s_text: String
+  s_thumbnailUrl: URL
+  s_timeRequired: Duration
+  s_translator: U_s_Organization_OR_s_Person
+  s_typicalAgeRange: String
+  s_version: Float
+  s_video: s_VideoObject
+  s_workExample: s_CreativeWork
+  s_alternateName: [String]!
+  s_disambiguatingDescription: String
+  s_identifier: [U_s_PropertyValue_OR_URL]!
+  s_image: U_s_ImageObject_OR_URL
+  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
+  s_potentialAction: [s_Action]!
+  s_sameAs: [URL]!
+}
+
+type j_ActivityElement implements I_j_ScorableAlternative {
+  __id: String! @id
+  __typename: String @typename
+  s_description: String
+  s_name: String
+  s_url: URL
+  j_alternateActivities(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  j_curatedActivity: j_CuratedActivity!
+  s_duration: Duration
+  j_endOffset: Duration
+  s_estimatedCost: U_s_MonetaryAmount_OR_String
+  s_isPartOf: s_CreativeWork
+  s_position: U_Int_OR_String
+  j_startOffset: Duration
+  s_about: owl_Thing
+  s_accessMode: String
+  s_accessModeSufficient: String
+  s_accessibilityAPI: String
+  s_accessibilityControl: String
+  s_accessibilityFeature: String
+  s_accessibilityHazard: String
+  s_accessibilitySummary: String
+  s_accountablePerson: [s_Person]!
+  s_aggregateRating: s_AggregateRating
+  s_alternativeHeadline: String
+  s_associatedMedia: s_MediaObject
+  s_audience: s_Audience
+  s_audio: s_AudioObject
+  s_author: U_s_Organization_OR_s_Person
+  s_award: String
+  s_character: s_Person
+  s_citation: U_s_CreativeWork_OR_String
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_commentCount: Int
+  s_contentLocation: s_Place
+  s_contentRating: U_s_Rating_OR_String
+  s_contributor: [U_s_Organization_OR_s_Person]!
+  s_copyrightHolder: U_s_Organization_OR_s_Person
+  s_copyrightYear: Float
+  s_creator: [U_s_Organization_OR_s_Person]!
+  s_dateCreated: U_Date_OR_DateTime
+  s_dateModified: U_Date_OR_DateTime
+  s_datePublished: Date
+  s_discussionUrl: URL
+  s_editor: s_Person
+  s_educationalAlignment: s_AlignmentObject
+  s_educationalUse: String
+  s_encoding: s_MediaObject
+  s_encodingFormat: URL
+  s_exampleOfWork: s_CreativeWork
+  s_expires: Date
+  s_funder: U_s_Organization_OR_s_Person
+  s_genre: URL
+  s_hasPart: s_CreativeWork
+  s_headline: String
+  s_inLanguage: U_s_Language_OR_String
+  s_interactionStatistic: s_InteractionCounter
+  s_interactivityType: String
+  s_isAccessibleForFree: Boolean
+  s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
+  s_isFamilyFriendly: Boolean
+  s_keywords: String
+  s_learningResourceType: String
+  s_license: U_s_CreativeWork_OR_URL
+  s_locationCreated: s_Place
+  s_mainEntity: owl_Thing
+  s_material: U_s_Product_OR_URL
+  s_mentions: owl_Thing
+  s_offers: s_Offer
+  s_producer: U_s_Organization_OR_s_Person
+  s_provider: U_s_Organization_OR_s_Person
+  s_publication: s_PublicationEvent
+  s_publisher: U_s_Organization_OR_s_Person
+  s_publishingPrinciples: U_s_CreativeWork_OR_URL
+  s_recordedAt: s_Event
+  s_releasedEvent: s_PublicationEvent
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_schemaVersion: URL
+  s_sourceOrganization: s_Organization
+  s_spatialCoverage: s_Place
+  s_sponsor: [U_s_Organization_OR_s_Person]!
+  s_temporalCoverage: U_URL_OR_DateTime
+  s_text: String
+  s_thumbnailUrl: URL
+  s_timeRequired: Duration
+  s_translator: U_s_Organization_OR_s_Person
+  s_typicalAgeRange: String
+  s_version: Float
+  s_video: s_VideoObject
+  s_workExample: s_CreativeWork
+  s_alternateName: [String]!
+  s_disambiguatingDescription: String
+  s_identifier: [U_s_PropertyValue_OR_URL]!
+  s_image: U_s_ImageObject_OR_URL
+  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
+  s_potentialAction: [s_Action]!
+  s_sameAs: [URL]!
+}
+
+type j_BookedTrip implements I_s_Invoice {
+  __id: String! @id
+  __typename: String @typename
+  s_description: String
+  s_name: String
+  s_url: URL
+  j_itinerary: j_Itinerary
   j_tripProfile: j_TripProfile!
   s_accountId: String
   s_billingPeriod: Duration
@@ -1983,7 +1756,7 @@ type j_BookedTrip implements I_s_Invoice {
   s_paymentMethodId: String
   s_paymentStatus: U_s_PaymentStatusType_OR_String
   s_provider: U_s_Organization_OR_s_Person
-  s_referencesOrder: s_Order
+  s_referencesOrder(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_scheduledPaymentDate: Date
   s_totalPaymentDue: U_s_MonetaryAmount_OR_s_PriceSpecification
   s_alternateName: [String]!
@@ -1995,41 +1768,18 @@ type j_BookedTrip implements I_s_Invoice {
   s_sameAs: [URL]!
 }
 
-type j_BookedTrip_Connection {
-  edges: [j_BookedTrip_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_BookedTrip_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_BookedTrip_Edge {
-  cursor: String!
-  edge: j_BookedTrip!
-}
-
 type j_CuratedAccommodation implements I_s_Accommodation & I_j_CuratedPlace {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   j_recommendedStay: j_StayRange
   gn_countryCode: String!
   gn_featureClass: String!
   gn_featureCode: String!
   gn_geonamesID: String!
-  gn_nearby(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   gn_neighbour: [gn_Feature]!
   gn_officialName: String
   gn_parentADM1: gn_Feature!
@@ -2040,14 +1790,7 @@ type j_CuratedAccommodation implements I_s_Accommodation & I_j_CuratedPlace {
   gn_parentFeature: gn_Feature
   gn_population: Int
   gn_postalCode: [String]!
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_floorSize: s_QuantitativeValue
   s_numberOfRooms: U_s_QuantitativeValue_OR_Float
   s_permittedUsage: String
@@ -2073,23 +1816,9 @@ type j_CuratedAccommodation implements I_s_Accommodation & I_j_CuratedPlace {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -2103,22 +1832,17 @@ type j_CuratedAccommodation implements I_s_Accommodation & I_j_CuratedPlace {
 }
 
 type j_CuratedActivity implements I_j_CuratedPlace {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   j_recommendedStay: j_StayRange
   gn_countryCode: String!
   gn_featureClass: String!
   gn_featureCode: String!
   gn_geonamesID: String!
-  gn_nearby(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   gn_neighbour: [gn_Feature]!
   gn_officialName: String
   gn_parentADM1: gn_Feature!
@@ -2137,14 +1861,7 @@ type j_CuratedActivity implements I_j_CuratedPlace {
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -2158,23 +1875,9 @@ type j_CuratedActivity implements I_j_CuratedPlace {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -2188,22 +1891,17 @@ type j_CuratedActivity implements I_j_CuratedPlace {
 }
 
 type j_CuratedDestination implements I_j_CuratedPlace {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   j_recommendedStay: j_StayRange
   gn_countryCode: String!
   gn_featureClass: String!
   gn_featureCode: String!
   gn_geonamesID: String!
-  gn_nearby(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   gn_neighbour: [gn_Feature]!
   gn_officialName: String
   gn_parentADM1: gn_Feature!
@@ -2222,14 +1920,7 @@ type j_CuratedDestination implements I_j_CuratedPlace {
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -2243,23 +1934,9 @@ type j_CuratedDestination implements I_j_CuratedPlace {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -2273,22 +1950,17 @@ type j_CuratedDestination implements I_j_CuratedPlace {
 }
 
 type j_CuratedPlace implements I_gn_Feature & I_s_TouristAttraction {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   j_recommendedStay: j_StayRange
   gn_countryCode: String!
   gn_featureClass: String!
   gn_featureCode: String!
   gn_geonamesID: String!
-  gn_nearby(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): gn_Feature_Connection!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   gn_neighbour: [gn_Feature]!
   gn_officialName: String
   gn_parentADM1: gn_Feature!
@@ -2307,14 +1979,7 @@ type j_CuratedPlace implements I_gn_Feature & I_s_TouristAttraction {
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -2328,23 +1993,9 @@ type j_CuratedPlace implements I_gn_Feature & I_s_TouristAttraction {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -2357,28 +2008,114 @@ type j_CuratedPlace implements I_gn_Feature & I_s_TouristAttraction {
   s_sameAs: [URL]!
 }
 
-type j_CuratedPlace_Connection {
-  edges: [j_CuratedPlace_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_CuratedPlace_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_CuratedPlace_Edge {
-  cursor: String!
-  edge: j_CuratedPlace!
+type j_DestinationElement implements I_j_ScorableAlternative {
+  __id: String! @id
+  __typename: String @typename
+  s_description: String
+  s_name: String
+  s_url: URL
+  j_accommodationElements: j_AccommodationElement
+  j_activityElements: j_ActivityElement
+  j_alternateDestinations(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  j_curatedDestination: j_CuratedDestination!
+  j_transportElements: j_TransportElement
+  s_duration: Duration
+  j_endOffset: Duration
+  s_estimatedCost: U_s_MonetaryAmount_OR_String
+  s_isPartOf: s_CreativeWork
+  s_position: U_Int_OR_String
+  j_startOffset: Duration
+  s_about: owl_Thing
+  s_accessMode: String
+  s_accessModeSufficient: String
+  s_accessibilityAPI: String
+  s_accessibilityControl: String
+  s_accessibilityFeature: String
+  s_accessibilityHazard: String
+  s_accessibilitySummary: String
+  s_accountablePerson: [s_Person]!
+  s_aggregateRating: s_AggregateRating
+  s_alternativeHeadline: String
+  s_associatedMedia: s_MediaObject
+  s_audience: s_Audience
+  s_audio: s_AudioObject
+  s_author: U_s_Organization_OR_s_Person
+  s_award: String
+  s_character: s_Person
+  s_citation: U_s_CreativeWork_OR_String
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_commentCount: Int
+  s_contentLocation: s_Place
+  s_contentRating: U_s_Rating_OR_String
+  s_contributor: [U_s_Organization_OR_s_Person]!
+  s_copyrightHolder: U_s_Organization_OR_s_Person
+  s_copyrightYear: Float
+  s_creator: [U_s_Organization_OR_s_Person]!
+  s_dateCreated: U_Date_OR_DateTime
+  s_dateModified: U_Date_OR_DateTime
+  s_datePublished: Date
+  s_discussionUrl: URL
+  s_editor: s_Person
+  s_educationalAlignment: s_AlignmentObject
+  s_educationalUse: String
+  s_encoding: s_MediaObject
+  s_encodingFormat: URL
+  s_exampleOfWork: s_CreativeWork
+  s_expires: Date
+  s_funder: U_s_Organization_OR_s_Person
+  s_genre: URL
+  s_hasPart: s_CreativeWork
+  s_headline: String
+  s_inLanguage: U_s_Language_OR_String
+  s_interactionStatistic: s_InteractionCounter
+  s_interactivityType: String
+  s_isAccessibleForFree: Boolean
+  s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
+  s_isFamilyFriendly: Boolean
+  s_keywords: String
+  s_learningResourceType: String
+  s_license: U_s_CreativeWork_OR_URL
+  s_locationCreated: s_Place
+  s_mainEntity: owl_Thing
+  s_material: U_s_Product_OR_URL
+  s_mentions: owl_Thing
+  s_offers: s_Offer
+  s_producer: U_s_Organization_OR_s_Person
+  s_provider: U_s_Organization_OR_s_Person
+  s_publication: s_PublicationEvent
+  s_publisher: U_s_Organization_OR_s_Person
+  s_publishingPrinciples: U_s_CreativeWork_OR_URL
+  s_recordedAt: s_Event
+  s_releasedEvent: s_PublicationEvent
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_schemaVersion: URL
+  s_sourceOrganization: s_Organization
+  s_spatialCoverage: s_Place
+  s_sponsor: [U_s_Organization_OR_s_Person]!
+  s_temporalCoverage: U_URL_OR_DateTime
+  s_text: String
+  s_thumbnailUrl: URL
+  s_timeRequired: Duration
+  s_translator: U_s_Organization_OR_s_Person
+  s_typicalAgeRange: String
+  s_version: Float
+  s_video: s_VideoObject
+  s_workExample: s_CreativeWork
+  s_alternateName: [String]!
+  s_disambiguatingDescription: String
+  s_identifier: [U_s_PropertyValue_OR_URL]!
+  s_image: U_s_ImageObject_OR_URL
+  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
+  s_potentialAction: [s_Action]!
+  s_sameAs: [URL]!
 }
 
 type j_Identity implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   oidc_birthdate: Date
   oidc_email: String!
   oidc_email_verified: Boolean!
@@ -2407,24 +2144,6 @@ type j_Identity implements I_owl_Thing {
   s_sameAs: [URL]!
 }
 
-type j_Identity_Connection {
-  edges: [j_Identity_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_Identity_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_Identity_Edge {
-  cursor: String!
-  edge: j_Identity!
-}
-
 enum j_IdentityProvider {
   j_AmazonProvider
   j_FacebookProvider
@@ -2434,39 +2153,22 @@ enum j_IdentityProvider {
   j_TwitterProvider
 }
 
-type j_ItineraryAlternative implements I_j_ScorableAlternative {
+type j_Itinerary implements I_j_ScorableAlternative {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  j_allPlaces(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_CuratedPlace_Connection!
-  j_children(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ScorableAlternative_Connection!
-  j_curatedPlace: j_CuratedPlace!
+  s_url: URL
+  j_accommodationElements: j_AccommodationElement
+  j_activityElements: j_ActivityElement
+  j_destinationElements: j_DestinationElement
+  j_transportElements: j_TransportElement
   s_duration: Duration
+  j_endOffset: Duration
   s_estimatedCost: U_s_MonetaryAmount_OR_String
-  j_parent: j_ScorableAlternative
+  s_isPartOf: s_CreativeWork
   s_position: U_Int_OR_String
-  j_quote(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Offer_Connection!
+  j_startOffset: Duration
   s_about: owl_Thing
   s_accessMode: String
   s_accessModeSufficient: String
@@ -2485,17 +2187,10 @@ type j_ItineraryAlternative implements I_j_ScorableAlternative {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -2508,9 +2203,9 @@ type j_ItineraryAlternative implements I_j_ScorableAlternative {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -2521,7 +2216,6 @@ type j_ItineraryAlternative implements I_j_ScorableAlternative {
   s_isAccessibleForFree: Boolean
   s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
   s_isFamilyFriendly: Boolean
-  s_isPartOf: s_CreativeWork
   s_keywords: String
   s_learningResourceType: String
   s_license: U_s_CreativeWork_OR_URL
@@ -2537,14 +2231,7 @@ type j_ItineraryAlternative implements I_j_ScorableAlternative {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -2565,24 +2252,6 @@ type j_ItineraryAlternative implements I_j_ScorableAlternative {
   s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
-}
-
-type j_ItineraryAlternative_Connection {
-  edges: [j_ItineraryAlternative_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ItineraryAlternative_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_ItineraryAlternative_Edge {
-  cursor: String!
-  edge: j_ItineraryAlternative!
 }
 
 enum j_LocalTransportType {
@@ -2592,153 +2261,12 @@ enum j_LocalTransportType {
   j_SelfDriveManual
 }
 
-type j_ScorableAlternative implements I_s_CreativeWork {
-  s_description: String
-  s_id: URL!
-  s_name: String
-  j_children(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ScorableAlternative_Connection!
-  j_curatedPlace: j_CuratedPlace!
-  s_duration: Duration
-  s_estimatedCost: U_s_MonetaryAmount_OR_String
-  j_parent: j_ScorableAlternative
-  s_position: U_Int_OR_String
-  j_quote(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Offer_Connection!
-  s_about: owl_Thing
-  s_accessMode: String
-  s_accessModeSufficient: String
-  s_accessibilityAPI: String
-  s_accessibilityControl: String
-  s_accessibilityFeature: String
-  s_accessibilityHazard: String
-  s_accessibilitySummary: String
-  s_accountablePerson: [s_Person]!
-  s_aggregateRating: s_AggregateRating
-  s_alternativeHeadline: String
-  s_associatedMedia: s_MediaObject
-  s_audience: s_Audience
-  s_audio: s_AudioObject
-  s_author: U_s_Organization_OR_s_Person
-  s_award: String
-  s_character: s_Person
-  s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
-  s_commentCount: Int
-  s_contentLocation: s_Place
-  s_contentRating: String
-  s_contributor: [U_s_Organization_OR_s_Person]!
-  s_copyrightHolder: U_s_Organization_OR_s_Person
-  s_copyrightYear: Float
-  s_creator: [U_s_Organization_OR_s_Person]!
-  s_dateCreated: U_Date_OR_DateTime
-  s_dateModified: U_Date_OR_DateTime
-  s_datePublished: Date
-  s_discussionUrl: URL
-  s_editor: s_Person
-  s_educationalAlignment: s_AlignmentObject
-  s_educationalUse: String
-  s_encoding: s_MediaObject
-  s_exampleOfWork: s_CreativeWork
-  s_expires: Date
-  s_fileFormat: URL
-  s_funder: U_s_Organization_OR_s_Person
-  s_genre: URL
-  s_hasPart: s_CreativeWork
-  s_headline: String
-  s_inLanguage: U_s_Language_OR_String
-  s_interactionStatistic: s_InteractionCounter
-  s_interactivityType: String
-  s_isAccessibleForFree: Boolean
-  s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
-  s_isFamilyFriendly: Boolean
-  s_isPartOf: s_CreativeWork
-  s_keywords: String
-  s_learningResourceType: String
-  s_license: U_s_CreativeWork_OR_URL
-  s_locationCreated: s_Place
-  s_mainEntity: owl_Thing
-  s_material: U_s_Product_OR_URL
-  s_mentions: owl_Thing
-  s_offers: s_Offer
-  s_producer: U_s_Organization_OR_s_Person
-  s_provider: U_s_Organization_OR_s_Person
-  s_publication: s_PublicationEvent
-  s_publisher: U_s_Organization_OR_s_Person
-  s_publishingPrinciples: U_s_CreativeWork_OR_URL
-  s_recordedAt: s_Event
-  s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
-  s_schemaVersion: URL
-  s_sourceOrganization: s_Organization
-  s_spatialCoverage: s_Place
-  s_sponsor: [U_s_Organization_OR_s_Person]!
-  s_temporalCoverage: U_URL_OR_DateTime
-  s_text: String
-  s_thumbnailUrl: URL
-  s_timeRequired: Duration
-  s_translator: U_s_Organization_OR_s_Person
-  s_typicalAgeRange: String
-  s_version: Float
-  s_video: s_VideoObject
-  s_workExample: s_CreativeWork
-  s_alternateName: [String]!
-  s_disambiguatingDescription: String
-  s_identifier: [U_s_PropertyValue_OR_URL]!
-  s_image: U_s_ImageObject_OR_URL
-  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
-  s_potentialAction: [s_Action]!
-  s_sameAs: [URL]!
-}
-
-type j_ScorableAlternative_Connection {
-  edges: [j_ScorableAlternative_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ScorableAlternative_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_ScorableAlternative_Edge {
-  cursor: String!
-  edge: j_ScorableAlternative!
-}
-
 type j_Session implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_endTime: DateTime
   s_startTime: DateTime
   s_alternateName: [String]!
@@ -2750,28 +2278,12 @@ type j_Session implements I_owl_Thing {
   s_sameAs: [URL]!
 }
 
-type j_Session_Connection {
-  edges: [j_Session_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_Session_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_Session_Edge {
-  cursor: String!
-  edge: j_Session!
-}
-
 type j_StayRange {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   j_maxStay: Duration
   j_minStay: Duration
 }
@@ -2783,95 +2295,22 @@ enum j_SurpriseItineraryType {
   j_KnowNothing
 }
 
-enum j_TravellerGroupType {
-  j_Couple
-  j_Family
-  j_Friends
-  j_Group
-  j_Solo
-}
-
-enum j_TravelRadiusType {
-  j_Anywhere
-  j_SameContinent
-  j_SameCountry
-}
-
-type j_TripParty implements I_owl_Thing {
+type j_TransportElement implements I_j_ScorableAlternative {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  j_role: [j_TripRole!]!
-  j_subProfile: j_TripPartyProfile
-  j_tripProfile: j_TripProfile!
-  j_user: j_User
-  s_alternateName: [String]!
-  s_disambiguatingDescription: String
-  s_identifier: [U_s_PropertyValue_OR_URL]!
-  s_image: U_s_ImageObject_OR_URL
-  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
-  s_potentialAction: [s_Action]!
-  s_sameAs: [URL]!
-}
-
-type j_TripParty_Connection {
-  edges: [j_TripParty_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_TripParty_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_TripParty_Edge {
-  cursor: String!
-  edge: j_TripParty!
-}
-
-type j_TripPartyProfile implements I_j_TripProfile {
-  s_description: String
-  s_id: URL!
-  s_name: String
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
-  j_datesFlexible: Boolean
-  j_departFrom: [s_Place]!
-  j_departOnOrAfter: Date
-  j_groupSize: Int
-  j_groupType: j_TravellerGroupType
-  j_localTransport: [j_LocalTransportType]!
-  j_parties(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_TripParty_Connection!
-  j_placesToAvoid: [s_Place]!
-  j_placesToDiscover: [s_Place]!
-  j_potentialItineraries(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ItineraryAlternative_Connection!
-  j_returnOnOrBefore: Date
-  j_surpriseLevel: j_SurpriseItineraryType
-  j_travelPace: Int
-  j_travelRadius: j_TravelRadiusType
+  s_url: URL
+  s_distance: s_Distance
+  s_fromLocation: s_Place
+  j_mode: j_TravelMode
+  s_toLocation: s_Place
+  s_duration: Duration
+  j_endOffset: Duration
+  s_estimatedCost: U_s_MonetaryAmount_OR_String
+  s_isPartOf: s_CreativeWork
+  s_position: U_Int_OR_String
+  j_startOffset: Duration
   s_about: owl_Thing
   s_accessMode: String
   s_accessModeSufficient: String
@@ -2890,17 +2329,10 @@ type j_TripPartyProfile implements I_j_TripProfile {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -2913,9 +2345,9 @@ type j_TripPartyProfile implements I_j_TripProfile {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -2926,7 +2358,6 @@ type j_TripPartyProfile implements I_j_TripProfile {
   s_isAccessibleForFree: Boolean
   s_isBasedOn: U_s_CreativeWork_OR_s_Product_OR_URL
   s_isFamilyFriendly: Boolean
-  s_isPartOf: s_CreativeWork
   s_keywords: String
   s_learningResourceType: String
   s_license: U_s_CreativeWork_OR_URL
@@ -2935,7 +2366,6 @@ type j_TripPartyProfile implements I_j_TripProfile {
   s_material: U_s_Product_OR_URL
   s_mentions: owl_Thing
   s_offers: s_Offer
-  s_position: U_Int_OR_String
   s_producer: U_s_Organization_OR_s_Person
   s_provider: U_s_Organization_OR_s_Person
   s_publication: s_PublicationEvent
@@ -2943,14 +2373,7 @@ type j_TripPartyProfile implements I_j_TripProfile {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -2964,6 +2387,64 @@ type j_TripPartyProfile implements I_j_TripProfile {
   s_version: Float
   s_video: s_VideoObject
   s_workExample: s_CreativeWork
+  s_alternateName: [String]!
+  s_disambiguatingDescription: String
+  s_identifier: [U_s_PropertyValue_OR_URL]!
+  s_image: U_s_ImageObject_OR_URL
+  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
+  s_potentialAction: [s_Action]!
+  s_sameAs: [URL]!
+}
+
+enum j_TravelerGroupType {
+  j_Couple
+  j_Family
+  j_Friends
+  j_Group
+  j_Solo
+}
+
+enum j_TravelMode {
+  j_ByBike
+  j_ByBoat
+  j_ByBus
+  j_ByCar
+  j_ByFoot
+  j_ByMotorcycle
+  j_Flight
+  j_Train
+}
+
+enum j_TravelRadiusType {
+  j_Anywhere
+  j_SameContinent
+  j_SameCountry
+}
+
+type j_Trip implements I_s_Invoice {
+  __id: String! @id
+  __typename: String @typename
+  s_description: String
+  s_name: String
+  s_url: URL
+  j_itinerary: j_Itinerary
+  j_profile: j_TripProfile
+  s_referencesOrder(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  j_users(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_accountId: String
+  s_billingPeriod: Duration
+  s_broker: U_s_Organization_OR_s_Person
+  s_category: U_owl_Thing_OR_String
+  s_confirmationNumber: String
+  s_customer: U_s_Organization_OR_s_Person
+  s_minimumPaymentDue: U_s_MonetaryAmount_OR_s_PriceSpecification
+  s_paymentDueDate: DateTime
+  s_paymentMethod: s_PaymentMethod
+  s_paymentMethodId: String
+  s_paymentStatus: U_s_PaymentStatusType_OR_String
+  s_provider: U_s_Organization_OR_s_Person
+  s_scheduledPaymentDate: Date
+  s_totalPaymentDue: U_s_MonetaryAmount_OR_s_PriceSpecification
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -2974,41 +2455,21 @@ type j_TripPartyProfile implements I_j_TripProfile {
 }
 
 type j_TripProfile implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_url: URL
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   j_datesFlexible: Boolean
   j_departFrom: [s_Place]!
   j_departOnOrAfter: Date
   j_groupSize: Int
-  j_groupType: j_TravellerGroupType
+  j_groupType: j_TravelerGroupType
   j_localTransport: [j_LocalTransportType]!
-  j_parties(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_TripParty_Connection!
   j_placesToAvoid: [s_Place]!
   j_placesToDiscover: [s_Place]!
-  j_potentialItineraries(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_ItineraryAlternative_Connection!
+  j_potentialItineraries(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   j_returnOnOrBefore: Date
   j_surpriseLevel: j_SurpriseItineraryType
   j_travelPace: Int
@@ -3031,17 +2492,10 @@ type j_TripProfile implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -3054,9 +2508,9 @@ type j_TripProfile implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -3084,14 +2538,7 @@ type j_TripProfile implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -3114,68 +2561,17 @@ type j_TripProfile implements I_s_CreativeWork {
   s_sameAs: [URL]!
 }
 
-type j_TripProfile_Connection {
-  edges: [j_TripProfile_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_TripProfile_Connection!
-  pageInfo: PageInfo!
-}
-
-type j_TripProfile_Edge {
-  cursor: String!
-  edge: j_TripProfile!
-}
-
-enum j_TripRole {
-  j_Organizer
-  j_Sponsor
-  j_Tracker
-  j_Traveller
-}
-
 type j_User implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  j_bookedTrips(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_BookedTrip_Connection!
-  j_identities(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_Identity_Connection!
+  s_url: URL
+  j_bookedTrips(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  j_identities(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   j_person: s_Person
-  j_sessions(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_Session_Connection!
-  j_tripProfiles(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): j_TripProfile_Connection!
+  j_sessions(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  j_tripProfiles(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -3186,7 +2582,7 @@ type j_User implements I_owl_Thing {
 }
 
 type Mutation {
-  tripFilter(filterInput: TripFilterInput!): j_ItineraryAlternative_Connection!
+  tripFilter(tripFilter: TripFilterInput!): Connection!
 }
 
 type O_Boolean {
@@ -3234,9 +2630,11 @@ type O_URL {
 }
 
 type owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -3247,6 +2645,8 @@ type owl_Thing {
 }
 
 type PageInfo {
+  startCursor: String
+  endCursor: String
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
 }
@@ -3257,12 +2657,15 @@ type Query {
   curatedDestination(id: ID!): j_CuratedDestination
   curatedAccommodation(id: ID!): j_CuratedAccommodation
   curatedActivity(id: ID!): j_CuratedActivity
+  trip(id: ID!): j_Trip
 }
 
 type s_Action implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_actionStatus: s_ActionStatusType
   s_agent: U_s_Organization_OR_s_Person
   s_endTime: DateTime
@@ -3291,20 +2694,15 @@ enum s_ActionStatusType {
 }
 
 type s_AdministrativeArea implements I_s_Place {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -3318,23 +2716,9 @@ type s_AdministrativeArea implements I_s_Place {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -3348,9 +2732,11 @@ type s_AdministrativeArea implements I_s_Place {
 }
 
 type s_AggregateRating implements I_s_Rating {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_itemReviewed: owl_Thing
   s_ratingCount: Int
   s_reviewCount: Int
@@ -3368,9 +2754,11 @@ type s_AggregateRating implements I_s_Rating {
 }
 
 type s_AlignmentObject implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alignmentType: String
   s_educationalFramework: String
   s_targetDescription: String
@@ -3386,9 +2774,11 @@ type s_AlignmentObject implements I_s_Intangible {
 }
 
 type s_Answer implements I_s_Comment {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_downvoteCount: Int
   s_parentItem: s_Question
   s_upvoteCount: Int
@@ -3410,17 +2800,10 @@ type s_Answer implements I_s_Comment {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -3433,9 +2816,9 @@ type s_Answer implements I_s_Comment {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -3463,14 +2846,7 @@ type s_Answer implements I_s_Comment {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -3494,9 +2870,11 @@ type s_Answer implements I_s_Comment {
 }
 
 type s_Audience implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_audienceType: String
   s_geographicArea: s_AdministrativeArea
   s_alternateName: [String]!
@@ -3509,9 +2887,11 @@ type s_Audience implements I_s_Intangible {
 }
 
 type s_AudioObject implements I_s_MediaObject {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_transcript: String
   s_associatedArticle: s_NewsArticle
   s_bitrate: String
@@ -3520,7 +2900,7 @@ type s_AudioObject implements I_s_MediaObject {
   s_duration: Duration
   s_embedUrl: URL
   s_encodesCreativeWork: s_CreativeWork
-  s_encodingFormat: String
+  s_encodingFormat: URL
   s_height: U_s_Distance_OR_s_QuantitativeValue
   s_playerType: String
   s_productionCompany: s_Organization
@@ -3546,17 +2926,10 @@ type s_AudioObject implements I_s_MediaObject {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -3571,7 +2944,6 @@ type s_AudioObject implements I_s_MediaObject {
   s_encoding: s_MediaObject
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -3599,14 +2971,7 @@ type s_AudioObject implements I_s_MediaObject {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -3630,19 +2995,14 @@ type s_AudioObject implements I_s_MediaObject {
 }
 
 type s_Brand implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_aggregateRating: s_AggregateRating
   s_logo: U_s_ImageObject_OR_URL
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -3653,9 +3013,11 @@ type s_Brand implements I_s_Intangible {
 }
 
 type s_BroadcastService implements I_s_Service {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_broadcastAffiliateOf: s_Organization
   s_broadcastDisplayName: String
   s_broadcastTimezone: String
@@ -3678,14 +3040,7 @@ type s_BroadcastService implements I_s_Service {
   s_offers: s_Offer
   s_provider: U_s_Organization_OR_s_Person
   s_providerMobility: String
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_serviceOutput: owl_Thing
   s_serviceType: String
   s_alternateName: [String]!
@@ -3716,9 +3071,11 @@ enum s_BusinessFunction {
 }
 
 type s_Comment implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_downvoteCount: Int
   s_parentItem: s_Question
   s_upvoteCount: Int
@@ -3740,17 +3097,10 @@ type s_Comment implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -3763,9 +3113,9 @@ type s_Comment implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -3793,14 +3143,7 @@ type s_Comment implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -3823,28 +3166,12 @@ type s_Comment implements I_s_CreativeWork {
   s_sameAs: [URL]!
 }
 
-type s_Comment_Connection {
-  edges: [s_Comment_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
-  pageInfo: PageInfo!
-}
-
-type s_Comment_Edge {
-  cursor: String!
-  edge: s_Comment!
-}
-
 type s_ContactPoint implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_areaServed: U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String
   s_availableLanguage: U_s_Language_OR_String
   s_contactOption: s_ContactPointOption
@@ -3869,20 +3196,15 @@ enum s_ContactPointOption {
 }
 
 type s_Country implements I_s_AdministrativeArea {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -3896,23 +3218,9 @@ type s_Country implements I_s_AdministrativeArea {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -3926,9 +3234,11 @@ type s_Country implements I_s_AdministrativeArea {
 }
 
 type s_CreativeWork implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_about: owl_Thing
   s_accessMode: String
   s_accessModeSufficient: String
@@ -3947,17 +3257,10 @@ type s_CreativeWork implements I_owl_Thing {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -3970,9 +3273,9 @@ type s_CreativeWork implements I_owl_Thing {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -4000,14 +3303,7 @@ type s_CreativeWork implements I_owl_Thing {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -4031,9 +3327,11 @@ type s_CreativeWork implements I_owl_Thing {
 }
 
 type s_DataCatalog implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_dataset: s_Dataset
   s_about: owl_Thing
   s_accessMode: String
@@ -4053,17 +3351,10 @@ type s_DataCatalog implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -4076,9 +3367,9 @@ type s_DataCatalog implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -4106,14 +3397,7 @@ type s_DataCatalog implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -4137,9 +3421,11 @@ type s_DataCatalog implements I_s_CreativeWork {
 }
 
 type s_DataDownload implements I_s_MediaObject {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_associatedArticle: s_NewsArticle
   s_bitrate: String
   s_contentSize: String
@@ -4147,7 +3433,7 @@ type s_DataDownload implements I_s_MediaObject {
   s_duration: Duration
   s_embedUrl: URL
   s_encodesCreativeWork: s_CreativeWork
-  s_encodingFormat: String
+  s_encodingFormat: URL
   s_height: U_s_Distance_OR_s_QuantitativeValue
   s_playerType: String
   s_productionCompany: s_Organization
@@ -4173,17 +3459,10 @@ type s_DataDownload implements I_s_MediaObject {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -4198,7 +3477,6 @@ type s_DataDownload implements I_s_MediaObject {
   s_encoding: s_MediaObject
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -4226,14 +3504,7 @@ type s_DataDownload implements I_s_MediaObject {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -4257,9 +3528,11 @@ type s_DataDownload implements I_s_MediaObject {
 }
 
 type s_DataFeed implements I_s_Dataset {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_dataFeedElement: U_s_DataFeedItem_OR_owl_Thing_OR_String
   s_distribution: s_DataDownload
   s_includedInDataCatalog: s_DataCatalog
@@ -4282,17 +3555,10 @@ type s_DataFeed implements I_s_Dataset {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -4305,9 +3571,9 @@ type s_DataFeed implements I_s_Dataset {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -4335,14 +3601,7 @@ type s_DataFeed implements I_s_Dataset {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -4366,9 +3625,11 @@ type s_DataFeed implements I_s_Dataset {
 }
 
 type s_DataFeedItem implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_dateCreated: U_Date_OR_DateTime
   s_dateDeleted: DateTime
   s_dateModified: U_Date_OR_DateTime
@@ -4383,9 +3644,11 @@ type s_DataFeedItem implements I_s_Intangible {
 }
 
 type s_Dataset implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_distribution: s_DataDownload
   s_includedInDataCatalog: s_DataCatalog
   s_issn: String
@@ -4407,17 +3670,10 @@ type s_Dataset implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -4430,9 +3686,9 @@ type s_Dataset implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -4460,14 +3716,7 @@ type s_Dataset implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -4502,9 +3751,11 @@ enum s_DayOfWeek {
 }
 
 type s_DeliveryEvent implements I_s_Event {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_accessCode: String
   s_availableFrom: DateTime
   s_availableThrough: DateTime
@@ -4532,14 +3783,7 @@ type s_DeliveryEvent implements I_s_Event {
   s_previousStartDate: Date
   s_recordedIn: s_CreativeWork
   s_remainingAttendeeCapacity: Int
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_startDate: U_Date_OR_DateTime
   s_subEvent: s_Event
@@ -4570,9 +3814,11 @@ enum s_DeliveryMethod {
 }
 
 type s_Demand implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_acceptedPaymentMethod: U_s_LoanOrCredit_OR_s_PaymentMethod
   s_advanceBookingRequirement: s_QuantitativeValue
   s_areaServed: U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String
@@ -4615,9 +3861,11 @@ type s_Demand implements I_s_Intangible {
 }
 
 type s_Distance implements I_s_Quantity {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -4628,9 +3876,11 @@ type s_Distance implements I_s_Quantity {
 }
 
 type s_EducationalOrganization implements I_s_Organization {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alumni: s_Person
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
@@ -4665,14 +3915,7 @@ type s_EducationalOrganization implements I_s_Organization {
   s_owns: U_s_OwnershipInfo_OR_s_Product
   s_parentOrganization: s_Organization
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_seeks: s_Demand
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_subOrganization: s_Organization
@@ -4689,9 +3932,11 @@ type s_EducationalOrganization implements I_s_Organization {
 }
 
 type s_EntryPoint implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_actionApplication: s_SoftwareApplication
   s_actionPlatform: URL
   s_contentType: String
@@ -4708,9 +3953,11 @@ type s_EntryPoint implements I_s_Intangible {
 }
 
 type s_Enumeration implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -4721,9 +3968,11 @@ type s_Enumeration implements I_s_Intangible {
 }
 
 type s_Event implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_about: owl_Thing
   s_actor: s_Person
   s_aggregateRating: s_AggregateRating
@@ -4747,14 +3996,7 @@ type s_Event implements I_owl_Thing {
   s_previousStartDate: Date
   s_recordedIn: s_CreativeWork
   s_remainingAttendeeCapacity: Int
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_startDate: U_Date_OR_DateTime
   s_subEvent: s_Event
@@ -4785,9 +4027,11 @@ enum s_GenderType {
 }
 
 type s_GeoCoordinates implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_address: U_s_PostalAddress_OR_String
   s_addressCountry: U_s_Country_OR_String
   s_elevation: Float
@@ -4804,9 +4048,11 @@ type s_GeoCoordinates implements I_s_StructuredValue {
 }
 
 type s_GeoShape implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_address: U_s_PostalAddress_OR_String
   s_addressCountry: U_s_Country_OR_String
   s_box: String
@@ -4825,9 +4071,11 @@ type s_GeoShape implements I_s_StructuredValue {
 }
 
 type s_ImageObject implements I_s_MediaObject {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_caption: String
   s_exifData: U_s_PropertyValue_OR_String
   s_representativeOfPage: Boolean
@@ -4839,7 +4087,7 @@ type s_ImageObject implements I_s_MediaObject {
   s_duration: Duration
   s_embedUrl: URL
   s_encodesCreativeWork: s_CreativeWork
-  s_encodingFormat: String
+  s_encodingFormat: URL
   s_height: U_s_Distance_OR_s_QuantitativeValue
   s_playerType: String
   s_productionCompany: s_Organization
@@ -4865,17 +4113,10 @@ type s_ImageObject implements I_s_MediaObject {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -4890,7 +4131,6 @@ type s_ImageObject implements I_s_MediaObject {
   s_encoding: s_MediaObject
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -4918,14 +4158,7 @@ type s_ImageObject implements I_s_MediaObject {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -4949,9 +4182,11 @@ type s_ImageObject implements I_s_MediaObject {
 }
 
 type s_InteractionCounter implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_interactionService: U_s_SoftwareApplication_OR_s_WebSite
   s_interactionType: s_Action
   s_userInteractionCount: Int
@@ -4965,9 +4200,11 @@ type s_InteractionCounter implements I_s_StructuredValue {
 }
 
 type s_Invoice implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_accountId: String
   s_billingPeriod: Duration
   s_broker: U_s_Organization_OR_s_Person
@@ -4980,7 +4217,7 @@ type s_Invoice implements I_s_Intangible {
   s_paymentMethodId: String
   s_paymentStatus: U_s_PaymentStatusType_OR_String
   s_provider: U_s_Organization_OR_s_Person
-  s_referencesOrder: s_Order
+  s_referencesOrder(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_scheduledPaymentDate: Date
   s_totalPaymentDue: U_s_MonetaryAmount_OR_s_PriceSpecification
   s_alternateName: [String]!
@@ -5005,9 +4242,11 @@ enum s_ItemAvailability {
 }
 
 type s_ItemList implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_itemListElement: U_s_ListItem_OR_owl_Thing_OR_String
   s_itemListOrder: U_s_ItemListOrderType_OR_String
   s_numberOfItems: Int
@@ -5027,9 +4266,11 @@ enum s_ItemListOrderType {
 }
 
 type s_Language implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -5040,9 +4281,11 @@ type s_Language implements I_s_Intangible {
 }
 
 type s_ListItem implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_item: owl_Thing
   s_nextItem: s_ListItem
   s_position: U_Int_OR_String
@@ -5057,9 +4300,11 @@ type s_ListItem implements I_s_Intangible {
 }
 
 type s_LoanOrCredit implements I_s_FinancialProduct {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_amount: U_s_MonetaryAmount_OR_Float
   s_loanTerm: s_QuantitativeValue
   s_requiredCollateral: U_owl_Thing_OR_String
@@ -5082,14 +4327,7 @@ type s_LoanOrCredit implements I_s_FinancialProduct {
   s_offers: s_Offer
   s_provider: U_s_Organization_OR_s_Person
   s_providerMobility: String
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_serviceOutput: owl_Thing
   s_serviceType: String
   s_alternateName: [String]!
@@ -5102,9 +4340,11 @@ type s_LoanOrCredit implements I_s_FinancialProduct {
 }
 
 type s_LocationFeatureSpecification implements I_s_PropertyValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_hoursAvailable: s_OpeningHoursSpecification
   s_validFrom: DateTime
   s_validThrough: DateTime
@@ -5124,28 +4364,12 @@ type s_LocationFeatureSpecification implements I_s_PropertyValue {
   s_sameAs: [URL]!
 }
 
-type s_LocationFeatureSpecification_Connection {
-  edges: [s_LocationFeatureSpecification_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
-  pageInfo: PageInfo!
-}
-
-type s_LocationFeatureSpecification_Edge {
-  cursor: String!
-  edge: s_LocationFeatureSpecification!
-}
-
 type s_Map implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_mapType: s_MapCategoryType
   s_about: owl_Thing
   s_accessMode: String
@@ -5165,17 +4389,10 @@ type s_Map implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -5188,9 +4405,9 @@ type s_Map implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -5218,14 +4435,7 @@ type s_Map implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -5256,9 +4466,11 @@ enum s_MapCategoryType {
 }
 
 type s_MediaObject implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_associatedArticle: s_NewsArticle
   s_bitrate: String
   s_contentSize: String
@@ -5266,7 +4478,7 @@ type s_MediaObject implements I_s_CreativeWork {
   s_duration: Duration
   s_embedUrl: URL
   s_encodesCreativeWork: s_CreativeWork
-  s_encodingFormat: String
+  s_encodingFormat: URL
   s_height: U_s_Distance_OR_s_QuantitativeValue
   s_playerType: String
   s_productionCompany: s_Organization
@@ -5292,17 +4504,10 @@ type s_MediaObject implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -5317,7 +4522,6 @@ type s_MediaObject implements I_s_CreativeWork {
   s_encoding: s_MediaObject
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -5345,14 +4549,7 @@ type s_MediaObject implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -5376,9 +4573,11 @@ type s_MediaObject implements I_s_CreativeWork {
 }
 
 type s_MonetaryAmount implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_currency: String
   s_maxValue: Float
   s_minValue: Float
@@ -5395,9 +4594,11 @@ type s_MonetaryAmount implements I_s_StructuredValue {
 }
 
 type s_MusicAlbum implements I_s_MusicPlaylist {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_albumProductionType: s_MusicAlbumProductionType
   s_albumRelease: s_MusicRelease
   s_albumReleaseType: s_MusicAlbumReleaseType
@@ -5422,17 +4623,10 @@ type s_MusicAlbum implements I_s_MusicPlaylist {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -5445,9 +4639,9 @@ type s_MusicAlbum implements I_s_MusicPlaylist {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -5475,14 +4669,7 @@ type s_MusicAlbum implements I_s_MusicPlaylist {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -5525,9 +4712,11 @@ enum s_MusicAlbumReleaseType {
 }
 
 type s_MusicComposition implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_composer: U_s_Organization_OR_s_Person
   s_firstPerformance: s_Event
   s_includedComposition: s_MusicComposition
@@ -5556,17 +4745,10 @@ type s_MusicComposition implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -5579,9 +4761,9 @@ type s_MusicComposition implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -5609,14 +4791,7 @@ type s_MusicComposition implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -5640,9 +4815,11 @@ type s_MusicComposition implements I_s_CreativeWork {
 }
 
 type s_MusicGroup implements I_s_PerformingGroup {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_album: s_MusicAlbum
   s_genre: URL
   s_track: U_s_ItemList_OR_s_MusicRecording
@@ -5680,14 +4857,7 @@ type s_MusicGroup implements I_s_PerformingGroup {
   s_owns: U_s_OwnershipInfo_OR_s_Product
   s_parentOrganization: s_Organization
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_seeks: s_Demand
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_subOrganization: s_Organization
@@ -5704,9 +4874,11 @@ type s_MusicGroup implements I_s_PerformingGroup {
 }
 
 type s_MusicPlaylist implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_numTracks: Int
   s_track: U_s_ItemList_OR_s_MusicRecording
   s_about: owl_Thing
@@ -5727,17 +4899,10 @@ type s_MusicPlaylist implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -5750,9 +4915,9 @@ type s_MusicPlaylist implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -5780,14 +4945,7 @@ type s_MusicPlaylist implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -5811,9 +4969,11 @@ type s_MusicPlaylist implements I_s_CreativeWork {
 }
 
 type s_MusicRecording implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_byArtist: s_MusicGroup
   s_duration: Duration
   s_inAlbum: s_MusicAlbum
@@ -5838,17 +4998,10 @@ type s_MusicRecording implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -5861,9 +5014,9 @@ type s_MusicRecording implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -5891,14 +5044,7 @@ type s_MusicRecording implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -5922,9 +5068,11 @@ type s_MusicRecording implements I_s_CreativeWork {
 }
 
 type s_MusicRelease implements I_s_MusicPlaylist {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_catalogNumber: String
   s_creditedTo: U_s_Organization_OR_s_Person
   s_duration: Duration
@@ -5951,17 +5099,10 @@ type s_MusicRelease implements I_s_MusicPlaylist {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -5974,9 +5115,9 @@ type s_MusicRelease implements I_s_MusicPlaylist {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -6004,14 +5145,7 @@ type s_MusicRelease implements I_s_MusicPlaylist {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -6045,9 +5179,11 @@ enum s_MusicReleaseFormatType {
 }
 
 type s_NewsArticle implements I_s_Article {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_dateline: String
   s_printColumn: String
   s_printEdition: String
@@ -6077,17 +5213,10 @@ type s_NewsArticle implements I_s_Article {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -6100,9 +5229,9 @@ type s_NewsArticle implements I_s_Article {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -6130,14 +5259,7 @@ type s_NewsArticle implements I_s_Article {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -6161,9 +5283,11 @@ type s_NewsArticle implements I_s_Article {
 }
 
 type s_Offer implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_acceptedPaymentMethod: U_s_LoanOrCredit_OR_s_PaymentMethod
   s_addOn: s_Offer
   s_advanceBookingRequirement: s_QuantitativeValue
@@ -6197,14 +5321,7 @@ type s_Offer implements I_s_Intangible {
   s_priceCurrency: String
   s_priceSpecification: s_PriceSpecification
   s_priceValidUntil: Date
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_seller: U_s_Organization_OR_s_Person
   s_serialNumber: String
   s_sku: String
@@ -6220,28 +5337,12 @@ type s_Offer implements I_s_Intangible {
   s_sameAs: [URL]!
 }
 
-type s_Offer_Connection {
-  edges: [s_Offer_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Offer_Connection!
-  pageInfo: PageInfo!
-}
-
-type s_Offer_Edge {
-  cursor: String!
-  edge: s_Offer!
-}
-
 type s_OfferCatalog implements I_s_ItemList {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_itemListElement: U_s_ListItem_OR_owl_Thing_OR_String
   s_itemListOrder: U_s_ItemListOrderType_OR_String
   s_numberOfItems: Int
@@ -6262,9 +5363,11 @@ enum s_OfferItemCondition {
 }
 
 type s_OpeningHoursSpecification implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_closes: Time
   s_dayOfWeek: s_DayOfWeek
   s_opens: Time
@@ -6280,9 +5383,11 @@ type s_OpeningHoursSpecification implements I_s_StructuredValue {
 }
 
 type s_Order implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_acceptedOffer: s_Offer
   s_billingAddress: s_PostalAddress
   s_broker: U_s_Organization_OR_s_Person
@@ -6313,9 +5418,11 @@ type s_Order implements I_s_Intangible {
 }
 
 type s_OrderItem implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_orderDelivery: s_ParcelDelivery
   s_orderItemNumber: String
   s_orderItemStatus: s_OrderStatus
@@ -6342,9 +5449,11 @@ enum s_OrderStatus {
 }
 
 type s_Organization implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
   s_alumni: s_Person
@@ -6379,14 +5488,7 @@ type s_Organization implements I_owl_Thing {
   s_owns: U_s_OwnershipInfo_OR_s_Product
   s_parentOrganization: s_Organization
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_seeks: s_Demand
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_subOrganization: s_Organization
@@ -6403,9 +5505,11 @@ type s_Organization implements I_owl_Thing {
 }
 
 type s_OwnershipInfo implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_acquiredFrom: U_s_Organization_OR_s_Person
   s_ownedFrom: DateTime
   s_ownedThrough: DateTime
@@ -6420,9 +5524,11 @@ type s_OwnershipInfo implements I_s_StructuredValue {
 }
 
 type s_ParcelDelivery implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_deliveryAddress: s_PostalAddress
   s_deliveryStatus: s_DeliveryEvent
   s_expectedArrivalFrom: DateTime
@@ -6464,9 +5570,11 @@ enum s_PaymentStatusType {
 }
 
 type s_Person implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalName: String
   s_address: U_s_PostalAddress_OR_String
   s_affiliation: s_Organization
@@ -6528,9 +5636,11 @@ type s_Person implements I_owl_Thing {
 }
 
 type s_Photograph implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_about: owl_Thing
   s_accessMode: String
   s_accessModeSufficient: String
@@ -6549,17 +5659,10 @@ type s_Photograph implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -6572,9 +5675,9 @@ type s_Photograph implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -6602,14 +5705,7 @@ type s_Photograph implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -6633,20 +5729,15 @@ type s_Photograph implements I_s_CreativeWork {
 }
 
 type s_Place implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_address: U_s_PostalAddress_OR_String
   s_aggregateRating: s_AggregateRating
-  s_amenityFeature(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_LocationFeatureSpecification_Connection!
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_branchCode: String
   s_containedInPlace: [s_Place]!
   s_containsPlace: s_Place
@@ -6660,23 +5751,9 @@ type s_Place implements I_owl_Thing {
   s_logo: U_s_ImageObject_OR_URL
   s_maximumAttendeeCapacity: Int
   s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_publicAccess: Boolean
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_smokingAllowed: Boolean
   s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
   s_telephone: String
@@ -6690,9 +5767,11 @@ type s_Place implements I_owl_Thing {
 }
 
 type s_PostalAddress implements I_s_ContactPoint {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_addressCountry: U_s_Country_OR_String
   s_addressLocality: String
   s_addressRegion: String
@@ -6718,9 +5797,11 @@ type s_PostalAddress implements I_s_ContactPoint {
 }
 
 type s_PriceSpecification implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_eligibleQuantity: s_QuantitativeValue
   s_eligibleTransactionVolume: s_PriceSpecification
   s_maxPrice: Float
@@ -6740,9 +5821,11 @@ type s_PriceSpecification implements I_s_StructuredValue {
 }
 
 type s_Product implements I_owl_Thing {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_aggregateRating: s_AggregateRating
   s_audience: s_Audience
@@ -6771,14 +5854,7 @@ type s_Product implements I_owl_Thing {
   s_productionDate: Date
   s_purchaseDate: Date
   s_releaseDate: Date
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_sku: String
   s_weight: s_QuantitativeValue
   s_width: U_s_Distance_OR_s_QuantitativeValue
@@ -6792,9 +5868,11 @@ type s_Product implements I_owl_Thing {
 }
 
 type s_ProductModel implements I_s_Product {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_isVariantOf: s_ProductModel
   s_predecessorOf: s_ProductModel
   s_successorOf: s_ProductModel
@@ -6826,14 +5904,7 @@ type s_ProductModel implements I_s_Product {
   s_productionDate: Date
   s_purchaseDate: Date
   s_releaseDate: Date
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_sku: String
   s_weight: s_QuantitativeValue
   s_width: U_s_Distance_OR_s_QuantitativeValue
@@ -6847,9 +5918,11 @@ type s_ProductModel implements I_s_Product {
 }
 
 type s_ProgramMembership implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_hostingOrganization: s_Organization
   s_member: U_s_Organization_OR_s_Person
   s_membershipNumber: String
@@ -6864,9 +5937,11 @@ type s_ProgramMembership implements I_s_Intangible {
 }
 
 type s_PropertyValue implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_maxValue: Float
   s_minValue: Float
   s_propertyID: URL
@@ -6884,9 +5959,11 @@ type s_PropertyValue implements I_s_StructuredValue {
 }
 
 type s_PublicationEvent implements I_s_Event {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_isAccessibleForFree: Boolean
   s_publishedOn: s_BroadcastService
   s_about: owl_Thing
@@ -6911,14 +5988,7 @@ type s_PublicationEvent implements I_s_Event {
   s_previousStartDate: Date
   s_recordedIn: s_CreativeWork
   s_remainingAttendeeCapacity: Int
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_sponsor: [U_s_Organization_OR_s_Person]!
   s_startDate: U_Date_OR_DateTime
   s_subEvent: s_Event
@@ -6937,9 +6007,11 @@ type s_PublicationEvent implements I_s_Event {
 }
 
 type s_QualitativeValue implements I_s_Enumeration {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_equal: s_QualitativeValue
   s_greater: s_QualitativeValue
@@ -6958,9 +6030,11 @@ type s_QualitativeValue implements I_s_Enumeration {
 }
 
 type s_QuantitativeValue implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_additionalProperty: s_PropertyValue
   s_maxValue: Float
   s_minValue: Float
@@ -6978,13 +6052,15 @@ type s_QuantitativeValue implements I_s_StructuredValue {
 }
 
 type s_Question implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
-  s_acceptedAnswer: s_Answer
+  s_url: URL
+  s_acceptedAnswer: U_s_Answer_OR_s_ItemList
   s_answerCount: Int
   s_downvoteCount: Int
-  s_suggestedAnswer: s_Answer
+  s_suggestedAnswer: U_s_Answer_OR_s_ItemList
   s_upvoteCount: Int
   s_about: owl_Thing
   s_accessMode: String
@@ -7004,17 +6080,10 @@ type s_Question implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -7027,9 +6096,9 @@ type s_Question implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -7057,14 +6126,7 @@ type s_Question implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -7088,9 +6150,11 @@ type s_Question implements I_s_CreativeWork {
 }
 
 type s_Rating implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_author: U_s_Organization_OR_s_Person
   s_bestRating: Float
   s_ratingValue: Float
@@ -7105,9 +6169,11 @@ type s_Rating implements I_s_Intangible {
 }
 
 type s_Review implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_itemReviewed: owl_Thing
   s_reviewBody: String
   s_reviewRating: s_Rating
@@ -7129,17 +6195,10 @@ type s_Review implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -7152,9 +6211,9 @@ type s_Review implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -7182,14 +6241,7 @@ type s_Review implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -7212,28 +6264,12 @@ type s_Review implements I_s_CreativeWork {
   s_sameAs: [URL]!
 }
 
-type s_Review_Connection {
-  edges: [s_Review_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
-  pageInfo: PageInfo!
-}
-
-type s_Review_Edge {
-  cursor: String!
-  edge: s_Review!
-}
-
 type s_Service implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_aggregateRating: s_AggregateRating
   s_areaServed: U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String
   s_audience: s_Audience
@@ -7250,14 +6286,7 @@ type s_Service implements I_s_Intangible {
   s_offers: s_Offer
   s_provider: U_s_Organization_OR_s_Person
   s_providerMobility: String
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_serviceOutput: owl_Thing
   s_serviceType: String
   s_alternateName: [String]!
@@ -7270,9 +6299,11 @@ type s_Service implements I_s_Intangible {
 }
 
 type s_ServiceChannel implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_availableLanguage: U_s_Language_OR_String
   s_processingTime: Duration
   s_providesService: s_Service
@@ -7291,9 +6322,11 @@ type s_ServiceChannel implements I_s_Intangible {
 }
 
 type s_SoftwareApplication implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_applicationCategory: URL
   s_applicationSubCategory: URL
   s_applicationSuite: String
@@ -7334,17 +6367,10 @@ type s_SoftwareApplication implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -7357,9 +6383,9 @@ type s_SoftwareApplication implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -7387,14 +6413,7 @@ type s_SoftwareApplication implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -7418,9 +6437,11 @@ type s_SoftwareApplication implements I_s_CreativeWork {
 }
 
 type s_StructuredValue implements I_s_Intangible {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_alternateName: [String]!
   s_disambiguatingDescription: String
   s_identifier: [U_s_PropertyValue_OR_URL]!
@@ -7431,9 +6452,11 @@ type s_StructuredValue implements I_s_Intangible {
 }
 
 type s_TypeAndQuantityNode implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_amountOfThisGood: Float
   s_businessFunction: s_BusinessFunction
   s_typeOfGood: U_s_Product_OR_s_Service
@@ -7449,9 +6472,11 @@ type s_TypeAndQuantityNode implements I_s_StructuredValue {
 }
 
 type s_VideoObject implements I_s_MediaObject {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_actor: s_Person
   s_caption: String
   s_director: s_Person
@@ -7467,7 +6492,7 @@ type s_VideoObject implements I_s_MediaObject {
   s_duration: Duration
   s_embedUrl: URL
   s_encodesCreativeWork: s_CreativeWork
-  s_encodingFormat: String
+  s_encodingFormat: URL
   s_height: U_s_Distance_OR_s_QuantitativeValue
   s_playerType: String
   s_productionCompany: s_Organization
@@ -7493,17 +6518,10 @@ type s_VideoObject implements I_s_MediaObject {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -7518,7 +6536,6 @@ type s_VideoObject implements I_s_MediaObject {
   s_encoding: s_MediaObject
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -7546,14 +6563,7 @@ type s_VideoObject implements I_s_MediaObject {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -7577,9 +6587,11 @@ type s_VideoObject implements I_s_MediaObject {
 }
 
 type s_WarrantyPromise implements I_s_StructuredValue {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_durationOfWarranty: s_QuantitativeValue
   s_warrantyScope: s_WarrantyScope
   s_alternateName: [String]!
@@ -7598,9 +6610,11 @@ enum s_WarrantyScope {
 }
 
 type s_WebSite implements I_s_CreativeWork {
+  __id: String! @id
+  __typename: String @typename
   s_description: String
-  s_id: URL!
   s_name: String
+  s_url: URL
   s_issn: String
   s_about: owl_Thing
   s_accessMode: String
@@ -7620,17 +6634,10 @@ type s_WebSite implements I_s_CreativeWork {
   s_award: String
   s_character: s_Person
   s_citation: U_s_CreativeWork_OR_String
-  s_comment(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Comment_Connection!
+  s_comment(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_commentCount: Int
   s_contentLocation: s_Place
-  s_contentRating: String
+  s_contentRating: U_s_Rating_OR_String
   s_contributor: [U_s_Organization_OR_s_Person]!
   s_copyrightHolder: U_s_Organization_OR_s_Person
   s_copyrightYear: Float
@@ -7643,9 +6650,9 @@ type s_WebSite implements I_s_CreativeWork {
   s_educationalAlignment: s_AlignmentObject
   s_educationalUse: String
   s_encoding: s_MediaObject
+  s_encodingFormat: URL
   s_exampleOfWork: s_CreativeWork
   s_expires: Date
-  s_fileFormat: URL
   s_funder: U_s_Organization_OR_s_Person
   s_genre: URL
   s_hasPart: s_CreativeWork
@@ -7673,14 +6680,7 @@ type s_WebSite implements I_s_CreativeWork {
   s_publishingPrinciples: U_s_CreativeWork_OR_URL
   s_recordedAt: s_Event
   s_releasedEvent: s_PublicationEvent
-  s_review(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): s_Review_Connection!
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   s_schemaVersion: URL
   s_sourceOrganization: s_Organization
   s_spatialCoverage: s_Place
@@ -7715,13 +6715,13 @@ union U_Date_OR_DateTime = O_Date | O_DateTime
 
 union U_Int_OR_String = O_Int | O_String
 
+union U_NodeObject = j_BookedTrip | s_Comment | j_CuratedAccommodation | j_CuratedActivity | j_CuratedDestination | gn_Feature | j_Identity | s_ImageObject | j_Itinerary | s_LocationFeatureSpecification | s_Order | s_Photograph | s_Review | j_Session | j_TripProfile | j_User
+
 union U_owl_Thing_OR_String = owl_Thing | O_String
 
-union U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String =
-    s_AdministrativeArea
-  | s_GeoShape
-  | s_Place
-  | O_String
+union U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String = s_AdministrativeArea | s_GeoShape | s_Place | O_String
+
+union U_s_Answer_OR_s_ItemList = s_Answer | s_ItemList
 
 union U_s_Audience_OR_String = s_Audience | O_String
 
@@ -7737,49 +6737,19 @@ union U_s_CreativeWork_OR_String = s_CreativeWork | O_String
 
 union U_s_CreativeWork_OR_URL = s_CreativeWork | O_URL
 
-union U_s_DataFeedItem_OR_owl_Thing_OR_String =
-    s_DataFeedItem
-  | owl_Thing
-  | O_String
+union U_s_DataFeedItem_OR_owl_Thing_OR_String = s_DataFeedItem | owl_Thing | O_String
 
 union U_s_Distance_OR_s_QuantitativeValue = s_Distance | s_QuantitativeValue
 
-union U_s_EducationalOrganization_OR_s_Organization =
-    s_EducationalOrganization
-  | s_Organization
+union U_s_EducationalOrganization_OR_s_Organization = s_EducationalOrganization | s_Organization
 
-union U_s_Enumeration_OR_s_PropertyValue_OR_s_QualitativeValue_OR_s_QuantitativeValue_OR_s_StructuredValue =
-    s_Enumeration
-  | s_PropertyValue
-  | s_QualitativeValue
-  | s_QuantitativeValue
-  | s_StructuredValue
+union U_s_Enumeration_OR_s_PropertyValue_OR_s_QualitativeValue_OR_s_QuantitativeValue_OR_s_StructuredValue = s_Enumeration | s_PropertyValue | s_QualitativeValue | s_QuantitativeValue | s_StructuredValue
 
 union U_s_GenderType_OR_String = O_s_GenderType | O_String
 
 union U_s_GeoCoordinates_OR_s_GeoShape = s_GeoCoordinates | s_GeoShape
 
 union U_s_GeoShape_OR_s_Place_OR_String = s_GeoShape | s_Place | O_String
-
-union U_s_ImageObject_OR_s_Photograph = s_ImageObject | s_Photograph
-
-type U_s_ImageObject_OR_s_Photograph_Connection {
-  edges: [U_s_ImageObject_OR_s_Photograph_Edge]!
-  moreEdges(
-    filter: String
-    sortBy: String
-    first: Int
-    after: String
-    last: Int
-    before: String
-  ): U_s_ImageObject_OR_s_Photograph_Connection!
-  pageInfo: PageInfo!
-}
-
-type U_s_ImageObject_OR_s_Photograph_Edge {
-  cursor: String!
-  edge: U_s_ImageObject_OR_s_Photograph!
-}
 
 union U_s_ImageObject_OR_URL = s_ImageObject | O_URL
 
@@ -7797,9 +6767,7 @@ union U_s_Map_OR_URL = s_Map | O_URL
 
 union U_s_MonetaryAmount_OR_Float = s_MonetaryAmount | O_Float
 
-union U_s_MonetaryAmount_OR_s_PriceSpecification =
-    s_MonetaryAmount
-  | s_PriceSpecification
+union U_s_MonetaryAmount_OR_s_PriceSpecification = s_MonetaryAmount | s_PriceSpecification
 
 union U_s_MonetaryAmount_OR_String = s_MonetaryAmount | O_String
 
@@ -7809,9 +6777,7 @@ union U_s_OrderItem_OR_s_Product = s_OrderItem | s_Product
 
 union U_s_Organization_OR_s_Person = s_Organization | s_Person
 
-union U_s_Organization_OR_s_ProgramMembership =
-    s_Organization
-  | s_ProgramMembership
+union U_s_Organization_OR_s_ProgramMembership = s_Organization | s_ProgramMembership
 
 union U_s_OwnershipInfo_OR_s_Product = s_OwnershipInfo | s_Product
 
@@ -7819,10 +6785,7 @@ union U_s_PaymentStatusType_OR_String = O_s_PaymentStatusType | O_String
 
 union U_s_Person_OR_URL = s_Person | O_URL
 
-union U_s_Place_OR_s_PostalAddress_OR_String =
-    s_Place
-  | s_PostalAddress
-  | O_String
+union U_s_Place_OR_s_PostalAddress_OR_String = s_Place | s_PostalAddress | O_String
 
 union U_s_PostalAddress_OR_String = s_PostalAddress | O_String
 
@@ -7840,13 +6803,13 @@ union U_s_PropertyValue_OR_URL = s_PropertyValue | O_URL
 
 union U_s_QuantitativeValue_OR_Float = s_QuantitativeValue | O_Float
 
+union U_s_Rating_OR_String = s_Rating | O_String
+
 union U_s_SoftwareApplication_OR_s_WebSite = s_SoftwareApplication | s_WebSite
 
-union U_s_StructuredValue_OR_Boolean_OR_Float =
-    s_StructuredValue
-  | O_Boolean
-  | O_Float
+union U_s_StructuredValue_OR_Boolean_OR_Float = s_StructuredValue | O_Boolean | O_Float
 
 union U_URL_OR_DateTime = O_URL | O_DateTime
 
 scalar URL
+

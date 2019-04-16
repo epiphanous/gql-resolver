@@ -11,6 +11,7 @@ import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
 
 export default class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
   public result: List<GQLBooster>;
+
   constructor(
     validFields: Map<string, string>,
     validVariables: Set<GQLVariableDefinition>,

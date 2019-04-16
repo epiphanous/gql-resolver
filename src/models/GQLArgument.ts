@@ -4,6 +4,7 @@ import { GQLValue } from './GQLValue';
 interface IGQLArgument {
   name: string;
   value: GQLValue;
+
   resolve(vars: Map<string, any>): any;
 }
 
@@ -20,16 +21,17 @@ export class GQLArgument implements IGQLArgument {
     return this.value.resolve(vars);
   }
 }
-
+export class GQLAfterArgument extends GQLArgument {}
 export class GQLAnyArgument extends GQLArgument {}
+export class GQLBeforeArgument extends GQLArgument {}
 export class GQLBindingsArgument extends GQLArgument {}
 export class GQLBoostersArgument extends GQLArgument {}
 export class GQLFilterArgument extends GQLArgument {}
+export class GQLFirstArgument extends GQLArgument {}
 export class GQLIncludeDeprecatedArgument extends GQLArgument {}
 export class GQLInvalidArgument extends GQLArgument {}
-export class GQLLimitArgument extends GQLArgument {}
+export class GQLLastArgument extends GQLArgument {}
 export class GQLNameArgument extends GQLArgument {}
-export class GQLOffsetArgument extends GQLArgument {}
-export class GQLOrderArgument extends GQLArgument {}
 export class GQLPatternsArgument extends GQLArgument {}
+export class GQLSortByArgument extends GQLArgument {}
 export class GQLTransformsArgument extends GQLArgument {}

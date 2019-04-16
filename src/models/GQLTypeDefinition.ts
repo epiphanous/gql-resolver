@@ -1,6 +1,7 @@
 import { None, Option } from 'funfix';
 import { List } from 'immutable';
 import { GQLDirective } from './GQLDirective';
+import { GQLField } from './GQLSelection';
 import { GQLType } from './GQLType';
 import { GQLValue } from './GQLValue';
 
@@ -8,6 +9,7 @@ interface IGQLTypeDefinition {
   name: string;
   description?: Option<string>;
   directives?: List<GQLDirective>;
+
   deprecated(): Option<string>;
 }
 
@@ -50,6 +52,10 @@ export class GQLInterface extends GQLTypeDefinition implements IGQLInterface {
     super(name, description, directives);
     this.fields = fields;
   }
+
+  public idFields(): List<GQLFieldDefinition> {
+    return this.fields.filter(f => f.isIdField());
+  }
 }
 
 interface IGQLObjectType extends IGQLTypeDefinition {
@@ -82,6 +88,10 @@ export class GQLObjectType extends GQLTypeDefinition implements IGQLObjectType {
       newProps.directives || this.directives
     );
   }
+
+  public idFields(): List<GQLFieldDefinition> {
+    return this.fields.filter(f => f.isIdField());
+  }
 }
 
 interface IGQLFieldDefinition extends IGQLTypeDefinition {
@@ -104,6 +114,10 @@ export class GQLFieldDefinition extends GQLTypeDefinition
     super(name, description, directives);
     this.gqlType = gqlType;
     this.args = args;
+  }
+
+  public isIdField(): boolean {
+    return Option.of(this.directives.find(d => d.name === 'id')).nonEmpty();
   }
 }
 
@@ -197,6 +211,7 @@ export class GQLEnumValueDefinition extends GQLTypeDefinition {
     super(name, description, directives);
   }
 }
+
 interface IGQLEnum extends IGQLTypeDefinition {
   values: List<GQLEnumValueDefinition>;
 }

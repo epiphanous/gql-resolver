@@ -2,97 +2,99 @@
 
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
 
-import { SelectionOnlyOperationDefinitionContext } from './GraphQLParser';
-import { FullOperationDefinitionContext } from './GraphQLParser';
-import { FragmentSpreadSelectionContext } from './GraphQLParser';
-import { FieldSelectionContext } from './GraphQLParser';
-import { InlineFragmentSelectionContext } from './GraphQLParser';
-import { InputObjectTypeExtensionWithDirectivesContext } from './GraphQLParser';
-import { InputObjectTypeExtensionWithFieldsContext } from './GraphQLParser';
-import { InterfaceTypeExtensionWithFieldsContext } from './GraphQLParser';
-import { InterfaceTypeExtensionWithDirectivesContext } from './GraphQLParser';
-import { ObjectTypeExtensionWithDirectivesContext } from './GraphQLParser';
-import { ObjectTypeExtensionWithFieldsContext } from './GraphQLParser';
-import { ObjectTypeExtensionWithInterfacesContext } from './GraphQLParser';
-import { UnionTypeExtensionWithDirectivesContext } from './GraphQLParser';
-import { UnionTypeExtensionWithMembersContext } from './GraphQLParser';
-import { SchemaExtensionWithoutOperationsContext } from './GraphQLParser';
-import { SchemaExtensionWithOperationsContext } from './GraphQLParser';
-import { StringValueContext } from './GraphQLParser';
-import { NonEmptyObjectValueContext } from './GraphQLParser';
-import { EnumValueContext } from './GraphQLParser';
-import { VariableValueContext } from './GraphQLParser';
-import { IntValueContext } from './GraphQLParser';
-import { EmptyListValueContext } from './GraphQLParser';
-import { FloatValueContext } from './GraphQLParser';
-import { BooleanValueContext } from './GraphQLParser';
-import { NonEmptyListValueContext } from './GraphQLParser';
-import { NullValueContext } from './GraphQLParser';
-import { EmptyObjectValueContext } from './GraphQLParser';
-import { EnumTypeExtensionWithDirectivesContext } from './GraphQLParser';
-import { EnumTypeExtensionWithValuesContext } from './GraphQLParser';
-import { DocumentContext } from './GraphQLParser';
-import { DefinitionContext } from './GraphQLParser';
-import { ExecutableDefinitionContext } from './GraphQLParser';
-import { OperationDefinitionContext } from './GraphQLParser';
-import { OperationTypeContext } from './GraphQLParser';
-import { SelectionSetContext } from './GraphQLParser';
-import { SelectionContext } from './GraphQLParser';
-import { FieldContext } from './GraphQLParser';
-import { AliasContext } from './GraphQLParser';
-import { ArgumentsContext } from './GraphQLParser';
-import { ArgumentContext } from './GraphQLParser';
-import { FragmentSpreadContext } from './GraphQLParser';
-import { InlineFragmentContext } from './GraphQLParser';
-import { FragmentDefinitionContext } from './GraphQLParser';
-import { FragmentNameContext } from './GraphQLParser';
-import { TypeConditionContext } from './GraphQLParser';
-import { ValueContext } from './GraphQLParser';
-import { ObjectFieldContext } from './GraphQLParser';
-import { VariableDefinitionsContext } from './GraphQLParser';
-import { VariableDefinitionContext } from './GraphQLParser';
-import { VariableContext } from './GraphQLParser';
-import { DefaultValueContext } from './GraphQLParser';
-import { TypeContext } from './GraphQLParser';
-import { NamedTypeContext } from './GraphQLParser';
-import { ListTypeContext } from './GraphQLParser';
-import { NonNullTypeContext } from './GraphQLParser';
-import { DirectivesContext } from './GraphQLParser';
-import { DirectiveContext } from './GraphQLParser';
-import { TypeSystemDefinitionContext } from './GraphQLParser';
-import { TypeSystemExtensionContext } from './GraphQLParser';
-import { SchemaDefinitionContext } from './GraphQLParser';
-import { SchemaExtensionContext } from './GraphQLParser';
-import { OperationTypeDefinitionContext } from './GraphQLParser';
-import { DescriptionContext } from './GraphQLParser';
-import { TypeDefinitionContext } from './GraphQLParser';
-import { TypeExtensionContext } from './GraphQLParser';
-import { ScalarTypeDefinitionContext } from './GraphQLParser';
-import { ScalarTypeExtensionContext } from './GraphQLParser';
-import { ObjectTypeDefinitionContext } from './GraphQLParser';
-import { ObjectTypeExtensionContext } from './GraphQLParser';
-import { ImplementsInterfacesContext } from './GraphQLParser';
-import { FieldsDefinitionContext } from './GraphQLParser';
-import { FieldDefinitionContext } from './GraphQLParser';
-import { ArgumentsDefinitionContext } from './GraphQLParser';
-import { InputValueDefinitionContext } from './GraphQLParser';
-import { InterfaceTypeDefinitionContext } from './GraphQLParser';
-import { InterfaceTypeExtensionContext } from './GraphQLParser';
-import { UnionTypeDefinitionContext } from './GraphQLParser';
-import { UnionMemberTypesContext } from './GraphQLParser';
-import { UnionTypeExtensionContext } from './GraphQLParser';
-import { EnumTypeDefinitionContext } from './GraphQLParser';
-import { EnumValuesDefinitionContext } from './GraphQLParser';
-import { EnumValueDefinitionContext } from './GraphQLParser';
-import { EnumTypeExtensionContext } from './GraphQLParser';
-import { InputObjectTypeDefinitionContext } from './GraphQLParser';
-import { InputFieldsDefinitionContext } from './GraphQLParser';
-import { InputObjectTypeExtensionContext } from './GraphQLParser';
-import { DirectiveDefinitionContext } from './GraphQLParser';
-import { DirectiveLocationsContext } from './GraphQLParser';
-import { DirectiveLocationContext } from './GraphQLParser';
-import { ExecutableDirectiveLocationContext } from './GraphQLParser';
-import { TypeSystemDirectiveLocationContext } from './GraphQLParser';
+import {
+  AliasContext,
+  ArgumentContext,
+  ArgumentsContext,
+  ArgumentsDefinitionContext,
+  BooleanValueContext,
+  DefaultValueContext,
+  DefinitionContext,
+  DescriptionContext,
+  DirectiveContext,
+  DirectiveDefinitionContext,
+  DirectiveLocationContext,
+  DirectiveLocationsContext,
+  DirectivesContext,
+  DocumentContext,
+  EmptyListValueContext,
+  EmptyObjectValueContext,
+  EnumTypeDefinitionContext,
+  EnumTypeExtensionContext,
+  EnumTypeExtensionWithDirectivesContext,
+  EnumTypeExtensionWithValuesContext,
+  EnumValueContext,
+  EnumValueDefinitionContext,
+  EnumValuesDefinitionContext,
+  ExecutableDefinitionContext,
+  ExecutableDirectiveLocationContext,
+  FieldContext,
+  FieldDefinitionContext,
+  FieldsDefinitionContext,
+  FieldSelectionContext,
+  FloatValueContext,
+  FragmentDefinitionContext,
+  FragmentNameContext,
+  FragmentSpreadContext,
+  FragmentSpreadSelectionContext,
+  FullOperationDefinitionContext,
+  ImplementsInterfacesContext,
+  InlineFragmentContext,
+  InlineFragmentSelectionContext,
+  InputFieldsDefinitionContext,
+  InputObjectTypeDefinitionContext,
+  InputObjectTypeExtensionContext,
+  InputObjectTypeExtensionWithDirectivesContext,
+  InputObjectTypeExtensionWithFieldsContext,
+  InputValueDefinitionContext,
+  InterfaceTypeDefinitionContext,
+  InterfaceTypeExtensionContext,
+  InterfaceTypeExtensionWithDirectivesContext,
+  InterfaceTypeExtensionWithFieldsContext,
+  IntValueContext,
+  ListTypeContext,
+  NamedTypeContext,
+  NonEmptyListValueContext,
+  NonEmptyObjectValueContext,
+  NonNullTypeContext,
+  NullValueContext,
+  ObjectFieldContext,
+  ObjectTypeDefinitionContext,
+  ObjectTypeExtensionContext,
+  ObjectTypeExtensionWithDirectivesContext,
+  ObjectTypeExtensionWithFieldsContext,
+  ObjectTypeExtensionWithInterfacesContext,
+  OperationDefinitionContext,
+  OperationTypeContext,
+  OperationTypeDefinitionContext,
+  ScalarTypeDefinitionContext,
+  ScalarTypeExtensionContext,
+  SchemaDefinitionContext,
+  SchemaExtensionContext,
+  SchemaExtensionWithOperationsContext,
+  SchemaExtensionWithoutOperationsContext,
+  SelectionContext,
+  SelectionOnlyOperationDefinitionContext,
+  SelectionSetContext,
+  StringValueContext,
+  TypeConditionContext,
+  TypeContext,
+  TypeDefinitionContext,
+  TypeExtensionContext,
+  TypeSystemDefinitionContext,
+  TypeSystemDirectiveLocationContext,
+  TypeSystemExtensionContext,
+  UnionMemberTypesContext,
+  UnionTypeDefinitionContext,
+  UnionTypeExtensionContext,
+  UnionTypeExtensionWithDirectivesContext,
+  UnionTypeExtensionWithMembersContext,
+  ValueContext,
+  VariableContext,
+  VariableDefinitionContext,
+  VariableDefinitionsContext,
+  VariableValueContext,
+} from './GraphQLParser';
 
 /**
  * This interface defines a complete listener for a parse tree produced by

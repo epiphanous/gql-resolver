@@ -1,4 +1,3 @@
-import { toMap } from 'antlr4ts/misc';
 import { None, Option, Some, TNone, TSome } from 'funfix';
 import { List, Map, Seq, Set } from 'immutable';
 import { GQLField, GQLInlineFragment, GQLSelection } from './GQLSelection';
@@ -104,9 +103,11 @@ export class GQLSchema implements IGQLSchema {
   public getTypeName(t: string | GQLTypeDefinition): string {
     return typeof t === 'string' ? t : t.name;
   }
+
   public isScalar(t: string | GQLTypeDefinition): boolean {
     return this.scalarTypes.has(this.getTypeName(t));
   }
+
   public isScalarLike(t: string | GQLTypeDefinition): boolean {
     return (
       this.isScalar(t) ||
@@ -115,6 +116,7 @@ export class GQLSchema implements IGQLSchema {
       this.isScalarObjectType(t)
     );
   }
+
   public isScalarObjectType(t: string | GQLTypeDefinition): boolean {
     if (typeof t === 'string') {
       return t.startsWith('O_') && this.isScalarLike(t.substring(2));
@@ -122,12 +124,15 @@ export class GQLSchema implements IGQLSchema {
       return this.isObjectType(t) && this.isScalarObjectType(t.name);
     }
   }
+
   public isInterface(t: string | GQLTypeDefinition): boolean {
     return this.interfaces.has(this.getTypeName(t));
   }
+
   public isUnion(t: string | GQLTypeDefinition): boolean {
     return this.unions.has(this.getTypeName(t));
   }
+
   public isUnionScalarLike(t: string | GQLTypeDefinition): boolean {
     const name = this.getTypeName(t);
     if (this.unions.has(name)) {
@@ -136,21 +141,27 @@ export class GQLSchema implements IGQLSchema {
     }
     return false;
   }
+
   public isObjectType(t: string | GQLTypeDefinition): boolean {
     return this.objectTypes.has(this.getTypeName(t));
   }
+
   public isObjectLike(t: string | GQLTypeDefinition): boolean {
     return !this.isScalarLike(t);
   }
+
   public isMultiType(t: string | GQLTypeDefinition): boolean {
     return this.isInterface(t) || this.isUnion(t);
   }
+
   public isEnum(t: string | GQLTypeDefinition): boolean {
     return this.enums.has(this.getTypeName(t));
   }
+
   public getTypeClass(tdOpt: Option<GQLTypeDefinition>): Option<string> {
     return tdOpt.map(td => td.constructor.name);
   }
+
   public getKind(t: Option<GQLTypeDefinition>): string {
     return t
       .map(td => {
@@ -306,7 +317,7 @@ export class GQLSchema implements IGQLSchema {
     const scalars = List<[string, GQLField]>().asMutable();
     const objects = List<[string, GQLField]>().asMutable();
     const errors = List<Error>().asMutable();
-    console.log(fields);
+    // console.log(fields);
 
     fields
       .flatMap<[string, GQLField]>(tf => {

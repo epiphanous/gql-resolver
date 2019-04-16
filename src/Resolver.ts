@@ -18,9 +18,8 @@ export class Resolver {
     operationName: Option<string> = None
   ) {
     const queryBuilder = new GQLQueryBuilder(this.context, vars, operationName);
-    return Builder.parse<GQLQueryDocument>(
-      queryBuilder,
-      query
-    ).map(doc => doc.execute(queryBuilder));
+    return Builder.parse<GQLQueryDocument>(queryBuilder, query).map(doc =>
+      doc.execute(queryBuilder)
+    );
   }
 }

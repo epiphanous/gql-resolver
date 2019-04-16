@@ -1,5 +1,5 @@
-import {List, OrderedMap} from 'immutable';
-import sizeof = require('object-sizeof');
+import { List, OrderedMap } from 'immutable';
+import sizeof from 'object-sizeof';
 
 interface IMetaFields {
   startTime: number;
@@ -22,13 +22,10 @@ export default class QueryResult {
     done: false,
     ok: true,
     errors: List<string>().asMutable(),
-    bps: 0
+    bps: 0,
   };
 
-  constructor(
-    startTime: number = 0,
-    duration: number = 0
-  ) {
+  constructor(startTime: number = 0, duration: number = 0) {
     this.meta.startTime = startTime || new Date().getTime();
     this.meta.duration = duration;
     this.meta.count = 0;

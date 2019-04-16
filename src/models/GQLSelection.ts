@@ -1,10 +1,8 @@
-import { Option } from 'funfix';
+import { Option, None } from 'funfix';
 import * as id64 from 'id64';
 import { List } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
-import ResolverContext from './ResolverContext';
-import { GQLTypeDefinition } from './GQLTypeDefinition';
 
 interface IGQLSelection {
   name: string;
@@ -19,33 +17,27 @@ export class GQLSelection implements IGQLSelection {
 }
 
 interface IGQLField extends IGQLSelection {
-  alias: Option<string>;
-  args: List<GQLArgument>;
-  directives: List<GQLDirective>;
-  selections: List<GQLSelection>;
-  outputType: string;
+  alias?: Option<string>;
+  args?: List<GQLArgument>;
+  directives?: List<GQLDirective>;
+  selections?: List<GQLSelection>;
+  outputType?: string;
   parentType: string; // parent field's outputType
-  fields: List<[string, GQLField]>;
+  fields?: List<[string, GQLField]>;
 }
 
 export class GQLField extends GQLSelection implements IGQLField {
-  public alias: Option<string>;
-  public args: List<GQLArgument>;
-  public directives: List<GQLDirective>;
-  public selections: List<GQLSelection>;
-  public outputType: string;
-  public fields: List<[string, GQLField]>;
+  public alias: Option<string> = None;
+  public args = List<GQLArgument>();
+  public directives = List<GQLDirective>();
+  public selections = List<GQLSelection>();
+  public outputType: string = 'xsd:string';
+  public fields = List<[string, GQLField]>();
   public parentType: string;
 
   constructor(data: Partial<IGQLField> = {}) {
     super(data.name);
-    this.alias = data.alias;
-    this.args = data.args;
-    this.directives = data.directives;
-    this.selections = data.selections;
-    this.outputType = data.outputType;
-    this.parentType = data.parentType;
-    this.fields = data.fields;
+    Object.assign<GQLField, Partial<IGQLField>>(this, data);
   }
 
   public copy(data: Partial<IGQLField>) {

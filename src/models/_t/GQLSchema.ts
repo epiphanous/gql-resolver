@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import fs = require('fs');
 import 'mocha';
 import Builder from '../../builders/Builder';
 import GQLSchemaBuilder from '../../builders/graphql/GQLSchemaBuilder';
 import { GQLSchema } from '../GQLSchema';
 import { GQLEnum, GQLObjectType } from '../GQLTypeDefinition';
+import fs = require('fs');
 
 describe('GQLSchema', () => {
   let schema: GQLSchema = null;

@@ -1,12 +1,11 @@
-import { assert, expect } from 'chai';
-import fs = require('fs');
+import { expect } from 'chai';
 import { Some } from 'funfix';
-import { List, Map } from 'immutable';
+import { Map } from 'immutable';
 import 'mocha';
-import {inspect} from 'util';
 import ResolverContext from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
-import {SparqlQueryStrategyFactory} from '../strategies/SparqlQueryStrategyFactory';
+import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
+import fs = require('fs');
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
@@ -27,8 +26,9 @@ describe('Resolver', () => {
     const result = await resolver.resolve(
       `
     query test {
-      home: curatedDestination(first: 2) {
-        gn_nearby {
+      home: curatedDestination(id: 'yerevan') {
+        gn_nearby(first: 3) {
+          totalCount
           edges {
             node {
               ... on j_CuratedDestination {
@@ -38,7 +38,7 @@ describe('Resolver', () => {
           }
         }
       }
-      }
+    }
     `,
       Map(),
       Some('test')

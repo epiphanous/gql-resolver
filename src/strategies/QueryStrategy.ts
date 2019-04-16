@@ -37,11 +37,11 @@ export default abstract class QueryStrategy implements IQueryStrategy {
     );
   }
 
+  public abstract resolve(): Promise<QueryResult>;
+
   protected getArgs(plan: GQLExecutionPlan) {
     return Map(
       plan.args.map<[string, any]>(arg => [arg.name, arg.resolve(plan.vars)])
     );
   }
-
-  public abstract resolve(): Promise<QueryResult>;
 }

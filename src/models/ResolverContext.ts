@@ -5,11 +5,6 @@ import { GQLSchema } from './GQLSchema';
 import { QueryStrategyFactory } from '../strategies/QueryStrategyFactory';
 
 export default class ResolverContext {
-  public static buildSchema(schemaText: string): GQLSchema {
-    const builder = new GQLSchemaBuilder();
-    return Builder.parse<GQLSchema>(builder, schemaText).get();
-  }
-
   public schema: GQLSchema;
   public strategies: Map<string, QueryStrategyFactory>;
   public defaultStrategy: string;
@@ -27,6 +22,12 @@ export default class ResolverContext {
     this.schema = ResolverContext.buildSchema(schemaText);
     this.strategies = strategies;
     this.defaultStrategy = defaultStrategy;
+  }
+
+  public static buildSchema(schemaText: string): GQLSchema {
+    const builder = new GQLSchemaBuilder();
+    const schemaTry = Builder.parse<GQLSchema>(builder, schemaText);
+    return schemaTry.get();
   }
 
   public getStrategyFactory(name: string): QueryStrategyFactory {

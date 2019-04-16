@@ -6,12 +6,13 @@ import {
   OrderBysContext,
   QueryModificationParser,
 } from '../../antlr4/generated/QueryModificationParser';
-import { GQLOrderBy } from '../../models/GQLOrderBy';
+import { GQLSortBy } from '../../models/GQLSortBy';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
 
 export default class GQLOrderByBuilder extends GQLObjectQueryModifierBuilder {
-  public result: List<GQLOrderBy>;
+  public result: List<GQLSortBy>;
+
   constructor(
     validFields: Map<string, string>,
     validVariables: Set<GQLVariableDefinition>,
@@ -53,6 +54,6 @@ export default class GQLOrderByBuilder extends GQLObjectQueryModifierBuilder {
   public processOrderBy(context: OrderByContext) {
     const expression = this.processExpression(context.expression()).expression;
     const desc = Option.of(context.DESC()).nonEmpty();
-    return new GQLOrderBy(expression, desc);
+    return new GQLSortBy(expression, desc);
   }
 }

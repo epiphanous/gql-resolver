@@ -4,6 +4,7 @@
     "module": "commonjs",
     "noImplicitAny": false,
     "target": "es6",
+    "lib": ["es2018"],
     "moduleResolution": "node",
     "experimentalDecorators": true
   }

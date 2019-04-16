@@ -7,6 +7,7 @@ import BuilderError from './BuilderError';
 export default class BuilderErrorListener<T>
   implements ANTLRErrorListener<any> {
   public builder: BuilderBase<T>;
+
   constructor(builder: BuilderBase<T>) {
     this.builder = builder;
   }

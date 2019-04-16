@@ -698,6 +698,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       'xsd:string'
     );
   }
+
   public processContainsFunc(
     context: QMP.ContainsFuncContext
   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
@@ -709,6 +710,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       'xsd:boolean'
     );
   }
+
   public processDatatypeFunc(
     context: QMP.DatatypeFuncContext
   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
@@ -719,6 +721,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       GQLObjectQueryModifierBuilderTypes.string
     );
   }
+
   public processDayFunc(
     context: QMP.DayFuncContext
   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
@@ -762,6 +765,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       GQLObjectQueryModifierBuilderTypes.numeric
     );
   }
+
   public processHoursFunc(
     context: QMP.HoursFuncContext
   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {

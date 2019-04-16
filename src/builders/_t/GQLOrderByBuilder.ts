@@ -1,6 +1,4 @@
-import {List, Map, Set} from 'immutable';
-import { Option, Try } from 'funfix';
-import { GQLFilter } from '../../models/GQLFilter';
+import { Map, Set } from 'immutable';
 import ResolverContext from '../../models/ResolverContext';
 import GQLOrderByBuilder from '../../builders/graphql/GQLOrderByBuilder';
 import { GQLObjectType } from '../../models/GQLTypeDefinition';

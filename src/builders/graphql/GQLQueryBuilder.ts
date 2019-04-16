@@ -25,18 +25,20 @@ import {
 import { DEFAULT_PREFIXES } from '../../models/Constants';
 import { GQLAny } from '../../models/GQLAny';
 import {
+  GQLAfterArgument,
   GQLAnyArgument,
   GQLArgument,
+  GQLBeforeArgument,
   GQLBindingsArgument,
   GQLBoostersArgument,
   GQLFilterArgument,
+  GQLFirstArgument,
   GQLIncludeDeprecatedArgument,
   GQLInvalidArgument,
-  GQLLimitArgument,
+  GQLLastArgument,
   GQLNameArgument,
-  GQLOffsetArgument,
-  GQLOrderArgument,
   GQLPatternsArgument,
+  GQLSortByArgument,
   GQLTransformsArgument,
 } from '../../models/GQLArgument';
 import { GQLBinding } from '../../models/GQLBinding';
@@ -45,7 +47,7 @@ import { GQLDirective } from '../../models/GQLDirective';
 import { GQLFilter } from '../../models/GQLFilter';
 import { GQLFragmentDefinition } from '../../models/GQLFragmentDefinition';
 import { GQLOperation } from '../../models/GQLOperation';
-import { GQLOrderBy } from '../../models/GQLOrderBy';
+import { GQLSortBy } from '../../models/GQLSortBy';
 import { GQLPattern } from '../../models/GQLPattern';
 import { GQLQueryArguments } from '../../models/GQLQueryArguments';
 import { GQLQueryDocument } from '../../models/GQLQueryDocument';
@@ -82,10 +84,12 @@ const ARG_TYPES = {
   ARG_BOOSTERS: 'boosters',
   ARG_FILTER: 'filter',
   ARG_INCLUDE_DEPRECATED: 'includeDeprecated',
-  ARG_LIMIT: 'limit',
+  ARG_FIRST: 'first',
+  ARG_LAST: 'last',
   ARG_NAME: 'name',
-  ARG_OFFSET: 'offset',
-  ARG_ORDER: 'order',
+  ARG_BEFORE: 'before',
+  ARG_AFTER: 'after',
+  ARG_SORT_BY: 'sortBy',
   ARG_PATTERNS: 'patterns',
   ARG_TRANSFORMS: 'transforms',
 };
@@ -169,28 +173,32 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
         return qa.copy({
           bindings: this.processBindings(a.resolve(this.vars), allFields),
         });
-      } else if (arg instanceof GQLOrderArgument) {
-        const a = arg as GQLOrderArgument;
+      } else if (arg instanceof GQLSortByArgument) {
+        const a = arg as GQLSortByArgument;
         return qa.copy({
-          order: this.processOrder(a.resolve(this.vars), allFields),
+          sortBy: this.processOrder(a.resolve(this.vars), allFields),
         });
       } else if (arg instanceof GQLTransformsArgument) {
         const a = arg as GQLTransformsArgument;
         return qa.copy({
           transforms: this.processTransforms(a.resolve(this.vars)),
         });
-      } else if (arg instanceof GQLLimitArgument) {
-        const a = arg as GQLLimitArgument;
-        const limit = Some(parseInt(a.resolve(this.vars), 10));
-        if (qa.offset.nonEmpty) {
-          return qa.copy({ limit });
-        } else {
-          return qa.copy({ limit, offset: Some(0) });
-        }
-      } else if (arg instanceof GQLOffsetArgument) {
-        const a = arg as GQLOffsetArgument;
-        const offset = Some(parseInt(a.resolve(this.vars), 10));
-        return qa.copy({ offset });
+      } else if (arg instanceof GQLAfterArgument) {
+        const a = arg as GQLAfterArgument;
+        const after = Some(a.resolve(this.vars));
+        return qa.copy({ after });
+      } else if (arg instanceof GQLBeforeArgument) {
+        const a = arg as GQLBeforeArgument;
+        const before = Some(a.resolve(this.vars));
+        return qa.copy({ before });
+      } else if (arg instanceof GQLFirstArgument) {
+        const a = arg as GQLFirstArgument;
+        const first = Some(parseInt(a.resolve(this.vars), 10));
+        return qa.copy({ first });
+      } else if (arg instanceof GQLLastArgument) {
+        const a = arg as GQLFirstArgument;
+        const last = Some(parseInt(a.resolve(this.vars), 10));
+        return qa.copy({ last });
       } else if (arg instanceof GQLNameArgument) {
         const a = arg as GQLNameArgument;
         return qa.copy({ name: Some(a.resolve(this.vars)) });
@@ -265,7 +273,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
   }
 
   public processOrder(orderExpr: string, validFields: Map<string, string>) {
-    return Builder.parse<List<GQLOrderBy>>(
+    return Builder.parse<List<GQLSortBy>>(
       new GQLOrderByBuilder(
         validFields,
         this.variables,
@@ -477,10 +485,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
           .toLowerCase()} '${typeDefName}`,
         ctx
       );
-      return new GQLInvalidArgument(
-        name,
-        new GQLStringValue('error')
-      );
+      return new GQLInvalidArgument(name, new GQLStringValue('error'));
     } else {
       const argDef = argDefOpt.get();
       const expectedType = argDef.gqlType.name;
@@ -514,12 +519,16 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
         switch (name) {
           case ARG_TYPES.ARG_FILTER:
             return new GQLFilterArgument(name, v);
-          case ARG_TYPES.ARG_ORDER:
-            return new GQLOrderArgument(name, v);
-          case ARG_TYPES.ARG_LIMIT:
-            return new GQLLimitArgument(name, v);
-          case ARG_TYPES.ARG_OFFSET:
-            return new GQLOffsetArgument(name, v);
+          case ARG_TYPES.ARG_SORT_BY:
+            return new GQLSortByArgument(name, v);
+          case ARG_TYPES.ARG_FIRST:
+            return new GQLFirstArgument(name, v);
+          case ARG_TYPES.ARG_LAST:
+            return new GQLLastArgument(name, v);
+          case ARG_TYPES.ARG_BEFORE:
+            return new GQLBeforeArgument(name, v);
+          case ARG_TYPES.ARG_AFTER:
+            return new GQLAfterArgument(name, v);
           case ARG_TYPES.ARG_TRANSFORMS:
             return new GQLTransformsArgument(name, v);
           case ARG_TYPES.ARG_PATTERNS:
@@ -536,10 +545,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
             return new GQLAnyArgument(name, v);
         }
       } else {
-        return new GQLInvalidArgument(
-          name,
-          new GQLStringValue('error')
-        );
+        return new GQLInvalidArgument(name, new GQLStringValue('error'));
       }
     }
   }

@@ -5,6 +5,8 @@ import { GraphQLLexer } from '../../antlr4/generated/GraphQLLexer';
 import { GraphQLListener } from '../../antlr4/generated/GraphQLListener';
 import {
   BooleanValueContext,
+  DefaultValueContext,
+  DescriptionContext,
   DocumentContext,
   EmptyListValueContext,
   EmptyObjectValueContext,
@@ -20,8 +22,6 @@ import {
   ValueContext,
   VariableValueContext,
 } from '../../antlr4/generated/GraphQLParser';
-import { DefaultValueContext } from '../../antlr4/generated/GraphQLParser';
-import { DescriptionContext } from '../../antlr4/generated/GraphQLParser';
 import { GQLType } from '../../models/GQLType';
 import {
   GQLBooleanValue,
@@ -43,6 +43,7 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
   public lexer(inputStream: ANTLRInputStream) {
     return new GraphQLLexer(inputStream);
   }
+
   public parser(tokenStream: TokenStream) {
     return new GraphQLParser(tokenStream);
   }

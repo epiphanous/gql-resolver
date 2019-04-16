@@ -4,49 +4,43 @@ import { GQLAny } from './GQLAny';
 import { GQLBinding } from './GQLBinding';
 import { GQLBooster } from './GQLBooster';
 import { GQLFilter } from './GQLFilter';
-import { GQLOrderBy } from './GQLOrderBy';
 import { GQLPattern } from './GQLPattern';
+import { GQLSortBy } from './GQLSortBy';
 import { GQLTransform } from './GQLTransform';
 
 interface IGQLQueryArguments {
-  any: List<GQLAny>;
-  bindings: List<GQLBinding>;
-  boosters: List<GQLBooster>;
-  filter: Option<GQLFilter>;
-  includeDeprecated: Option<boolean>;
-  limit: Option<number>;
-  name: Option<string>;
-  offset: Option<number>;
-  order: List<GQLOrderBy>;
-  patterns: List<GQLPattern>;
-  transforms: List<GQLTransform>;
+  after?: Option<string>;
+  any?: List<GQLAny>;
+  before?: Option<string>;
+  bindings?: List<GQLBinding>;
+  boosters?: List<GQLBooster>;
+  filter?: Option<GQLFilter>;
+  first?: Option<number>;
+  includeDeprecated?: Option<boolean>;
+  last?: Option<number>;
+  name?: Option<string>;
+  sortBy?: List<GQLSortBy>;
+  patterns?: List<GQLPattern>;
+  transforms?: List<GQLTransform>;
 }
 
 export class GQLQueryArguments implements IGQLQueryArguments {
-  public any: List<GQLAny>;
-  public bindings: List<GQLBinding>;
-  public boosters: List<GQLBooster>;
-  public filter: Option<GQLFilter>;
-  public includeDeprecated: Option<boolean>;
-  public limit: Option<number>;
-  public name: Option<string>;
-  public offset: Option<number>;
-  public order: List<GQLOrderBy>;
-  public patterns: List<GQLPattern>;
-  public transforms: List<GQLTransform>;
+  public after: Option<string> = None;
+  public any = List<GQLAny>();
+  public before: Option<string> = None;
+  public bindings = List<GQLBinding>();
+  public boosters = List<GQLBooster>();
+  public filter: Option<GQLFilter> = None;
+  public first: Option<number> = None;
+  public includeDeprecated: Option<boolean> = None;
+  public last: Option<number> = None;
+  public name: Option<string> = None;
+  public sortBy = List<GQLSortBy>();
+  public patterns = List<GQLPattern>();
+  public transforms = List<GQLTransform>();
 
   constructor(data: Partial<IGQLQueryArguments> = {}) {
-    this.any = data.any || List();
-    this.bindings = data.bindings || List();
-    this.boosters = data.boosters || List();
-    this.filter = data.filter || None;
-    this.includeDeprecated = data.includeDeprecated || None;
-    this.limit = data.limit || None;
-    this.name = data.name || None;
-    this.offset = data.offset || None;
-    this.order = data.order || List();
-    this.patterns = data.patterns || List();
-    this.transforms = data.transforms || List();
+    Object.assign<GQLQueryArguments, Partial<IGQLQueryArguments>>(this, data);
   }
 
   public copy(data: Partial<IGQLQueryArguments>) {

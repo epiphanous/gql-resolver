@@ -1,13 +1,11 @@
-import { expect } from 'chai';
-import fs = require('fs');
 import { Map } from 'immutable';
 import 'mocha';
 import { GQLQueryDocument } from '../../../models/GQLQueryDocument';
 import ResolverContext from '../../../models/ResolverContext';
-import QueryStrategy from '../../../strategies/QueryStrategy';
-import {SparqlQueryStrategyFactory} from '../../../strategies/SparqlQueryStrategyFactory';
+import { SparqlQueryStrategyFactory } from '../../../strategies/SparqlQueryStrategyFactory';
 import Builder from '../../Builder';
 import GQLQueryBuilder from '../GQLQueryBuilder';
+import fs = require('fs');
 
 describe('GQLQueryBuilder', () => {
   let context: ResolverContext = null;
@@ -18,7 +16,7 @@ describe('GQLQueryBuilder', () => {
       const schemaText = fs.readFileSync('./src/schema.graphql', 'utf8');
       context = new ResolverContext(
         schemaText,
-        Map({nothing: new SparqlQueryStrategyFactory()}),
+        Map({ nothing: new SparqlQueryStrategyFactory() }),
         'nothing'
       );
     }

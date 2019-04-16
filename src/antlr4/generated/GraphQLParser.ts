@@ -2,17 +2,11 @@
 
 import { ATN } from 'antlr4ts/atn/ATN';
 import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer';
-import { FailedPredicateException } from 'antlr4ts/FailedPredicateException';
-import { NotNull } from 'antlr4ts/Decorators';
 import { NoViableAltException } from 'antlr4ts/NoViableAltException';
-import { Override } from 'antlr4ts/Decorators';
 import { Parser } from 'antlr4ts/Parser';
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { ParserATNSimulator } from 'antlr4ts/atn/ParserATNSimulator';
-import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
-import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
 import { RecognitionException } from 'antlr4ts/RecognitionException';
-import { RuleContext } from 'antlr4ts/RuleContext';
 //import { RuleVersion } from "antlr4ts/RuleVersion";
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { Token } from 'antlr4ts/Token';
@@ -332,3255 +326,9 @@ export class GraphQLParser extends Parser {
   );
 
   // @Override
-  // @NotNull
-  public get vocabulary(): Vocabulary {
-    return GraphQLParser.VOCABULARY;
-  }
-  // tslint:enable:no-trailing-whitespace
-
-  // @Override
-  public get grammarFileName(): string {
-    return 'GraphQL.g4';
-  }
-
-  // @Override
-  public get ruleNames(): string[] {
-    return GraphQLParser.ruleNames;
-  }
-
-  // @Override
-  public get serializedATN(): string {
-    return GraphQLParser._serializedATN;
-  }
-
-  constructor(input: TokenStream) {
-    super(input);
-    this._interp = new ParserATNSimulator(GraphQLParser._ATN, this);
-  }
-  // @RuleVersion(0)
-  public document(): DocumentContext {
-    let _localctx: DocumentContext = new DocumentContext(this._ctx, this.state);
-    this.enterRule(_localctx, 0, GraphQLParser.RULE_document);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 125;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 124;
-              this.definition();
-            }
-          }
-          this.state = 127;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (
-          ((_la & ~0x1f) === 0 &&
-            ((1 << _la) &
-              ((1 << GraphQLParser.T__0) |
-                (1 << GraphQLParser.T__1) |
-                (1 << GraphQLParser.T__2) |
-                (1 << GraphQLParser.T__3) |
-                (1 << GraphQLParser.T__9) |
-                (1 << GraphQLParser.T__17) |
-                (1 << GraphQLParser.T__18) |
-                (1 << GraphQLParser.T__19) |
-                (1 << GraphQLParser.T__20) |
-                (1 << GraphQLParser.T__23) |
-                (1 << GraphQLParser.T__24) |
-                (1 << GraphQLParser.T__26) |
-                (1 << GraphQLParser.T__27) |
-                (1 << GraphQLParser.T__28))) !==
-              0) ||
-          _la === GraphQLParser.STRING_VALUE
-        );
-        this.state = 129;
-        this.match(GraphQLParser.EOF);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public definition(): DefinitionContext {
-    let _localctx: DefinitionContext = new DefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 2, GraphQLParser.RULE_definition);
-    try {
-      this.state = 134;
-      this._errHandler.sync(this);
-      switch (this._input.LA(1)) {
-        case GraphQLParser.T__0:
-        case GraphQLParser.T__1:
-        case GraphQLParser.T__2:
-        case GraphQLParser.T__3:
-        case GraphQLParser.T__9:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 131;
-            this.executableDefinition();
-          }
-          break;
-        case GraphQLParser.T__17:
-        case GraphQLParser.T__19:
-        case GraphQLParser.T__20:
-        case GraphQLParser.T__23:
-        case GraphQLParser.T__24:
-        case GraphQLParser.T__26:
-        case GraphQLParser.T__27:
-        case GraphQLParser.T__28:
-        case GraphQLParser.STRING_VALUE:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 132;
-            this.typeSystemDefinition();
-          }
-          break;
-        case GraphQLParser.T__18:
-          this.enterOuterAlt(_localctx, 3);
-          {
-            this.state = 133;
-            this.typeSystemExtension();
-          }
-          break;
-        default:
-          throw new NoViableAltException(this);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public executableDefinition(): ExecutableDefinitionContext {
-    let _localctx: ExecutableDefinitionContext = new ExecutableDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 4, GraphQLParser.RULE_executableDefinition);
-    try {
-      this.state = 138;
-      this._errHandler.sync(this);
-      switch (this._input.LA(1)) {
-        case GraphQLParser.T__0:
-        case GraphQLParser.T__1:
-        case GraphQLParser.T__2:
-        case GraphQLParser.T__3:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 136;
-            this.operationDefinition();
-          }
-          break;
-        case GraphQLParser.T__9:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 137;
-            this.fragmentDefinition();
-          }
-          break;
-        default:
-          throw new NoViableAltException(this);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public operationDefinition(): OperationDefinitionContext {
-    let _localctx: OperationDefinitionContext = new OperationDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 6, GraphQLParser.RULE_operationDefinition);
-    let _la: number;
-    try {
-      this.state = 153;
-      this._errHandler.sync(this);
-      switch (this._input.LA(1)) {
-        case GraphQLParser.T__3:
-          _localctx = new SelectionOnlyOperationDefinitionContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 140;
-            this.selectionSet();
-          }
-          break;
-        case GraphQLParser.T__0:
-        case GraphQLParser.T__1:
-        case GraphQLParser.T__2:
-          _localctx = new FullOperationDefinitionContext(_localctx);
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 141;
-            this.operationType();
-            this.state = 143;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.NAME) {
-              {
-                this.state = 142;
-                this.match(GraphQLParser.NAME);
-              }
-            }
-
-            this.state = 146;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__6) {
-              {
-                this.state = 145;
-                this.variableDefinitions();
-              }
-            }
-
-            this.state = 149;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__16) {
-              {
-                this.state = 148;
-                this.directives();
-              }
-            }
-
-            this.state = 151;
-            this.selectionSet();
-          }
-          break;
-        default:
-          throw new NoViableAltException(this);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public operationType(): OperationTypeContext {
-    let _localctx: OperationTypeContext = new OperationTypeContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 8, GraphQLParser.RULE_operationType);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 155;
-        _la = this._input.LA(1);
-        if (
-          !(
-            (_la & ~0x1f) === 0 &&
-            ((1 << _la) &
-              ((1 << GraphQLParser.T__0) |
-                (1 << GraphQLParser.T__1) |
-                (1 << GraphQLParser.T__2))) !==
-              0
-          )
-        ) {
-          this._errHandler.recoverInline(this);
-        } else {
-          if (this._input.LA(1) === Token.EOF) {
-            this.matchedEOF = true;
-          }
-
-          this._errHandler.reportMatch(this);
-          this.consume();
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public selectionSet(): SelectionSetContext {
-    let _localctx: SelectionSetContext = new SelectionSetContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 10, GraphQLParser.RULE_selectionSet);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 157;
-        this.match(GraphQLParser.T__3);
-        this.state = 159;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 158;
-              this.selection();
-            }
-          }
-          this.state = 161;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (_la === GraphQLParser.T__8 || _la === GraphQLParser.NAME);
-        this.state = 163;
-        this.match(GraphQLParser.T__4);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public selection(): SelectionContext {
-    let _localctx: SelectionContext = new SelectionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 12, GraphQLParser.RULE_selection);
-    try {
-      this.state = 168;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 8, this._ctx)) {
-        case 1:
-          _localctx = new FieldSelectionContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 165;
-            this.field();
-          }
-          break;
-
-        case 2:
-          _localctx = new FragmentSpreadSelectionContext(_localctx);
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 166;
-            this.fragmentSpread();
-          }
-          break;
-
-        case 3:
-          _localctx = new InlineFragmentSelectionContext(_localctx);
-          this.enterOuterAlt(_localctx, 3);
-          {
-            this.state = 167;
-            this.inlineFragment();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public field(): FieldContext {
-    let _localctx: FieldContext = new FieldContext(this._ctx, this.state);
-    this.enterRule(_localctx, 14, GraphQLParser.RULE_field);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 171;
-        this._errHandler.sync(this);
-        switch (this.interpreter.adaptivePredict(this._input, 9, this._ctx)) {
-          case 1:
-            {
-              this.state = 170;
-              this.alias();
-            }
-            break;
-        }
-        this.state = 173;
-        this.match(GraphQLParser.NAME);
-        this.state = 175;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__6) {
-          {
-            this.state = 174;
-            this.arguments();
-          }
-        }
-
-        this.state = 178;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 177;
-            this.directives();
-          }
-        }
-
-        this.state = 181;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__3) {
-          {
-            this.state = 180;
-            this.selectionSet();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public alias(): AliasContext {
-    let _localctx: AliasContext = new AliasContext(this._ctx, this.state);
-    this.enterRule(_localctx, 16, GraphQLParser.RULE_alias);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 183;
-        this.match(GraphQLParser.NAME);
-        this.state = 184;
-        this.match(GraphQLParser.T__5);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public arguments(): ArgumentsContext {
-    let _localctx: ArgumentsContext = new ArgumentsContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 18, GraphQLParser.RULE_arguments);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 186;
-        this.match(GraphQLParser.T__6);
-        this.state = 188;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 187;
-              this.argument();
-            }
-          }
-          this.state = 190;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (_la === GraphQLParser.NAME);
-        this.state = 192;
-        this.match(GraphQLParser.T__7);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public argument(): ArgumentContext {
-    let _localctx: ArgumentContext = new ArgumentContext(this._ctx, this.state);
-    this.enterRule(_localctx, 20, GraphQLParser.RULE_argument);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 194;
-        this.match(GraphQLParser.NAME);
-        this.state = 195;
-        this.match(GraphQLParser.T__5);
-        this.state = 196;
-        this.value();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public fragmentSpread(): FragmentSpreadContext {
-    let _localctx: FragmentSpreadContext = new FragmentSpreadContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 22, GraphQLParser.RULE_fragmentSpread);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 198;
-        this.match(GraphQLParser.T__8);
-        this.state = 199;
-        this.fragmentName();
-        this.state = 201;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 200;
-            this.directives();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public inlineFragment(): InlineFragmentContext {
-    let _localctx: InlineFragmentContext = new InlineFragmentContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 24, GraphQLParser.RULE_inlineFragment);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 203;
-        this.match(GraphQLParser.T__8);
-        this.state = 205;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__10) {
-          {
-            this.state = 204;
-            this.typeCondition();
-          }
-        }
-
-        this.state = 208;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 207;
-            this.directives();
-          }
-        }
-
-        this.state = 210;
-        this.selectionSet();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public fragmentDefinition(): FragmentDefinitionContext {
-    let _localctx: FragmentDefinitionContext = new FragmentDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 26, GraphQLParser.RULE_fragmentDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 212;
-        this.match(GraphQLParser.T__9);
-        this.state = 213;
-        this.fragmentName();
-        this.state = 214;
-        this.typeCondition();
-        this.state = 216;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 215;
-            this.directives();
-          }
-        }
-
-        this.state = 218;
-        this.selectionSet();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public fragmentName(): FragmentNameContext {
-    let _localctx: FragmentNameContext = new FragmentNameContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 28, GraphQLParser.RULE_fragmentName);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 220;
-        this.match(GraphQLParser.NAME);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public typeCondition(): TypeConditionContext {
-    let _localctx: TypeConditionContext = new TypeConditionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 30, GraphQLParser.RULE_typeCondition);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 222;
-        this.match(GraphQLParser.T__10);
-        this.state = 223;
-        this.namedType();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public value(): ValueContext {
-    let _localctx: ValueContext = new ValueContext(this._ctx, this.state);
-    this.enterRule(_localctx, 32, GraphQLParser.RULE_value);
-    let _la: number;
-    try {
-      this.state = 252;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 20, this._ctx)) {
-        case 1:
-          _localctx = new VariableValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 225;
-            this.variable();
-          }
-          break;
-
-        case 2:
-          _localctx = new IntValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 226;
-            this.match(GraphQLParser.INT_VALUE);
-          }
-          break;
-
-        case 3:
-          _localctx = new FloatValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 3);
-          {
-            this.state = 227;
-            this.match(GraphQLParser.FLOAT_VALUE);
-          }
-          break;
-
-        case 4:
-          _localctx = new StringValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 4);
-          {
-            this.state = 228;
-            this.match(GraphQLParser.STRING_VALUE);
-          }
-          break;
-
-        case 5:
-          _localctx = new BooleanValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 5);
-          {
-            this.state = 229;
-            this.match(GraphQLParser.BOOLEAN_VALUE);
-          }
-          break;
-
-        case 6:
-          _localctx = new NullValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 6);
-          {
-            this.state = 230;
-            this.match(GraphQLParser.NULL_VALUE);
-          }
-          break;
-
-        case 7:
-          _localctx = new EnumValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 7);
-          {
-            this.state = 231;
-            this.match(GraphQLParser.NAME);
-          }
-          break;
-
-        case 8:
-          _localctx = new EmptyListValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 8);
-          {
-            this.state = 232;
-            this.match(GraphQLParser.T__11);
-            this.state = 233;
-            this.match(GraphQLParser.T__12);
-          }
-          break;
-
-        case 9:
-          _localctx = new NonEmptyListValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 9);
-          {
-            this.state = 234;
-            this.match(GraphQLParser.T__11);
-            this.state = 236;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            do {
-              {
-                {
-                  this.state = 235;
-                  this.value();
-                }
-              }
-              this.state = 238;
-              this._errHandler.sync(this);
-              _la = this._input.LA(1);
-            } while (
-              ((_la & ~0x1f) === 0 &&
-                ((1 << _la) &
-                  ((1 << GraphQLParser.T__3) |
-                    (1 << GraphQLParser.T__11) |
-                    (1 << GraphQLParser.T__13))) !==
-                  0) ||
-              (((_la - 49) & ~0x1f) === 0 &&
-                ((1 << (_la - 49)) &
-                  ((1 << (GraphQLParser.NAME - 49)) |
-                    (1 << (GraphQLParser.INT_VALUE - 49)) |
-                    (1 << (GraphQLParser.FLOAT_VALUE - 49)) |
-                    (1 << (GraphQLParser.STRING_VALUE - 49)) |
-                    (1 << (GraphQLParser.BOOLEAN_VALUE - 49)) |
-                    (1 << (GraphQLParser.NULL_VALUE - 49)))) !==
-                  0)
-            );
-            this.state = 240;
-            this.match(GraphQLParser.T__12);
-          }
-          break;
-
-        case 10:
-          _localctx = new EmptyObjectValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 10);
-          {
-            this.state = 242;
-            this.match(GraphQLParser.T__3);
-            this.state = 243;
-            this.match(GraphQLParser.T__4);
-          }
-          break;
-
-        case 11:
-          _localctx = new NonEmptyObjectValueContext(_localctx);
-          this.enterOuterAlt(_localctx, 11);
-          {
-            this.state = 244;
-            this.match(GraphQLParser.T__3);
-            this.state = 246;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            do {
-              {
-                {
-                  this.state = 245;
-                  this.objectField();
-                }
-              }
-              this.state = 248;
-              this._errHandler.sync(this);
-              _la = this._input.LA(1);
-            } while (_la === GraphQLParser.NAME);
-            this.state = 250;
-            this.match(GraphQLParser.T__4);
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public objectField(): ObjectFieldContext {
-    let _localctx: ObjectFieldContext = new ObjectFieldContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 34, GraphQLParser.RULE_objectField);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 254;
-        this.match(GraphQLParser.NAME);
-        this.state = 255;
-        this.match(GraphQLParser.T__5);
-        this.state = 256;
-        this.value();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public variableDefinitions(): VariableDefinitionsContext {
-    let _localctx: VariableDefinitionsContext = new VariableDefinitionsContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 36, GraphQLParser.RULE_variableDefinitions);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 258;
-        this.match(GraphQLParser.T__6);
-        this.state = 260;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 259;
-              this.variableDefinition();
-            }
-          }
-          this.state = 262;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (_la === GraphQLParser.T__13);
-        this.state = 264;
-        this.match(GraphQLParser.T__7);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public variableDefinition(): VariableDefinitionContext {
-    let _localctx: VariableDefinitionContext = new VariableDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 38, GraphQLParser.RULE_variableDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 266;
-        this.variable();
-        this.state = 267;
-        this.match(GraphQLParser.T__5);
-        this.state = 268;
-        this.type();
-        this.state = 270;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__14) {
-          {
-            this.state = 269;
-            this.defaultValue();
-          }
-        }
-
-        this.state = 273;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 272;
-            this.directives();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public variable(): VariableContext {
-    let _localctx: VariableContext = new VariableContext(this._ctx, this.state);
-    this.enterRule(_localctx, 40, GraphQLParser.RULE_variable);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 275;
-        this.match(GraphQLParser.T__13);
-        this.state = 276;
-        this.match(GraphQLParser.NAME);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public defaultValue(): DefaultValueContext {
-    let _localctx: DefaultValueContext = new DefaultValueContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 42, GraphQLParser.RULE_defaultValue);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 278;
-        this.match(GraphQLParser.T__14);
-        this.state = 279;
-        this.value();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public type(): TypeContext {
-    let _localctx: TypeContext = new TypeContext(this._ctx, this.state);
-    this.enterRule(_localctx, 44, GraphQLParser.RULE_type);
-    let _la: number;
-    try {
-      this.state = 289;
-      this._errHandler.sync(this);
-      switch (this._input.LA(1)) {
-        case GraphQLParser.NAME:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 281;
-            this.namedType();
-            this.state = 283;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__15) {
-              {
-                this.state = 282;
-                this.nonNullType();
-              }
-            }
-          }
-          break;
-        case GraphQLParser.T__11:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 285;
-            this.listType();
-            this.state = 287;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__15) {
-              {
-                this.state = 286;
-                this.nonNullType();
-              }
-            }
-          }
-          break;
-        default:
-          throw new NoViableAltException(this);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public namedType(): NamedTypeContext {
-    let _localctx: NamedTypeContext = new NamedTypeContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 46, GraphQLParser.RULE_namedType);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 291;
-        this.match(GraphQLParser.NAME);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public listType(): ListTypeContext {
-    let _localctx: ListTypeContext = new ListTypeContext(this._ctx, this.state);
-    this.enterRule(_localctx, 48, GraphQLParser.RULE_listType);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 293;
-        this.match(GraphQLParser.T__11);
-        this.state = 294;
-        this.type();
-        this.state = 295;
-        this.match(GraphQLParser.T__12);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public nonNullType(): NonNullTypeContext {
-    let _localctx: NonNullTypeContext = new NonNullTypeContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 50, GraphQLParser.RULE_nonNullType);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 297;
-        this.match(GraphQLParser.T__15);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public directives(): DirectivesContext {
-    let _localctx: DirectivesContext = new DirectivesContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 52, GraphQLParser.RULE_directives);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 300;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 299;
-              this.directive();
-            }
-          }
-          this.state = 302;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (_la === GraphQLParser.T__16);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public directive(): DirectiveContext {
-    let _localctx: DirectiveContext = new DirectiveContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 54, GraphQLParser.RULE_directive);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 304;
-        this.match(GraphQLParser.T__16);
-        this.state = 305;
-        this.match(GraphQLParser.NAME);
-        this.state = 307;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__6) {
-          {
-            this.state = 306;
-            this.arguments();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public typeSystemDefinition(): TypeSystemDefinitionContext {
-    let _localctx: TypeSystemDefinitionContext = new TypeSystemDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 56, GraphQLParser.RULE_typeSystemDefinition);
-    try {
-      this.state = 312;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 29, this._ctx)) {
-        case 1:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 309;
-            this.schemaDefinition();
-          }
-          break;
-
-        case 2:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 310;
-            this.typeDefinition();
-          }
-          break;
-
-        case 3:
-          this.enterOuterAlt(_localctx, 3);
-          {
-            this.state = 311;
-            this.directiveDefinition();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public typeSystemExtension(): TypeSystemExtensionContext {
-    let _localctx: TypeSystemExtensionContext = new TypeSystemExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 58, GraphQLParser.RULE_typeSystemExtension);
-    try {
-      this.state = 316;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 30, this._ctx)) {
-        case 1:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 314;
-            this.schemaExtension();
-          }
-          break;
-
-        case 2:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 315;
-            this.typeExtension();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public schemaDefinition(): SchemaDefinitionContext {
-    let _localctx: SchemaDefinitionContext = new SchemaDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 60, GraphQLParser.RULE_schemaDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 318;
-        this.match(GraphQLParser.T__17);
-        this.state = 320;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 319;
-            this.directives();
-          }
-        }
-
-        this.state = 322;
-        this.match(GraphQLParser.T__3);
-        this.state = 324;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 323;
-              this.operationTypeDefinition();
-            }
-          }
-          this.state = 326;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (
-          (_la & ~0x1f) === 0 &&
-          ((1 << _la) &
-            ((1 << GraphQLParser.T__0) |
-              (1 << GraphQLParser.T__1) |
-              (1 << GraphQLParser.T__2))) !==
-            0
-        );
-        this.state = 328;
-        this.match(GraphQLParser.T__4);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public schemaExtension(): SchemaExtensionContext {
-    let _localctx: SchemaExtensionContext = new SchemaExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 62, GraphQLParser.RULE_schemaExtension);
-    let _la: number;
-    try {
-      this.state = 346;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 35, this._ctx)) {
-        case 1:
-          _localctx = new SchemaExtensionWithOperationsContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 330;
-            this.match(GraphQLParser.T__18);
-            this.state = 331;
-            this.match(GraphQLParser.T__17);
-            this.state = 333;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__16) {
-              {
-                this.state = 332;
-                this.directives();
-              }
-            }
-
-            this.state = 335;
-            this.match(GraphQLParser.T__3);
-            this.state = 337;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            do {
-              {
-                {
-                  this.state = 336;
-                  this.operationTypeDefinition();
-                }
-              }
-              this.state = 339;
-              this._errHandler.sync(this);
-              _la = this._input.LA(1);
-            } while (
-              (_la & ~0x1f) === 0 &&
-              ((1 << _la) &
-                ((1 << GraphQLParser.T__0) |
-                  (1 << GraphQLParser.T__1) |
-                  (1 << GraphQLParser.T__2))) !==
-                0
-            );
-            this.state = 341;
-            this.match(GraphQLParser.T__4);
-          }
-          break;
-
-        case 2:
-          _localctx = new SchemaExtensionWithoutOperationsContext(_localctx);
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 343;
-            this.match(GraphQLParser.T__18);
-            this.state = 344;
-            this.match(GraphQLParser.T__17);
-            this.state = 345;
-            this.directives();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public operationTypeDefinition(): OperationTypeDefinitionContext {
-    let _localctx: OperationTypeDefinitionContext = new OperationTypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 64, GraphQLParser.RULE_operationTypeDefinition);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 348;
-        this.operationType();
-        this.state = 349;
-        this.match(GraphQLParser.T__5);
-        this.state = 350;
-        this.namedType();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public description(): DescriptionContext {
-    let _localctx: DescriptionContext = new DescriptionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 66, GraphQLParser.RULE_description);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 352;
-        this.match(GraphQLParser.STRING_VALUE);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public typeDefinition(): TypeDefinitionContext {
-    let _localctx: TypeDefinitionContext = new TypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 68, GraphQLParser.RULE_typeDefinition);
-    try {
-      this.state = 360;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 36, this._ctx)) {
-        case 1:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 354;
-            this.scalarTypeDefinition();
-          }
-          break;
-
-        case 2:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 355;
-            this.objectTypeDefinition();
-          }
-          break;
-
-        case 3:
-          this.enterOuterAlt(_localctx, 3);
-          {
-            this.state = 356;
-            this.interfaceTypeDefinition();
-          }
-          break;
-
-        case 4:
-          this.enterOuterAlt(_localctx, 4);
-          {
-            this.state = 357;
-            this.unionTypeDefinition();
-          }
-          break;
-
-        case 5:
-          this.enterOuterAlt(_localctx, 5);
-          {
-            this.state = 358;
-            this.enumTypeDefinition();
-          }
-          break;
-
-        case 6:
-          this.enterOuterAlt(_localctx, 6);
-          {
-            this.state = 359;
-            this.inputObjectTypeDefinition();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public typeExtension(): TypeExtensionContext {
-    let _localctx: TypeExtensionContext = new TypeExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 70, GraphQLParser.RULE_typeExtension);
-    try {
-      this.state = 368;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 37, this._ctx)) {
-        case 1:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 362;
-            this.scalarTypeExtension();
-          }
-          break;
-
-        case 2:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 363;
-            this.objectTypeExtension();
-          }
-          break;
-
-        case 3:
-          this.enterOuterAlt(_localctx, 3);
-          {
-            this.state = 364;
-            this.interfaceTypeExtension();
-          }
-          break;
-
-        case 4:
-          this.enterOuterAlt(_localctx, 4);
-          {
-            this.state = 365;
-            this.unionTypeExtension();
-          }
-          break;
-
-        case 5:
-          this.enterOuterAlt(_localctx, 5);
-          {
-            this.state = 366;
-            this.enumTypeExtension();
-          }
-          break;
-
-        case 6:
-          this.enterOuterAlt(_localctx, 6);
-          {
-            this.state = 367;
-            this.inputObjectTypeExtension();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public scalarTypeDefinition(): ScalarTypeDefinitionContext {
-    let _localctx: ScalarTypeDefinitionContext = new ScalarTypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 72, GraphQLParser.RULE_scalarTypeDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 371;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 370;
-            this.description();
-          }
-        }
-
-        this.state = 373;
-        this.match(GraphQLParser.T__19);
-        this.state = 374;
-        this.match(GraphQLParser.NAME);
-        this.state = 376;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 375;
-            this.directives();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public scalarTypeExtension(): ScalarTypeExtensionContext {
-    let _localctx: ScalarTypeExtensionContext = new ScalarTypeExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 74, GraphQLParser.RULE_scalarTypeExtension);
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 378;
-        this.match(GraphQLParser.T__18);
-        this.state = 379;
-        this.match(GraphQLParser.T__19);
-        this.state = 380;
-        this.match(GraphQLParser.NAME);
-        this.state = 381;
-        this.directives();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public objectTypeDefinition(): ObjectTypeDefinitionContext {
-    let _localctx: ObjectTypeDefinitionContext = new ObjectTypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 76, GraphQLParser.RULE_objectTypeDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 384;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 383;
-            this.description();
-          }
-        }
-
-        this.state = 386;
-        this.match(GraphQLParser.T__20);
-        this.state = 387;
-        this.match(GraphQLParser.NAME);
-        this.state = 389;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__21) {
-          {
-            this.state = 388;
-            this.implementsInterfaces();
-          }
-        }
-
-        this.state = 392;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 391;
-            this.directives();
-          }
-        }
-
-        this.state = 395;
-        this._errHandler.sync(this);
-        switch (this.interpreter.adaptivePredict(this._input, 43, this._ctx)) {
-          case 1:
-            {
-              this.state = 394;
-              this.fieldsDefinition();
-            }
-            break;
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public objectTypeExtension(): ObjectTypeExtensionContext {
-    let _localctx: ObjectTypeExtensionContext = new ObjectTypeExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 78, GraphQLParser.RULE_objectTypeExtension);
-    let _la: number;
-    try {
-      this.state = 418;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 47, this._ctx)) {
-        case 1:
-          _localctx = new ObjectTypeExtensionWithFieldsContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 397;
-            this.match(GraphQLParser.T__18);
-            this.state = 398;
-            this.match(GraphQLParser.T__20);
-            this.state = 399;
-            this.match(GraphQLParser.NAME);
-            this.state = 401;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__21) {
-              {
-                this.state = 400;
-                this.implementsInterfaces();
-              }
-            }
-
-            this.state = 404;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__16) {
-              {
-                this.state = 403;
-                this.directives();
-              }
-            }
-
-            this.state = 406;
-            this.fieldsDefinition();
-          }
-          break;
-
-        case 2:
-          _localctx = new ObjectTypeExtensionWithDirectivesContext(_localctx);
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 407;
-            this.match(GraphQLParser.T__18);
-            this.state = 408;
-            this.match(GraphQLParser.T__20);
-            this.state = 409;
-            this.match(GraphQLParser.NAME);
-            this.state = 411;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__21) {
-              {
-                this.state = 410;
-                this.implementsInterfaces();
-              }
-            }
-
-            this.state = 413;
-            this.directives();
-          }
-          break;
-
-        case 3:
-          _localctx = new ObjectTypeExtensionWithInterfacesContext(_localctx);
-          this.enterOuterAlt(_localctx, 3);
-          {
-            this.state = 414;
-            this.match(GraphQLParser.T__18);
-            this.state = 415;
-            this.match(GraphQLParser.T__20);
-            this.state = 416;
-            this.match(GraphQLParser.NAME);
-            this.state = 417;
-            this.implementsInterfaces();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public implementsInterfaces(): ImplementsInterfacesContext {
-    let _localctx: ImplementsInterfacesContext = new ImplementsInterfacesContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 80, GraphQLParser.RULE_implementsInterfaces);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 420;
-        this.match(GraphQLParser.T__21);
-        this.state = 422;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__22) {
-          {
-            this.state = 421;
-            this.match(GraphQLParser.T__22);
-          }
-        }
-
-        this.state = 424;
-        this.namedType();
-        this.state = 431;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        while (_la === GraphQLParser.T__22 || _la === GraphQLParser.NAME) {
-          {
-            {
-              this.state = 426;
-              this._errHandler.sync(this);
-              _la = this._input.LA(1);
-              if (_la === GraphQLParser.T__22) {
-                {
-                  this.state = 425;
-                  this.match(GraphQLParser.T__22);
-                }
-              }
-
-              this.state = 428;
-              this.namedType();
-            }
-          }
-          this.state = 433;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public fieldsDefinition(): FieldsDefinitionContext {
-    let _localctx: FieldsDefinitionContext = new FieldsDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 82, GraphQLParser.RULE_fieldsDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 434;
-        this.match(GraphQLParser.T__3);
-        this.state = 436;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 435;
-              this.fieldDefinition();
-            }
-          }
-          this.state = 438;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (
-          _la === GraphQLParser.NAME ||
-          _la === GraphQLParser.STRING_VALUE
-        );
-        this.state = 440;
-        this.match(GraphQLParser.T__4);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public fieldDefinition(): FieldDefinitionContext {
-    let _localctx: FieldDefinitionContext = new FieldDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 84, GraphQLParser.RULE_fieldDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 443;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 442;
-            this.description();
-          }
-        }
-
-        this.state = 445;
-        this.match(GraphQLParser.NAME);
-        this.state = 447;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__6) {
-          {
-            this.state = 446;
-            this.argumentsDefinition();
-          }
-        }
-
-        this.state = 449;
-        this.match(GraphQLParser.T__5);
-        this.state = 450;
-        this.type();
-        this.state = 452;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 451;
-            this.directives();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public argumentsDefinition(): ArgumentsDefinitionContext {
-    let _localctx: ArgumentsDefinitionContext = new ArgumentsDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 86, GraphQLParser.RULE_argumentsDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 454;
-        this.match(GraphQLParser.T__6);
-        this.state = 456;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 455;
-              this.inputValueDefinition();
-            }
-          }
-          this.state = 458;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (
-          _la === GraphQLParser.NAME ||
-          _la === GraphQLParser.STRING_VALUE
-        );
-        this.state = 460;
-        this.match(GraphQLParser.T__7);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public inputValueDefinition(): InputValueDefinitionContext {
-    let _localctx: InputValueDefinitionContext = new InputValueDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 88, GraphQLParser.RULE_inputValueDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 463;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 462;
-            this.description();
-          }
-        }
-
-        this.state = 465;
-        this.match(GraphQLParser.NAME);
-        this.state = 466;
-        this.match(GraphQLParser.T__5);
-        this.state = 467;
-        this.type();
-        this.state = 469;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__14) {
-          {
-            this.state = 468;
-            this.defaultValue();
-          }
-        }
-
-        this.state = 472;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 471;
-            this.directives();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public interfaceTypeDefinition(): InterfaceTypeDefinitionContext {
-    let _localctx: InterfaceTypeDefinitionContext = new InterfaceTypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 90, GraphQLParser.RULE_interfaceTypeDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 475;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 474;
-            this.description();
-          }
-        }
-
-        this.state = 477;
-        this.match(GraphQLParser.T__23);
-        this.state = 478;
-        this.match(GraphQLParser.NAME);
-        this.state = 480;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 479;
-            this.directives();
-          }
-        }
-
-        this.state = 483;
-        this._errHandler.sync(this);
-        switch (this.interpreter.adaptivePredict(this._input, 61, this._ctx)) {
-          case 1:
-            {
-              this.state = 482;
-              this.fieldsDefinition();
-            }
-            break;
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public interfaceTypeExtension(): InterfaceTypeExtensionContext {
-    let _localctx: InterfaceTypeExtensionContext = new InterfaceTypeExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 92, GraphQLParser.RULE_interfaceTypeExtension);
-    let _la: number;
-    try {
-      this.state = 496;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 63, this._ctx)) {
-        case 1:
-          _localctx = new InterfaceTypeExtensionWithFieldsContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 485;
-            this.match(GraphQLParser.T__18);
-            this.state = 486;
-            this.match(GraphQLParser.T__23);
-            this.state = 487;
-            this.match(GraphQLParser.NAME);
-            this.state = 489;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__16) {
-              {
-                this.state = 488;
-                this.directives();
-              }
-            }
-
-            this.state = 491;
-            this.fieldsDefinition();
-          }
-          break;
-
-        case 2:
-          _localctx = new InterfaceTypeExtensionWithDirectivesContext(
-            _localctx
-          );
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 492;
-            this.match(GraphQLParser.T__18);
-            this.state = 493;
-            this.match(GraphQLParser.T__23);
-            this.state = 494;
-            this.match(GraphQLParser.NAME);
-            this.state = 495;
-            this.directives();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public unionTypeDefinition(): UnionTypeDefinitionContext {
-    let _localctx: UnionTypeDefinitionContext = new UnionTypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 94, GraphQLParser.RULE_unionTypeDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 499;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 498;
-            this.description();
-          }
-        }
-
-        this.state = 501;
-        this.match(GraphQLParser.T__24);
-        this.state = 502;
-        this.match(GraphQLParser.NAME);
-        this.state = 504;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 503;
-            this.directives();
-          }
-        }
-
-        this.state = 507;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__14) {
-          {
-            this.state = 506;
-            this.unionMemberTypes();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public unionMemberTypes(): UnionMemberTypesContext {
-    let _localctx: UnionMemberTypesContext = new UnionMemberTypesContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 96, GraphQLParser.RULE_unionMemberTypes);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 509;
-        this.match(GraphQLParser.T__14);
-        this.state = 511;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__25) {
-          {
-            this.state = 510;
-            this.match(GraphQLParser.T__25);
-          }
-        }
-
-        this.state = 513;
-        this.namedType();
-        this.state = 520;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        while (_la === GraphQLParser.T__25 || _la === GraphQLParser.NAME) {
-          {
-            {
-              this.state = 515;
-              this._errHandler.sync(this);
-              _la = this._input.LA(1);
-              if (_la === GraphQLParser.T__25) {
-                {
-                  this.state = 514;
-                  this.match(GraphQLParser.T__25);
-                }
-              }
-
-              this.state = 517;
-              this.namedType();
-            }
-          }
-          this.state = 522;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public unionTypeExtension(): UnionTypeExtensionContext {
-    let _localctx: UnionTypeExtensionContext = new UnionTypeExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 98, GraphQLParser.RULE_unionTypeExtension);
-    let _la: number;
-    try {
-      this.state = 534;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 71, this._ctx)) {
-        case 1:
-          _localctx = new UnionTypeExtensionWithMembersContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 523;
-            this.match(GraphQLParser.T__18);
-            this.state = 524;
-            this.match(GraphQLParser.T__24);
-            this.state = 525;
-            this.match(GraphQLParser.NAME);
-            this.state = 527;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__16) {
-              {
-                this.state = 526;
-                this.directives();
-              }
-            }
-
-            this.state = 529;
-            this.unionMemberTypes();
-          }
-          break;
-
-        case 2:
-          _localctx = new UnionTypeExtensionWithDirectivesContext(_localctx);
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 530;
-            this.match(GraphQLParser.T__18);
-            this.state = 531;
-            this.match(GraphQLParser.T__24);
-            this.state = 532;
-            this.match(GraphQLParser.NAME);
-            this.state = 533;
-            this.directives();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public enumTypeDefinition(): EnumTypeDefinitionContext {
-    let _localctx: EnumTypeDefinitionContext = new EnumTypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 100, GraphQLParser.RULE_enumTypeDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 537;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 536;
-            this.description();
-          }
-        }
-
-        this.state = 539;
-        this.match(GraphQLParser.T__26);
-        this.state = 540;
-        this.match(GraphQLParser.NAME);
-        this.state = 542;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 541;
-            this.directives();
-          }
-        }
-
-        this.state = 545;
-        this._errHandler.sync(this);
-        switch (this.interpreter.adaptivePredict(this._input, 74, this._ctx)) {
-          case 1:
-            {
-              this.state = 544;
-              this.enumValuesDefinition();
-            }
-            break;
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public enumValuesDefinition(): EnumValuesDefinitionContext {
-    let _localctx: EnumValuesDefinitionContext = new EnumValuesDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 102, GraphQLParser.RULE_enumValuesDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 547;
-        this.match(GraphQLParser.T__3);
-        this.state = 549;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 548;
-              this.enumValueDefinition();
-            }
-          }
-          this.state = 551;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (
-          _la === GraphQLParser.NAME ||
-          _la === GraphQLParser.STRING_VALUE
-        );
-        this.state = 553;
-        this.match(GraphQLParser.T__4);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public enumValueDefinition(): EnumValueDefinitionContext {
-    let _localctx: EnumValueDefinitionContext = new EnumValueDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 104, GraphQLParser.RULE_enumValueDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 556;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 555;
-            this.description();
-          }
-        }
-
-        this.state = 558;
-        this.match(GraphQLParser.NAME);
-        this.state = 560;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 559;
-            this.directives();
-          }
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public enumTypeExtension(): EnumTypeExtensionContext {
-    let _localctx: EnumTypeExtensionContext = new EnumTypeExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 106, GraphQLParser.RULE_enumTypeExtension);
-    let _la: number;
-    try {
-      this.state = 573;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 79, this._ctx)) {
-        case 1:
-          _localctx = new EnumTypeExtensionWithValuesContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 562;
-            this.match(GraphQLParser.T__18);
-            this.state = 563;
-            this.match(GraphQLParser.T__26);
-            this.state = 564;
-            this.match(GraphQLParser.NAME);
-            this.state = 566;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__16) {
-              {
-                this.state = 565;
-                this.directives();
-              }
-            }
-
-            this.state = 568;
-            this.enumValuesDefinition();
-          }
-          break;
-
-        case 2:
-          _localctx = new EnumTypeExtensionWithDirectivesContext(_localctx);
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 569;
-            this.match(GraphQLParser.T__18);
-            this.state = 570;
-            this.match(GraphQLParser.T__26);
-            this.state = 571;
-            this.match(GraphQLParser.NAME);
-            this.state = 572;
-            this.directives();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public inputObjectTypeDefinition(): InputObjectTypeDefinitionContext {
-    let _localctx: InputObjectTypeDefinitionContext = new InputObjectTypeDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(
-      _localctx,
-      108,
-      GraphQLParser.RULE_inputObjectTypeDefinition
-    );
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 576;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 575;
-            this.description();
-          }
-        }
-
-        this.state = 578;
-        this.match(GraphQLParser.T__27);
-        this.state = 579;
-        this.match(GraphQLParser.NAME);
-        this.state = 581;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__16) {
-          {
-            this.state = 580;
-            this.directives();
-          }
-        }
-
-        this.state = 584;
-        this._errHandler.sync(this);
-        switch (this.interpreter.adaptivePredict(this._input, 82, this._ctx)) {
-          case 1:
-            {
-              this.state = 583;
-              this.inputFieldsDefinition();
-            }
-            break;
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public inputFieldsDefinition(): InputFieldsDefinitionContext {
-    let _localctx: InputFieldsDefinitionContext = new InputFieldsDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 110, GraphQLParser.RULE_inputFieldsDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 586;
-        this.match(GraphQLParser.T__3);
-        this.state = 588;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        do {
-          {
-            {
-              this.state = 587;
-              this.inputValueDefinition();
-            }
-          }
-          this.state = 590;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        } while (
-          _la === GraphQLParser.NAME ||
-          _la === GraphQLParser.STRING_VALUE
-        );
-        this.state = 592;
-        this.match(GraphQLParser.T__4);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public inputObjectTypeExtension(): InputObjectTypeExtensionContext {
-    let _localctx: InputObjectTypeExtensionContext = new InputObjectTypeExtensionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 112, GraphQLParser.RULE_inputObjectTypeExtension);
-    let _la: number;
-    try {
-      this.state = 605;
-      this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 85, this._ctx)) {
-        case 1:
-          _localctx = new InputObjectTypeExtensionWithFieldsContext(_localctx);
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 594;
-            this.match(GraphQLParser.T__18);
-            this.state = 595;
-            this.match(GraphQLParser.T__27);
-            this.state = 596;
-            this.match(GraphQLParser.NAME);
-            this.state = 598;
-            this._errHandler.sync(this);
-            _la = this._input.LA(1);
-            if (_la === GraphQLParser.T__16) {
-              {
-                this.state = 597;
-                this.directives();
-              }
-            }
-
-            this.state = 600;
-            this.inputFieldsDefinition();
-          }
-          break;
-
-        case 2:
-          _localctx = new InputObjectTypeExtensionWithDirectivesContext(
-            _localctx
-          );
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 601;
-            this.match(GraphQLParser.T__18);
-            this.state = 602;
-            this.match(GraphQLParser.T__27);
-            this.state = 603;
-            this.match(GraphQLParser.NAME);
-            this.state = 604;
-            this.directives();
-          }
-          break;
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public directiveDefinition(): DirectiveDefinitionContext {
-    let _localctx: DirectiveDefinitionContext = new DirectiveDefinitionContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 114, GraphQLParser.RULE_directiveDefinition);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 608;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.STRING_VALUE) {
-          {
-            this.state = 607;
-            this.description();
-          }
-        }
-
-        this.state = 610;
-        this.match(GraphQLParser.T__28);
-        this.state = 611;
-        this.match(GraphQLParser.T__16);
-        this.state = 612;
-        this.match(GraphQLParser.NAME);
-        this.state = 614;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__6) {
-          {
-            this.state = 613;
-            this.argumentsDefinition();
-          }
-        }
-
-        this.state = 616;
-        this.directiveLocations();
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public directiveLocations(): DirectiveLocationsContext {
-    let _localctx: DirectiveLocationsContext = new DirectiveLocationsContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 116, GraphQLParser.RULE_directiveLocations);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 618;
-        this.match(GraphQLParser.T__10);
-        this.state = 620;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        if (_la === GraphQLParser.T__25) {
-          {
-            this.state = 619;
-            this.match(GraphQLParser.T__25);
-          }
-        }
-
-        this.state = 622;
-        this.directiveLocation();
-        {
-          this.state = 624;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-          if (_la === GraphQLParser.T__25) {
-            {
-              this.state = 623;
-              this.match(GraphQLParser.T__25);
-            }
-          }
-
-          this.state = 626;
-          this.directiveLocation();
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public directiveLocation(): DirectiveLocationContext {
-    let _localctx: DirectiveLocationContext = new DirectiveLocationContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 118, GraphQLParser.RULE_directiveLocation);
-    try {
-      this.state = 630;
-      this._errHandler.sync(this);
-      switch (this._input.LA(1)) {
-        case GraphQLParser.T__29:
-        case GraphQLParser.T__30:
-        case GraphQLParser.T__31:
-        case GraphQLParser.T__32:
-        case GraphQLParser.T__33:
-        case GraphQLParser.T__34:
-        case GraphQLParser.T__35:
-        case GraphQLParser.T__36:
-          this.enterOuterAlt(_localctx, 1);
-          {
-            this.state = 628;
-            this.executableDirectiveLocation();
-          }
-          break;
-        case GraphQLParser.T__37:
-        case GraphQLParser.T__38:
-        case GraphQLParser.T__39:
-        case GraphQLParser.T__40:
-        case GraphQLParser.T__41:
-        case GraphQLParser.T__42:
-        case GraphQLParser.T__43:
-        case GraphQLParser.T__44:
-        case GraphQLParser.T__45:
-        case GraphQLParser.T__46:
-        case GraphQLParser.T__47:
-          this.enterOuterAlt(_localctx, 2);
-          {
-            this.state = 629;
-            this.typeSystemDirectiveLocation();
-          }
-          break;
-        default:
-          throw new NoViableAltException(this);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public executableDirectiveLocation(): ExecutableDirectiveLocationContext {
-    let _localctx: ExecutableDirectiveLocationContext = new ExecutableDirectiveLocationContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(
-      _localctx,
-      120,
-      GraphQLParser.RULE_executableDirectiveLocation
-    );
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 632;
-        _la = this._input.LA(1);
-        if (
-          !(
-            ((_la - 30) & ~0x1f) === 0 &&
-            ((1 << (_la - 30)) &
-              ((1 << (GraphQLParser.T__29 - 30)) |
-                (1 << (GraphQLParser.T__30 - 30)) |
-                (1 << (GraphQLParser.T__31 - 30)) |
-                (1 << (GraphQLParser.T__32 - 30)) |
-                (1 << (GraphQLParser.T__33 - 30)) |
-                (1 << (GraphQLParser.T__34 - 30)) |
-                (1 << (GraphQLParser.T__35 - 30)) |
-                (1 << (GraphQLParser.T__36 - 30)))) !==
-              0
-          )
-        ) {
-          this._errHandler.recoverInline(this);
-        } else {
-          if (this._input.LA(1) === Token.EOF) {
-            this.matchedEOF = true;
-          }
-
-          this._errHandler.reportMatch(this);
-          this.consume();
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
-  public typeSystemDirectiveLocation(): TypeSystemDirectiveLocationContext {
-    let _localctx: TypeSystemDirectiveLocationContext = new TypeSystemDirectiveLocationContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(
-      _localctx,
-      122,
-      GraphQLParser.RULE_typeSystemDirectiveLocation
-    );
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 634;
-        _la = this._input.LA(1);
-        if (
-          !(
-            ((_la - 38) & ~0x1f) === 0 &&
-            ((1 << (_la - 38)) &
-              ((1 << (GraphQLParser.T__37 - 38)) |
-                (1 << (GraphQLParser.T__38 - 38)) |
-                (1 << (GraphQLParser.T__39 - 38)) |
-                (1 << (GraphQLParser.T__40 - 38)) |
-                (1 << (GraphQLParser.T__41 - 38)) |
-                (1 << (GraphQLParser.T__42 - 38)) |
-                (1 << (GraphQLParser.T__43 - 38)) |
-                (1 << (GraphQLParser.T__44 - 38)) |
-                (1 << (GraphQLParser.T__45 - 38)) |
-                (1 << (GraphQLParser.T__46 - 38)) |
-                (1 << (GraphQLParser.T__47 - 38)))) !==
-              0
-          )
-        ) {
-          this._errHandler.recoverInline(this);
-        } else {
-          if (this._input.LA(1) === Token.EOF) {
-            this.matchedEOF = true;
-          }
-
-          this._errHandler.reportMatch(this);
-          this.consume();
-        }
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-
   private static readonly _serializedATNSegments: number = 2;
+
+  // tslint:enable:no-trailing-whitespace
   private static readonly _serializedATNSegment0: string =
     '\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x03:\u027F\x04\x02' +
     '\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07' +
@@ -3907,7 +655,14 @@ export class GraphQLParser extends Parser {
     ],
     ''
   );
+
+  constructor(input: TokenStream) {
+    super(input);
+    this._interp = new ParserATNSimulator(GraphQLParser._ATN, this);
+  }
+
   public static __ATN: ATN;
+
   public static get _ATN(): ATN {
     if (!GraphQLParser.__ATN) {
       GraphQLParser.__ATN = new ATNDeserializer().deserialize(
@@ -3917,14 +672,3330 @@ export class GraphQLParser extends Parser {
 
     return GraphQLParser.__ATN;
   }
+
+  // @NotNull
+  public get vocabulary(): Vocabulary {
+    return GraphQLParser.VOCABULARY;
+  }
+
+  // @Override
+  public get grammarFileName(): string {
+    return 'GraphQL.g4';
+  }
+
+  // @Override
+  public get ruleNames(): string[] {
+    return GraphQLParser.ruleNames;
+  }
+
+  // @Override
+  public get serializedATN(): string {
+    return GraphQLParser._serializedATN;
+  }
+
+  // @RuleVersion(0)
+  public document(): DocumentContext {
+    let _localctx: DocumentContext = new DocumentContext(this._ctx, this.state);
+    this.enterRule(_localctx, 0, GraphQLParser.RULE_document);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 125;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 124;
+              this.definition();
+            }
+          }
+          this.state = 127;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (
+          ((_la & ~0x1f) === 0 &&
+            ((1 << _la) &
+              ((1 << GraphQLParser.T__0) |
+                (1 << GraphQLParser.T__1) |
+                (1 << GraphQLParser.T__2) |
+                (1 << GraphQLParser.T__3) |
+                (1 << GraphQLParser.T__9) |
+                (1 << GraphQLParser.T__17) |
+                (1 << GraphQLParser.T__18) |
+                (1 << GraphQLParser.T__19) |
+                (1 << GraphQLParser.T__20) |
+                (1 << GraphQLParser.T__23) |
+                (1 << GraphQLParser.T__24) |
+                (1 << GraphQLParser.T__26) |
+                (1 << GraphQLParser.T__27) |
+                (1 << GraphQLParser.T__28))) !==
+              0) ||
+          _la === GraphQLParser.STRING_VALUE
+        );
+        this.state = 129;
+        this.match(GraphQLParser.EOF);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public definition(): DefinitionContext {
+    let _localctx: DefinitionContext = new DefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 2, GraphQLParser.RULE_definition);
+    try {
+      this.state = 134;
+      this._errHandler.sync(this);
+      switch (this._input.LA(1)) {
+        case GraphQLParser.T__0:
+        case GraphQLParser.T__1:
+        case GraphQLParser.T__2:
+        case GraphQLParser.T__3:
+        case GraphQLParser.T__9:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 131;
+            this.executableDefinition();
+          }
+          break;
+        case GraphQLParser.T__17:
+        case GraphQLParser.T__19:
+        case GraphQLParser.T__20:
+        case GraphQLParser.T__23:
+        case GraphQLParser.T__24:
+        case GraphQLParser.T__26:
+        case GraphQLParser.T__27:
+        case GraphQLParser.T__28:
+        case GraphQLParser.STRING_VALUE:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 132;
+            this.typeSystemDefinition();
+          }
+          break;
+        case GraphQLParser.T__18:
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 133;
+            this.typeSystemExtension();
+          }
+          break;
+        default:
+          throw new NoViableAltException(this);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public executableDefinition(): ExecutableDefinitionContext {
+    let _localctx: ExecutableDefinitionContext = new ExecutableDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 4, GraphQLParser.RULE_executableDefinition);
+    try {
+      this.state = 138;
+      this._errHandler.sync(this);
+      switch (this._input.LA(1)) {
+        case GraphQLParser.T__0:
+        case GraphQLParser.T__1:
+        case GraphQLParser.T__2:
+        case GraphQLParser.T__3:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 136;
+            this.operationDefinition();
+          }
+          break;
+        case GraphQLParser.T__9:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 137;
+            this.fragmentDefinition();
+          }
+          break;
+        default:
+          throw new NoViableAltException(this);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public operationDefinition(): OperationDefinitionContext {
+    let _localctx: OperationDefinitionContext = new OperationDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 6, GraphQLParser.RULE_operationDefinition);
+    let _la: number;
+    try {
+      this.state = 153;
+      this._errHandler.sync(this);
+      switch (this._input.LA(1)) {
+        case GraphQLParser.T__3:
+          _localctx = new SelectionOnlyOperationDefinitionContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 140;
+            this.selectionSet();
+          }
+          break;
+        case GraphQLParser.T__0:
+        case GraphQLParser.T__1:
+        case GraphQLParser.T__2:
+          _localctx = new FullOperationDefinitionContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 141;
+            this.operationType();
+            this.state = 143;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.NAME) {
+              {
+                this.state = 142;
+                this.match(GraphQLParser.NAME);
+              }
+            }
+
+            this.state = 146;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__6) {
+              {
+                this.state = 145;
+                this.variableDefinitions();
+              }
+            }
+
+            this.state = 149;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__16) {
+              {
+                this.state = 148;
+                this.directives();
+              }
+            }
+
+            this.state = 151;
+            this.selectionSet();
+          }
+          break;
+        default:
+          throw new NoViableAltException(this);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public operationType(): OperationTypeContext {
+    let _localctx: OperationTypeContext = new OperationTypeContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 8, GraphQLParser.RULE_operationType);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 155;
+        _la = this._input.LA(1);
+        if (
+          !(
+            (_la & ~0x1f) === 0 &&
+            ((1 << _la) &
+              ((1 << GraphQLParser.T__0) |
+                (1 << GraphQLParser.T__1) |
+                (1 << GraphQLParser.T__2))) !==
+              0
+          )
+        ) {
+          this._errHandler.recoverInline(this);
+        } else {
+          if (this._input.LA(1) === Token.EOF) {
+            this.matchedEOF = true;
+          }
+
+          this._errHandler.reportMatch(this);
+          this.consume();
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public selectionSet(): SelectionSetContext {
+    let _localctx: SelectionSetContext = new SelectionSetContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 10, GraphQLParser.RULE_selectionSet);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 157;
+        this.match(GraphQLParser.T__3);
+        this.state = 159;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 158;
+              this.selection();
+            }
+          }
+          this.state = 161;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (_la === GraphQLParser.T__8 || _la === GraphQLParser.NAME);
+        this.state = 163;
+        this.match(GraphQLParser.T__4);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public selection(): SelectionContext {
+    let _localctx: SelectionContext = new SelectionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 12, GraphQLParser.RULE_selection);
+    try {
+      this.state = 168;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 8, this._ctx)) {
+        case 1:
+          _localctx = new FieldSelectionContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 165;
+            this.field();
+          }
+          break;
+
+        case 2:
+          _localctx = new FragmentSpreadSelectionContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 166;
+            this.fragmentSpread();
+          }
+          break;
+
+        case 3:
+          _localctx = new InlineFragmentSelectionContext(_localctx);
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 167;
+            this.inlineFragment();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public field(): FieldContext {
+    let _localctx: FieldContext = new FieldContext(this._ctx, this.state);
+    this.enterRule(_localctx, 14, GraphQLParser.RULE_field);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 171;
+        this._errHandler.sync(this);
+        switch (this.interpreter.adaptivePredict(this._input, 9, this._ctx)) {
+          case 1:
+            {
+              this.state = 170;
+              this.alias();
+            }
+            break;
+        }
+        this.state = 173;
+        this.match(GraphQLParser.NAME);
+        this.state = 175;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__6) {
+          {
+            this.state = 174;
+            this.arguments();
+          }
+        }
+
+        this.state = 178;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 177;
+            this.directives();
+          }
+        }
+
+        this.state = 181;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__3) {
+          {
+            this.state = 180;
+            this.selectionSet();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public alias(): AliasContext {
+    let _localctx: AliasContext = new AliasContext(this._ctx, this.state);
+    this.enterRule(_localctx, 16, GraphQLParser.RULE_alias);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 183;
+        this.match(GraphQLParser.NAME);
+        this.state = 184;
+        this.match(GraphQLParser.T__5);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public arguments(): ArgumentsContext {
+    let _localctx: ArgumentsContext = new ArgumentsContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 18, GraphQLParser.RULE_arguments);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 186;
+        this.match(GraphQLParser.T__6);
+        this.state = 188;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 187;
+              this.argument();
+            }
+          }
+          this.state = 190;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (_la === GraphQLParser.NAME);
+        this.state = 192;
+        this.match(GraphQLParser.T__7);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public argument(): ArgumentContext {
+    let _localctx: ArgumentContext = new ArgumentContext(this._ctx, this.state);
+    this.enterRule(_localctx, 20, GraphQLParser.RULE_argument);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 194;
+        this.match(GraphQLParser.NAME);
+        this.state = 195;
+        this.match(GraphQLParser.T__5);
+        this.state = 196;
+        this.value();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public fragmentSpread(): FragmentSpreadContext {
+    let _localctx: FragmentSpreadContext = new FragmentSpreadContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 22, GraphQLParser.RULE_fragmentSpread);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 198;
+        this.match(GraphQLParser.T__8);
+        this.state = 199;
+        this.fragmentName();
+        this.state = 201;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 200;
+            this.directives();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public inlineFragment(): InlineFragmentContext {
+    let _localctx: InlineFragmentContext = new InlineFragmentContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 24, GraphQLParser.RULE_inlineFragment);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 203;
+        this.match(GraphQLParser.T__8);
+        this.state = 205;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__10) {
+          {
+            this.state = 204;
+            this.typeCondition();
+          }
+        }
+
+        this.state = 208;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 207;
+            this.directives();
+          }
+        }
+
+        this.state = 210;
+        this.selectionSet();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public fragmentDefinition(): FragmentDefinitionContext {
+    let _localctx: FragmentDefinitionContext = new FragmentDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 26, GraphQLParser.RULE_fragmentDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 212;
+        this.match(GraphQLParser.T__9);
+        this.state = 213;
+        this.fragmentName();
+        this.state = 214;
+        this.typeCondition();
+        this.state = 216;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 215;
+            this.directives();
+          }
+        }
+
+        this.state = 218;
+        this.selectionSet();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public fragmentName(): FragmentNameContext {
+    let _localctx: FragmentNameContext = new FragmentNameContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 28, GraphQLParser.RULE_fragmentName);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 220;
+        this.match(GraphQLParser.NAME);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public typeCondition(): TypeConditionContext {
+    let _localctx: TypeConditionContext = new TypeConditionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 30, GraphQLParser.RULE_typeCondition);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 222;
+        this.match(GraphQLParser.T__10);
+        this.state = 223;
+        this.namedType();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public value(): ValueContext {
+    let _localctx: ValueContext = new ValueContext(this._ctx, this.state);
+    this.enterRule(_localctx, 32, GraphQLParser.RULE_value);
+    let _la: number;
+    try {
+      this.state = 252;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 20, this._ctx)) {
+        case 1:
+          _localctx = new VariableValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 225;
+            this.variable();
+          }
+          break;
+
+        case 2:
+          _localctx = new IntValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 226;
+            this.match(GraphQLParser.INT_VALUE);
+          }
+          break;
+
+        case 3:
+          _localctx = new FloatValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 227;
+            this.match(GraphQLParser.FLOAT_VALUE);
+          }
+          break;
+
+        case 4:
+          _localctx = new StringValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 4);
+          {
+            this.state = 228;
+            this.match(GraphQLParser.STRING_VALUE);
+          }
+          break;
+
+        case 5:
+          _localctx = new BooleanValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 5);
+          {
+            this.state = 229;
+            this.match(GraphQLParser.BOOLEAN_VALUE);
+          }
+          break;
+
+        case 6:
+          _localctx = new NullValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 6);
+          {
+            this.state = 230;
+            this.match(GraphQLParser.NULL_VALUE);
+          }
+          break;
+
+        case 7:
+          _localctx = new EnumValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 7);
+          {
+            this.state = 231;
+            this.match(GraphQLParser.NAME);
+          }
+          break;
+
+        case 8:
+          _localctx = new EmptyListValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 8);
+          {
+            this.state = 232;
+            this.match(GraphQLParser.T__11);
+            this.state = 233;
+            this.match(GraphQLParser.T__12);
+          }
+          break;
+
+        case 9:
+          _localctx = new NonEmptyListValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 9);
+          {
+            this.state = 234;
+            this.match(GraphQLParser.T__11);
+            this.state = 236;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            do {
+              {
+                {
+                  this.state = 235;
+                  this.value();
+                }
+              }
+              this.state = 238;
+              this._errHandler.sync(this);
+              _la = this._input.LA(1);
+            } while (
+              ((_la & ~0x1f) === 0 &&
+                ((1 << _la) &
+                  ((1 << GraphQLParser.T__3) |
+                    (1 << GraphQLParser.T__11) |
+                    (1 << GraphQLParser.T__13))) !==
+                  0) ||
+              (((_la - 49) & ~0x1f) === 0 &&
+                ((1 << (_la - 49)) &
+                  ((1 << (GraphQLParser.NAME - 49)) |
+                    (1 << (GraphQLParser.INT_VALUE - 49)) |
+                    (1 << (GraphQLParser.FLOAT_VALUE - 49)) |
+                    (1 << (GraphQLParser.STRING_VALUE - 49)) |
+                    (1 << (GraphQLParser.BOOLEAN_VALUE - 49)) |
+                    (1 << (GraphQLParser.NULL_VALUE - 49)))) !==
+                  0)
+            );
+            this.state = 240;
+            this.match(GraphQLParser.T__12);
+          }
+          break;
+
+        case 10:
+          _localctx = new EmptyObjectValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 10);
+          {
+            this.state = 242;
+            this.match(GraphQLParser.T__3);
+            this.state = 243;
+            this.match(GraphQLParser.T__4);
+          }
+          break;
+
+        case 11:
+          _localctx = new NonEmptyObjectValueContext(_localctx);
+          this.enterOuterAlt(_localctx, 11);
+          {
+            this.state = 244;
+            this.match(GraphQLParser.T__3);
+            this.state = 246;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            do {
+              {
+                {
+                  this.state = 245;
+                  this.objectField();
+                }
+              }
+              this.state = 248;
+              this._errHandler.sync(this);
+              _la = this._input.LA(1);
+            } while (_la === GraphQLParser.NAME);
+            this.state = 250;
+            this.match(GraphQLParser.T__4);
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public objectField(): ObjectFieldContext {
+    let _localctx: ObjectFieldContext = new ObjectFieldContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 34, GraphQLParser.RULE_objectField);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 254;
+        this.match(GraphQLParser.NAME);
+        this.state = 255;
+        this.match(GraphQLParser.T__5);
+        this.state = 256;
+        this.value();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public variableDefinitions(): VariableDefinitionsContext {
+    let _localctx: VariableDefinitionsContext = new VariableDefinitionsContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 36, GraphQLParser.RULE_variableDefinitions);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 258;
+        this.match(GraphQLParser.T__6);
+        this.state = 260;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 259;
+              this.variableDefinition();
+            }
+          }
+          this.state = 262;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (_la === GraphQLParser.T__13);
+        this.state = 264;
+        this.match(GraphQLParser.T__7);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public variableDefinition(): VariableDefinitionContext {
+    let _localctx: VariableDefinitionContext = new VariableDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 38, GraphQLParser.RULE_variableDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 266;
+        this.variable();
+        this.state = 267;
+        this.match(GraphQLParser.T__5);
+        this.state = 268;
+        this.type();
+        this.state = 270;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__14) {
+          {
+            this.state = 269;
+            this.defaultValue();
+          }
+        }
+
+        this.state = 273;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 272;
+            this.directives();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public variable(): VariableContext {
+    let _localctx: VariableContext = new VariableContext(this._ctx, this.state);
+    this.enterRule(_localctx, 40, GraphQLParser.RULE_variable);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 275;
+        this.match(GraphQLParser.T__13);
+        this.state = 276;
+        this.match(GraphQLParser.NAME);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public defaultValue(): DefaultValueContext {
+    let _localctx: DefaultValueContext = new DefaultValueContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 42, GraphQLParser.RULE_defaultValue);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 278;
+        this.match(GraphQLParser.T__14);
+        this.state = 279;
+        this.value();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public type(): TypeContext {
+    let _localctx: TypeContext = new TypeContext(this._ctx, this.state);
+    this.enterRule(_localctx, 44, GraphQLParser.RULE_type);
+    let _la: number;
+    try {
+      this.state = 289;
+      this._errHandler.sync(this);
+      switch (this._input.LA(1)) {
+        case GraphQLParser.NAME:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 281;
+            this.namedType();
+            this.state = 283;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__15) {
+              {
+                this.state = 282;
+                this.nonNullType();
+              }
+            }
+          }
+          break;
+        case GraphQLParser.T__11:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 285;
+            this.listType();
+            this.state = 287;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__15) {
+              {
+                this.state = 286;
+                this.nonNullType();
+              }
+            }
+          }
+          break;
+        default:
+          throw new NoViableAltException(this);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public namedType(): NamedTypeContext {
+    let _localctx: NamedTypeContext = new NamedTypeContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 46, GraphQLParser.RULE_namedType);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 291;
+        this.match(GraphQLParser.NAME);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public listType(): ListTypeContext {
+    let _localctx: ListTypeContext = new ListTypeContext(this._ctx, this.state);
+    this.enterRule(_localctx, 48, GraphQLParser.RULE_listType);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 293;
+        this.match(GraphQLParser.T__11);
+        this.state = 294;
+        this.type();
+        this.state = 295;
+        this.match(GraphQLParser.T__12);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public nonNullType(): NonNullTypeContext {
+    let _localctx: NonNullTypeContext = new NonNullTypeContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 50, GraphQLParser.RULE_nonNullType);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 297;
+        this.match(GraphQLParser.T__15);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public directives(): DirectivesContext {
+    let _localctx: DirectivesContext = new DirectivesContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 52, GraphQLParser.RULE_directives);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 300;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 299;
+              this.directive();
+            }
+          }
+          this.state = 302;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (_la === GraphQLParser.T__16);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public directive(): DirectiveContext {
+    let _localctx: DirectiveContext = new DirectiveContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 54, GraphQLParser.RULE_directive);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 304;
+        this.match(GraphQLParser.T__16);
+        this.state = 305;
+        this.match(GraphQLParser.NAME);
+        this.state = 307;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__6) {
+          {
+            this.state = 306;
+            this.arguments();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public typeSystemDefinition(): TypeSystemDefinitionContext {
+    let _localctx: TypeSystemDefinitionContext = new TypeSystemDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 56, GraphQLParser.RULE_typeSystemDefinition);
+    try {
+      this.state = 312;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 29, this._ctx)) {
+        case 1:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 309;
+            this.schemaDefinition();
+          }
+          break;
+
+        case 2:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 310;
+            this.typeDefinition();
+          }
+          break;
+
+        case 3:
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 311;
+            this.directiveDefinition();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public typeSystemExtension(): TypeSystemExtensionContext {
+    let _localctx: TypeSystemExtensionContext = new TypeSystemExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 58, GraphQLParser.RULE_typeSystemExtension);
+    try {
+      this.state = 316;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 30, this._ctx)) {
+        case 1:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 314;
+            this.schemaExtension();
+          }
+          break;
+
+        case 2:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 315;
+            this.typeExtension();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public schemaDefinition(): SchemaDefinitionContext {
+    let _localctx: SchemaDefinitionContext = new SchemaDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 60, GraphQLParser.RULE_schemaDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 318;
+        this.match(GraphQLParser.T__17);
+        this.state = 320;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 319;
+            this.directives();
+          }
+        }
+
+        this.state = 322;
+        this.match(GraphQLParser.T__3);
+        this.state = 324;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 323;
+              this.operationTypeDefinition();
+            }
+          }
+          this.state = 326;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (
+          (_la & ~0x1f) === 0 &&
+          ((1 << _la) &
+            ((1 << GraphQLParser.T__0) |
+              (1 << GraphQLParser.T__1) |
+              (1 << GraphQLParser.T__2))) !==
+            0
+        );
+        this.state = 328;
+        this.match(GraphQLParser.T__4);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public schemaExtension(): SchemaExtensionContext {
+    let _localctx: SchemaExtensionContext = new SchemaExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 62, GraphQLParser.RULE_schemaExtension);
+    let _la: number;
+    try {
+      this.state = 346;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 35, this._ctx)) {
+        case 1:
+          _localctx = new SchemaExtensionWithOperationsContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 330;
+            this.match(GraphQLParser.T__18);
+            this.state = 331;
+            this.match(GraphQLParser.T__17);
+            this.state = 333;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__16) {
+              {
+                this.state = 332;
+                this.directives();
+              }
+            }
+
+            this.state = 335;
+            this.match(GraphQLParser.T__3);
+            this.state = 337;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            do {
+              {
+                {
+                  this.state = 336;
+                  this.operationTypeDefinition();
+                }
+              }
+              this.state = 339;
+              this._errHandler.sync(this);
+              _la = this._input.LA(1);
+            } while (
+              (_la & ~0x1f) === 0 &&
+              ((1 << _la) &
+                ((1 << GraphQLParser.T__0) |
+                  (1 << GraphQLParser.T__1) |
+                  (1 << GraphQLParser.T__2))) !==
+                0
+            );
+            this.state = 341;
+            this.match(GraphQLParser.T__4);
+          }
+          break;
+
+        case 2:
+          _localctx = new SchemaExtensionWithoutOperationsContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 343;
+            this.match(GraphQLParser.T__18);
+            this.state = 344;
+            this.match(GraphQLParser.T__17);
+            this.state = 345;
+            this.directives();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public operationTypeDefinition(): OperationTypeDefinitionContext {
+    let _localctx: OperationTypeDefinitionContext = new OperationTypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 64, GraphQLParser.RULE_operationTypeDefinition);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 348;
+        this.operationType();
+        this.state = 349;
+        this.match(GraphQLParser.T__5);
+        this.state = 350;
+        this.namedType();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public description(): DescriptionContext {
+    let _localctx: DescriptionContext = new DescriptionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 66, GraphQLParser.RULE_description);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 352;
+        this.match(GraphQLParser.STRING_VALUE);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public typeDefinition(): TypeDefinitionContext {
+    let _localctx: TypeDefinitionContext = new TypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 68, GraphQLParser.RULE_typeDefinition);
+    try {
+      this.state = 360;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 36, this._ctx)) {
+        case 1:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 354;
+            this.scalarTypeDefinition();
+          }
+          break;
+
+        case 2:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 355;
+            this.objectTypeDefinition();
+          }
+          break;
+
+        case 3:
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 356;
+            this.interfaceTypeDefinition();
+          }
+          break;
+
+        case 4:
+          this.enterOuterAlt(_localctx, 4);
+          {
+            this.state = 357;
+            this.unionTypeDefinition();
+          }
+          break;
+
+        case 5:
+          this.enterOuterAlt(_localctx, 5);
+          {
+            this.state = 358;
+            this.enumTypeDefinition();
+          }
+          break;
+
+        case 6:
+          this.enterOuterAlt(_localctx, 6);
+          {
+            this.state = 359;
+            this.inputObjectTypeDefinition();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public typeExtension(): TypeExtensionContext {
+    let _localctx: TypeExtensionContext = new TypeExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 70, GraphQLParser.RULE_typeExtension);
+    try {
+      this.state = 368;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 37, this._ctx)) {
+        case 1:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 362;
+            this.scalarTypeExtension();
+          }
+          break;
+
+        case 2:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 363;
+            this.objectTypeExtension();
+          }
+          break;
+
+        case 3:
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 364;
+            this.interfaceTypeExtension();
+          }
+          break;
+
+        case 4:
+          this.enterOuterAlt(_localctx, 4);
+          {
+            this.state = 365;
+            this.unionTypeExtension();
+          }
+          break;
+
+        case 5:
+          this.enterOuterAlt(_localctx, 5);
+          {
+            this.state = 366;
+            this.enumTypeExtension();
+          }
+          break;
+
+        case 6:
+          this.enterOuterAlt(_localctx, 6);
+          {
+            this.state = 367;
+            this.inputObjectTypeExtension();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public scalarTypeDefinition(): ScalarTypeDefinitionContext {
+    let _localctx: ScalarTypeDefinitionContext = new ScalarTypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 72, GraphQLParser.RULE_scalarTypeDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 371;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 370;
+            this.description();
+          }
+        }
+
+        this.state = 373;
+        this.match(GraphQLParser.T__19);
+        this.state = 374;
+        this.match(GraphQLParser.NAME);
+        this.state = 376;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 375;
+            this.directives();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public scalarTypeExtension(): ScalarTypeExtensionContext {
+    let _localctx: ScalarTypeExtensionContext = new ScalarTypeExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 74, GraphQLParser.RULE_scalarTypeExtension);
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 378;
+        this.match(GraphQLParser.T__18);
+        this.state = 379;
+        this.match(GraphQLParser.T__19);
+        this.state = 380;
+        this.match(GraphQLParser.NAME);
+        this.state = 381;
+        this.directives();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public objectTypeDefinition(): ObjectTypeDefinitionContext {
+    let _localctx: ObjectTypeDefinitionContext = new ObjectTypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 76, GraphQLParser.RULE_objectTypeDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 384;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 383;
+            this.description();
+          }
+        }
+
+        this.state = 386;
+        this.match(GraphQLParser.T__20);
+        this.state = 387;
+        this.match(GraphQLParser.NAME);
+        this.state = 389;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__21) {
+          {
+            this.state = 388;
+            this.implementsInterfaces();
+          }
+        }
+
+        this.state = 392;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 391;
+            this.directives();
+          }
+        }
+
+        this.state = 395;
+        this._errHandler.sync(this);
+        switch (this.interpreter.adaptivePredict(this._input, 43, this._ctx)) {
+          case 1:
+            {
+              this.state = 394;
+              this.fieldsDefinition();
+            }
+            break;
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public objectTypeExtension(): ObjectTypeExtensionContext {
+    let _localctx: ObjectTypeExtensionContext = new ObjectTypeExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 78, GraphQLParser.RULE_objectTypeExtension);
+    let _la: number;
+    try {
+      this.state = 418;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 47, this._ctx)) {
+        case 1:
+          _localctx = new ObjectTypeExtensionWithFieldsContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 397;
+            this.match(GraphQLParser.T__18);
+            this.state = 398;
+            this.match(GraphQLParser.T__20);
+            this.state = 399;
+            this.match(GraphQLParser.NAME);
+            this.state = 401;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__21) {
+              {
+                this.state = 400;
+                this.implementsInterfaces();
+              }
+            }
+
+            this.state = 404;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__16) {
+              {
+                this.state = 403;
+                this.directives();
+              }
+            }
+
+            this.state = 406;
+            this.fieldsDefinition();
+          }
+          break;
+
+        case 2:
+          _localctx = new ObjectTypeExtensionWithDirectivesContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 407;
+            this.match(GraphQLParser.T__18);
+            this.state = 408;
+            this.match(GraphQLParser.T__20);
+            this.state = 409;
+            this.match(GraphQLParser.NAME);
+            this.state = 411;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__21) {
+              {
+                this.state = 410;
+                this.implementsInterfaces();
+              }
+            }
+
+            this.state = 413;
+            this.directives();
+          }
+          break;
+
+        case 3:
+          _localctx = new ObjectTypeExtensionWithInterfacesContext(_localctx);
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 414;
+            this.match(GraphQLParser.T__18);
+            this.state = 415;
+            this.match(GraphQLParser.T__20);
+            this.state = 416;
+            this.match(GraphQLParser.NAME);
+            this.state = 417;
+            this.implementsInterfaces();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public implementsInterfaces(): ImplementsInterfacesContext {
+    let _localctx: ImplementsInterfacesContext = new ImplementsInterfacesContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 80, GraphQLParser.RULE_implementsInterfaces);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 420;
+        this.match(GraphQLParser.T__21);
+        this.state = 422;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__22) {
+          {
+            this.state = 421;
+            this.match(GraphQLParser.T__22);
+          }
+        }
+
+        this.state = 424;
+        this.namedType();
+        this.state = 431;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        while (_la === GraphQLParser.T__22 || _la === GraphQLParser.NAME) {
+          {
+            {
+              this.state = 426;
+              this._errHandler.sync(this);
+              _la = this._input.LA(1);
+              if (_la === GraphQLParser.T__22) {
+                {
+                  this.state = 425;
+                  this.match(GraphQLParser.T__22);
+                }
+              }
+
+              this.state = 428;
+              this.namedType();
+            }
+          }
+          this.state = 433;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public fieldsDefinition(): FieldsDefinitionContext {
+    let _localctx: FieldsDefinitionContext = new FieldsDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 82, GraphQLParser.RULE_fieldsDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 434;
+        this.match(GraphQLParser.T__3);
+        this.state = 436;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 435;
+              this.fieldDefinition();
+            }
+          }
+          this.state = 438;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (
+          _la === GraphQLParser.NAME ||
+          _la === GraphQLParser.STRING_VALUE
+        );
+        this.state = 440;
+        this.match(GraphQLParser.T__4);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public fieldDefinition(): FieldDefinitionContext {
+    let _localctx: FieldDefinitionContext = new FieldDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 84, GraphQLParser.RULE_fieldDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 443;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 442;
+            this.description();
+          }
+        }
+
+        this.state = 445;
+        this.match(GraphQLParser.NAME);
+        this.state = 447;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__6) {
+          {
+            this.state = 446;
+            this.argumentsDefinition();
+          }
+        }
+
+        this.state = 449;
+        this.match(GraphQLParser.T__5);
+        this.state = 450;
+        this.type();
+        this.state = 452;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 451;
+            this.directives();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public argumentsDefinition(): ArgumentsDefinitionContext {
+    let _localctx: ArgumentsDefinitionContext = new ArgumentsDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 86, GraphQLParser.RULE_argumentsDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 454;
+        this.match(GraphQLParser.T__6);
+        this.state = 456;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 455;
+              this.inputValueDefinition();
+            }
+          }
+          this.state = 458;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (
+          _la === GraphQLParser.NAME ||
+          _la === GraphQLParser.STRING_VALUE
+        );
+        this.state = 460;
+        this.match(GraphQLParser.T__7);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public inputValueDefinition(): InputValueDefinitionContext {
+    let _localctx: InputValueDefinitionContext = new InputValueDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 88, GraphQLParser.RULE_inputValueDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 463;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 462;
+            this.description();
+          }
+        }
+
+        this.state = 465;
+        this.match(GraphQLParser.NAME);
+        this.state = 466;
+        this.match(GraphQLParser.T__5);
+        this.state = 467;
+        this.type();
+        this.state = 469;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__14) {
+          {
+            this.state = 468;
+            this.defaultValue();
+          }
+        }
+
+        this.state = 472;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 471;
+            this.directives();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public interfaceTypeDefinition(): InterfaceTypeDefinitionContext {
+    let _localctx: InterfaceTypeDefinitionContext = new InterfaceTypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 90, GraphQLParser.RULE_interfaceTypeDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 475;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 474;
+            this.description();
+          }
+        }
+
+        this.state = 477;
+        this.match(GraphQLParser.T__23);
+        this.state = 478;
+        this.match(GraphQLParser.NAME);
+        this.state = 480;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 479;
+            this.directives();
+          }
+        }
+
+        this.state = 483;
+        this._errHandler.sync(this);
+        switch (this.interpreter.adaptivePredict(this._input, 61, this._ctx)) {
+          case 1:
+            {
+              this.state = 482;
+              this.fieldsDefinition();
+            }
+            break;
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public interfaceTypeExtension(): InterfaceTypeExtensionContext {
+    let _localctx: InterfaceTypeExtensionContext = new InterfaceTypeExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 92, GraphQLParser.RULE_interfaceTypeExtension);
+    let _la: number;
+    try {
+      this.state = 496;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 63, this._ctx)) {
+        case 1:
+          _localctx = new InterfaceTypeExtensionWithFieldsContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 485;
+            this.match(GraphQLParser.T__18);
+            this.state = 486;
+            this.match(GraphQLParser.T__23);
+            this.state = 487;
+            this.match(GraphQLParser.NAME);
+            this.state = 489;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__16) {
+              {
+                this.state = 488;
+                this.directives();
+              }
+            }
+
+            this.state = 491;
+            this.fieldsDefinition();
+          }
+          break;
+
+        case 2:
+          _localctx = new InterfaceTypeExtensionWithDirectivesContext(
+            _localctx
+          );
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 492;
+            this.match(GraphQLParser.T__18);
+            this.state = 493;
+            this.match(GraphQLParser.T__23);
+            this.state = 494;
+            this.match(GraphQLParser.NAME);
+            this.state = 495;
+            this.directives();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public unionTypeDefinition(): UnionTypeDefinitionContext {
+    let _localctx: UnionTypeDefinitionContext = new UnionTypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 94, GraphQLParser.RULE_unionTypeDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 499;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 498;
+            this.description();
+          }
+        }
+
+        this.state = 501;
+        this.match(GraphQLParser.T__24);
+        this.state = 502;
+        this.match(GraphQLParser.NAME);
+        this.state = 504;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 503;
+            this.directives();
+          }
+        }
+
+        this.state = 507;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__14) {
+          {
+            this.state = 506;
+            this.unionMemberTypes();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public unionMemberTypes(): UnionMemberTypesContext {
+    let _localctx: UnionMemberTypesContext = new UnionMemberTypesContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 96, GraphQLParser.RULE_unionMemberTypes);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 509;
+        this.match(GraphQLParser.T__14);
+        this.state = 511;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__25) {
+          {
+            this.state = 510;
+            this.match(GraphQLParser.T__25);
+          }
+        }
+
+        this.state = 513;
+        this.namedType();
+        this.state = 520;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        while (_la === GraphQLParser.T__25 || _la === GraphQLParser.NAME) {
+          {
+            {
+              this.state = 515;
+              this._errHandler.sync(this);
+              _la = this._input.LA(1);
+              if (_la === GraphQLParser.T__25) {
+                {
+                  this.state = 514;
+                  this.match(GraphQLParser.T__25);
+                }
+              }
+
+              this.state = 517;
+              this.namedType();
+            }
+          }
+          this.state = 522;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public unionTypeExtension(): UnionTypeExtensionContext {
+    let _localctx: UnionTypeExtensionContext = new UnionTypeExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 98, GraphQLParser.RULE_unionTypeExtension);
+    let _la: number;
+    try {
+      this.state = 534;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 71, this._ctx)) {
+        case 1:
+          _localctx = new UnionTypeExtensionWithMembersContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 523;
+            this.match(GraphQLParser.T__18);
+            this.state = 524;
+            this.match(GraphQLParser.T__24);
+            this.state = 525;
+            this.match(GraphQLParser.NAME);
+            this.state = 527;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__16) {
+              {
+                this.state = 526;
+                this.directives();
+              }
+            }
+
+            this.state = 529;
+            this.unionMemberTypes();
+          }
+          break;
+
+        case 2:
+          _localctx = new UnionTypeExtensionWithDirectivesContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 530;
+            this.match(GraphQLParser.T__18);
+            this.state = 531;
+            this.match(GraphQLParser.T__24);
+            this.state = 532;
+            this.match(GraphQLParser.NAME);
+            this.state = 533;
+            this.directives();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public enumTypeDefinition(): EnumTypeDefinitionContext {
+    let _localctx: EnumTypeDefinitionContext = new EnumTypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 100, GraphQLParser.RULE_enumTypeDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 537;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 536;
+            this.description();
+          }
+        }
+
+        this.state = 539;
+        this.match(GraphQLParser.T__26);
+        this.state = 540;
+        this.match(GraphQLParser.NAME);
+        this.state = 542;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 541;
+            this.directives();
+          }
+        }
+
+        this.state = 545;
+        this._errHandler.sync(this);
+        switch (this.interpreter.adaptivePredict(this._input, 74, this._ctx)) {
+          case 1:
+            {
+              this.state = 544;
+              this.enumValuesDefinition();
+            }
+            break;
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public enumValuesDefinition(): EnumValuesDefinitionContext {
+    let _localctx: EnumValuesDefinitionContext = new EnumValuesDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 102, GraphQLParser.RULE_enumValuesDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 547;
+        this.match(GraphQLParser.T__3);
+        this.state = 549;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 548;
+              this.enumValueDefinition();
+            }
+          }
+          this.state = 551;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (
+          _la === GraphQLParser.NAME ||
+          _la === GraphQLParser.STRING_VALUE
+        );
+        this.state = 553;
+        this.match(GraphQLParser.T__4);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public enumValueDefinition(): EnumValueDefinitionContext {
+    let _localctx: EnumValueDefinitionContext = new EnumValueDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 104, GraphQLParser.RULE_enumValueDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 556;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 555;
+            this.description();
+          }
+        }
+
+        this.state = 558;
+        this.match(GraphQLParser.NAME);
+        this.state = 560;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 559;
+            this.directives();
+          }
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public enumTypeExtension(): EnumTypeExtensionContext {
+    let _localctx: EnumTypeExtensionContext = new EnumTypeExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 106, GraphQLParser.RULE_enumTypeExtension);
+    let _la: number;
+    try {
+      this.state = 573;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 79, this._ctx)) {
+        case 1:
+          _localctx = new EnumTypeExtensionWithValuesContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 562;
+            this.match(GraphQLParser.T__18);
+            this.state = 563;
+            this.match(GraphQLParser.T__26);
+            this.state = 564;
+            this.match(GraphQLParser.NAME);
+            this.state = 566;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__16) {
+              {
+                this.state = 565;
+                this.directives();
+              }
+            }
+
+            this.state = 568;
+            this.enumValuesDefinition();
+          }
+          break;
+
+        case 2:
+          _localctx = new EnumTypeExtensionWithDirectivesContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 569;
+            this.match(GraphQLParser.T__18);
+            this.state = 570;
+            this.match(GraphQLParser.T__26);
+            this.state = 571;
+            this.match(GraphQLParser.NAME);
+            this.state = 572;
+            this.directives();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public inputObjectTypeDefinition(): InputObjectTypeDefinitionContext {
+    let _localctx: InputObjectTypeDefinitionContext = new InputObjectTypeDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(
+      _localctx,
+      108,
+      GraphQLParser.RULE_inputObjectTypeDefinition
+    );
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 576;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 575;
+            this.description();
+          }
+        }
+
+        this.state = 578;
+        this.match(GraphQLParser.T__27);
+        this.state = 579;
+        this.match(GraphQLParser.NAME);
+        this.state = 581;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__16) {
+          {
+            this.state = 580;
+            this.directives();
+          }
+        }
+
+        this.state = 584;
+        this._errHandler.sync(this);
+        switch (this.interpreter.adaptivePredict(this._input, 82, this._ctx)) {
+          case 1:
+            {
+              this.state = 583;
+              this.inputFieldsDefinition();
+            }
+            break;
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public inputFieldsDefinition(): InputFieldsDefinitionContext {
+    let _localctx: InputFieldsDefinitionContext = new InputFieldsDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 110, GraphQLParser.RULE_inputFieldsDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 586;
+        this.match(GraphQLParser.T__3);
+        this.state = 588;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        do {
+          {
+            {
+              this.state = 587;
+              this.inputValueDefinition();
+            }
+          }
+          this.state = 590;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+        } while (
+          _la === GraphQLParser.NAME ||
+          _la === GraphQLParser.STRING_VALUE
+        );
+        this.state = 592;
+        this.match(GraphQLParser.T__4);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public inputObjectTypeExtension(): InputObjectTypeExtensionContext {
+    let _localctx: InputObjectTypeExtensionContext = new InputObjectTypeExtensionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 112, GraphQLParser.RULE_inputObjectTypeExtension);
+    let _la: number;
+    try {
+      this.state = 605;
+      this._errHandler.sync(this);
+      switch (this.interpreter.adaptivePredict(this._input, 85, this._ctx)) {
+        case 1:
+          _localctx = new InputObjectTypeExtensionWithFieldsContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 594;
+            this.match(GraphQLParser.T__18);
+            this.state = 595;
+            this.match(GraphQLParser.T__27);
+            this.state = 596;
+            this.match(GraphQLParser.NAME);
+            this.state = 598;
+            this._errHandler.sync(this);
+            _la = this._input.LA(1);
+            if (_la === GraphQLParser.T__16) {
+              {
+                this.state = 597;
+                this.directives();
+              }
+            }
+
+            this.state = 600;
+            this.inputFieldsDefinition();
+          }
+          break;
+
+        case 2:
+          _localctx = new InputObjectTypeExtensionWithDirectivesContext(
+            _localctx
+          );
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 601;
+            this.match(GraphQLParser.T__18);
+            this.state = 602;
+            this.match(GraphQLParser.T__27);
+            this.state = 603;
+            this.match(GraphQLParser.NAME);
+            this.state = 604;
+            this.directives();
+          }
+          break;
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public directiveDefinition(): DirectiveDefinitionContext {
+    let _localctx: DirectiveDefinitionContext = new DirectiveDefinitionContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 114, GraphQLParser.RULE_directiveDefinition);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 608;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.STRING_VALUE) {
+          {
+            this.state = 607;
+            this.description();
+          }
+        }
+
+        this.state = 610;
+        this.match(GraphQLParser.T__28);
+        this.state = 611;
+        this.match(GraphQLParser.T__16);
+        this.state = 612;
+        this.match(GraphQLParser.NAME);
+        this.state = 614;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__6) {
+          {
+            this.state = 613;
+            this.argumentsDefinition();
+          }
+        }
+
+        this.state = 616;
+        this.directiveLocations();
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public directiveLocations(): DirectiveLocationsContext {
+    let _localctx: DirectiveLocationsContext = new DirectiveLocationsContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 116, GraphQLParser.RULE_directiveLocations);
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 618;
+        this.match(GraphQLParser.T__10);
+        this.state = 620;
+        this._errHandler.sync(this);
+        _la = this._input.LA(1);
+        if (_la === GraphQLParser.T__25) {
+          {
+            this.state = 619;
+            this.match(GraphQLParser.T__25);
+          }
+        }
+
+        this.state = 622;
+        this.directiveLocation();
+        {
+          this.state = 624;
+          this._errHandler.sync(this);
+          _la = this._input.LA(1);
+          if (_la === GraphQLParser.T__25) {
+            {
+              this.state = 623;
+              this.match(GraphQLParser.T__25);
+            }
+          }
+
+          this.state = 626;
+          this.directiveLocation();
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public directiveLocation(): DirectiveLocationContext {
+    let _localctx: DirectiveLocationContext = new DirectiveLocationContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(_localctx, 118, GraphQLParser.RULE_directiveLocation);
+    try {
+      this.state = 630;
+      this._errHandler.sync(this);
+      switch (this._input.LA(1)) {
+        case GraphQLParser.T__29:
+        case GraphQLParser.T__30:
+        case GraphQLParser.T__31:
+        case GraphQLParser.T__32:
+        case GraphQLParser.T__33:
+        case GraphQLParser.T__34:
+        case GraphQLParser.T__35:
+        case GraphQLParser.T__36:
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 628;
+            this.executableDirectiveLocation();
+          }
+          break;
+        case GraphQLParser.T__37:
+        case GraphQLParser.T__38:
+        case GraphQLParser.T__39:
+        case GraphQLParser.T__40:
+        case GraphQLParser.T__41:
+        case GraphQLParser.T__42:
+        case GraphQLParser.T__43:
+        case GraphQLParser.T__44:
+        case GraphQLParser.T__45:
+        case GraphQLParser.T__46:
+        case GraphQLParser.T__47:
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 629;
+            this.typeSystemDirectiveLocation();
+          }
+          break;
+        default:
+          throw new NoViableAltException(this);
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public executableDirectiveLocation(): ExecutableDirectiveLocationContext {
+    let _localctx: ExecutableDirectiveLocationContext = new ExecutableDirectiveLocationContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(
+      _localctx,
+      120,
+      GraphQLParser.RULE_executableDirectiveLocation
+    );
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 632;
+        _la = this._input.LA(1);
+        if (
+          !(
+            ((_la - 30) & ~0x1f) === 0 &&
+            ((1 << (_la - 30)) &
+              ((1 << (GraphQLParser.T__29 - 30)) |
+                (1 << (GraphQLParser.T__30 - 30)) |
+                (1 << (GraphQLParser.T__31 - 30)) |
+                (1 << (GraphQLParser.T__32 - 30)) |
+                (1 << (GraphQLParser.T__33 - 30)) |
+                (1 << (GraphQLParser.T__34 - 30)) |
+                (1 << (GraphQLParser.T__35 - 30)) |
+                (1 << (GraphQLParser.T__36 - 30)))) !==
+              0
+          )
+        ) {
+          this._errHandler.recoverInline(this);
+        } else {
+          if (this._input.LA(1) === Token.EOF) {
+            this.matchedEOF = true;
+          }
+
+          this._errHandler.reportMatch(this);
+          this.consume();
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
+
+  // @RuleVersion(0)
+  public typeSystemDirectiveLocation(): TypeSystemDirectiveLocationContext {
+    let _localctx: TypeSystemDirectiveLocationContext = new TypeSystemDirectiveLocationContext(
+      this._ctx,
+      this.state
+    );
+    this.enterRule(
+      _localctx,
+      122,
+      GraphQLParser.RULE_typeSystemDirectiveLocation
+    );
+    let _la: number;
+    try {
+      this.enterOuterAlt(_localctx, 1);
+      {
+        this.state = 634;
+        _la = this._input.LA(1);
+        if (
+          !(
+            ((_la - 38) & ~0x1f) === 0 &&
+            ((1 << (_la - 38)) &
+              ((1 << (GraphQLParser.T__37 - 38)) |
+                (1 << (GraphQLParser.T__38 - 38)) |
+                (1 << (GraphQLParser.T__39 - 38)) |
+                (1 << (GraphQLParser.T__40 - 38)) |
+                (1 << (GraphQLParser.T__41 - 38)) |
+                (1 << (GraphQLParser.T__42 - 38)) |
+                (1 << (GraphQLParser.T__43 - 38)) |
+                (1 << (GraphQLParser.T__44 - 38)) |
+                (1 << (GraphQLParser.T__45 - 38)) |
+                (1 << (GraphQLParser.T__46 - 38)) |
+                (1 << (GraphQLParser.T__47 - 38)))) !==
+              0
+          )
+        ) {
+          this._errHandler.recoverInline(this);
+        } else {
+          if (this._input.LA(1) === Token.EOF) {
+            this.matchedEOF = true;
+          }
+
+          this._errHandler.reportMatch(this);
+          this.consume();
+        }
+      }
+    } catch (re) {
+      if (re instanceof RecognitionException) {
+        _localctx.exception = re;
+        this._errHandler.reportError(this, re);
+        this._errHandler.recover(this, re);
+      } else {
+        throw re;
+      }
+    } finally {
+      this.exitRule();
+    }
+    return _localctx;
+  }
 }
 
 export class DocumentContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_document;
+  }
+
   public EOF(): TerminalNode {
     return this.getToken(GraphQLParser.EOF, 0);
   }
+
   public definition(): DefinitionContext[];
+
   public definition(i: number): DefinitionContext;
+
   public definition(i?: number): DefinitionContext | DefinitionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(DefinitionContext);
@@ -3932,19 +4003,14 @@ export class DocumentContext extends ParserRuleContext {
       return this.getRuleContext(i, DefinitionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_document;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDocument) {
       listener.enterDocument(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDocument) {
@@ -3954,28 +4020,34 @@ export class DocumentContext extends ParserRuleContext {
 }
 
 export class DefinitionContext extends ParserRuleContext {
-  public executableDefinition(): ExecutableDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, ExecutableDefinitionContext);
-  }
-  public typeSystemDefinition(): TypeSystemDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, TypeSystemDefinitionContext);
-  }
-  public typeSystemExtension(): TypeSystemExtensionContext | undefined {
-    return this.tryGetRuleContext(0, TypeSystemExtensionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_definition;
   }
+
+  public executableDefinition(): ExecutableDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, ExecutableDefinitionContext);
+  }
+
+  public typeSystemDefinition(): TypeSystemDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, TypeSystemDefinitionContext);
+  }
+
+  public typeSystemExtension(): TypeSystemExtensionContext | undefined {
+    return this.tryGetRuleContext(0, TypeSystemExtensionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDefinition) {
       listener.enterDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDefinition) {
@@ -3985,25 +4057,30 @@ export class DefinitionContext extends ParserRuleContext {
 }
 
 export class ExecutableDefinitionContext extends ParserRuleContext {
-  public operationDefinition(): OperationDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, OperationDefinitionContext);
-  }
-  public fragmentDefinition(): FragmentDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, FragmentDefinitionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_executableDefinition;
   }
+
+  public operationDefinition(): OperationDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, OperationDefinitionContext);
+  }
+
+  public fragmentDefinition(): FragmentDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, FragmentDefinitionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterExecutableDefinition) {
       listener.enterExecutableDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitExecutableDefinition) {
@@ -4016,28 +4093,34 @@ export class OperationDefinitionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_operationDefinition;
   }
+
   public copyFrom(ctx: OperationDefinitionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class SelectionOnlyOperationDefinitionContext extends OperationDefinitionContext {
-  public selectionSet(): SelectionSetContext {
-    return this.getRuleContext(0, SelectionSetContext);
-  }
   constructor(ctx: OperationDefinitionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public selectionSet(): SelectionSetContext {
+    return this.getRuleContext(0, SelectionSetContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterSelectionOnlyOperationDefinition) {
       listener.enterSelectionOnlyOperationDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitSelectionOnlyOperationDefinition) {
@@ -4045,32 +4128,40 @@ export class SelectionOnlyOperationDefinitionContext extends OperationDefinition
     }
   }
 }
+
 export class FullOperationDefinitionContext extends OperationDefinitionContext {
-  public operationType(): OperationTypeContext {
-    return this.getRuleContext(0, OperationTypeContext);
-  }
-  public selectionSet(): SelectionSetContext {
-    return this.getRuleContext(0, SelectionSetContext);
-  }
-  public NAME(): TerminalNode | undefined {
-    return this.tryGetToken(GraphQLParser.NAME, 0);
-  }
-  public variableDefinitions(): VariableDefinitionsContext | undefined {
-    return this.tryGetRuleContext(0, VariableDefinitionsContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: OperationDefinitionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public operationType(): OperationTypeContext {
+    return this.getRuleContext(0, OperationTypeContext);
+  }
+
+  public selectionSet(): SelectionSetContext {
+    return this.getRuleContext(0, SelectionSetContext);
+  }
+
+  public NAME(): TerminalNode | undefined {
+    return this.tryGetToken(GraphQLParser.NAME, 0);
+  }
+
+  public variableDefinitions(): VariableDefinitionsContext | undefined {
+    return this.tryGetRuleContext(0, VariableDefinitionsContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFullOperationDefinition) {
       listener.enterFullOperationDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFullOperationDefinition) {
@@ -4083,16 +4174,19 @@ export class OperationTypeContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_operationType;
   }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterOperationType) {
       listener.enterOperationType(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitOperationType) {
@@ -4102,8 +4196,19 @@ export class OperationTypeContext extends ParserRuleContext {
 }
 
 export class SelectionSetContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_selectionSet;
+  }
+
   public selection(): SelectionContext[];
+
   public selection(i: number): SelectionContext;
+
   public selection(i?: number): SelectionContext | SelectionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(SelectionContext);
@@ -4111,19 +4216,14 @@ export class SelectionSetContext extends ParserRuleContext {
       return this.getRuleContext(i, SelectionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_selectionSet;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterSelectionSet) {
       listener.enterSelectionSet(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitSelectionSet) {
@@ -4136,28 +4236,34 @@ export class SelectionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_selection;
   }
+
   public copyFrom(ctx: SelectionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class FragmentSpreadSelectionContext extends SelectionContext {
-  public fragmentSpread(): FragmentSpreadContext {
-    return this.getRuleContext(0, FragmentSpreadContext);
-  }
   constructor(ctx: SelectionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public fragmentSpread(): FragmentSpreadContext {
+    return this.getRuleContext(0, FragmentSpreadContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFragmentSpreadSelection) {
       listener.enterFragmentSpreadSelection(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFragmentSpreadSelection) {
@@ -4165,20 +4271,24 @@ export class FragmentSpreadSelectionContext extends SelectionContext {
     }
   }
 }
+
 export class FieldSelectionContext extends SelectionContext {
-  public field(): FieldContext {
-    return this.getRuleContext(0, FieldContext);
-  }
   constructor(ctx: SelectionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public field(): FieldContext {
+    return this.getRuleContext(0, FieldContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFieldSelection) {
       listener.enterFieldSelection(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFieldSelection) {
@@ -4186,20 +4296,24 @@ export class FieldSelectionContext extends SelectionContext {
     }
   }
 }
+
 export class InlineFragmentSelectionContext extends SelectionContext {
-  public inlineFragment(): InlineFragmentContext {
-    return this.getRuleContext(0, InlineFragmentContext);
-  }
   constructor(ctx: SelectionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public inlineFragment(): InlineFragmentContext {
+    return this.getRuleContext(0, InlineFragmentContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInlineFragmentSelection) {
       listener.enterInlineFragmentSelection(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInlineFragmentSelection) {
@@ -4209,34 +4323,42 @@ export class InlineFragmentSelectionContext extends SelectionContext {
 }
 
 export class FieldContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public alias(): AliasContext | undefined {
-    return this.tryGetRuleContext(0, AliasContext);
-  }
-  public arguments(): ArgumentsContext | undefined {
-    return this.tryGetRuleContext(0, ArgumentsContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
-  public selectionSet(): SelectionSetContext | undefined {
-    return this.tryGetRuleContext(0, SelectionSetContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_field;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public alias(): AliasContext | undefined {
+    return this.tryGetRuleContext(0, AliasContext);
+  }
+
+  public arguments(): ArgumentsContext | undefined {
+    return this.tryGetRuleContext(0, ArgumentsContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
+  public selectionSet(): SelectionSetContext | undefined {
+    return this.tryGetRuleContext(0, SelectionSetContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterField) {
       listener.enterField(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitField) {
@@ -4246,22 +4368,26 @@ export class FieldContext extends ParserRuleContext {
 }
 
 export class AliasContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_alias;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterAlias) {
       listener.enterAlias(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitAlias) {
@@ -4271,8 +4397,19 @@ export class AliasContext extends ParserRuleContext {
 }
 
 export class ArgumentsContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_arguments;
+  }
+
   public argument(): ArgumentContext[];
+
   public argument(i: number): ArgumentContext;
+
   public argument(i?: number): ArgumentContext | ArgumentContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ArgumentContext);
@@ -4280,19 +4417,14 @@ export class ArgumentsContext extends ParserRuleContext {
       return this.getRuleContext(i, ArgumentContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_arguments;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterArguments) {
       listener.enterArguments(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitArguments) {
@@ -4302,25 +4434,30 @@ export class ArgumentsContext extends ParserRuleContext {
 }
 
 export class ArgumentContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public value(): ValueContext {
-    return this.getRuleContext(0, ValueContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_argument;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public value(): ValueContext {
+    return this.getRuleContext(0, ValueContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterArgument) {
       listener.enterArgument(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitArgument) {
@@ -4330,25 +4467,30 @@ export class ArgumentContext extends ParserRuleContext {
 }
 
 export class FragmentSpreadContext extends ParserRuleContext {
-  public fragmentName(): FragmentNameContext {
-    return this.getRuleContext(0, FragmentNameContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_fragmentSpread;
   }
+
+  public fragmentName(): FragmentNameContext {
+    return this.getRuleContext(0, FragmentNameContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFragmentSpread) {
       listener.enterFragmentSpread(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFragmentSpread) {
@@ -4358,28 +4500,34 @@ export class FragmentSpreadContext extends ParserRuleContext {
 }
 
 export class InlineFragmentContext extends ParserRuleContext {
-  public selectionSet(): SelectionSetContext {
-    return this.getRuleContext(0, SelectionSetContext);
-  }
-  public typeCondition(): TypeConditionContext | undefined {
-    return this.tryGetRuleContext(0, TypeConditionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_inlineFragment;
   }
+
+  public selectionSet(): SelectionSetContext {
+    return this.getRuleContext(0, SelectionSetContext);
+  }
+
+  public typeCondition(): TypeConditionContext | undefined {
+    return this.tryGetRuleContext(0, TypeConditionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInlineFragment) {
       listener.enterInlineFragment(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInlineFragment) {
@@ -4389,31 +4537,38 @@ export class InlineFragmentContext extends ParserRuleContext {
 }
 
 export class FragmentDefinitionContext extends ParserRuleContext {
-  public fragmentName(): FragmentNameContext {
-    return this.getRuleContext(0, FragmentNameContext);
-  }
-  public typeCondition(): TypeConditionContext {
-    return this.getRuleContext(0, TypeConditionContext);
-  }
-  public selectionSet(): SelectionSetContext {
-    return this.getRuleContext(0, SelectionSetContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_fragmentDefinition;
   }
+
+  public fragmentName(): FragmentNameContext {
+    return this.getRuleContext(0, FragmentNameContext);
+  }
+
+  public typeCondition(): TypeConditionContext {
+    return this.getRuleContext(0, TypeConditionContext);
+  }
+
+  public selectionSet(): SelectionSetContext {
+    return this.getRuleContext(0, SelectionSetContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFragmentDefinition) {
       listener.enterFragmentDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFragmentDefinition) {
@@ -4423,22 +4578,26 @@ export class FragmentDefinitionContext extends ParserRuleContext {
 }
 
 export class FragmentNameContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_fragmentName;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFragmentName) {
       listener.enterFragmentName(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFragmentName) {
@@ -4448,22 +4607,26 @@ export class FragmentNameContext extends ParserRuleContext {
 }
 
 export class TypeConditionContext extends ParserRuleContext {
-  public namedType(): NamedTypeContext {
-    return this.getRuleContext(0, NamedTypeContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_typeCondition;
   }
+
+  public namedType(): NamedTypeContext {
+    return this.getRuleContext(0, NamedTypeContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterTypeCondition) {
       listener.enterTypeCondition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitTypeCondition) {
@@ -4476,28 +4639,34 @@ export class ValueContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_value;
   }
+
   public copyFrom(ctx: ValueContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class StringValueContext extends ValueContext {
-  public STRING_VALUE(): TerminalNode {
-    return this.getToken(GraphQLParser.STRING_VALUE, 0);
-  }
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public STRING_VALUE(): TerminalNode {
+    return this.getToken(GraphQLParser.STRING_VALUE, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterStringValue) {
       listener.enterStringValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitStringValue) {
@@ -4505,9 +4674,17 @@ export class StringValueContext extends ValueContext {
     }
   }
 }
+
 export class NonEmptyObjectValueContext extends ValueContext {
+  constructor(ctx: ValueContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
+
   public objectField(): ObjectFieldContext[];
+
   public objectField(i: number): ObjectFieldContext;
+
   public objectField(i?: number): ObjectFieldContext | ObjectFieldContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ObjectFieldContext);
@@ -4515,16 +4692,14 @@ export class NonEmptyObjectValueContext extends ValueContext {
       return this.getRuleContext(i, ObjectFieldContext);
     }
   }
-  constructor(ctx: ValueContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterNonEmptyObjectValue) {
       listener.enterNonEmptyObjectValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitNonEmptyObjectValue) {
@@ -4532,20 +4707,24 @@ export class NonEmptyObjectValueContext extends ValueContext {
     }
   }
 }
+
 export class EnumValueContext extends ValueContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEnumValue) {
       listener.enterEnumValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEnumValue) {
@@ -4553,20 +4732,24 @@ export class EnumValueContext extends ValueContext {
     }
   }
 }
+
 export class VariableValueContext extends ValueContext {
-  public variable(): VariableContext {
-    return this.getRuleContext(0, VariableContext);
-  }
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public variable(): VariableContext {
+    return this.getRuleContext(0, VariableContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterVariableValue) {
       listener.enterVariableValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitVariableValue) {
@@ -4574,20 +4757,24 @@ export class VariableValueContext extends ValueContext {
     }
   }
 }
+
 export class IntValueContext extends ValueContext {
-  public INT_VALUE(): TerminalNode {
-    return this.getToken(GraphQLParser.INT_VALUE, 0);
-  }
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public INT_VALUE(): TerminalNode {
+    return this.getToken(GraphQLParser.INT_VALUE, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterIntValue) {
       listener.enterIntValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitIntValue) {
@@ -4595,17 +4782,20 @@ export class IntValueContext extends ValueContext {
     }
   }
 }
+
 export class EmptyListValueContext extends ValueContext {
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEmptyListValue) {
       listener.enterEmptyListValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEmptyListValue) {
@@ -4613,20 +4803,24 @@ export class EmptyListValueContext extends ValueContext {
     }
   }
 }
+
 export class FloatValueContext extends ValueContext {
-  public FLOAT_VALUE(): TerminalNode {
-    return this.getToken(GraphQLParser.FLOAT_VALUE, 0);
-  }
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public FLOAT_VALUE(): TerminalNode {
+    return this.getToken(GraphQLParser.FLOAT_VALUE, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFloatValue) {
       listener.enterFloatValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFloatValue) {
@@ -4634,20 +4828,24 @@ export class FloatValueContext extends ValueContext {
     }
   }
 }
+
 export class BooleanValueContext extends ValueContext {
-  public BOOLEAN_VALUE(): TerminalNode {
-    return this.getToken(GraphQLParser.BOOLEAN_VALUE, 0);
-  }
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public BOOLEAN_VALUE(): TerminalNode {
+    return this.getToken(GraphQLParser.BOOLEAN_VALUE, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterBooleanValue) {
       listener.enterBooleanValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitBooleanValue) {
@@ -4655,9 +4853,17 @@ export class BooleanValueContext extends ValueContext {
     }
   }
 }
+
 export class NonEmptyListValueContext extends ValueContext {
+  constructor(ctx: ValueContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
+
   public value(): ValueContext[];
+
   public value(i: number): ValueContext;
+
   public value(i?: number): ValueContext | ValueContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ValueContext);
@@ -4665,16 +4871,14 @@ export class NonEmptyListValueContext extends ValueContext {
       return this.getRuleContext(i, ValueContext);
     }
   }
-  constructor(ctx: ValueContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterNonEmptyListValue) {
       listener.enterNonEmptyListValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitNonEmptyListValue) {
@@ -4682,20 +4886,24 @@ export class NonEmptyListValueContext extends ValueContext {
     }
   }
 }
+
 export class NullValueContext extends ValueContext {
-  public NULL_VALUE(): TerminalNode {
-    return this.getToken(GraphQLParser.NULL_VALUE, 0);
-  }
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NULL_VALUE(): TerminalNode {
+    return this.getToken(GraphQLParser.NULL_VALUE, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterNullValue) {
       listener.enterNullValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitNullValue) {
@@ -4703,17 +4911,20 @@ export class NullValueContext extends ValueContext {
     }
   }
 }
+
 export class EmptyObjectValueContext extends ValueContext {
   constructor(ctx: ValueContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEmptyObjectValue) {
       listener.enterEmptyObjectValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEmptyObjectValue) {
@@ -4723,25 +4934,30 @@ export class EmptyObjectValueContext extends ValueContext {
 }
 
 export class ObjectFieldContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public value(): ValueContext {
-    return this.getRuleContext(0, ValueContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_objectField;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public value(): ValueContext {
+    return this.getRuleContext(0, ValueContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterObjectField) {
       listener.enterObjectField(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitObjectField) {
@@ -4751,8 +4967,19 @@ export class ObjectFieldContext extends ParserRuleContext {
 }
 
 export class VariableDefinitionsContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_variableDefinitions;
+  }
+
   public variableDefinition(): VariableDefinitionContext[];
+
   public variableDefinition(i: number): VariableDefinitionContext;
+
   public variableDefinition(
     i?: number
   ): VariableDefinitionContext | VariableDefinitionContext[] {
@@ -4762,19 +4989,14 @@ export class VariableDefinitionsContext extends ParserRuleContext {
       return this.getRuleContext(i, VariableDefinitionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_variableDefinitions;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterVariableDefinitions) {
       listener.enterVariableDefinitions(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitVariableDefinitions) {
@@ -4784,31 +5006,38 @@ export class VariableDefinitionsContext extends ParserRuleContext {
 }
 
 export class VariableDefinitionContext extends ParserRuleContext {
-  public variable(): VariableContext {
-    return this.getRuleContext(0, VariableContext);
-  }
-  public type(): TypeContext {
-    return this.getRuleContext(0, TypeContext);
-  }
-  public defaultValue(): DefaultValueContext | undefined {
-    return this.tryGetRuleContext(0, DefaultValueContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_variableDefinition;
   }
+
+  public variable(): VariableContext {
+    return this.getRuleContext(0, VariableContext);
+  }
+
+  public type(): TypeContext {
+    return this.getRuleContext(0, TypeContext);
+  }
+
+  public defaultValue(): DefaultValueContext | undefined {
+    return this.tryGetRuleContext(0, DefaultValueContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterVariableDefinition) {
       listener.enterVariableDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitVariableDefinition) {
@@ -4818,22 +5047,26 @@ export class VariableDefinitionContext extends ParserRuleContext {
 }
 
 export class VariableContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_variable;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterVariable) {
       listener.enterVariable(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitVariable) {
@@ -4843,22 +5076,26 @@ export class VariableContext extends ParserRuleContext {
 }
 
 export class DefaultValueContext extends ParserRuleContext {
-  public value(): ValueContext {
-    return this.getRuleContext(0, ValueContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_defaultValue;
   }
+
+  public value(): ValueContext {
+    return this.getRuleContext(0, ValueContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDefaultValue) {
       listener.enterDefaultValue(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDefaultValue) {
@@ -4868,28 +5105,34 @@ export class DefaultValueContext extends ParserRuleContext {
 }
 
 export class TypeContext extends ParserRuleContext {
-  public namedType(): NamedTypeContext | undefined {
-    return this.tryGetRuleContext(0, NamedTypeContext);
-  }
-  public nonNullType(): NonNullTypeContext | undefined {
-    return this.tryGetRuleContext(0, NonNullTypeContext);
-  }
-  public listType(): ListTypeContext | undefined {
-    return this.tryGetRuleContext(0, ListTypeContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_type;
   }
+
+  public namedType(): NamedTypeContext | undefined {
+    return this.tryGetRuleContext(0, NamedTypeContext);
+  }
+
+  public nonNullType(): NonNullTypeContext | undefined {
+    return this.tryGetRuleContext(0, NonNullTypeContext);
+  }
+
+  public listType(): ListTypeContext | undefined {
+    return this.tryGetRuleContext(0, ListTypeContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterType) {
       listener.enterType(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitType) {
@@ -4899,22 +5142,26 @@ export class TypeContext extends ParserRuleContext {
 }
 
 export class NamedTypeContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_namedType;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterNamedType) {
       listener.enterNamedType(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitNamedType) {
@@ -4924,22 +5171,26 @@ export class NamedTypeContext extends ParserRuleContext {
 }
 
 export class ListTypeContext extends ParserRuleContext {
-  public type(): TypeContext {
-    return this.getRuleContext(0, TypeContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_listType;
   }
+
+  public type(): TypeContext {
+    return this.getRuleContext(0, TypeContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterListType) {
       listener.enterListType(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitListType) {
@@ -4952,16 +5203,19 @@ export class NonNullTypeContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_nonNullType;
   }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterNonNullType) {
       listener.enterNonNullType(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitNonNullType) {
@@ -4971,8 +5225,19 @@ export class NonNullTypeContext extends ParserRuleContext {
 }
 
 export class DirectivesContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_directives;
+  }
+
   public directive(): DirectiveContext[];
+
   public directive(i: number): DirectiveContext;
+
   public directive(i?: number): DirectiveContext | DirectiveContext[] {
     if (i === undefined) {
       return this.getRuleContexts(DirectiveContext);
@@ -4980,19 +5245,14 @@ export class DirectivesContext extends ParserRuleContext {
       return this.getRuleContext(i, DirectiveContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_directives;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDirectives) {
       listener.enterDirectives(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDirectives) {
@@ -5002,25 +5262,30 @@ export class DirectivesContext extends ParserRuleContext {
 }
 
 export class DirectiveContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public arguments(): ArgumentsContext | undefined {
-    return this.tryGetRuleContext(0, ArgumentsContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_directive;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public arguments(): ArgumentsContext | undefined {
+    return this.tryGetRuleContext(0, ArgumentsContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDirective) {
       listener.enterDirective(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDirective) {
@@ -5030,28 +5295,34 @@ export class DirectiveContext extends ParserRuleContext {
 }
 
 export class TypeSystemDefinitionContext extends ParserRuleContext {
-  public schemaDefinition(): SchemaDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, SchemaDefinitionContext);
-  }
-  public typeDefinition(): TypeDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, TypeDefinitionContext);
-  }
-  public directiveDefinition(): DirectiveDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, DirectiveDefinitionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_typeSystemDefinition;
   }
+
+  public schemaDefinition(): SchemaDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, SchemaDefinitionContext);
+  }
+
+  public typeDefinition(): TypeDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, TypeDefinitionContext);
+  }
+
+  public directiveDefinition(): DirectiveDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, DirectiveDefinitionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterTypeSystemDefinition) {
       listener.enterTypeSystemDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitTypeSystemDefinition) {
@@ -5061,25 +5332,30 @@ export class TypeSystemDefinitionContext extends ParserRuleContext {
 }
 
 export class TypeSystemExtensionContext extends ParserRuleContext {
-  public schemaExtension(): SchemaExtensionContext | undefined {
-    return this.tryGetRuleContext(0, SchemaExtensionContext);
-  }
-  public typeExtension(): TypeExtensionContext | undefined {
-    return this.tryGetRuleContext(0, TypeExtensionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_typeSystemExtension;
   }
+
+  public schemaExtension(): SchemaExtensionContext | undefined {
+    return this.tryGetRuleContext(0, SchemaExtensionContext);
+  }
+
+  public typeExtension(): TypeExtensionContext | undefined {
+    return this.tryGetRuleContext(0, TypeExtensionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterTypeSystemExtension) {
       listener.enterTypeSystemExtension(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitTypeSystemExtension) {
@@ -5089,11 +5365,23 @@ export class TypeSystemExtensionContext extends ParserRuleContext {
 }
 
 export class SchemaDefinitionContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_schemaDefinition;
+  }
+
   public directives(): DirectivesContext | undefined {
     return this.tryGetRuleContext(0, DirectivesContext);
   }
+
   public operationTypeDefinition(): OperationTypeDefinitionContext[];
+
   public operationTypeDefinition(i: number): OperationTypeDefinitionContext;
+
   public operationTypeDefinition(
     i?: number
   ): OperationTypeDefinitionContext | OperationTypeDefinitionContext[] {
@@ -5103,19 +5391,14 @@ export class SchemaDefinitionContext extends ParserRuleContext {
       return this.getRuleContext(i, OperationTypeDefinitionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_schemaDefinition;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterSchemaDefinition) {
       listener.enterSchemaDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitSchemaDefinition) {
@@ -5128,28 +5411,34 @@ export class SchemaExtensionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_schemaExtension;
   }
+
   public copyFrom(ctx: SchemaExtensionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class SchemaExtensionWithoutOperationsContext extends SchemaExtensionContext {
-  public directives(): DirectivesContext {
-    return this.getRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: SchemaExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public directives(): DirectivesContext {
+    return this.getRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterSchemaExtensionWithoutOperations) {
       listener.enterSchemaExtensionWithoutOperations(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitSchemaExtensionWithoutOperations) {
@@ -5157,12 +5446,21 @@ export class SchemaExtensionWithoutOperationsContext extends SchemaExtensionCont
     }
   }
 }
+
 export class SchemaExtensionWithOperationsContext extends SchemaExtensionContext {
+  constructor(ctx: SchemaExtensionContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
+
   public directives(): DirectivesContext | undefined {
     return this.tryGetRuleContext(0, DirectivesContext);
   }
+
   public operationTypeDefinition(): OperationTypeDefinitionContext[];
+
   public operationTypeDefinition(i: number): OperationTypeDefinitionContext;
+
   public operationTypeDefinition(
     i?: number
   ): OperationTypeDefinitionContext | OperationTypeDefinitionContext[] {
@@ -5172,16 +5470,14 @@ export class SchemaExtensionWithOperationsContext extends SchemaExtensionContext
       return this.getRuleContext(i, OperationTypeDefinitionContext);
     }
   }
-  constructor(ctx: SchemaExtensionContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterSchemaExtensionWithOperations) {
       listener.enterSchemaExtensionWithOperations(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitSchemaExtensionWithOperations) {
@@ -5191,25 +5487,30 @@ export class SchemaExtensionWithOperationsContext extends SchemaExtensionContext
 }
 
 export class OperationTypeDefinitionContext extends ParserRuleContext {
-  public operationType(): OperationTypeContext {
-    return this.getRuleContext(0, OperationTypeContext);
-  }
-  public namedType(): NamedTypeContext {
-    return this.getRuleContext(0, NamedTypeContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_operationTypeDefinition;
   }
+
+  public operationType(): OperationTypeContext {
+    return this.getRuleContext(0, OperationTypeContext);
+  }
+
+  public namedType(): NamedTypeContext {
+    return this.getRuleContext(0, NamedTypeContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterOperationTypeDefinition) {
       listener.enterOperationTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitOperationTypeDefinition) {
@@ -5219,22 +5520,26 @@ export class OperationTypeDefinitionContext extends ParserRuleContext {
 }
 
 export class DescriptionContext extends ParserRuleContext {
-  public STRING_VALUE(): TerminalNode {
-    return this.getToken(GraphQLParser.STRING_VALUE, 0);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_description;
   }
+
+  public STRING_VALUE(): TerminalNode {
+    return this.getToken(GraphQLParser.STRING_VALUE, 0);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDescription) {
       listener.enterDescription(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDescription) {
@@ -5244,39 +5549,48 @@ export class DescriptionContext extends ParserRuleContext {
 }
 
 export class TypeDefinitionContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_typeDefinition;
+  }
+
   public scalarTypeDefinition(): ScalarTypeDefinitionContext | undefined {
     return this.tryGetRuleContext(0, ScalarTypeDefinitionContext);
   }
+
   public objectTypeDefinition(): ObjectTypeDefinitionContext | undefined {
     return this.tryGetRuleContext(0, ObjectTypeDefinitionContext);
   }
+
   public interfaceTypeDefinition(): InterfaceTypeDefinitionContext | undefined {
     return this.tryGetRuleContext(0, InterfaceTypeDefinitionContext);
   }
+
   public unionTypeDefinition(): UnionTypeDefinitionContext | undefined {
     return this.tryGetRuleContext(0, UnionTypeDefinitionContext);
   }
+
   public enumTypeDefinition(): EnumTypeDefinitionContext | undefined {
     return this.tryGetRuleContext(0, EnumTypeDefinitionContext);
   }
+
   public inputObjectTypeDefinition():
     | InputObjectTypeDefinitionContext
     | undefined {
     return this.tryGetRuleContext(0, InputObjectTypeDefinitionContext);
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_typeDefinition;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterTypeDefinition) {
       listener.enterTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitTypeDefinition) {
@@ -5286,39 +5600,48 @@ export class TypeDefinitionContext extends ParserRuleContext {
 }
 
 export class TypeExtensionContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_typeExtension;
+  }
+
   public scalarTypeExtension(): ScalarTypeExtensionContext | undefined {
     return this.tryGetRuleContext(0, ScalarTypeExtensionContext);
   }
+
   public objectTypeExtension(): ObjectTypeExtensionContext | undefined {
     return this.tryGetRuleContext(0, ObjectTypeExtensionContext);
   }
+
   public interfaceTypeExtension(): InterfaceTypeExtensionContext | undefined {
     return this.tryGetRuleContext(0, InterfaceTypeExtensionContext);
   }
+
   public unionTypeExtension(): UnionTypeExtensionContext | undefined {
     return this.tryGetRuleContext(0, UnionTypeExtensionContext);
   }
+
   public enumTypeExtension(): EnumTypeExtensionContext | undefined {
     return this.tryGetRuleContext(0, EnumTypeExtensionContext);
   }
+
   public inputObjectTypeExtension():
     | InputObjectTypeExtensionContext
     | undefined {
     return this.tryGetRuleContext(0, InputObjectTypeExtensionContext);
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_typeExtension;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterTypeExtension) {
       listener.enterTypeExtension(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitTypeExtension) {
@@ -5328,28 +5651,34 @@ export class TypeExtensionContext extends ParserRuleContext {
 }
 
 export class ScalarTypeDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_scalarTypeDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterScalarTypeDefinition) {
       listener.enterScalarTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitScalarTypeDefinition) {
@@ -5359,25 +5688,30 @@ export class ScalarTypeDefinitionContext extends ParserRuleContext {
 }
 
 export class ScalarTypeExtensionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public directives(): DirectivesContext {
-    return this.getRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_scalarTypeExtension;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public directives(): DirectivesContext {
+    return this.getRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterScalarTypeExtension) {
       listener.enterScalarTypeExtension(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitScalarTypeExtension) {
@@ -5387,34 +5721,42 @@ export class ScalarTypeExtensionContext extends ParserRuleContext {
 }
 
 export class ObjectTypeDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public implementsInterfaces(): ImplementsInterfacesContext | undefined {
-    return this.tryGetRuleContext(0, ImplementsInterfacesContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
-  public fieldsDefinition(): FieldsDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, FieldsDefinitionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_objectTypeDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public implementsInterfaces(): ImplementsInterfacesContext | undefined {
+    return this.tryGetRuleContext(0, ImplementsInterfacesContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
+  public fieldsDefinition(): FieldsDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, FieldsDefinitionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterObjectTypeDefinition) {
       listener.enterObjectTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitObjectTypeDefinition) {
@@ -5427,34 +5769,42 @@ export class ObjectTypeExtensionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_objectTypeExtension;
   }
+
   public copyFrom(ctx: ObjectTypeExtensionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class ObjectTypeExtensionWithDirectivesContext extends ObjectTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public directives(): DirectivesContext {
-    return this.getRuleContext(0, DirectivesContext);
-  }
-  public implementsInterfaces(): ImplementsInterfacesContext | undefined {
-    return this.tryGetRuleContext(0, ImplementsInterfacesContext);
-  }
   constructor(ctx: ObjectTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public directives(): DirectivesContext {
+    return this.getRuleContext(0, DirectivesContext);
+  }
+
+  public implementsInterfaces(): ImplementsInterfacesContext | undefined {
+    return this.tryGetRuleContext(0, ImplementsInterfacesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterObjectTypeExtensionWithDirectives) {
       listener.enterObjectTypeExtensionWithDirectives(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitObjectTypeExtensionWithDirectives) {
@@ -5462,29 +5812,36 @@ export class ObjectTypeExtensionWithDirectivesContext extends ObjectTypeExtensio
     }
   }
 }
+
 export class ObjectTypeExtensionWithFieldsContext extends ObjectTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public fieldsDefinition(): FieldsDefinitionContext {
-    return this.getRuleContext(0, FieldsDefinitionContext);
-  }
-  public implementsInterfaces(): ImplementsInterfacesContext | undefined {
-    return this.tryGetRuleContext(0, ImplementsInterfacesContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: ObjectTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public fieldsDefinition(): FieldsDefinitionContext {
+    return this.getRuleContext(0, FieldsDefinitionContext);
+  }
+
+  public implementsInterfaces(): ImplementsInterfacesContext | undefined {
+    return this.tryGetRuleContext(0, ImplementsInterfacesContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterObjectTypeExtensionWithFields) {
       listener.enterObjectTypeExtensionWithFields(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitObjectTypeExtensionWithFields) {
@@ -5492,23 +5849,28 @@ export class ObjectTypeExtensionWithFieldsContext extends ObjectTypeExtensionCon
     }
   }
 }
+
 export class ObjectTypeExtensionWithInterfacesContext extends ObjectTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public implementsInterfaces(): ImplementsInterfacesContext {
-    return this.getRuleContext(0, ImplementsInterfacesContext);
-  }
   constructor(ctx: ObjectTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public implementsInterfaces(): ImplementsInterfacesContext {
+    return this.getRuleContext(0, ImplementsInterfacesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterObjectTypeExtensionWithInterfaces) {
       listener.enterObjectTypeExtensionWithInterfaces(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitObjectTypeExtensionWithInterfaces) {
@@ -5518,8 +5880,19 @@ export class ObjectTypeExtensionWithInterfacesContext extends ObjectTypeExtensio
 }
 
 export class ImplementsInterfacesContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_implementsInterfaces;
+  }
+
   public namedType(): NamedTypeContext[];
+
   public namedType(i: number): NamedTypeContext;
+
   public namedType(i?: number): NamedTypeContext | NamedTypeContext[] {
     if (i === undefined) {
       return this.getRuleContexts(NamedTypeContext);
@@ -5527,19 +5900,14 @@ export class ImplementsInterfacesContext extends ParserRuleContext {
       return this.getRuleContext(i, NamedTypeContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_implementsInterfaces;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterImplementsInterfaces) {
       listener.enterImplementsInterfaces(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitImplementsInterfaces) {
@@ -5549,8 +5917,19 @@ export class ImplementsInterfacesContext extends ParserRuleContext {
 }
 
 export class FieldsDefinitionContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_fieldsDefinition;
+  }
+
   public fieldDefinition(): FieldDefinitionContext[];
+
   public fieldDefinition(i: number): FieldDefinitionContext;
+
   public fieldDefinition(
     i?: number
   ): FieldDefinitionContext | FieldDefinitionContext[] {
@@ -5560,19 +5939,14 @@ export class FieldsDefinitionContext extends ParserRuleContext {
       return this.getRuleContext(i, FieldDefinitionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_fieldsDefinition;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFieldsDefinition) {
       listener.enterFieldsDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFieldsDefinition) {
@@ -5582,34 +5956,42 @@ export class FieldsDefinitionContext extends ParserRuleContext {
 }
 
 export class FieldDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public type(): TypeContext {
-    return this.getRuleContext(0, TypeContext);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public argumentsDefinition(): ArgumentsDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, ArgumentsDefinitionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_fieldDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public type(): TypeContext {
+    return this.getRuleContext(0, TypeContext);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public argumentsDefinition(): ArgumentsDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, ArgumentsDefinitionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterFieldDefinition) {
       listener.enterFieldDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitFieldDefinition) {
@@ -5619,8 +6001,19 @@ export class FieldDefinitionContext extends ParserRuleContext {
 }
 
 export class ArgumentsDefinitionContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_argumentsDefinition;
+  }
+
   public inputValueDefinition(): InputValueDefinitionContext[];
+
   public inputValueDefinition(i: number): InputValueDefinitionContext;
+
   public inputValueDefinition(
     i?: number
   ): InputValueDefinitionContext | InputValueDefinitionContext[] {
@@ -5630,19 +6023,14 @@ export class ArgumentsDefinitionContext extends ParserRuleContext {
       return this.getRuleContext(i, InputValueDefinitionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_argumentsDefinition;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterArgumentsDefinition) {
       listener.enterArgumentsDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitArgumentsDefinition) {
@@ -5652,34 +6040,42 @@ export class ArgumentsDefinitionContext extends ParserRuleContext {
 }
 
 export class InputValueDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public type(): TypeContext {
-    return this.getRuleContext(0, TypeContext);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public defaultValue(): DefaultValueContext | undefined {
-    return this.tryGetRuleContext(0, DefaultValueContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_inputValueDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public type(): TypeContext {
+    return this.getRuleContext(0, TypeContext);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public defaultValue(): DefaultValueContext | undefined {
+    return this.tryGetRuleContext(0, DefaultValueContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInputValueDefinition) {
       listener.enterInputValueDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInputValueDefinition) {
@@ -5689,31 +6085,38 @@ export class InputValueDefinitionContext extends ParserRuleContext {
 }
 
 export class InterfaceTypeDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
-  public fieldsDefinition(): FieldsDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, FieldsDefinitionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_interfaceTypeDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
+  public fieldsDefinition(): FieldsDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, FieldsDefinitionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInterfaceTypeDefinition) {
       listener.enterInterfaceTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInterfaceTypeDefinition) {
@@ -5726,34 +6129,42 @@ export class InterfaceTypeExtensionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_interfaceTypeExtension;
   }
+
   public copyFrom(ctx: InterfaceTypeExtensionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class InterfaceTypeExtensionWithFieldsContext extends InterfaceTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public fieldsDefinition(): FieldsDefinitionContext {
-    return this.getRuleContext(0, FieldsDefinitionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: InterfaceTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public fieldsDefinition(): FieldsDefinitionContext {
+    return this.getRuleContext(0, FieldsDefinitionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInterfaceTypeExtensionWithFields) {
       listener.enterInterfaceTypeExtensionWithFields(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInterfaceTypeExtensionWithFields) {
@@ -5761,23 +6172,28 @@ export class InterfaceTypeExtensionWithFieldsContext extends InterfaceTypeExtens
     }
   }
 }
+
 export class InterfaceTypeExtensionWithDirectivesContext extends InterfaceTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public directives(): DirectivesContext {
-    return this.getRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: InterfaceTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public directives(): DirectivesContext {
+    return this.getRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInterfaceTypeExtensionWithDirectives) {
       listener.enterInterfaceTypeExtensionWithDirectives(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInterfaceTypeExtensionWithDirectives) {
@@ -5787,31 +6203,38 @@ export class InterfaceTypeExtensionWithDirectivesContext extends InterfaceTypeEx
 }
 
 export class UnionTypeDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
-  public unionMemberTypes(): UnionMemberTypesContext | undefined {
-    return this.tryGetRuleContext(0, UnionMemberTypesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_unionTypeDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
+  public unionMemberTypes(): UnionMemberTypesContext | undefined {
+    return this.tryGetRuleContext(0, UnionMemberTypesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterUnionTypeDefinition) {
       listener.enterUnionTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitUnionTypeDefinition) {
@@ -5821,8 +6244,19 @@ export class UnionTypeDefinitionContext extends ParserRuleContext {
 }
 
 export class UnionMemberTypesContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_unionMemberTypes;
+  }
+
   public namedType(): NamedTypeContext[];
+
   public namedType(i: number): NamedTypeContext;
+
   public namedType(i?: number): NamedTypeContext | NamedTypeContext[] {
     if (i === undefined) {
       return this.getRuleContexts(NamedTypeContext);
@@ -5830,19 +6264,14 @@ export class UnionMemberTypesContext extends ParserRuleContext {
       return this.getRuleContext(i, NamedTypeContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_unionMemberTypes;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterUnionMemberTypes) {
       listener.enterUnionMemberTypes(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitUnionMemberTypes) {
@@ -5855,31 +6284,38 @@ export class UnionTypeExtensionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_unionTypeExtension;
   }
+
   public copyFrom(ctx: UnionTypeExtensionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class UnionTypeExtensionWithDirectivesContext extends UnionTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public directives(): DirectivesContext {
-    return this.getRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: UnionTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public directives(): DirectivesContext {
+    return this.getRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterUnionTypeExtensionWithDirectives) {
       listener.enterUnionTypeExtensionWithDirectives(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitUnionTypeExtensionWithDirectives) {
@@ -5887,26 +6323,32 @@ export class UnionTypeExtensionWithDirectivesContext extends UnionTypeExtensionC
     }
   }
 }
+
 export class UnionTypeExtensionWithMembersContext extends UnionTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public unionMemberTypes(): UnionMemberTypesContext {
-    return this.getRuleContext(0, UnionMemberTypesContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: UnionTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public unionMemberTypes(): UnionMemberTypesContext {
+    return this.getRuleContext(0, UnionMemberTypesContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterUnionTypeExtensionWithMembers) {
       listener.enterUnionTypeExtensionWithMembers(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitUnionTypeExtensionWithMembers) {
@@ -5916,31 +6358,38 @@ export class UnionTypeExtensionWithMembersContext extends UnionTypeExtensionCont
 }
 
 export class EnumTypeDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
-  public enumValuesDefinition(): EnumValuesDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, EnumValuesDefinitionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_enumTypeDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
+  public enumValuesDefinition(): EnumValuesDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, EnumValuesDefinitionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEnumTypeDefinition) {
       listener.enterEnumTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEnumTypeDefinition) {
@@ -5950,8 +6399,19 @@ export class EnumTypeDefinitionContext extends ParserRuleContext {
 }
 
 export class EnumValuesDefinitionContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_enumValuesDefinition;
+  }
+
   public enumValueDefinition(): EnumValueDefinitionContext[];
+
   public enumValueDefinition(i: number): EnumValueDefinitionContext;
+
   public enumValueDefinition(
     i?: number
   ): EnumValueDefinitionContext | EnumValueDefinitionContext[] {
@@ -5961,19 +6421,14 @@ export class EnumValuesDefinitionContext extends ParserRuleContext {
       return this.getRuleContext(i, EnumValueDefinitionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_enumValuesDefinition;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEnumValuesDefinition) {
       listener.enterEnumValuesDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEnumValuesDefinition) {
@@ -5983,28 +6438,34 @@ export class EnumValuesDefinitionContext extends ParserRuleContext {
 }
 
 export class EnumValueDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_enumValueDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEnumValueDefinition) {
       listener.enterEnumValueDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEnumValueDefinition) {
@@ -6017,31 +6478,38 @@ export class EnumTypeExtensionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_enumTypeExtension;
   }
+
   public copyFrom(ctx: EnumTypeExtensionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class EnumTypeExtensionWithDirectivesContext extends EnumTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public directives(): DirectivesContext {
-    return this.getRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: EnumTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public directives(): DirectivesContext {
+    return this.getRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEnumTypeExtensionWithDirectives) {
       listener.enterEnumTypeExtensionWithDirectives(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEnumTypeExtensionWithDirectives) {
@@ -6049,26 +6517,32 @@ export class EnumTypeExtensionWithDirectivesContext extends EnumTypeExtensionCon
     }
   }
 }
+
 export class EnumTypeExtensionWithValuesContext extends EnumTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public enumValuesDefinition(): EnumValuesDefinitionContext {
-    return this.getRuleContext(0, EnumValuesDefinitionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: EnumTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public enumValuesDefinition(): EnumValuesDefinitionContext {
+    return this.getRuleContext(0, EnumValuesDefinitionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterEnumTypeExtensionWithValues) {
       listener.enterEnumTypeExtensionWithValues(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitEnumTypeExtensionWithValues) {
@@ -6078,31 +6552,38 @@ export class EnumTypeExtensionWithValuesContext extends EnumTypeExtensionContext
 }
 
 export class InputObjectTypeDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
-  public inputFieldsDefinition(): InputFieldsDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, InputFieldsDefinitionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_inputObjectTypeDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
+  public inputFieldsDefinition(): InputFieldsDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, InputFieldsDefinitionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInputObjectTypeDefinition) {
       listener.enterInputObjectTypeDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInputObjectTypeDefinition) {
@@ -6112,8 +6593,19 @@ export class InputObjectTypeDefinitionContext extends ParserRuleContext {
 }
 
 export class InputFieldsDefinitionContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_inputFieldsDefinition;
+  }
+
   public inputValueDefinition(): InputValueDefinitionContext[];
+
   public inputValueDefinition(i: number): InputValueDefinitionContext;
+
   public inputValueDefinition(
     i?: number
   ): InputValueDefinitionContext | InputValueDefinitionContext[] {
@@ -6123,19 +6615,14 @@ export class InputFieldsDefinitionContext extends ParserRuleContext {
       return this.getRuleContext(i, InputValueDefinitionContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_inputFieldsDefinition;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInputFieldsDefinition) {
       listener.enterInputFieldsDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInputFieldsDefinition) {
@@ -6148,31 +6635,38 @@ export class InputObjectTypeExtensionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_inputObjectTypeExtension;
   }
+
   public copyFrom(ctx: InputObjectTypeExtensionContext): void {
     super.copyFrom(ctx);
   }
 }
+
 export class InputObjectTypeExtensionWithDirectivesContext extends InputObjectTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public directives(): DirectivesContext {
-    return this.getRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: InputObjectTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public directives(): DirectivesContext {
+    return this.getRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInputObjectTypeExtensionWithDirectives) {
       listener.enterInputObjectTypeExtensionWithDirectives(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInputObjectTypeExtensionWithDirectives) {
@@ -6180,26 +6674,32 @@ export class InputObjectTypeExtensionWithDirectivesContext extends InputObjectTy
     }
   }
 }
+
 export class InputObjectTypeExtensionWithFieldsContext extends InputObjectTypeExtensionContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public inputFieldsDefinition(): InputFieldsDefinitionContext {
-    return this.getRuleContext(0, InputFieldsDefinitionContext);
-  }
-  public directives(): DirectivesContext | undefined {
-    return this.tryGetRuleContext(0, DirectivesContext);
-  }
   constructor(ctx: InputObjectTypeExtensionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public inputFieldsDefinition(): InputFieldsDefinitionContext {
+    return this.getRuleContext(0, InputFieldsDefinitionContext);
+  }
+
+  public directives(): DirectivesContext | undefined {
+    return this.tryGetRuleContext(0, DirectivesContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterInputObjectTypeExtensionWithFields) {
       listener.enterInputObjectTypeExtensionWithFields(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitInputObjectTypeExtensionWithFields) {
@@ -6209,31 +6709,38 @@ export class InputObjectTypeExtensionWithFieldsContext extends InputObjectTypeEx
 }
 
 export class DirectiveDefinitionContext extends ParserRuleContext {
-  public NAME(): TerminalNode {
-    return this.getToken(GraphQLParser.NAME, 0);
-  }
-  public directiveLocations(): DirectiveLocationsContext {
-    return this.getRuleContext(0, DirectiveLocationsContext);
-  }
-  public description(): DescriptionContext | undefined {
-    return this.tryGetRuleContext(0, DescriptionContext);
-  }
-  public argumentsDefinition(): ArgumentsDefinitionContext | undefined {
-    return this.tryGetRuleContext(0, ArgumentsDefinitionContext);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_directiveDefinition;
   }
+
+  public NAME(): TerminalNode {
+    return this.getToken(GraphQLParser.NAME, 0);
+  }
+
+  public directiveLocations(): DirectiveLocationsContext {
+    return this.getRuleContext(0, DirectiveLocationsContext);
+  }
+
+  public description(): DescriptionContext | undefined {
+    return this.tryGetRuleContext(0, DescriptionContext);
+  }
+
+  public argumentsDefinition(): ArgumentsDefinitionContext | undefined {
+    return this.tryGetRuleContext(0, ArgumentsDefinitionContext);
+  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDirectiveDefinition) {
       listener.enterDirectiveDefinition(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDirectiveDefinition) {
@@ -6243,8 +6750,19 @@ export class DirectiveDefinitionContext extends ParserRuleContext {
 }
 
 export class DirectiveLocationsContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_directiveLocations;
+  }
+
   public directiveLocation(): DirectiveLocationContext[];
+
   public directiveLocation(i: number): DirectiveLocationContext;
+
   public directiveLocation(
     i?: number
   ): DirectiveLocationContext | DirectiveLocationContext[] {
@@ -6254,19 +6772,14 @@ export class DirectiveLocationsContext extends ParserRuleContext {
       return this.getRuleContext(i, DirectiveLocationContext);
     }
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_directiveLocations;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDirectiveLocations) {
       listener.enterDirectiveLocations(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDirectiveLocations) {
@@ -6276,29 +6789,34 @@ export class DirectiveLocationsContext extends ParserRuleContext {
 }
 
 export class DirectiveLocationContext extends ParserRuleContext {
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+
+  // @Override
+  public get ruleIndex(): number {
+    return GraphQLParser.RULE_directiveLocation;
+  }
+
   public executableDirectiveLocation():
     | ExecutableDirectiveLocationContext
     | undefined {
     return this.tryGetRuleContext(0, ExecutableDirectiveLocationContext);
   }
+
   public typeSystemDirectiveLocation():
     | TypeSystemDirectiveLocationContext
     | undefined {
     return this.tryGetRuleContext(0, TypeSystemDirectiveLocationContext);
   }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return GraphQLParser.RULE_directiveLocation;
-  }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterDirectiveLocation) {
       listener.enterDirectiveLocation(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitDirectiveLocation) {
@@ -6311,16 +6829,19 @@ export class ExecutableDirectiveLocationContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_executableDirectiveLocation;
   }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterExecutableDirectiveLocation) {
       listener.enterExecutableDirectiveLocation(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitExecutableDirectiveLocation) {
@@ -6333,16 +6854,19 @@ export class TypeSystemDirectiveLocationContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
+
   // @Override
   public get ruleIndex(): number {
     return GraphQLParser.RULE_typeSystemDirectiveLocation;
   }
+
   // @Override
   public enterRule(listener: GraphQLListener): void {
     if (listener.enterTypeSystemDirectiveLocation) {
       listener.enterTypeSystemDirectiveLocation(this);
     }
   }
+
   // @Override
   public exitRule(listener: GraphQLListener): void {
     if (listener.exitTypeSystemDirectiveLocation) {

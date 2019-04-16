@@ -1,10 +1,4 @@
-import { expect } from 'chai';
-import {List, OrderedMap} from 'immutable';
 import 'mocha';
-import sizeof = require('object-sizeof');
-import {GQLExecutionPlan} from '../../models/GQLExecutionPlan';
-import QueryResult from '../../models/QueryResult';
-import SparqlQueryStrategy from '../SparqlQueryStrategy';
 
 describe('fetchResults', () => {
   // TODO should be rewritten to utilize the Factory class

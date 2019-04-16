@@ -38,6 +38,7 @@ export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQue
 
 export class GQLObjectQueryModifierParensExpression extends GQLObjectQueryModifierExpression {
   public expr: GQLObjectQueryModifierExpression;
+
   constructor(expr: GQLObjectQueryModifierExpression) {
     super(`(${expr.expression})`, expr.dataType, expr.underlyingValue);
     this.expr = expr;
@@ -49,9 +50,15 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
   public values: List<
     Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>
   >;
+
   constructor(
     disjunctives: List<GQLObjectQueryModifierConjunction>,
-    values: List<Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>> = List<
+    values: List<
+      Map<
+        GQLObjectQueryModifierField,
+        GQLObjectQueryModifierPrimitiveExpression
+      >
+    > = List<
       Map<
         GQLObjectQueryModifierField,
         GQLObjectQueryModifierPrimitiveExpression
@@ -69,6 +76,7 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
 
 export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExpression {
   public conjunctives: List<GQLObjectQueryModifierOptionalNegation>;
+
   constructor(conjunctives: List<GQLObjectQueryModifierOptionalNegation>) {
     super(
       conjunctives.map(x => `(${x.expression})`).join(' && '),
@@ -81,6 +89,7 @@ export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExp
 export class GQLObjectQueryModifierOptionalNegation extends GQLObjectQueryModifierExpression {
   public hasNot: boolean;
   public expr: GQLObjectQueryModifierPredicate;
+
   constructor(hasNot: boolean, expr: GQLObjectQueryModifierPredicate) {
     super(`${hasNot ? '!' : ''}${expr.expression}`, 'xsd:boolean');
     this.hasNot = hasNot;
@@ -90,6 +99,7 @@ export class GQLObjectQueryModifierOptionalNegation extends GQLObjectQueryModifi
 
 export class GQLObjectQueryModifierPredicate extends GQLObjectQueryModifierExpression {
   public expr: GQLObjectQueryModifierExpression;
+
   constructor(expr: GQLObjectQueryModifierExpression) {
     super(expr.expression, 'xsd:boolean', expr.underlyingValue);
     this.expr = expr;
@@ -100,6 +110,7 @@ export class GQLObjectQueryBasicComparisonPredicate extends GQLObjectQueryModifi
   public lhs: GQLObjectQueryModifierExpression;
   public rhs: GQLObjectQueryModifierExpression;
   public op: string;
+
   constructor(
     lhs: GQLObjectQueryModifierExpression,
     op: string,

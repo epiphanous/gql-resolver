@@ -5,9 +5,6 @@ import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer';
 import { CharStream } from 'antlr4ts/CharStream';
 import { Lexer } from 'antlr4ts/Lexer';
 import { LexerATNSimulator } from 'antlr4ts/atn/LexerATNSimulator';
-import { NotNull } from 'antlr4ts/Decorators';
-import { Override } from 'antlr4ts/Decorators';
-import { RuleContext } from 'antlr4ts/RuleContext';
 import { Vocabulary } from 'antlr4ts/Vocabulary';
 import { VocabularyImpl } from 'antlr4ts/VocabularyImpl';
 
@@ -424,38 +421,9 @@ export class QueryModificationLexer extends Lexer {
   );
 
   // @Override
-  // @NotNull
-  public get vocabulary(): Vocabulary {
-    return QueryModificationLexer.VOCABULARY;
-  }
-  // tslint:enable:no-trailing-whitespace
-
-  constructor(input: CharStream) {
-    super(input);
-    this._interp = new LexerATNSimulator(QueryModificationLexer._ATN, this);
-  }
-
-  // @Override
-  public get grammarFileName(): string {
-    return 'QueryModification.g4';
-  }
-
-  // @Override
-  public get ruleNames(): string[] {
-    return QueryModificationLexer.ruleNames;
-  }
-
-  // @Override
-  public get serializedATN(): string {
-    return QueryModificationLexer._serializedATN;
-  }
-
-  // @Override
-  public get modeNames(): string[] {
-    return QueryModificationLexer.modeNames;
-  }
-
   private static readonly _serializedATNSegments: number = 3;
+
+  // tslint:enable:no-trailing-whitespace
   private static readonly _serializedATNSegment0: string =
     '\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x02{\u0657\b\x01' +
     '\x04\x02\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06' +
@@ -1254,7 +1222,14 @@ export class QueryModificationLexer extends Lexer {
     ],
     ''
   );
+
+  constructor(input: CharStream) {
+    super(input);
+    this._interp = new LexerATNSimulator(QueryModificationLexer._ATN, this);
+  }
+
   public static __ATN: ATN;
+
   public static get _ATN(): ATN {
     if (!QueryModificationLexer.__ATN) {
       QueryModificationLexer.__ATN = new ATNDeserializer().deserialize(
@@ -1263,5 +1238,30 @@ export class QueryModificationLexer extends Lexer {
     }
 
     return QueryModificationLexer.__ATN;
+  }
+
+  // @NotNull
+  public get vocabulary(): Vocabulary {
+    return QueryModificationLexer.VOCABULARY;
+  }
+
+  // @Override
+  public get grammarFileName(): string {
+    return 'QueryModification.g4';
+  }
+
+  // @Override
+  public get ruleNames(): string[] {
+    return QueryModificationLexer.ruleNames;
+  }
+
+  // @Override
+  public get serializedATN(): string {
+    return QueryModificationLexer._serializedATN;
+  }
+
+  // @Override
+  public get modeNames(): string[] {
+    return QueryModificationLexer.modeNames;
   }
 }

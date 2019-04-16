@@ -1,6 +1,7 @@
 import { Option } from 'funfix';
 import { List, Map, Set } from 'immutable';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
+import { GQLFragmentDefinition } from './GQLFragmentDefinition';
 import { GQLOperation } from './GQLOperation';
 import {
   GQLField,
@@ -9,7 +10,6 @@ import {
   GQLSelection,
 } from './GQLSelection';
 import ResolverContext from './ResolverContext';
-import { GQLFragmentDefinition } from './GQLFragmentDefinition';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;
@@ -86,7 +86,9 @@ export class GQLQueryDocument {
           .getFieldType(field.name)
           .map(ft => {
             const fields = this.flattenSelections(ft, field.selections);
-            return List<[string, GQLField]>([[parentType, field.copy({ fields })]]);
+            return List<[string, GQLField]>([
+              [parentType, field.copy({ fields })],
+            ]);
           });
         if (typedFieldOpt.isEmpty()) {
           throw new Error(`can't find field definition ${field.name}`);
@@ -96,7 +98,7 @@ export class GQLQueryDocument {
       case GQLInlineFragment:
         const frag = selection as GQLInlineFragment;
         const inlineFragOpt = this.context.schema
-        // .getFieldType(frag.typeCondition)
+          // .getFieldType(frag.typeCondition)
           .getTypeDefinition(frag.typeCondition)
           .map(ft => this.flattenSelections(ft.name, frag.selections));
         if (inlineFragOpt.isEmpty()) {

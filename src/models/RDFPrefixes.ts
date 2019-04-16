@@ -63,7 +63,7 @@ export class RDFPrefixes {
       new SimpleNamespace('rdfs', 'http://www.w3.org/2000/01/rdf-schema]#'),
     ],
     ['xsd', new SimpleNamespace('xsd', 'http://www.w3.org/2001/XMLSchema#')],
-    ['schema', new SimpleNamespace('schema', 'http://schema.org/')],
+    ['s', new SimpleNamespace('schema', 'http://schema.org/')],
     [
       'skos',
       new SimpleNamespace('skos', 'http://www.w3.org/2004/02/skos/core]#'),
@@ -72,6 +72,7 @@ export class RDFPrefixes {
     ['unit', new SimpleNamespace('unit', 'http://qudt.org/vocab/unit#')],
     ['xml', new SimpleNamespace('xml', 'http://www.w3.org/XML/1998/namespace')],
     ['xsd', new SimpleNamespace('xsd', 'http://www.w3.org/2001/XMLSchema#')],
+    ['j', new SimpleNamespace('j', 'http://jubel.co/jtv/')],
   ]);
 
   public static nameToPrefix = Map(
@@ -80,17 +81,6 @@ export class RDFPrefixes {
       ns.getPrefix(),
     ])
   );
-
-  public static iriWithNameToPrefixedString(iri: string) {
-    return Option.of(
-      RDFPrefixes.nameToPrefix.keySeq().find(name => iri.startsWith(name))
-    )
-      .map(name => {
-        iri.replace(name, RDFPrefixes.nameToPrefix.get(name) + '_');
-      })
-      .getOrElse(iri);
-  }
-
   public sparqlHandler: QueryHandler;
   public namespaces: Map<string, SimpleNamespace>;
   public prefixes: Set<string>;
@@ -122,6 +112,16 @@ export class RDFPrefixes {
         `PREFIX ${p}: <${this.namespaces.get(p).getName()}>`,
       ])
     );
+  }
+
+  public static iriWithNameToPrefixedString(iri: string) {
+    return Option.of(
+      RDFPrefixes.nameToPrefix.keySeq().find(name => iri.startsWith(name))
+    )
+      .map(name => {
+        iri.replace(name, RDFPrefixes.nameToPrefix.get(name) + '_');
+      })
+      .getOrElse(iri);
   }
 
   public sparqlPrefixesForQuery(query: string): string {
