@@ -3,10 +3,14 @@
 import { ATN } from 'antlr4ts/atn/ATN';
 import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer';
 import { FailedPredicateException } from 'antlr4ts/FailedPredicateException';
+import { NotNull } from 'antlr4ts/Decorators';
 import { NoViableAltException } from 'antlr4ts/NoViableAltException';
+import { Override } from 'antlr4ts/Decorators';
 import { Parser } from 'antlr4ts/Parser';
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { ParserATNSimulator } from 'antlr4ts/atn/ParserATNSimulator';
+import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
+import { ParseTreeVisitor } from 'antlr4ts/tree/ParseTreeVisitor';
 import { RecognitionException } from 'antlr4ts/RecognitionException';
 import { RuleContext } from 'antlr4ts/RuleContext';
 //import { RuleVersion } from "antlr4ts/RuleVersion";
@@ -382,395 +386,11 @@ export class QueryModificationParser extends Parser {
   );
 
   // @Override
-  private static readonly _serializedATNSegments: number = 2;
-
-  // tslint:enable:no-trailing-whitespace
-  private static readonly _serializedATNSegment0: string =
-    '\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x03{\u02B0\x04\x02' +
-    '\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07' +
-    '\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04' +
-    '\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04' +
-    '\x13\t\x13\x04\x14\t\x14\x04\x15\t\x15\x04\x16\t\x16\x04\x17\t\x17\x04' +
-    '\x18\t\x18\x04\x19\t\x19\x04\x1A\t\x1A\x04\x1B\t\x1B\x04\x1C\t\x1C\x04' +
-    '\x1D\t\x1D\x04\x1E\t\x1E\x04\x1F\t\x1F\x04 \t \x04!\t!\x04"\t"\x04#' +
-    "\t#\x04$\t$\x04%\t%\x04&\t&\x04'\t'\x04(\t(\x03\x02\x03\x02\x03\x02" +
-    '\x03\x03\x03\x03\x03\x03\x07\x03W\n\x03\f\x03\x0E\x03Z\v\x03\x03\x03\x03' +
-    '\x03\x03\x04\x03\x04\x03\x04\x07\x04a\n\x04\f\x04\x0E\x04d\v\x04\x03\x04' +
-    '\x03\x04\x03\x05\x03\x05\x03\x05\x07\x05k\n\x05\f\x05\x0E\x05n\v\x05\x03' +
-    '\x05\x03\x05\x03\x06\x03\x06\x03\x06\x07\x06u\n\x06\f\x06\x0E\x06x\v\x06' +
-    '\x03\x06\x03\x06\x03\x07\x03\x07\x05\x07~\n\x07\x03\b\x03\b\x03\b\x07' +
-    '\b\x83\n\b\f\b\x0E\b\x86\v\b\x03\b\x03\b\x03\t\x03\t\x03\t\x03\t\x03\t' +
-    '\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x05\t\x98\n\t\x03' +
-    '\n\x03\n\x03\n\x07\n\x9D\n\n\f\n\x0E\n\xA0\v\n\x03\v\x03\v\x03\v\x07\v' +
-    '\xA5\n\v\f\v\x0E\v\xA8\v\v\x03\f\x05\f\xAB\n\f\x03\f\x03\f\x03\r\x03\r' +
-    '\x03\r\x03\r\x03\r\x03\r\x05\r\xB5\n\r\x03\r\x03\r\x03\r\x03\r\x03\r\x05' +
-    '\r\xBC\n\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x05\r\xC5\n\r\x03' +
-    '\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x05' +
-    '\x0E\xD0\n\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E' +
-    '\x03\x0E\x07\x0E\xDA\n\x0E\f\x0E\x0E\x0E\xDD\v\x0E\x03\x0F\x03\x0F\x03' +
-    '\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x05\x0F\xE8\n\x0F' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\u011B\n\x10\x03\x10\x03\x10\x05' +
-    '\x10\u011F\n\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\u0180' +
-    '\n\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x05\x10\u018D\n\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
-    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\u01F3\n\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
-    '\x03\x10\x03\x10\x05\x10\u0212\n\x10\x03\x11\x05\x11\u0215\n\x11\x03\x11' +
-    '\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x07\x11\u021D\n\x11\f\x11\x0E' +
-    '\x11\u0220\v\x11\x03\x11\x03\x11\x05\x11\u0224\n\x11\x03\x11\x05\x11\u0227' +
-    '\n\x11\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x05\x11\u022E\n\x11\x03' +
-    '\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x05' +
-    '\x12\u0239\n\x12\x03\x13\x05\x13\u023C\n\x13\x03\x13\x03\x13\x03\x13\x03' +
-    '\x13\x03\x13\x05\x13\u0243\n\x13\x03\x13\x03\x13\x03\x13\x03\x13\x05\x13' +
-    '\u0249\n\x13\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x15\x03\x15\x03' +
-    '\x15\x03\x15\x07\x15\u0254\n\x15\f\x15\x0E\x15\u0257\v\x15\x03\x15\x03' +
-    '\x15\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16\x05\x16\u0261\n\x16' +
-    '\x03\x16\x03\x16\x03\x16\x05\x16\u0266\n\x16\x03\x16\x03\x16\x05\x16\u026A' +
-    '\n\x16\x03\x17\x03\x17\x03\x17\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18' +
-    '\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x05\x18\u027B' +
-    '\n\x18\x03\x19\x03\x19\x03\x19\x03\x19\x03\x19\x03\x19\x03\x19\x05\x19' +
-    '\u0284\n\x19\x03\x1A\x03\x1A\x03\x1A\x05\x1A\u0289\n\x1A\x03\x1B\x03\x1B' +
-    '\x03\x1B\x03\x1C\x03\x1C\x03\x1D\x03\x1D\x03\x1E\x03\x1E\x03\x1F\x03\x1F' +
-    '\x03 \x03 \x03!\x03!\x03"\x03"\x05"\u029C\n"\x03#\x03#\x03$\x03$\x05' +
-    "$\u02A2\n$\x03%\x03%\x05%\u02A6\n%\x03&\x03&\x05&\u02AA\n&\x03'\x03'" +
-    '\x03(\x03(\x03(\x02\x02\x03\x1A)\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f' +
-    '\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C\x02\x1E' +
-    '\x02 \x02"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x022\x024\x026\x028\x02' +
-    ':\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02J\x02L\x02N\x02\x02\r\x04\x02' +
-    '\x1E\x1E))\x04\x02\x04\x04\b\b\x04\x02\x05\x05\t\t\x04\x02..__\x04\x02' +
-    '\n\n\r\x15\x03\x02\x16\x17\x03\x02\x18\x1A\x03\x02st\x04\x02,,bb\x03\x02' +
-    'kl\x04\x02mmww\u02FD\x02P\x03\x02\x02\x02\x04S\x03\x02\x02\x02\x06]\x03' +
-    '\x02\x02\x02\bg\x03\x02\x02\x02\nq\x03\x02\x02\x02\f{\x03\x02\x02\x02' +
-    '\x0E\x7F\x03\x02\x02\x02\x10\x97\x03\x02\x02\x02\x12\x99\x03\x02\x02\x02' +
-    '\x14\xA1\x03\x02\x02\x02\x16\xAA\x03\x02\x02\x02\x18\xC4\x03\x02\x02\x02' +
-    '\x1A\xCF\x03\x02\x02\x02\x1C\xE7\x03\x02\x02\x02\x1E\u0211\x03\x02\x02' +
-    '\x02 \u022D\x03\x02\x02\x02"\u0238\x03\x02\x02\x02$\u0248\x03\x02\x02' +
-    '\x02&\u024A\x03\x02\x02\x02(\u024F\x03\x02\x02\x02*\u0269\x03\x02\x02' +
-    '\x02,\u026B\x03\x02\x02\x02.\u027A\x03\x02\x02\x020\u0283\x03\x02\x02' +
-    '\x022\u0288\x03\x02\x02\x024\u028A\x03\x02\x02\x026\u028D\x03\x02\x02' +
-    '\x028\u028F\x03\x02\x02\x02:\u0291\x03\x02\x02\x02<\u0293\x03\x02\x02' +
-    '\x02>\u0295\x03\x02\x02\x02@\u0297\x03\x02\x02\x02B\u029B\x03\x02\x02' +
-    '\x02D\u029D\x03\x02\x02\x02F\u02A1\x03\x02\x02\x02H\u02A5\x03\x02\x02' +
-    '\x02J\u02A9\x03\x02\x02\x02L\u02AB\x03\x02\x02\x02N\u02AD\x03\x02\x02' +
-    '\x02PQ\x05\x12\n\x02QR\x07\x02\x02\x03R\x03\x03\x02\x02\x02SX\x05 \x11' +
-    '\x02TU\x07\x03\x02\x02UW\x05 \x11\x02VT\x03\x02\x02\x02WZ\x03\x02\x02' +
-    '\x02XV\x03\x02\x02\x02XY\x03\x02\x02\x02Y[\x03\x02\x02\x02ZX\x03\x02\x02' +
-    '\x02[\\\x07\x02\x02\x03\\\x05\x03\x02\x02\x02]b\x05$\x13\x02^_\x07\x03' +
-    '\x02\x02_a\x05$\x13\x02`^\x03\x02\x02\x02ad\x03\x02\x02\x02b`\x03\x02' +
-    '\x02\x02bc\x03\x02\x02\x02ce\x03\x02\x02\x02db\x03\x02\x02\x02ef\x07\x02' +
-    '\x02\x03f\x07\x03\x02\x02\x02gl\x05&\x14\x02hi\x07\x03\x02\x02ik\x05&' +
-    '\x14\x02jh\x03\x02\x02\x02kn\x03\x02\x02\x02lj\x03\x02\x02\x02lm\x03\x02' +
-    '\x02\x02mo\x03\x02\x02\x02nl\x03\x02\x02\x02op\x07\x02\x02\x03p\t\x03' +
-    '\x02\x02\x02qv\x05\f\x07\x02rs\x07\x03\x02\x02su\x05\f\x07\x02tr\x03\x02' +
-    '\x02\x02ux\x03\x02\x02\x02vt\x03\x02\x02\x02vw\x03\x02\x02\x02wy\x03\x02' +
-    '\x02\x02xv\x03\x02\x02\x02yz\x07\x02\x02\x03z\v\x03\x02\x02\x02{}\x05' +
-    '\x1A\x0E\x02|~\t\x02\x02\x02}|\x03\x02\x02\x02}~\x03\x02\x02\x02~\r\x03' +
-    '\x02\x02\x02\x7F\x84\x05\x10\t\x02\x80\x81\x07\x03\x02\x02\x81\x83\x05' +
-    '\x10\t\x02\x82\x80\x03\x02\x02\x02\x83\x86\x03\x02\x02\x02\x84\x82\x03' +
-    '\x02\x02\x02\x84\x85\x03\x02\x02\x02\x85\x87\x03\x02\x02\x02\x86\x84\x03' +
-    '\x02\x02\x02\x87\x88\x07\x02\x02\x03\x88\x0F\x03\x02\x02\x02\x89\x8A\x07' +
-    'a\x02\x02\x8A\x98\x05F$\x02\x8B\x98\x07\x1B\x02\x02\x8C\x98\x07#\x02\x02' +
-    '\x8D\x98\x07-\x02\x02\x8E\x98\x07=\x02\x02\x8F\x98\x07@\x02\x02\x90\x98' +
-    '\x07G\x02\x02\x91\x98\x07M\x02\x02\x92\x98\x07P\x02\x02\x93\x98\x07Q\x02' +
-    '\x02\x94\x98\x07R\x02\x02\x95\x98\x07S\x02\x02\x96\x98\x07d\x02\x02\x97' +
-    '\x89\x03\x02\x02\x02\x97\x8B\x03\x02\x02\x02\x97\x8C\x03\x02\x02\x02\x97' +
-    '\x8D\x03\x02\x02\x02\x97\x8E\x03\x02\x02\x02\x97\x8F\x03\x02\x02\x02\x97' +
-    '\x90\x03\x02\x02\x02\x97\x91\x03\x02\x02\x02\x97\x92\x03\x02\x02\x02\x97' +
-    '\x93\x03\x02\x02\x02\x97\x94\x03\x02\x02\x02\x97\x95\x03\x02\x02\x02\x97' +
-    '\x96\x03\x02\x02\x02\x98\x11\x03\x02\x02\x02\x99\x9E\x05\x14\v\x02\x9A' +
-    '\x9B\x07I\x02\x02\x9B\x9D\x05\x14\v\x02\x9C\x9A\x03\x02\x02\x02\x9D\xA0' +
-    '\x03\x02\x02\x02\x9E\x9C\x03\x02\x02\x02\x9E\x9F\x03\x02\x02\x02\x9F\x13' +
-    '\x03\x02\x02\x02\xA0\x9E\x03\x02\x02\x02\xA1\xA6\x05\x16\f\x02\xA2\xA3' +
-    '\x07\x1C\x02\x02\xA3\xA5\x05\x16\f\x02\xA4\xA2\x03\x02\x02\x02\xA5\xA8' +
-    '\x03\x02\x02\x02\xA6\xA4\x03\x02\x02\x02\xA6\xA7\x03\x02\x02\x02\xA7\x15' +
-    '\x03\x02\x02\x02\xA8\xA6\x03\x02\x02\x02\xA9\xAB\x07E\x02\x02\xAA\xA9' +
-    '\x03\x02\x02\x02\xAA\xAB\x03\x02\x02\x02\xAB\xAC\x03\x02\x02\x02\xAC\xAD' +
-    '\x05\x18\r\x02\xAD\x17\x03\x02\x02\x02\xAE\xAF\x05\x1A\x0E\x02\xAF\xB0' +
-    '\x058\x1D\x02\xB0\xB1\x05\x1A\x0E\x02\xB1\xC5\x03\x02\x02\x02\xB2\xB4' +
-    '\x05\x1A\x0E\x02\xB3\xB5\x07E\x02\x02\xB4\xB3\x03\x02\x02\x02\xB4\xB5' +
-    '\x03\x02\x02\x02\xB5\xB6\x03\x02\x02\x02\xB6\xB7\x073\x02\x02\xB7\xB8' +
-    '\x05(\x15\x02\xB8\xC5\x03\x02\x02\x02\xB9\xBB\x05\x1A\x0E\x02\xBA\xBC' +
-    '\x07E\x02\x02\xBB\xBA\x03\x02\x02\x02\xBB\xBC\x03\x02\x02\x02\xBC\xBD' +
-    '\x03\x02\x02\x02\xBD\xBE\x073\x02\x02\xBE\xBF\x054\x1B\x02\xBF\xC5\x03' +
-    '\x02\x02\x02\xC0\xC1\x07\x04\x02\x02\xC1\xC2\x05\x12\n\x02\xC2\xC3\x07' +
-    '\x05\x02\x02\xC3\xC5\x03\x02\x02\x02\xC4\xAE\x03\x02\x02\x02\xC4\xB2\x03' +
-    '\x02\x02\x02\xC4\xB9\x03\x02\x02\x02\xC4\xC0\x03\x02\x02\x02\xC5\x19\x03' +
-    '\x02\x02\x02\xC6\xC7\b\x0E\x01\x02\xC7\xC8\x05:\x1E\x02\xC8\xC9\x05\x1A' +
-    '\x0E\x07\xC9\xD0\x03\x02\x02\x02\xCA\xD0\x05\x1C\x0F\x02\xCB\xCC\x07\x04' +
-    '\x02\x02\xCC\xCD\x05\x1A\x0E\x02\xCD\xCE\x07\x05\x02\x02\xCE\xD0\x03\x02' +
-    '\x02\x02\xCF\xC6\x03\x02\x02\x02\xCF\xCA\x03\x02\x02\x02\xCF\xCB\x03\x02' +
-    '\x02\x02\xD0\xDB\x03\x02\x02\x02\xD1\xD2\f\x06\x02\x02\xD2\xD3\x05<\x1F' +
-    '\x02\xD3\xD4\x05\x1A\x0E\x07\xD4\xDA\x03\x02\x02\x02\xD5\xD6\f\x05\x02' +
-    '\x02\xD6\xD7\x05> \x02\xD7\xD8\x05\x1A\x0E\x06\xD8\xDA\x03\x02\x02\x02' +
-    '\xD9\xD1\x03\x02\x02\x02\xD9\xD5\x03\x02\x02\x02\xDA\xDD\x03\x02\x02\x02' +
-    '\xDB\xD9\x03\x02\x02\x02\xDB\xDC\x03\x02\x02\x02\xDC\x1B\x03\x02\x02\x02' +
-    '\xDD\xDB\x03\x02\x02\x02\xDE\xE8\x05\x1E\x10\x02\xDF\xE8\x05.\x18\x02' +
-    '\xE0\xE8\x050\x19\x02\xE1\xE8\x05@!\x02\xE2\xE8\x052\x1A\x02\xE3\xE8\x05' +
-    'D#\x02\xE4\xE8\x05J&\x02\xE5\xE8\x056\x1C\x02\xE6\xE8\x054\x1B\x02\xE7' +
-    '\xDE\x03\x02\x02\x02\xE7\xDF\x03\x02\x02\x02\xE7\xE0\x03\x02\x02\x02\xE7' +
-    '\xE1\x03\x02\x02\x02\xE7\xE2\x03\x02\x02\x02\xE7\xE3\x03\x02\x02\x02\xE7' +
-    '\xE4\x03\x02\x02\x02\xE7\xE5\x03\x02\x02\x02\xE7\xE6\x03\x02\x02\x02\xE8' +
-    '\x1D\x03\x02\x02\x02\xE9\xEA\x07\x1B\x02\x02\xEA\xEB\x07\x04\x02\x02\xEB' +
-    '\xEC\x05\x1A\x0E\x02\xEC\xED\x07\x05\x02\x02\xED\u0212\x03\x02\x02\x02' +
-    '\xEE\xEF\x07"\x02\x02\xEF\xF0\x07\x04\x02\x02\xF0\xF1\x056\x1C\x02\xF1' +
-    '\xF2\x07\x05\x02\x02\xF2\u0212\x03\x02\x02\x02\xF3\xF4\x07#\x02\x02\xF4' +
-    '\xF5\x07\x04\x02\x02\xF5\xF6\x05\x1A\x0E\x02\xF6\xF7\x07\x05\x02\x02\xF7' +
-    '\u0212\x03\x02\x02\x02\xF8\xF9\x07$\x02\x02\xF9\xFA\x07\x06\x02\x02\xFA' +
-    '\xFB\x05F$\x02\xFB\xFC\x07\x07\x02\x02\xFC\xFD\x05(\x15\x02\xFD\u0212' +
-    '\x03\x02\x02\x02\xFE\xFF\x07%\x02\x02\xFF\u0212\x05(\x15\x02\u0100\u0101' +
-    '\x07&\x02\x02\u0101\u0102\x07\x04\x02\x02\u0102\u0103\x05\x1A\x0E\x02' +
-    '\u0103\u0104\x07\x03\x02\x02\u0104\u0105\x05\x1A\x0E\x02\u0105\u0106\x07' +
-    "\x05\x02\x02\u0106\u0212\x03\x02\x02\x02\u0107\u0108\x07'\x02\x02\u0108" +
-    '\u0109\x07\x04\x02\x02\u0109\u010A\x05\x1A\x0E\x02\u010A\u010B\x07\x05' +
-    '\x02\x02\u010B\u0212\x03\x02\x02\x02\u010C\u010D\x07(\x02\x02\u010D\u010E' +
-    '\x07\x04\x02\x02\u010E\u010F\x05\x1A\x0E\x02\u010F\u0110\x07\x05\x02\x02' +
-    '\u0110\u0212\x03\x02\x02\x02\u0111\u0112\x07*\x02\x02\u0112\u0113\x07' +
-    '\x04\x02\x02\u0113\u0114\x05\x1A\x0E\x02\u0114\u0115\x07\x05\x02\x02\u0115' +
-    '\u0212\x03\x02\x02\x02\u0116\u0117\x07+\x02\x02\u0117\u0118\t\x03\x02' +
-    '\x02\u0118\u011A\x05\x1A\x0E\x02\u0119\u011B\x07\x03\x02\x02\u011A\u0119' +
-    '\x03\x02\x02\x02\u011A\u011B\x03\x02\x02\x02\u011B\u011C\x03\x02\x02\x02' +
-    '\u011C\u011E\x05\x1A\x0E\x02\u011D\u011F\x07\x03\x02\x02\u011E\u011D\x03' +
-    '\x02\x02\x02\u011E\u011F\x03\x02\x02\x02\u011F\u0120\x03\x02\x02\x02\u0120' +
-    '\u0121\x05\x1A\x0E\x02\u0121\u0122\t\x04\x02\x02\u0122\u0212\x03\x02\x02' +
-    '\x02\u0123\u0124\x07-\x02\x02\u0124\u0125\x07\x04\x02\x02\u0125\u0126' +
-    '\x05\x1A\x0E\x02\u0126\u0127\x07\x05\x02\x02\u0127\u0212\x03\x02\x02\x02' +
-    '\u0128\u0129\x07/\x02\x02\u0129\u012A\x07\x04\x02\x02\u012A\u012B\x05' +
-    '\x1A\x0E\x02\u012B\u012C\x07\x05\x02\x02\u012C\u0212\x03\x02\x02\x02\u012D' +
-    '\u012E\x070\x02\x02\u012E\u012F\x07\x04\x02\x02\u012F\u0130\x05\x18\r' +
-    '\x02\u0130\u0131\x07\x03\x02\x02\u0131\u0132\x05\x1A\x0E\x02\u0132\u0133' +
-    '\x07\x03\x02\x02\u0133\u0134\x05\x1A\x0E\x02\u0134\u0135\x07\x05\x02\x02' +
-    '\u0135\u0212\x03\x02\x02\x02\u0136\u0137\x074\x02\x02\u0137\u0138\x07' +
-    '\x04\x02\x02\u0138\u0139\x05\x1A\x0E\x02\u0139\u013A\x07\x05\x02\x02\u013A' +
-    '\u0212\x03\x02\x02\x02\u013B\u013C\x075\x02\x02\u013C\u013D\x07\x04\x02' +
-    '\x02\u013D\u013E\x05\x1A\x0E\x02\u013E\u013F\x07\x05\x02\x02\u013F\u0212' +
-    '\x03\x02\x02\x02\u0140\u0141\x076\x02\x02\u0141\u0142\x07\x04\x02\x02' +
-    '\u0142\u0143\x05\x1A\x0E\x02\u0143\u0144\x07\x05\x02\x02\u0144\u0212\x03' +
-    '\x02\x02\x02\u0145\u0146\x077\x02\x02\u0146\u0147\x07\x04\x02\x02\u0147' +
-    '\u0148\x05\x1A\x0E\x02\u0148\u0149\x07\x05\x02\x02\u0149\u0212\x03\x02' +
-    '\x02\x02\u014A\u014B\x078\x02\x02\u014B\u014C\x07\x04\x02\x02\u014C\u014D' +
-    '\x05\x1A\x0E\x02\u014D\u014E\x07\x05\x02\x02\u014E\u0212\x03\x02\x02\x02' +
-    '\u014F\u0150\x079\x02\x02\u0150\u0151\x07\x04\x02\x02\u0151\u0152\x05' +
-    '\x1A\x0E\x02\u0152\u0153\x07\x05\x02\x02\u0153\u0212\x03\x02\x02\x02\u0154' +
-    '\u0155\x07:\x02\x02\u0155\u0156\x07\x04\x02\x02\u0156\u0157\x05\x1A\x0E' +
-    '\x02\u0157\u0158\x07\x05\x02\x02\u0158\u0212\x03\x02\x02\x02\u0159\u015A' +
-    '\x07;\x02\x02\u015A\u015B\x07\x04\x02\x02\u015B\u015C\x05\x1A\x0E\x02' +
-    '\u015C\u015D\x07\x03\x02\x02\u015D\u015E\x05\x1A\x0E\x02\u015E\u015F\x07' +
-    '\x05\x02\x02\u015F\u0212\x03\x02\x02\x02\u0160\u0161\x07=\x02\x02\u0161' +
-    '\u0162\x07\x04\x02\x02\u0162\u0163\x05\x1A\x0E\x02\u0163\u0164\x07\x05' +
-    '\x02\x02\u0164\u0212\x03\x02\x02\x02\u0165\u0166\x07@\x02\x02\u0166\u0167' +
-    '\x07\x04\x02\x02\u0167\u0168\x05\x1A\x0E\x02\u0168\u0169\x07\x05\x02\x02' +
-    '\u0169\u0212\x03\x02\x02\x02\u016A\u016B\x07B\x02\x02\u016B\u016C\x07' +
-    '\x04\x02\x02\u016C\u016D\x05\x1A\x0E\x02\u016D\u016E\x07\x05\x02\x02\u016E' +
-    '\u0212\x03\x02\x02\x02\u016F\u0170\x07C\x02\x02\u0170\u0171\x07\x04\x02' +
-    '\x02\u0171\u0172\x05\x1A\x0E\x02\u0172\u0173\x07\x05\x02\x02\u0173\u0212' +
-    '\x03\x02\x02\x02\u0174\u0175\x07F\x02\x02\u0175\u0212\x07v\x02\x02\u0176' +
-    '\u0177\x07J\x02\x02\u0177\u0212\x07v\x02\x02\u0178\u0179\x07K\x02\x02' +
-    '\u0179\u017A\x07\x04\x02\x02\u017A\u017B\x05\x1A\x0E\x02\u017B\u017C\x07' +
-    '\x03\x02\x02\u017C\u017F\x05\x1A\x0E\x02\u017D\u017E\x07\x03\x02\x02\u017E' +
-    '\u0180\x05\x1A\x0E\x02\u017F\u017D\x03\x02\x02\x02\u017F\u0180\x03\x02' +
-    '\x02\x02\u0180\u0181\x03\x02\x02\x02\u0181\u0182\x07\x05\x02\x02\u0182' +
-    '\u0212\x03\x02\x02\x02\u0183\u0184\x07L\x02\x02\u0184\u0185\x07\x04\x02' +
-    '\x02\u0185\u0186\x05\x1A\x0E\x02\u0186\u0187\x07\x03\x02\x02\u0187\u0188' +
-    '\x05\x1A\x0E\x02\u0188\u0189\x07\x03\x02\x02\u0189\u018C\x05\x1A\x0E\x02' +
-    '\u018A\u018B\x07\x03\x02\x02\u018B\u018D\x05\x1A\x0E\x02\u018C\u018A\x03' +
-    '\x02\x02\x02\u018C\u018D\x03\x02\x02\x02\u018D\u018E\x03\x02\x02\x02\u018E' +
-    '\u018F\x07\x05\x02\x02\u018F\u0212\x03\x02\x02\x02\u0190\u0191\x07M\x02' +
-    '\x02\u0191\u0192\x07\x04\x02\x02\u0192\u0193\x05\x1A\x0E\x02\u0193\u0194' +
-    '\x07\x05\x02\x02\u0194\u0212\x03\x02\x02\x02\u0195\u0196\x07N\x02\x02' +
-    '\u0196\u0197\x07\x04\x02\x02\u0197\u0198\x056\x1C\x02\u0198\u0199\x07' +
-    '\x03\x02\x02\u0199\u019A\x056\x1C\x02\u019A\u019B\x07\x05\x02\x02\u019B' +
-    '\u0212\x03\x02\x02\x02\u019C\u019D\x07O\x02\x02\u019D\u019E\x07\x04\x02' +
-    '\x02\u019E\u019F\x05\x1A\x0E\x02\u019F\u01A0\x07\x05\x02\x02\u01A0\u0212' +
-    '\x03\x02\x02\x02\u01A1\u01A2\x07P\x02\x02\u01A2\u01A3\x07\x04\x02\x02' +
-    '\u01A3\u01A4\x05\x1A\x0E\x02\u01A4\u01A5\x07\x05\x02\x02\u01A5\u0212\x03' +
-    '\x02\x02\x02\u01A6\u01A7\x07Q\x02\x02\u01A7\u01A8\x07\x04\x02\x02\u01A8' +
-    '\u01A9\x05\x1A\x0E\x02\u01A9\u01AA\x07\x05\x02\x02\u01AA\u0212\x03\x02' +
-    '\x02\x02\u01AB\u01AC\x07R\x02\x02\u01AC\u01AD\x07\x04\x02\x02\u01AD\u01AE' +
-    '\x05\x1A\x0E\x02\u01AE\u01AF\x07\x05\x02\x02\u01AF\u0212\x03\x02\x02\x02' +
-    '\u01B0\u01B1\x07S\x02\x02\u01B1\u01B2\x07\x04\x02\x02\u01B2\u01B3\x05' +
-    '\x1A\x0E\x02\u01B3\u01B4\x07\x05\x02\x02\u01B4\u0212\x03\x02\x02\x02\u01B5' +
-    '\u01B6\x07T\x02\x02\u01B6\u01B7\x07\x04\x02\x02\u01B7\u01B8\x05\x1A\x0E' +
-    '\x02\u01B8\u01B9\x07\x05\x02\x02\u01B9\u0212\x03\x02\x02\x02\u01BA\u01BB' +
-    '\x07U\x02\x02\u01BB\u01BC\x07\x04\x02\x02\u01BC\u01BD\x05\x1A\x0E\x02' +
-    '\u01BD\u01BE\x07\x03\x02\x02\u01BE\u01BF\x05\x1A\x0E\x02\u01BF\u01C0\x07' +
-    '\x05\x02\x02\u01C0\u0212\x03\x02\x02\x02\u01C1\u01C2\x07V\x02\x02\u01C2' +
-    '\u01C3\x07\x04\x02\x02\u01C3\u01C4\x05\x1A\x0E\x02\u01C4\u01C5\x07\x03' +
-    '\x02\x02\u01C5\u01C6\x05\x1A\x0E\x02\u01C6\u01C7\x07\x05\x02\x02\u01C7' +
-    '\u0212\x03\x02\x02\x02\u01C8\u01C9\x07W\x02\x02\u01C9\u01CA\x07\x04\x02' +
-    '\x02\u01CA\u01CB\x05\x1A\x0E\x02\u01CB\u01CC\x07\x03\x02\x02\u01CC\u01CD' +
-    '\x05F$\x02\u01CD\u01CE\x07\x05\x02\x02\u01CE\u0212\x03\x02\x02\x02\u01CF' +
-    '\u01D0\x07X\x02\x02\u01D0\u01D1\x07\x04\x02\x02\u01D1\u01D2\x05\x1A\x0E' +
-    '\x02\u01D2\u01D3\x07\x03\x02\x02\u01D3\u01D4\x05\x1A\x0E\x02\u01D4\u01D5' +
-    '\x07\x05\x02\x02\u01D5\u0212\x03\x02\x02\x02\u01D6\u01D7\x07Y\x02\x02' +
-    '\u01D7\u01D8\x07\x04\x02\x02\u01D8\u01D9\x05\x1A\x0E\x02\u01D9\u01DA\x07' +
-    '\x03\x02\x02\u01DA\u01DB\x05\x1A\x0E\x02\u01DB\u01DC\x07\x05\x02\x02\u01DC' +
-    '\u0212\x03\x02\x02\x02\u01DD\u01DE\x07Z\x02\x02\u01DE\u01DF\x07\x04\x02' +
-    '\x02\u01DF\u01E0\x05\x1A\x0E\x02\u01E0\u01E1\x07\x05\x02\x02\u01E1\u0212' +
-    '\x03\x02\x02\x02\u01E2\u01E3\x07[\x02\x02\u01E3\u01E4\x07\x04\x02\x02' +
-    '\u01E4\u01E5\x05\x1A\x0E\x02\u01E5\u01E6\x07\x03\x02\x02\u01E6\u01E7\x05' +
-    '\x1A\x0E\x02\u01E7\u01E8\x07\x05\x02\x02\u01E8\u0212\x03\x02\x02\x02\u01E9' +
-    '\u01EA\x07\\\x02\x02\u01EA\u0212\x07v\x02\x02\u01EB\u01EC\x07^\x02\x02' +
-    '\u01EC\u01ED\x07\x04\x02\x02\u01ED\u01EE\x05\x1A\x0E\x02\u01EE\u01EF\x07' +
-    '\x03\x02\x02\u01EF\u01F2\x05\x1A\x0E\x02\u01F0\u01F1\x07\x03\x02\x02\u01F1' +
-    '\u01F3\x05\x1A\x0E\x02\u01F2\u01F0\x03\x02\x02\x02\u01F2\u01F3\x03\x02' +
-    '\x02\x02\u01F3\u01F4\x03\x02\x02\x02\u01F4\u01F5\x07\x05\x02\x02\u01F5' +
-    '\u0212\x03\x02\x02\x02\u01F6\u01F7\x07`\x02\x02\u01F7\u01F8\x07\x04\x02' +
-    '\x02\u01F8\u01F9\x05\x1A\x0E\x02\u01F9\u01FA\x07\x05\x02\x02\u01FA\u0212' +
-    '\x03\x02\x02\x02\u01FB\u01FC\x07c\x02\x02\u01FC\u01FD\x07\x04\x02\x02' +
-    '\u01FD\u01FE\x05\x1A\x0E\x02\u01FE\u01FF\x07\x05\x02\x02\u01FF\u0212\x03' +
-    '\x02\x02\x02\u0200\u0201\x07d\x02\x02\u0201\u0202\x07\x04\x02\x02\u0202' +
-    '\u0203\x05\x1A\x0E\x02\u0203\u0204\x07\x05\x02\x02\u0204\u0212\x03\x02' +
-    '\x02\x02\u0205\u0206\x07e\x02\x02\u0206\u0207\x07\x04\x02\x02\u0207\u0208' +
-    '\x05\x1A\x0E\x02\u0208\u0209\x07\x05\x02\x02\u0209\u0212\x03\x02\x02\x02' +
-    '\u020A\u020B\x07f\x02\x02\u020B\u0212\x07v\x02\x02\u020C\u020D\x07h\x02' +
-    '\x02\u020D\u020E\x07\x04\x02\x02\u020E\u020F\x05\x1A\x0E\x02\u020F\u0210' +
-    '\x07\x05\x02\x02\u0210\u0212\x03\x02\x02\x02\u0211\xE9\x03\x02\x02\x02' +
-    '\u0211\xEE\x03\x02\x02\x02\u0211\xF3\x03\x02\x02\x02\u0211\xF8\x03\x02' +
-    '\x02\x02\u0211\xFE\x03\x02\x02\x02\u0211\u0100\x03\x02\x02\x02\u0211\u0107' +
-    '\x03\x02\x02\x02\u0211\u010C\x03\x02\x02\x02\u0211\u0111\x03\x02\x02\x02' +
-    '\u0211\u0116\x03\x02\x02\x02\u0211\u0123\x03\x02\x02\x02\u0211\u0128\x03' +
-    '\x02\x02\x02\u0211\u012D\x03\x02\x02\x02\u0211\u0136\x03\x02\x02\x02\u0211' +
-    '\u013B\x03\x02\x02\x02\u0211\u0140\x03\x02\x02\x02\u0211\u0145\x03\x02' +
-    '\x02\x02\u0211\u014A\x03\x02\x02\x02\u0211\u014F\x03\x02\x02\x02\u0211' +
-    '\u0154\x03\x02\x02\x02\u0211\u0159\x03\x02\x02\x02\u0211\u0160\x03\x02' +
-    '\x02\x02\u0211\u0165\x03\x02\x02\x02\u0211\u016A\x03\x02\x02\x02\u0211' +
-    '\u016F\x03\x02\x02\x02\u0211\u0174\x03\x02\x02\x02\u0211\u0176\x03\x02' +
-    '\x02\x02\u0211\u0178\x03\x02\x02\x02\u0211\u0183\x03\x02\x02\x02\u0211' +
-    '\u0190\x03\x02\x02\x02\u0211\u0195\x03\x02\x02\x02\u0211\u019C\x03\x02' +
-    '\x02\x02\u0211\u01A1\x03\x02\x02\x02\u0211\u01A6\x03\x02\x02\x02\u0211' +
-    '\u01AB\x03\x02\x02\x02\u0211\u01B0\x03\x02\x02\x02\u0211\u01B5\x03\x02' +
-    '\x02\x02\u0211\u01BA\x03\x02\x02\x02\u0211\u01C1\x03\x02\x02\x02';
-  private static readonly _serializedATNSegment1: string =
-    '\u0211\u01C8\x03\x02\x02\x02\u0211\u01CF\x03\x02\x02\x02\u0211\u01D6\x03' +
-    '\x02\x02\x02\u0211\u01DD\x03\x02\x02\x02\u0211\u01E2\x03\x02\x02\x02\u0211' +
-    '\u01E9\x03\x02\x02\x02\u0211\u01EB\x03\x02\x02\x02\u0211\u01F6\x03\x02' +
-    '\x02\x02\u0211\u01FB\x03\x02\x02\x02\u0211\u0200\x03\x02\x02\x02\u0211' +
-    '\u0205\x03\x02\x02\x02\u0211\u020A\x03\x02\x02\x02\u0211\u020C\x03\x02' +
-    '\x02\x02\u0212\x1F\x03\x02\x02\x02\u0213\u0215\x056\x1C\x02\u0214\u0213' +
-    '\x03\x02\x02\x02\u0214\u0215\x03\x02\x02\x02\u0215\u0216\x03\x02\x02\x02' +
-    '\u0216\u0217\t\x05\x02\x02\u0217\u0223\x05B"\x02\u0218\u0219\x07\x04' +
-    '\x02\x02\u0219\u021E\x05"\x12\x02\u021A\u021B\x07\x03\x02\x02\u021B\u021D' +
-    '\x05"\x12\x02\u021C\u021A\x03\x02\x02\x02\u021D\u0220\x03\x02\x02\x02' +
-    '\u021E\u021C\x03\x02\x02\x02\u021E\u021F\x03\x02\x02\x02\u021F\u0221\x03' +
-    '\x02\x02\x02\u0220\u021E\x03\x02\x02\x02\u0221\u0222\x07\x05\x02\x02\u0222' +
-    '\u0224\x03\x02\x02\x02\u0223\u0218\x03\x02\x02\x02\u0223\u0224\x03\x02' +
-    '\x02\x02\u0224\u022E\x03\x02\x02\x02\u0225\u0227\x056\x1C\x02\u0226\u0225' +
-    '\x03\x02\x02\x02\u0226\u0227\x03\x02\x02\x02\u0227\u0228\x03\x02\x02\x02' +
-    '\u0228\u0229\x07g\x02\x02\u0229\u022A\x05,\x17\x02\u022A\u022B\x07H\x02' +
-    '\x02\u022B\u022C\x05*\x16\x02\u022C\u022E\x03\x02\x02\x02\u022D\u0214' +
-    '\x03\x02\x02\x02\u022D\u0226\x03\x02\x02\x02\u022E!\x03\x02\x02\x02\u022F' +
-    '\u0230\x07!\x02\x02\u0230\u0231\x07\n\x02\x02\u0231\u0239\x052\x1A\x02' +
-    '\u0232\u0233\x07A\x02\x02\u0233\u0234\x07\n\x02\x02\u0234\u0239\x07p\x02' +
-    '\x02\u0235\u0236\x07?\x02\x02\u0236\u0237\x07\n\x02\x02\u0237\u0239\x07' +
-    'o\x02\x02\u0238\u022F\x03\x02\x02\x02\u0238\u0232\x03\x02\x02\x02\u0238' +
-    '\u0235\x03\x02\x02\x02\u0239#\x03\x02\x02\x02\u023A\u023C\x07!\x02\x02' +
-    '\u023B\u023A\x03\x02\x02\x02\u023B\u023C\x03\x02\x02\x02\u023C\u023D\x03' +
-    '\x02\x02\x02\u023D\u023E\x052\x1A\x02\u023E\u023F\x072\x02\x02\u023F\u0240' +
-    '\x05F$\x02\u0240\u0249\x03\x02\x02\x02\u0241\u0243\x07!\x02\x02\u0242' +
-    '\u0241\x03\x02\x02\x02\u0242\u0243\x03\x02\x02\x02\u0243\u0244\x03\x02' +
-    '\x02\x02\u0244\u0245\x052\x1A\x02\u0245\u0246\x071\x02\x02\u0246\u0247' +
-    '\x05F$\x02\u0247\u0249\x03\x02\x02\x02\u0248\u023B\x03\x02\x02\x02\u0248' +
-    '\u0242\x03\x02\x02\x02\u0249%\x03\x02\x02\x02\u024A\u024B\x07\x1F\x02' +
-    '\x02\u024B\u024C\x05\x1A\x0E\x02\u024C\u024D\x07\x1D\x02\x02\u024D\u024E' +
-    "\x07x\x02\x02\u024E'\x03\x02\x02\x02\u024F\u0250\x07\x04\x02\x02\u0250" +
-    '\u0255\x05\x1A\x0E\x02\u0251\u0252\x07\x03\x02\x02\u0252\u0254\x05\x1A' +
-    '\x0E\x02\u0253\u0251\x03\x02\x02\x02\u0254\u0257\x03\x02\x02\x02\u0255' +
-    '\u0253\x03\x02\x02\x02\u0255\u0256\x03\x02\x02\x02\u0256\u0258\x03\x02' +
-    '\x02\x02\u0257\u0255\x03\x02\x02\x02\u0258\u0259\x07\x05\x02\x02\u0259' +
-    ')\x03\x02\x02\x02\u025A\u026A\x054\x1B\x02\u025B\u026A\x05J&\x02\u025C' +
-    '\u025D\x07<\x02\x02\u025D\u0260\x07\x04\x02\x02\u025E\u0261\x054\x1B\x02' +
-    '\u025F\u0261\x052\x1A\x02\u0260\u025E\x03\x02\x02\x02\u0260\u025F\x03' +
-    '\x02\x02\x02\u0261\u0262\x03\x02\x02\x02\u0262\u0265\x07\x03\x02\x02\u0263' +
-    '\u0266\x054\x1B\x02\u0264\u0266\x052\x1A\x02\u0265\u0263\x03\x02\x02\x02' +
-    '\u0265\u0264\x03\x02\x02\x02\u0266\u0267\x03\x02\x02\x02\u0267\u0268\x07' +
-    '\x05\x02\x02\u0268\u026A\x03\x02\x02\x02\u0269\u025A\x03\x02\x02\x02\u0269' +
-    '\u025B\x03\x02\x02\x02\u0269\u025C\x03\x02\x02\x02\u026A+\x03\x02\x02' +
-    '\x02\u026B\u026C\x05H%\x02\u026C\u026D\x05F$\x02\u026D-\x03\x02\x02\x02' +
-    "\u026E\u026F\x05J&\x02\u026F\u0270\x07\x06\x02\x02\u0270\u0271\x05L'" +
-    '\x02\u0271\u0272\x07\x07\x02\x02\u0272\u0273\x07v\x02\x02\u0273\u027B' +
-    '\x03\x02\x02\x02\u0274\u0275\x05J&\x02\u0275\u0276\x07\x06\x02\x02\u0276' +
-    "\u0277\x05L'\x02\u0277\u0278\x07\x07\x02\x02\u0278\u0279\x05(\x15\x02" +
-    '\u0279\u027B\x03\x02\x02\x02\u027A\u026E\x03\x02\x02\x02\u027A\u0274\x03' +
-    '\x02\x02\x02\u027B/\x03\x02\x02\x02\u027C\u027D\x05@!\x02\u027D\u027E' +
-    '\x07n\x02\x02\u027E\u0284\x03\x02\x02\x02\u027F\u0280\x05@!\x02\u0280' +
-    '\u0281\x07\v\x02\x02\u0281\u0282\x05J&\x02\u0282\u0284\x03\x02\x02\x02' +
-    '\u0283\u027C\x03\x02\x02\x02\u0283\u027F\x03\x02\x02\x02\u02841\x03\x02' +
-    '\x02\x02\u0285\u0289\x07o\x02\x02\u0286\u0289\x07p\x02\x02\u0287\u0289' +
-    '\x07q\x02\x02\u0288\u0285\x03\x02\x02\x02\u0288\u0286\x03\x02\x02\x02' +
-    '\u0288\u0287\x03\x02\x02\x02\u02893\x03\x02\x02\x02\u028A\u028B\x07\f' +
-    '\x02\x02\u028B\u028C\x07x\x02\x02\u028C5\x03\x02\x02\x02\u028D\u028E\x07' +
-    'x\x02\x02\u028E7\x03\x02\x02\x02\u028F\u0290\t\x06\x02\x02\u02909\x03' +
-    '\x02\x02\x02\u0291\u0292\t\x07\x02\x02\u0292;\x03\x02\x02\x02\u0293\u0294' +
-    '\t\b\x02\x02\u0294=\x03\x02\x02\x02\u0295\u0296\t\x07\x02\x02\u0296?\x03' +
-    '\x02\x02\x02\u0297\u0298\t\t\x02\x02\u0298A\x03\x02\x02\x02\u0299\u029C' +
-    '\x05@!\x02\u029A\u029C\x054\x1B\x02\u029B\u0299\x03\x02\x02\x02\u029B' +
-    '\u029A\x03\x02\x02\x02\u029CC\x03\x02\x02\x02\u029D\u029E\t\n\x02\x02' +
-    '\u029EE\x03\x02\x02\x02\u029F\u02A2\x05J&\x02\u02A0\u02A2\x054\x1B\x02' +
-    '\u02A1\u029F\x03\x02\x02\x02\u02A1\u02A0\x03\x02\x02\x02\u02A2G\x03\x02' +
-    '\x02\x02\u02A3\u02A6\x052\x1A\x02\u02A4\u02A6\x054\x1B\x02\u02A5\u02A3' +
-    '\x03\x02\x02\x02\u02A5\u02A4\x03\x02\x02\x02\u02A6I\x03\x02\x02\x02\u02A7' +
-    "\u02AA\x07j\x02\x02\u02A8\u02AA\x05L'\x02\u02A9\u02A7\x03\x02\x02\x02" +
-    '\u02A9\u02A8\x03\x02\x02\x02\u02AAK\x03\x02\x02\x02\u02AB\u02AC\t\v\x02' +
-    '\x02\u02ACM\x03\x02\x02\x02\u02AD\u02AE\t\f\x02\x02\u02AEO\x03\x02\x02' +
-    '\x02-Xblv}\x84\x97\x9E\xA6\xAA\xB4\xBB\xC4\xCF\xD9\xDB\xE7\u011A\u011E' +
-    '\u017F\u018C\u01F2\u0211\u0214\u021E\u0223\u0226\u022D\u0238\u023B\u0242' +
-    '\u0248\u0255\u0260\u0265\u0269\u027A\u0283\u0288\u029B\u02A1\u02A5\u02A9';
-  public static readonly _serializedATN: string = Utils.join(
-    [
-      QueryModificationParser._serializedATNSegment0,
-      QueryModificationParser._serializedATNSegment1,
-    ],
-    ''
-  );
-
-  constructor(input: TokenStream) {
-    super(input);
-    this._interp = new ParserATNSimulator(QueryModificationParser._ATN, this);
-  }
-
-  public static __ATN: ATN;
-
-  public static get _ATN(): ATN {
-    if (!QueryModificationParser.__ATN) {
-      QueryModificationParser.__ATN = new ATNDeserializer().deserialize(
-        Utils.toCharArray(QueryModificationParser._serializedATN)
-      );
-    }
-
-    return QueryModificationParser.__ATN;
-  }
-
   // @NotNull
   public get vocabulary(): Vocabulary {
     return QueryModificationParser.VOCABULARY;
   }
+  // tslint:enable:no-trailing-whitespace
 
   // @Override
   public get grammarFileName(): string {
@@ -787,6 +407,10 @@ export class QueryModificationParser extends Parser {
     return QueryModificationParser._serializedATN;
   }
 
+  constructor(input: TokenStream) {
+    super(input);
+    this._interp = new ParserATNSimulator(QueryModificationParser._ATN, this);
+  }
   // @RuleVersion(0)
   public filter(): FilterContext {
     let _localctx: FilterContext = new FilterContext(this._ctx, this.state);
@@ -812,7 +436,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public patterns(): PatternsContext {
     let _localctx: PatternsContext = new PatternsContext(this._ctx, this.state);
@@ -855,7 +478,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public boosters(): BoostersContext {
     let _localctx: BoostersContext = new BoostersContext(this._ctx, this.state);
@@ -898,7 +520,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public bindings(): BindingsContext {
     let _localctx: BindingsContext = new BindingsContext(this._ctx, this.state);
@@ -941,7 +562,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public orderBys(): OrderBysContext {
     let _localctx: OrderBysContext = new OrderBysContext(this._ctx, this.state);
@@ -984,7 +604,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public orderBy(): OrderByContext {
     let _localctx: OrderByContext = new OrderByContext(this._ctx, this.state);
@@ -1036,7 +655,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public transforms(): TransformsContext {
     let _localctx: TransformsContext = new TransformsContext(
@@ -1082,7 +700,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public transform(): TransformContext {
     let _localctx: TransformContext = new TransformContext(
@@ -1203,7 +820,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public searchCondition(): SearchConditionContext {
     let _localctx: SearchConditionContext = new SearchConditionContext(
@@ -1247,7 +863,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public searchConditionAnd(): SearchConditionAndContext {
     let _localctx: SearchConditionAndContext = new SearchConditionAndContext(
@@ -1295,7 +910,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public searchConditionNot(): SearchConditionNotContext {
     let _localctx: SearchConditionNotContext = new SearchConditionNotContext(
@@ -1337,7 +951,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public predicate(): PredicateContext {
     let _localctx: PredicateContext = new PredicateContext(
@@ -1437,9 +1050,7 @@ export class QueryModificationParser extends Parser {
   }
 
   public expression(): ExpressionContext;
-
   public expression(_p: number): ExpressionContext;
-
   // @RuleVersion(0)
   public expression(_p?: number): ExpressionContext {
     if (_p === undefined) {
@@ -1652,7 +1263,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public expressionAtom(): ExpressionAtomContext {
     let _localctx: ExpressionAtomContext = new ExpressionAtomContext(
@@ -1758,7 +1368,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public builtinCall(): BuiltinCallContext {
     let _localctx: BuiltinCallContext = new BuiltinCallContext(
@@ -2647,7 +2256,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public pattern(): PatternContext {
     let _localctx: PatternContext = new PatternContext(this._ctx, this.state);
@@ -2760,7 +2368,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public textMatchParam(): TextMatchParamContext {
     let _localctx: TextMatchParamContext = new TextMatchParamContext(
@@ -2824,7 +2431,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public boost(): BoostContext {
     let _localctx: BoostContext = new BoostContext(this._ctx, this.state);
@@ -2893,7 +2499,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public binding(): BindingContext {
     let _localctx: BindingContext = new BindingContext(this._ctx, this.state);
@@ -2923,7 +2528,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public expressionList(): ExpressionListContext {
     let _localctx: ExpressionListContext = new ExpressionListContext(
@@ -2971,7 +2575,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public featureOrLatLon(): FeatureOrLatLonContext {
     let _localctx: FeatureOrLatLonContext = new FeatureOrLatLonContext(
@@ -3071,7 +2674,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public proximitySpec(): ProximitySpecContext {
     let _localctx: ProximitySpecContext = new ProximitySpecContext(
@@ -3100,7 +2702,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public functionCall(): FunctionCallContext {
     let _localctx: FunctionCallContext = new FunctionCallContext(
@@ -3159,7 +2760,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public rdfLiteral(): RdfLiteralContext {
     let _localctx: RdfLiteralContext = new RdfLiteralContext(
@@ -3208,7 +2808,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public numericLiteral(): NumericLiteralContext {
     let _localctx: NumericLiteralContext = new NumericLiteralContext(
@@ -3260,7 +2859,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public varRef(): VarRefContext {
     let _localctx: VarRefContext = new VarRefContext(this._ctx, this.state);
@@ -3286,7 +2884,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public fieldRef(): FieldRefContext {
     let _localctx: FieldRefContext = new FieldRefContext(this._ctx, this.state);
@@ -3310,7 +2907,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public comparisonOp(): ComparisonOpContext {
     let _localctx: ComparisonOpContext = new ComparisonOpContext(
@@ -3364,7 +2960,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public unaryOp(): UnaryOpContext {
     let _localctx: UnaryOpContext = new UnaryOpContext(this._ctx, this.state);
@@ -3404,7 +2999,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public factorOp(): FactorOpContext {
     let _localctx: FactorOpContext = new FactorOpContext(this._ctx, this.state);
@@ -3448,7 +3042,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public termOp(): TermOpContext {
     let _localctx: TermOpContext = new TermOpContext(this._ctx, this.state);
@@ -3488,7 +3081,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public stringLiteral(): StringLiteralContext {
     let _localctx: StringLiteralContext = new StringLiteralContext(
@@ -3531,7 +3123,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public stringLiteralOrVarRef(): StringLiteralOrVarRefContext {
     let _localctx: StringLiteralOrVarRefContext = new StringLiteralOrVarRefContext(
@@ -3578,7 +3169,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public booleanLiteral(): BooleanLiteralContext {
     let _localctx: BooleanLiteralContext = new BooleanLiteralContext(
@@ -3621,7 +3211,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public iriRefOrVarRef(): IriRefOrVarRefContext {
     let _localctx: IriRefOrVarRefContext = new IriRefOrVarRefContext(
@@ -3665,7 +3254,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public numericLiteralOrVarRef(): NumericLiteralOrVarRefContext {
     let _localctx: NumericLiteralOrVarRefContext = new NumericLiteralOrVarRefContext(
@@ -3713,7 +3301,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public iriRef(): IriRefContext {
     let _localctx: IriRefContext = new IriRefContext(this._ctx, this.state);
@@ -3755,7 +3342,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public prefixedName(): PrefixedNameContext {
     let _localctx: PrefixedNameContext = new PrefixedNameContext(
@@ -3798,7 +3384,6 @@ export class QueryModificationParser extends Parser {
     }
     return _localctx;
   }
-
   // @RuleVersion(0)
   public blankNode(): BlankNodeContext {
     let _localctx: BlankNodeContext = new BlankNodeContext(
@@ -3856,7 +3441,6 @@ export class QueryModificationParser extends Parser {
     }
     return true;
   }
-
   private expression_sempred(
     _localctx: ExpressionContext,
     predIndex: number
@@ -3870,33 +3454,404 @@ export class QueryModificationParser extends Parser {
     }
     return true;
   }
+
+  private static readonly _serializedATNSegments: number = 2;
+  private static readonly _serializedATNSegment0: string =
+    '\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x03{\u02B0\x04\x02' +
+    '\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07' +
+    '\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04' +
+    '\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04' +
+    '\x13\t\x13\x04\x14\t\x14\x04\x15\t\x15\x04\x16\t\x16\x04\x17\t\x17\x04' +
+    '\x18\t\x18\x04\x19\t\x19\x04\x1A\t\x1A\x04\x1B\t\x1B\x04\x1C\t\x1C\x04' +
+    '\x1D\t\x1D\x04\x1E\t\x1E\x04\x1F\t\x1F\x04 \t \x04!\t!\x04"\t"\x04#' +
+    "\t#\x04$\t$\x04%\t%\x04&\t&\x04'\t'\x04(\t(\x03\x02\x03\x02\x03\x02" +
+    '\x03\x03\x03\x03\x03\x03\x07\x03W\n\x03\f\x03\x0E\x03Z\v\x03\x03\x03\x03' +
+    '\x03\x03\x04\x03\x04\x03\x04\x07\x04a\n\x04\f\x04\x0E\x04d\v\x04\x03\x04' +
+    '\x03\x04\x03\x05\x03\x05\x03\x05\x07\x05k\n\x05\f\x05\x0E\x05n\v\x05\x03' +
+    '\x05\x03\x05\x03\x06\x03\x06\x03\x06\x07\x06u\n\x06\f\x06\x0E\x06x\v\x06' +
+    '\x03\x06\x03\x06\x03\x07\x03\x07\x05\x07~\n\x07\x03\b\x03\b\x03\b\x07' +
+    '\b\x83\n\b\f\b\x0E\b\x86\v\b\x03\b\x03\b\x03\t\x03\t\x03\t\x03\t\x03\t' +
+    '\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x05\t\x98\n\t\x03' +
+    '\n\x03\n\x03\n\x07\n\x9D\n\n\f\n\x0E\n\xA0\v\n\x03\v\x03\v\x03\v\x07\v' +
+    '\xA5\n\v\f\v\x0E\v\xA8\v\v\x03\f\x05\f\xAB\n\f\x03\f\x03\f\x03\r\x03\r' +
+    '\x03\r\x03\r\x03\r\x03\r\x05\r\xB5\n\r\x03\r\x03\r\x03\r\x03\r\x03\r\x05' +
+    '\r\xBC\n\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x05\r\xC5\n\r\x03' +
+    '\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x05' +
+    '\x0E\xD0\n\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E\x03\x0E' +
+    '\x03\x0E\x07\x0E\xDA\n\x0E\f\x0E\x0E\x0E\xDD\v\x0E\x03\x0F\x03\x0F\x03' +
+    '\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x05\x0F\xE8\n\x0F' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\u011B\n\x10\x03\x10\x03\x10\x05' +
+    '\x10\u011F\n\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\u0180' +
+    '\n\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x05\x10\u018D\n\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03' +
+    '\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x05\x10\u01F3\n\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10\x03\x10' +
+    '\x03\x10\x03\x10\x05\x10\u0212\n\x10\x03\x11\x05\x11\u0215\n\x11\x03\x11' +
+    '\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x07\x11\u021D\n\x11\f\x11\x0E' +
+    '\x11\u0220\v\x11\x03\x11\x03\x11\x05\x11\u0224\n\x11\x03\x11\x05\x11\u0227' +
+    '\n\x11\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x05\x11\u022E\n\x11\x03' +
+    '\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x05' +
+    '\x12\u0239\n\x12\x03\x13\x05\x13\u023C\n\x13\x03\x13\x03\x13\x03\x13\x03' +
+    '\x13\x03\x13\x05\x13\u0243\n\x13\x03\x13\x03\x13\x03\x13\x03\x13\x05\x13' +
+    '\u0249\n\x13\x03\x14\x03\x14\x03\x14\x03\x14\x03\x14\x03\x15\x03\x15\x03' +
+    '\x15\x03\x15\x07\x15\u0254\n\x15\f\x15\x0E\x15\u0257\v\x15\x03\x15\x03' +
+    '\x15\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16\x03\x16\x05\x16\u0261\n\x16' +
+    '\x03\x16\x03\x16\x03\x16\x05\x16\u0266\n\x16\x03\x16\x03\x16\x05\x16\u026A' +
+    '\n\x16\x03\x17\x03\x17\x03\x17\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18' +
+    '\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x05\x18\u027B' +
+    '\n\x18\x03\x19\x03\x19\x03\x19\x03\x19\x03\x19\x03\x19\x03\x19\x05\x19' +
+    '\u0284\n\x19\x03\x1A\x03\x1A\x03\x1A\x05\x1A\u0289\n\x1A\x03\x1B\x03\x1B' +
+    '\x03\x1B\x03\x1C\x03\x1C\x03\x1D\x03\x1D\x03\x1E\x03\x1E\x03\x1F\x03\x1F' +
+    '\x03 \x03 \x03!\x03!\x03"\x03"\x05"\u029C\n"\x03#\x03#\x03$\x03$\x05' +
+    "$\u02A2\n$\x03%\x03%\x05%\u02A6\n%\x03&\x03&\x05&\u02AA\n&\x03'\x03'" +
+    '\x03(\x03(\x03(\x02\x02\x03\x1A)\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f' +
+    '\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C\x02\x1E' +
+    '\x02 \x02"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x022\x024\x026\x028\x02' +
+    ':\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02J\x02L\x02N\x02\x02\r\x04\x02' +
+    '\x1E\x1E))\x04\x02\x04\x04\b\b\x04\x02\x05\x05\t\t\x04\x02..__\x04\x02' +
+    '\n\n\r\x15\x03\x02\x16\x17\x03\x02\x18\x1A\x03\x02st\x04\x02,,bb\x03\x02' +
+    'kl\x04\x02mmww\u02FD\x02P\x03\x02\x02\x02\x04S\x03\x02\x02\x02\x06]\x03' +
+    '\x02\x02\x02\bg\x03\x02\x02\x02\nq\x03\x02\x02\x02\f{\x03\x02\x02\x02' +
+    '\x0E\x7F\x03\x02\x02\x02\x10\x97\x03\x02\x02\x02\x12\x99\x03\x02\x02\x02' +
+    '\x14\xA1\x03\x02\x02\x02\x16\xAA\x03\x02\x02\x02\x18\xC4\x03\x02\x02\x02' +
+    '\x1A\xCF\x03\x02\x02\x02\x1C\xE7\x03\x02\x02\x02\x1E\u0211\x03\x02\x02' +
+    '\x02 \u022D\x03\x02\x02\x02"\u0238\x03\x02\x02\x02$\u0248\x03\x02\x02' +
+    '\x02&\u024A\x03\x02\x02\x02(\u024F\x03\x02\x02\x02*\u0269\x03\x02\x02' +
+    '\x02,\u026B\x03\x02\x02\x02.\u027A\x03\x02\x02\x020\u0283\x03\x02\x02' +
+    '\x022\u0288\x03\x02\x02\x024\u028A\x03\x02\x02\x026\u028D\x03\x02\x02' +
+    '\x028\u028F\x03\x02\x02\x02:\u0291\x03\x02\x02\x02<\u0293\x03\x02\x02' +
+    '\x02>\u0295\x03\x02\x02\x02@\u0297\x03\x02\x02\x02B\u029B\x03\x02\x02' +
+    '\x02D\u029D\x03\x02\x02\x02F\u02A1\x03\x02\x02\x02H\u02A5\x03\x02\x02' +
+    '\x02J\u02A9\x03\x02\x02\x02L\u02AB\x03\x02\x02\x02N\u02AD\x03\x02\x02' +
+    '\x02PQ\x05\x12\n\x02QR\x07\x02\x02\x03R\x03\x03\x02\x02\x02SX\x05 \x11' +
+    '\x02TU\x07\x03\x02\x02UW\x05 \x11\x02VT\x03\x02\x02\x02WZ\x03\x02\x02' +
+    '\x02XV\x03\x02\x02\x02XY\x03\x02\x02\x02Y[\x03\x02\x02\x02ZX\x03\x02\x02' +
+    '\x02[\\\x07\x02\x02\x03\\\x05\x03\x02\x02\x02]b\x05$\x13\x02^_\x07\x03' +
+    '\x02\x02_a\x05$\x13\x02`^\x03\x02\x02\x02ad\x03\x02\x02\x02b`\x03\x02' +
+    '\x02\x02bc\x03\x02\x02\x02ce\x03\x02\x02\x02db\x03\x02\x02\x02ef\x07\x02' +
+    '\x02\x03f\x07\x03\x02\x02\x02gl\x05&\x14\x02hi\x07\x03\x02\x02ik\x05&' +
+    '\x14\x02jh\x03\x02\x02\x02kn\x03\x02\x02\x02lj\x03\x02\x02\x02lm\x03\x02' +
+    '\x02\x02mo\x03\x02\x02\x02nl\x03\x02\x02\x02op\x07\x02\x02\x03p\t\x03' +
+    '\x02\x02\x02qv\x05\f\x07\x02rs\x07\x03\x02\x02su\x05\f\x07\x02tr\x03\x02' +
+    '\x02\x02ux\x03\x02\x02\x02vt\x03\x02\x02\x02vw\x03\x02\x02\x02wy\x03\x02' +
+    '\x02\x02xv\x03\x02\x02\x02yz\x07\x02\x02\x03z\v\x03\x02\x02\x02{}\x05' +
+    '\x1A\x0E\x02|~\t\x02\x02\x02}|\x03\x02\x02\x02}~\x03\x02\x02\x02~\r\x03' +
+    '\x02\x02\x02\x7F\x84\x05\x10\t\x02\x80\x81\x07\x03\x02\x02\x81\x83\x05' +
+    '\x10\t\x02\x82\x80\x03\x02\x02\x02\x83\x86\x03\x02\x02\x02\x84\x82\x03' +
+    '\x02\x02\x02\x84\x85\x03\x02\x02\x02\x85\x87\x03\x02\x02\x02\x86\x84\x03' +
+    '\x02\x02\x02\x87\x88\x07\x02\x02\x03\x88\x0F\x03\x02\x02\x02\x89\x8A\x07' +
+    'a\x02\x02\x8A\x98\x05F$\x02\x8B\x98\x07\x1B\x02\x02\x8C\x98\x07#\x02\x02' +
+    '\x8D\x98\x07-\x02\x02\x8E\x98\x07=\x02\x02\x8F\x98\x07@\x02\x02\x90\x98' +
+    '\x07G\x02\x02\x91\x98\x07M\x02\x02\x92\x98\x07P\x02\x02\x93\x98\x07Q\x02' +
+    '\x02\x94\x98\x07R\x02\x02\x95\x98\x07S\x02\x02\x96\x98\x07d\x02\x02\x97' +
+    '\x89\x03\x02\x02\x02\x97\x8B\x03\x02\x02\x02\x97\x8C\x03\x02\x02\x02\x97' +
+    '\x8D\x03\x02\x02\x02\x97\x8E\x03\x02\x02\x02\x97\x8F\x03\x02\x02\x02\x97' +
+    '\x90\x03\x02\x02\x02\x97\x91\x03\x02\x02\x02\x97\x92\x03\x02\x02\x02\x97' +
+    '\x93\x03\x02\x02\x02\x97\x94\x03\x02\x02\x02\x97\x95\x03\x02\x02\x02\x97' +
+    '\x96\x03\x02\x02\x02\x98\x11\x03\x02\x02\x02\x99\x9E\x05\x14\v\x02\x9A' +
+    '\x9B\x07I\x02\x02\x9B\x9D\x05\x14\v\x02\x9C\x9A\x03\x02\x02\x02\x9D\xA0' +
+    '\x03\x02\x02\x02\x9E\x9C\x03\x02\x02\x02\x9E\x9F\x03\x02\x02\x02\x9F\x13' +
+    '\x03\x02\x02\x02\xA0\x9E\x03\x02\x02\x02\xA1\xA6\x05\x16\f\x02\xA2\xA3' +
+    '\x07\x1C\x02\x02\xA3\xA5\x05\x16\f\x02\xA4\xA2\x03\x02\x02\x02\xA5\xA8' +
+    '\x03\x02\x02\x02\xA6\xA4\x03\x02\x02\x02\xA6\xA7\x03\x02\x02\x02\xA7\x15' +
+    '\x03\x02\x02\x02\xA8\xA6\x03\x02\x02\x02\xA9\xAB\x07E\x02\x02\xAA\xA9' +
+    '\x03\x02\x02\x02\xAA\xAB\x03\x02\x02\x02\xAB\xAC\x03\x02\x02\x02\xAC\xAD' +
+    '\x05\x18\r\x02\xAD\x17\x03\x02\x02\x02\xAE\xAF\x05\x1A\x0E\x02\xAF\xB0' +
+    '\x058\x1D\x02\xB0\xB1\x05\x1A\x0E\x02\xB1\xC5\x03\x02\x02\x02\xB2\xB4' +
+    '\x05\x1A\x0E\x02\xB3\xB5\x07E\x02\x02\xB4\xB3\x03\x02\x02\x02\xB4\xB5' +
+    '\x03\x02\x02\x02\xB5\xB6\x03\x02\x02\x02\xB6\xB7\x073\x02\x02\xB7\xB8' +
+    '\x05(\x15\x02\xB8\xC5\x03\x02\x02\x02\xB9\xBB\x05\x1A\x0E\x02\xBA\xBC' +
+    '\x07E\x02\x02\xBB\xBA\x03\x02\x02\x02\xBB\xBC\x03\x02\x02\x02\xBC\xBD' +
+    '\x03\x02\x02\x02\xBD\xBE\x073\x02\x02\xBE\xBF\x054\x1B\x02\xBF\xC5\x03' +
+    '\x02\x02\x02\xC0\xC1\x07\x04\x02\x02\xC1\xC2\x05\x12\n\x02\xC2\xC3\x07' +
+    '\x05\x02\x02\xC3\xC5\x03\x02\x02\x02\xC4\xAE\x03\x02\x02\x02\xC4\xB2\x03' +
+    '\x02\x02\x02\xC4\xB9\x03\x02\x02\x02\xC4\xC0\x03\x02\x02\x02\xC5\x19\x03' +
+    '\x02\x02\x02\xC6\xC7\b\x0E\x01\x02\xC7\xC8\x05:\x1E\x02\xC8\xC9\x05\x1A' +
+    '\x0E\x07\xC9\xD0\x03\x02\x02\x02\xCA\xD0\x05\x1C\x0F\x02\xCB\xCC\x07\x04' +
+    '\x02\x02\xCC\xCD\x05\x1A\x0E\x02\xCD\xCE\x07\x05\x02\x02\xCE\xD0\x03\x02' +
+    '\x02\x02\xCF\xC6\x03\x02\x02\x02\xCF\xCA\x03\x02\x02\x02\xCF\xCB\x03\x02' +
+    '\x02\x02\xD0\xDB\x03\x02\x02\x02\xD1\xD2\f\x06\x02\x02\xD2\xD3\x05<\x1F' +
+    '\x02\xD3\xD4\x05\x1A\x0E\x07\xD4\xDA\x03\x02\x02\x02\xD5\xD6\f\x05\x02' +
+    '\x02\xD6\xD7\x05> \x02\xD7\xD8\x05\x1A\x0E\x06\xD8\xDA\x03\x02\x02\x02' +
+    '\xD9\xD1\x03\x02\x02\x02\xD9\xD5\x03\x02\x02\x02\xDA\xDD\x03\x02\x02\x02' +
+    '\xDB\xD9\x03\x02\x02\x02\xDB\xDC\x03\x02\x02\x02\xDC\x1B\x03\x02\x02\x02' +
+    '\xDD\xDB\x03\x02\x02\x02\xDE\xE8\x05\x1E\x10\x02\xDF\xE8\x05.\x18\x02' +
+    '\xE0\xE8\x050\x19\x02\xE1\xE8\x05@!\x02\xE2\xE8\x052\x1A\x02\xE3\xE8\x05' +
+    'D#\x02\xE4\xE8\x05J&\x02\xE5\xE8\x056\x1C\x02\xE6\xE8\x054\x1B\x02\xE7' +
+    '\xDE\x03\x02\x02\x02\xE7\xDF\x03\x02\x02\x02\xE7\xE0\x03\x02\x02\x02\xE7' +
+    '\xE1\x03\x02\x02\x02\xE7\xE2\x03\x02\x02\x02\xE7\xE3\x03\x02\x02\x02\xE7' +
+    '\xE4\x03\x02\x02\x02\xE7\xE5\x03\x02\x02\x02\xE7\xE6\x03\x02\x02\x02\xE8' +
+    '\x1D\x03\x02\x02\x02\xE9\xEA\x07\x1B\x02\x02\xEA\xEB\x07\x04\x02\x02\xEB' +
+    '\xEC\x05\x1A\x0E\x02\xEC\xED\x07\x05\x02\x02\xED\u0212\x03\x02\x02\x02' +
+    '\xEE\xEF\x07"\x02\x02\xEF\xF0\x07\x04\x02\x02\xF0\xF1\x056\x1C\x02\xF1' +
+    '\xF2\x07\x05\x02\x02\xF2\u0212\x03\x02\x02\x02\xF3\xF4\x07#\x02\x02\xF4' +
+    '\xF5\x07\x04\x02\x02\xF5\xF6\x05\x1A\x0E\x02\xF6\xF7\x07\x05\x02\x02\xF7' +
+    '\u0212\x03\x02\x02\x02\xF8\xF9\x07$\x02\x02\xF9\xFA\x07\x06\x02\x02\xFA' +
+    '\xFB\x05F$\x02\xFB\xFC\x07\x07\x02\x02\xFC\xFD\x05(\x15\x02\xFD\u0212' +
+    '\x03\x02\x02\x02\xFE\xFF\x07%\x02\x02\xFF\u0212\x05(\x15\x02\u0100\u0101' +
+    '\x07&\x02\x02\u0101\u0102\x07\x04\x02\x02\u0102\u0103\x05\x1A\x0E\x02' +
+    '\u0103\u0104\x07\x03\x02\x02\u0104\u0105\x05\x1A\x0E\x02\u0105\u0106\x07' +
+    "\x05\x02\x02\u0106\u0212\x03\x02\x02\x02\u0107\u0108\x07'\x02\x02\u0108" +
+    '\u0109\x07\x04\x02\x02\u0109\u010A\x05\x1A\x0E\x02\u010A\u010B\x07\x05' +
+    '\x02\x02\u010B\u0212\x03\x02\x02\x02\u010C\u010D\x07(\x02\x02\u010D\u010E' +
+    '\x07\x04\x02\x02\u010E\u010F\x05\x1A\x0E\x02\u010F\u0110\x07\x05\x02\x02' +
+    '\u0110\u0212\x03\x02\x02\x02\u0111\u0112\x07*\x02\x02\u0112\u0113\x07' +
+    '\x04\x02\x02\u0113\u0114\x05\x1A\x0E\x02\u0114\u0115\x07\x05\x02\x02\u0115' +
+    '\u0212\x03\x02\x02\x02\u0116\u0117\x07+\x02\x02\u0117\u0118\t\x03\x02' +
+    '\x02\u0118\u011A\x05\x1A\x0E\x02\u0119\u011B\x07\x03\x02\x02\u011A\u0119' +
+    '\x03\x02\x02\x02\u011A\u011B\x03\x02\x02\x02\u011B\u011C\x03\x02\x02\x02' +
+    '\u011C\u011E\x05\x1A\x0E\x02\u011D\u011F\x07\x03\x02\x02\u011E\u011D\x03' +
+    '\x02\x02\x02\u011E\u011F\x03\x02\x02\x02\u011F\u0120\x03\x02\x02\x02\u0120' +
+    '\u0121\x05\x1A\x0E\x02\u0121\u0122\t\x04\x02\x02\u0122\u0212\x03\x02\x02' +
+    '\x02\u0123\u0124\x07-\x02\x02\u0124\u0125\x07\x04\x02\x02\u0125\u0126' +
+    '\x05\x1A\x0E\x02\u0126\u0127\x07\x05\x02\x02\u0127\u0212\x03\x02\x02\x02' +
+    '\u0128\u0129\x07/\x02\x02\u0129\u012A\x07\x04\x02\x02\u012A\u012B\x05' +
+    '\x1A\x0E\x02\u012B\u012C\x07\x05\x02\x02\u012C\u0212\x03\x02\x02\x02\u012D' +
+    '\u012E\x070\x02\x02\u012E\u012F\x07\x04\x02\x02\u012F\u0130\x05\x18\r' +
+    '\x02\u0130\u0131\x07\x03\x02\x02\u0131\u0132\x05\x1A\x0E\x02\u0132\u0133' +
+    '\x07\x03\x02\x02\u0133\u0134\x05\x1A\x0E\x02\u0134\u0135\x07\x05\x02\x02' +
+    '\u0135\u0212\x03\x02\x02\x02\u0136\u0137\x074\x02\x02\u0137\u0138\x07' +
+    '\x04\x02\x02\u0138\u0139\x05\x1A\x0E\x02\u0139\u013A\x07\x05\x02\x02\u013A' +
+    '\u0212\x03\x02\x02\x02\u013B\u013C\x075\x02\x02\u013C\u013D\x07\x04\x02' +
+    '\x02\u013D\u013E\x05\x1A\x0E\x02\u013E\u013F\x07\x05\x02\x02\u013F\u0212' +
+    '\x03\x02\x02\x02\u0140\u0141\x076\x02\x02\u0141\u0142\x07\x04\x02\x02' +
+    '\u0142\u0143\x05\x1A\x0E\x02\u0143\u0144\x07\x05\x02\x02\u0144\u0212\x03' +
+    '\x02\x02\x02\u0145\u0146\x077\x02\x02\u0146\u0147\x07\x04\x02\x02\u0147' +
+    '\u0148\x05\x1A\x0E\x02\u0148\u0149\x07\x05\x02\x02\u0149\u0212\x03\x02' +
+    '\x02\x02\u014A\u014B\x078\x02\x02\u014B\u014C\x07\x04\x02\x02\u014C\u014D' +
+    '\x05\x1A\x0E\x02\u014D\u014E\x07\x05\x02\x02\u014E\u0212\x03\x02\x02\x02' +
+    '\u014F\u0150\x079\x02\x02\u0150\u0151\x07\x04\x02\x02\u0151\u0152\x05' +
+    '\x1A\x0E\x02\u0152\u0153\x07\x05\x02\x02\u0153\u0212\x03\x02\x02\x02\u0154' +
+    '\u0155\x07:\x02\x02\u0155\u0156\x07\x04\x02\x02\u0156\u0157\x05\x1A\x0E' +
+    '\x02\u0157\u0158\x07\x05\x02\x02\u0158\u0212\x03\x02\x02\x02\u0159\u015A' +
+    '\x07;\x02\x02\u015A\u015B\x07\x04\x02\x02\u015B\u015C\x05\x1A\x0E\x02' +
+    '\u015C\u015D\x07\x03\x02\x02\u015D\u015E\x05\x1A\x0E\x02\u015E\u015F\x07' +
+    '\x05\x02\x02\u015F\u0212\x03\x02\x02\x02\u0160\u0161\x07=\x02\x02\u0161' +
+    '\u0162\x07\x04\x02\x02\u0162\u0163\x05\x1A\x0E\x02\u0163\u0164\x07\x05' +
+    '\x02\x02\u0164\u0212\x03\x02\x02\x02\u0165\u0166\x07@\x02\x02\u0166\u0167' +
+    '\x07\x04\x02\x02\u0167\u0168\x05\x1A\x0E\x02\u0168\u0169\x07\x05\x02\x02' +
+    '\u0169\u0212\x03\x02\x02\x02\u016A\u016B\x07B\x02\x02\u016B\u016C\x07' +
+    '\x04\x02\x02\u016C\u016D\x05\x1A\x0E\x02\u016D\u016E\x07\x05\x02\x02\u016E' +
+    '\u0212\x03\x02\x02\x02\u016F\u0170\x07C\x02\x02\u0170\u0171\x07\x04\x02' +
+    '\x02\u0171\u0172\x05\x1A\x0E\x02\u0172\u0173\x07\x05\x02\x02\u0173\u0212' +
+    '\x03\x02\x02\x02\u0174\u0175\x07F\x02\x02\u0175\u0212\x07v\x02\x02\u0176' +
+    '\u0177\x07J\x02\x02\u0177\u0212\x07v\x02\x02\u0178\u0179\x07K\x02\x02' +
+    '\u0179\u017A\x07\x04\x02\x02\u017A\u017B\x05\x1A\x0E\x02\u017B\u017C\x07' +
+    '\x03\x02\x02\u017C\u017F\x05\x1A\x0E\x02\u017D\u017E\x07\x03\x02\x02\u017E' +
+    '\u0180\x05\x1A\x0E\x02\u017F\u017D\x03\x02\x02\x02\u017F\u0180\x03\x02' +
+    '\x02\x02\u0180\u0181\x03\x02\x02\x02\u0181\u0182\x07\x05\x02\x02\u0182' +
+    '\u0212\x03\x02\x02\x02\u0183\u0184\x07L\x02\x02\u0184\u0185\x07\x04\x02' +
+    '\x02\u0185\u0186\x05\x1A\x0E\x02\u0186\u0187\x07\x03\x02\x02\u0187\u0188' +
+    '\x05\x1A\x0E\x02\u0188\u0189\x07\x03\x02\x02\u0189\u018C\x05\x1A\x0E\x02' +
+    '\u018A\u018B\x07\x03\x02\x02\u018B\u018D\x05\x1A\x0E\x02\u018C\u018A\x03' +
+    '\x02\x02\x02\u018C\u018D\x03\x02\x02\x02\u018D\u018E\x03\x02\x02\x02\u018E' +
+    '\u018F\x07\x05\x02\x02\u018F\u0212\x03\x02\x02\x02\u0190\u0191\x07M\x02' +
+    '\x02\u0191\u0192\x07\x04\x02\x02\u0192\u0193\x05\x1A\x0E\x02\u0193\u0194' +
+    '\x07\x05\x02\x02\u0194\u0212\x03\x02\x02\x02\u0195\u0196\x07N\x02\x02' +
+    '\u0196\u0197\x07\x04\x02\x02\u0197\u0198\x056\x1C\x02\u0198\u0199\x07' +
+    '\x03\x02\x02\u0199\u019A\x056\x1C\x02\u019A\u019B\x07\x05\x02\x02\u019B' +
+    '\u0212\x03\x02\x02\x02\u019C\u019D\x07O\x02\x02\u019D\u019E\x07\x04\x02' +
+    '\x02\u019E\u019F\x05\x1A\x0E\x02\u019F\u01A0\x07\x05\x02\x02\u01A0\u0212' +
+    '\x03\x02\x02\x02\u01A1\u01A2\x07P\x02\x02\u01A2\u01A3\x07\x04\x02\x02' +
+    '\u01A3\u01A4\x05\x1A\x0E\x02\u01A4\u01A5\x07\x05\x02\x02\u01A5\u0212\x03' +
+    '\x02\x02\x02\u01A6\u01A7\x07Q\x02\x02\u01A7\u01A8\x07\x04\x02\x02\u01A8' +
+    '\u01A9\x05\x1A\x0E\x02\u01A9\u01AA\x07\x05\x02\x02\u01AA\u0212\x03\x02' +
+    '\x02\x02\u01AB\u01AC\x07R\x02\x02\u01AC\u01AD\x07\x04\x02\x02\u01AD\u01AE' +
+    '\x05\x1A\x0E\x02\u01AE\u01AF\x07\x05\x02\x02\u01AF\u0212\x03\x02\x02\x02' +
+    '\u01B0\u01B1\x07S\x02\x02\u01B1\u01B2\x07\x04\x02\x02\u01B2\u01B3\x05' +
+    '\x1A\x0E\x02\u01B3\u01B4\x07\x05\x02\x02\u01B4\u0212\x03\x02\x02\x02\u01B5' +
+    '\u01B6\x07T\x02\x02\u01B6\u01B7\x07\x04\x02\x02\u01B7\u01B8\x05\x1A\x0E' +
+    '\x02\u01B8\u01B9\x07\x05\x02\x02\u01B9\u0212\x03\x02\x02\x02\u01BA\u01BB' +
+    '\x07U\x02\x02\u01BB\u01BC\x07\x04\x02\x02\u01BC\u01BD\x05\x1A\x0E\x02' +
+    '\u01BD\u01BE\x07\x03\x02\x02\u01BE\u01BF\x05\x1A\x0E\x02\u01BF\u01C0\x07' +
+    '\x05\x02\x02\u01C0\u0212\x03\x02\x02\x02\u01C1\u01C2\x07V\x02\x02\u01C2' +
+    '\u01C3\x07\x04\x02\x02\u01C3\u01C4\x05\x1A\x0E\x02\u01C4\u01C5\x07\x03' +
+    '\x02\x02\u01C5\u01C6\x05\x1A\x0E\x02\u01C6\u01C7\x07\x05\x02\x02\u01C7' +
+    '\u0212\x03\x02\x02\x02\u01C8\u01C9\x07W\x02\x02\u01C9\u01CA\x07\x04\x02' +
+    '\x02\u01CA\u01CB\x05\x1A\x0E\x02\u01CB\u01CC\x07\x03\x02\x02\u01CC\u01CD' +
+    '\x05F$\x02\u01CD\u01CE\x07\x05\x02\x02\u01CE\u0212\x03\x02\x02\x02\u01CF' +
+    '\u01D0\x07X\x02\x02\u01D0\u01D1\x07\x04\x02\x02\u01D1\u01D2\x05\x1A\x0E' +
+    '\x02\u01D2\u01D3\x07\x03\x02\x02\u01D3\u01D4\x05\x1A\x0E\x02\u01D4\u01D5' +
+    '\x07\x05\x02\x02\u01D5\u0212\x03\x02\x02\x02\u01D6\u01D7\x07Y\x02\x02' +
+    '\u01D7\u01D8\x07\x04\x02\x02\u01D8\u01D9\x05\x1A\x0E\x02\u01D9\u01DA\x07' +
+    '\x03\x02\x02\u01DA\u01DB\x05\x1A\x0E\x02\u01DB\u01DC\x07\x05\x02\x02\u01DC' +
+    '\u0212\x03\x02\x02\x02\u01DD\u01DE\x07Z\x02\x02\u01DE\u01DF\x07\x04\x02' +
+    '\x02\u01DF\u01E0\x05\x1A\x0E\x02\u01E0\u01E1\x07\x05\x02\x02\u01E1\u0212' +
+    '\x03\x02\x02\x02\u01E2\u01E3\x07[\x02\x02\u01E3\u01E4\x07\x04\x02\x02' +
+    '\u01E4\u01E5\x05\x1A\x0E\x02\u01E5\u01E6\x07\x03\x02\x02\u01E6\u01E7\x05' +
+    '\x1A\x0E\x02\u01E7\u01E8\x07\x05\x02\x02\u01E8\u0212\x03\x02\x02\x02\u01E9' +
+    '\u01EA\x07\\\x02\x02\u01EA\u0212\x07v\x02\x02\u01EB\u01EC\x07^\x02\x02' +
+    '\u01EC\u01ED\x07\x04\x02\x02\u01ED\u01EE\x05\x1A\x0E\x02\u01EE\u01EF\x07' +
+    '\x03\x02\x02\u01EF\u01F2\x05\x1A\x0E\x02\u01F0\u01F1\x07\x03\x02\x02\u01F1' +
+    '\u01F3\x05\x1A\x0E\x02\u01F2\u01F0\x03\x02\x02\x02\u01F2\u01F3\x03\x02' +
+    '\x02\x02\u01F3\u01F4\x03\x02\x02\x02\u01F4\u01F5\x07\x05\x02\x02\u01F5' +
+    '\u0212\x03\x02\x02\x02\u01F6\u01F7\x07`\x02\x02\u01F7\u01F8\x07\x04\x02' +
+    '\x02\u01F8\u01F9\x05\x1A\x0E\x02\u01F9\u01FA\x07\x05\x02\x02\u01FA\u0212' +
+    '\x03\x02\x02\x02\u01FB\u01FC\x07c\x02\x02\u01FC\u01FD\x07\x04\x02\x02' +
+    '\u01FD\u01FE\x05\x1A\x0E\x02\u01FE\u01FF\x07\x05\x02\x02\u01FF\u0212\x03' +
+    '\x02\x02\x02\u0200\u0201\x07d\x02\x02\u0201\u0202\x07\x04\x02\x02\u0202' +
+    '\u0203\x05\x1A\x0E\x02\u0203\u0204\x07\x05\x02\x02\u0204\u0212\x03\x02' +
+    '\x02\x02\u0205\u0206\x07e\x02\x02\u0206\u0207\x07\x04\x02\x02\u0207\u0208' +
+    '\x05\x1A\x0E\x02\u0208\u0209\x07\x05\x02\x02\u0209\u0212\x03\x02\x02\x02' +
+    '\u020A\u020B\x07f\x02\x02\u020B\u0212\x07v\x02\x02\u020C\u020D\x07h\x02' +
+    '\x02\u020D\u020E\x07\x04\x02\x02\u020E\u020F\x05\x1A\x0E\x02\u020F\u0210' +
+    '\x07\x05\x02\x02\u0210\u0212\x03\x02\x02\x02\u0211\xE9\x03\x02\x02\x02' +
+    '\u0211\xEE\x03\x02\x02\x02\u0211\xF3\x03\x02\x02\x02\u0211\xF8\x03\x02' +
+    '\x02\x02\u0211\xFE\x03\x02\x02\x02\u0211\u0100\x03\x02\x02\x02\u0211\u0107' +
+    '\x03\x02\x02\x02\u0211\u010C\x03\x02\x02\x02\u0211\u0111\x03\x02\x02\x02' +
+    '\u0211\u0116\x03\x02\x02\x02\u0211\u0123\x03\x02\x02\x02\u0211\u0128\x03' +
+    '\x02\x02\x02\u0211\u012D\x03\x02\x02\x02\u0211\u0136\x03\x02\x02\x02\u0211' +
+    '\u013B\x03\x02\x02\x02\u0211\u0140\x03\x02\x02\x02\u0211\u0145\x03\x02' +
+    '\x02\x02\u0211\u014A\x03\x02\x02\x02\u0211\u014F\x03\x02\x02\x02\u0211' +
+    '\u0154\x03\x02\x02\x02\u0211\u0159\x03\x02\x02\x02\u0211\u0160\x03\x02' +
+    '\x02\x02\u0211\u0165\x03\x02\x02\x02\u0211\u016A\x03\x02\x02\x02\u0211' +
+    '\u016F\x03\x02\x02\x02\u0211\u0174\x03\x02\x02\x02\u0211\u0176\x03\x02' +
+    '\x02\x02\u0211\u0178\x03\x02\x02\x02\u0211\u0183\x03\x02\x02\x02\u0211' +
+    '\u0190\x03\x02\x02\x02\u0211\u0195\x03\x02\x02\x02\u0211\u019C\x03\x02' +
+    '\x02\x02\u0211\u01A1\x03\x02\x02\x02\u0211\u01A6\x03\x02\x02\x02\u0211' +
+    '\u01AB\x03\x02\x02\x02\u0211\u01B0\x03\x02\x02\x02\u0211\u01B5\x03\x02' +
+    '\x02\x02\u0211\u01BA\x03\x02\x02\x02\u0211\u01C1\x03\x02\x02\x02';
+  private static readonly _serializedATNSegment1: string =
+    '\u0211\u01C8\x03\x02\x02\x02\u0211\u01CF\x03\x02\x02\x02\u0211\u01D6\x03' +
+    '\x02\x02\x02\u0211\u01DD\x03\x02\x02\x02\u0211\u01E2\x03\x02\x02\x02\u0211' +
+    '\u01E9\x03\x02\x02\x02\u0211\u01EB\x03\x02\x02\x02\u0211\u01F6\x03\x02' +
+    '\x02\x02\u0211\u01FB\x03\x02\x02\x02\u0211\u0200\x03\x02\x02\x02\u0211' +
+    '\u0205\x03\x02\x02\x02\u0211\u020A\x03\x02\x02\x02\u0211\u020C\x03\x02' +
+    '\x02\x02\u0212\x1F\x03\x02\x02\x02\u0213\u0215\x056\x1C\x02\u0214\u0213' +
+    '\x03\x02\x02\x02\u0214\u0215\x03\x02\x02\x02\u0215\u0216\x03\x02\x02\x02' +
+    '\u0216\u0217\t\x05\x02\x02\u0217\u0223\x05B"\x02\u0218\u0219\x07\x04' +
+    '\x02\x02\u0219\u021E\x05"\x12\x02\u021A\u021B\x07\x03\x02\x02\u021B\u021D' +
+    '\x05"\x12\x02\u021C\u021A\x03\x02\x02\x02\u021D\u0220\x03\x02\x02\x02' +
+    '\u021E\u021C\x03\x02\x02\x02\u021E\u021F\x03\x02\x02\x02\u021F\u0221\x03' +
+    '\x02\x02\x02\u0220\u021E\x03\x02\x02\x02\u0221\u0222\x07\x05\x02\x02\u0222' +
+    '\u0224\x03\x02\x02\x02\u0223\u0218\x03\x02\x02\x02\u0223\u0224\x03\x02' +
+    '\x02\x02\u0224\u022E\x03\x02\x02\x02\u0225\u0227\x056\x1C\x02\u0226\u0225' +
+    '\x03\x02\x02\x02\u0226\u0227\x03\x02\x02\x02\u0227\u0228\x03\x02\x02\x02' +
+    '\u0228\u0229\x07g\x02\x02\u0229\u022A\x05,\x17\x02\u022A\u022B\x07H\x02' +
+    '\x02\u022B\u022C\x05*\x16\x02\u022C\u022E\x03\x02\x02\x02\u022D\u0214' +
+    '\x03\x02\x02\x02\u022D\u0226\x03\x02\x02\x02\u022E!\x03\x02\x02\x02\u022F' +
+    '\u0230\x07!\x02\x02\u0230\u0231\x07\n\x02\x02\u0231\u0239\x052\x1A\x02' +
+    '\u0232\u0233\x07A\x02\x02\u0233\u0234\x07\n\x02\x02\u0234\u0239\x07p\x02' +
+    '\x02\u0235\u0236\x07?\x02\x02\u0236\u0237\x07\n\x02\x02\u0237\u0239\x07' +
+    'o\x02\x02\u0238\u022F\x03\x02\x02\x02\u0238\u0232\x03\x02\x02\x02\u0238' +
+    '\u0235\x03\x02\x02\x02\u0239#\x03\x02\x02\x02\u023A\u023C\x07!\x02\x02' +
+    '\u023B\u023A\x03\x02\x02\x02\u023B\u023C\x03\x02\x02\x02\u023C\u023D\x03' +
+    '\x02\x02\x02\u023D\u023E\x052\x1A\x02\u023E\u023F\x072\x02\x02\u023F\u0240' +
+    '\x05F$\x02\u0240\u0249\x03\x02\x02\x02\u0241\u0243\x07!\x02\x02\u0242' +
+    '\u0241\x03\x02\x02\x02\u0242\u0243\x03\x02\x02\x02\u0243\u0244\x03\x02' +
+    '\x02\x02\u0244\u0245\x052\x1A\x02\u0245\u0246\x071\x02\x02\u0246\u0247' +
+    '\x05F$\x02\u0247\u0249\x03\x02\x02\x02\u0248\u023B\x03\x02\x02\x02\u0248' +
+    '\u0242\x03\x02\x02\x02\u0249%\x03\x02\x02\x02\u024A\u024B\x07\x1F\x02' +
+    '\x02\u024B\u024C\x05\x1A\x0E\x02\u024C\u024D\x07\x1D\x02\x02\u024D\u024E' +
+    "\x07x\x02\x02\u024E'\x03\x02\x02\x02\u024F\u0250\x07\x04\x02\x02\u0250" +
+    '\u0255\x05\x1A\x0E\x02\u0251\u0252\x07\x03\x02\x02\u0252\u0254\x05\x1A' +
+    '\x0E\x02\u0253\u0251\x03\x02\x02\x02\u0254\u0257\x03\x02\x02\x02\u0255' +
+    '\u0253\x03\x02\x02\x02\u0255\u0256\x03\x02\x02\x02\u0256\u0258\x03\x02' +
+    '\x02\x02\u0257\u0255\x03\x02\x02\x02\u0258\u0259\x07\x05\x02\x02\u0259' +
+    ')\x03\x02\x02\x02\u025A\u026A\x054\x1B\x02\u025B\u026A\x05J&\x02\u025C' +
+    '\u025D\x07<\x02\x02\u025D\u0260\x07\x04\x02\x02\u025E\u0261\x054\x1B\x02' +
+    '\u025F\u0261\x052\x1A\x02\u0260\u025E\x03\x02\x02\x02\u0260\u025F\x03' +
+    '\x02\x02\x02\u0261\u0262\x03\x02\x02\x02\u0262\u0265\x07\x03\x02\x02\u0263' +
+    '\u0266\x054\x1B\x02\u0264\u0266\x052\x1A\x02\u0265\u0263\x03\x02\x02\x02' +
+    '\u0265\u0264\x03\x02\x02\x02\u0266\u0267\x03\x02\x02\x02\u0267\u0268\x07' +
+    '\x05\x02\x02\u0268\u026A\x03\x02\x02\x02\u0269\u025A\x03\x02\x02\x02\u0269' +
+    '\u025B\x03\x02\x02\x02\u0269\u025C\x03\x02\x02\x02\u026A+\x03\x02\x02' +
+    '\x02\u026B\u026C\x05H%\x02\u026C\u026D\x05F$\x02\u026D-\x03\x02\x02\x02' +
+    "\u026E\u026F\x05J&\x02\u026F\u0270\x07\x06\x02\x02\u0270\u0271\x05L'" +
+    '\x02\u0271\u0272\x07\x07\x02\x02\u0272\u0273\x07v\x02\x02\u0273\u027B' +
+    '\x03\x02\x02\x02\u0274\u0275\x05J&\x02\u0275\u0276\x07\x06\x02\x02\u0276' +
+    "\u0277\x05L'\x02\u0277\u0278\x07\x07\x02\x02\u0278\u0279\x05(\x15\x02" +
+    '\u0279\u027B\x03\x02\x02\x02\u027A\u026E\x03\x02\x02\x02\u027A\u0274\x03' +
+    '\x02\x02\x02\u027B/\x03\x02\x02\x02\u027C\u027D\x05@!\x02\u027D\u027E' +
+    '\x07n\x02\x02\u027E\u0284\x03\x02\x02\x02\u027F\u0280\x05@!\x02\u0280' +
+    '\u0281\x07\v\x02\x02\u0281\u0282\x05J&\x02\u0282\u0284\x03\x02\x02\x02' +
+    '\u0283\u027C\x03\x02\x02\x02\u0283\u027F\x03\x02\x02\x02\u02841\x03\x02' +
+    '\x02\x02\u0285\u0289\x07o\x02\x02\u0286\u0289\x07p\x02\x02\u0287\u0289' +
+    '\x07q\x02\x02\u0288\u0285\x03\x02\x02\x02\u0288\u0286\x03\x02\x02\x02' +
+    '\u0288\u0287\x03\x02\x02\x02\u02893\x03\x02\x02\x02\u028A\u028B\x07\f' +
+    '\x02\x02\u028B\u028C\x07x\x02\x02\u028C5\x03\x02\x02\x02\u028D\u028E\x07' +
+    'x\x02\x02\u028E7\x03\x02\x02\x02\u028F\u0290\t\x06\x02\x02\u02909\x03' +
+    '\x02\x02\x02\u0291\u0292\t\x07\x02\x02\u0292;\x03\x02\x02\x02\u0293\u0294' +
+    '\t\b\x02\x02\u0294=\x03\x02\x02\x02\u0295\u0296\t\x07\x02\x02\u0296?\x03' +
+    '\x02\x02\x02\u0297\u0298\t\t\x02\x02\u0298A\x03\x02\x02\x02\u0299\u029C' +
+    '\x05@!\x02\u029A\u029C\x054\x1B\x02\u029B\u0299\x03\x02\x02\x02\u029B' +
+    '\u029A\x03\x02\x02\x02\u029CC\x03\x02\x02\x02\u029D\u029E\t\n\x02\x02' +
+    '\u029EE\x03\x02\x02\x02\u029F\u02A2\x05J&\x02\u02A0\u02A2\x054\x1B\x02' +
+    '\u02A1\u029F\x03\x02\x02\x02\u02A1\u02A0\x03\x02\x02\x02\u02A2G\x03\x02' +
+    '\x02\x02\u02A3\u02A6\x052\x1A\x02\u02A4\u02A6\x054\x1B\x02\u02A5\u02A3' +
+    '\x03\x02\x02\x02\u02A5\u02A4\x03\x02\x02\x02\u02A6I\x03\x02\x02\x02\u02A7' +
+    "\u02AA\x07j\x02\x02\u02A8\u02AA\x05L'\x02\u02A9\u02A7\x03\x02\x02\x02" +
+    '\u02A9\u02A8\x03\x02\x02\x02\u02AAK\x03\x02\x02\x02\u02AB\u02AC\t\v\x02' +
+    '\x02\u02ACM\x03\x02\x02\x02\u02AD\u02AE\t\f\x02\x02\u02AEO\x03\x02\x02' +
+    '\x02-Xblv}\x84\x97\x9E\xA6\xAA\xB4\xBB\xC4\xCF\xD9\xDB\xE7\u011A\u011E' +
+    '\u017F\u018C\u01F2\u0211\u0214\u021E\u0223\u0226\u022D\u0238\u023B\u0242' +
+    '\u0248\u0255\u0260\u0265\u0269\u027A\u0283\u0288\u029B\u02A1\u02A5\u02A9';
+  public static readonly _serializedATN: string = Utils.join(
+    [
+      QueryModificationParser._serializedATNSegment0,
+      QueryModificationParser._serializedATNSegment1,
+    ],
+    ''
+  );
+  public static __ATN: ATN;
+  public static get _ATN(): ATN {
+    if (!QueryModificationParser.__ATN) {
+      QueryModificationParser.__ATN = new ATNDeserializer().deserialize(
+        Utils.toCharArray(QueryModificationParser._serializedATN)
+      );
+    }
+
+    return QueryModificationParser.__ATN;
+  }
 }
 
 export class FilterContext extends ParserRuleContext {
+  public searchCondition(): SearchConditionContext {
+    return this.getRuleContext(0, SearchConditionContext);
+  }
+  public EOF(): TerminalNode {
+    return this.getToken(QueryModificationParser.EOF, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_filter;
   }
-
-  public searchCondition(): SearchConditionContext {
-    return this.getRuleContext(0, SearchConditionContext);
-  }
-
-  public EOF(): TerminalNode {
-    return this.getToken(QueryModificationParser.EOF, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFilter) {
       listener.enterFilter(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFilter) {
@@ -3906,19 +3861,8 @@ export class FilterContext extends ParserRuleContext {
 }
 
 export class PatternsContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_patterns;
-  }
-
   public pattern(): PatternContext[];
-
   public pattern(i: number): PatternContext;
-
   public pattern(i?: number): PatternContext | PatternContext[] {
     if (i === undefined) {
       return this.getRuleContexts(PatternContext);
@@ -3926,18 +3870,22 @@ export class PatternsContext extends ParserRuleContext {
       return this.getRuleContext(i, PatternContext);
     }
   }
-
   public EOF(): TerminalNode {
     return this.getToken(QueryModificationParser.EOF, 0);
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_patterns;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterPatterns) {
       listener.enterPatterns(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitPatterns) {
@@ -3947,19 +3895,8 @@ export class PatternsContext extends ParserRuleContext {
 }
 
 export class BoostersContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_boosters;
-  }
-
   public boost(): BoostContext[];
-
   public boost(i: number): BoostContext;
-
   public boost(i?: number): BoostContext | BoostContext[] {
     if (i === undefined) {
       return this.getRuleContexts(BoostContext);
@@ -3967,18 +3904,22 @@ export class BoostersContext extends ParserRuleContext {
       return this.getRuleContext(i, BoostContext);
     }
   }
-
   public EOF(): TerminalNode {
     return this.getToken(QueryModificationParser.EOF, 0);
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_boosters;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBoosters) {
       listener.enterBoosters(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBoosters) {
@@ -3988,19 +3929,8 @@ export class BoostersContext extends ParserRuleContext {
 }
 
 export class BindingsContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_bindings;
-  }
-
   public binding(): BindingContext[];
-
   public binding(i: number): BindingContext;
-
   public binding(i?: number): BindingContext | BindingContext[] {
     if (i === undefined) {
       return this.getRuleContexts(BindingContext);
@@ -4008,18 +3938,22 @@ export class BindingsContext extends ParserRuleContext {
       return this.getRuleContext(i, BindingContext);
     }
   }
-
   public EOF(): TerminalNode {
     return this.getToken(QueryModificationParser.EOF, 0);
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_bindings;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBindings) {
       listener.enterBindings(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBindings) {
@@ -4029,19 +3963,8 @@ export class BindingsContext extends ParserRuleContext {
 }
 
 export class OrderBysContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_orderBys;
-  }
-
   public orderBy(): OrderByContext[];
-
   public orderBy(i: number): OrderByContext;
-
   public orderBy(i?: number): OrderByContext | OrderByContext[] {
     if (i === undefined) {
       return this.getRuleContexts(OrderByContext);
@@ -4049,18 +3972,22 @@ export class OrderBysContext extends ParserRuleContext {
       return this.getRuleContext(i, OrderByContext);
     }
   }
-
   public EOF(): TerminalNode {
     return this.getToken(QueryModificationParser.EOF, 0);
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_orderBys;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterOrderBys) {
       listener.enterOrderBys(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitOrderBys) {
@@ -4070,34 +3997,28 @@ export class OrderBysContext extends ParserRuleContext {
 }
 
 export class OrderByContext extends ParserRuleContext {
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
+  public ASC(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.ASC, 0);
+  }
+  public DESC(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.DESC, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_orderBy;
   }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
-  public ASC(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.ASC, 0);
-  }
-
-  public DESC(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.DESC, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterOrderBy) {
       listener.enterOrderBy(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitOrderBy) {
@@ -4107,19 +4028,8 @@ export class OrderByContext extends ParserRuleContext {
 }
 
 export class TransformsContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_transforms;
-  }
-
   public transform(): TransformContext[];
-
   public transform(i: number): TransformContext;
-
   public transform(i?: number): TransformContext | TransformContext[] {
     if (i === undefined) {
       return this.getRuleContexts(TransformContext);
@@ -4127,18 +4037,22 @@ export class TransformsContext extends ParserRuleContext {
       return this.getRuleContext(i, TransformContext);
     }
   }
-
   public EOF(): TerminalNode {
     return this.getToken(QueryModificationParser.EOF, 0);
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_transforms;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTransforms) {
       listener.enterTransforms(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTransforms) {
@@ -4148,78 +4062,61 @@ export class TransformsContext extends ParserRuleContext {
 }
 
 export class TransformContext extends ParserRuleContext {
+  public TO_UNIT(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.TO_UNIT, 0);
+  }
+  public iriRefOrVarRef(): IriRefOrVarRefContext | undefined {
+    return this.tryGetRuleContext(0, IriRefOrVarRefContext);
+  }
+  public ABS(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.ABS, 0);
+  }
+  public CEIL(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.CEIL, 0);
+  }
+  public FLOOR(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.FLOOR, 0);
+  }
+  public LCASE(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.LCASE, 0);
+  }
+  public MD5(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.MD5, 0);
+  }
+  public OBFUSCATE(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.OBFUSCATE, 0);
+  }
+  public ROUND(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.ROUND, 0);
+  }
+  public SHA1(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.SHA1, 0);
+  }
+  public SHA256(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.SHA256, 0);
+  }
+  public SHA384(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.SHA384, 0);
+  }
+  public SHA512(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.SHA512, 0);
+  }
+  public UCASE(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.UCASE, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_transform;
   }
-
-  public TO_UNIT(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.TO_UNIT, 0);
-  }
-
-  public iriRefOrVarRef(): IriRefOrVarRefContext | undefined {
-    return this.tryGetRuleContext(0, IriRefOrVarRefContext);
-  }
-
-  public ABS(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.ABS, 0);
-  }
-
-  public CEIL(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.CEIL, 0);
-  }
-
-  public FLOOR(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.FLOOR, 0);
-  }
-
-  public LCASE(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.LCASE, 0);
-  }
-
-  public MD5(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.MD5, 0);
-  }
-
-  public OBFUSCATE(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.OBFUSCATE, 0);
-  }
-
-  public ROUND(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.ROUND, 0);
-  }
-
-  public SHA1(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.SHA1, 0);
-  }
-
-  public SHA256(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.SHA256, 0);
-  }
-
-  public SHA384(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.SHA384, 0);
-  }
-
-  public SHA512(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.SHA512, 0);
-  }
-
-  public UCASE(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.UCASE, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTransform) {
       listener.enterTransform(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTransform) {
@@ -4229,19 +4126,8 @@ export class TransformContext extends ParserRuleContext {
 }
 
 export class SearchConditionContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_searchCondition;
-  }
-
   public searchConditionAnd(): SearchConditionAndContext[];
-
   public searchConditionAnd(i: number): SearchConditionAndContext;
-
   public searchConditionAnd(
     i?: number
   ): SearchConditionAndContext | SearchConditionAndContext[] {
@@ -4251,11 +4137,8 @@ export class SearchConditionContext extends ParserRuleContext {
       return this.getRuleContext(i, SearchConditionAndContext);
     }
   }
-
   public OR(): TerminalNode[];
-
   public OR(i: number): TerminalNode;
-
   public OR(i?: number): TerminalNode | TerminalNode[] {
     if (i === undefined) {
       return this.getTokens(QueryModificationParser.OR);
@@ -4263,14 +4146,19 @@ export class SearchConditionContext extends ParserRuleContext {
       return this.getToken(QueryModificationParser.OR, i);
     }
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_searchCondition;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSearchCondition) {
       listener.enterSearchCondition(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSearchCondition) {
@@ -4280,19 +4168,8 @@ export class SearchConditionContext extends ParserRuleContext {
 }
 
 export class SearchConditionAndContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_searchConditionAnd;
-  }
-
   public searchConditionNot(): SearchConditionNotContext[];
-
   public searchConditionNot(i: number): SearchConditionNotContext;
-
   public searchConditionNot(
     i?: number
   ): SearchConditionNotContext | SearchConditionNotContext[] {
@@ -4302,11 +4179,8 @@ export class SearchConditionAndContext extends ParserRuleContext {
       return this.getRuleContext(i, SearchConditionNotContext);
     }
   }
-
   public AND(): TerminalNode[];
-
   public AND(i: number): TerminalNode;
-
   public AND(i?: number): TerminalNode | TerminalNode[] {
     if (i === undefined) {
       return this.getTokens(QueryModificationParser.AND);
@@ -4314,14 +4188,19 @@ export class SearchConditionAndContext extends ParserRuleContext {
       return this.getToken(QueryModificationParser.AND, i);
     }
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_searchConditionAnd;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSearchConditionAnd) {
       listener.enterSearchConditionAnd(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSearchConditionAnd) {
@@ -4331,30 +4210,25 @@ export class SearchConditionAndContext extends ParserRuleContext {
 }
 
 export class SearchConditionNotContext extends ParserRuleContext {
+  public predicate(): PredicateContext {
+    return this.getRuleContext(0, PredicateContext);
+  }
+  public NOT(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.NOT, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_searchConditionNot;
   }
-
-  public predicate(): PredicateContext {
-    return this.getRuleContext(0, PredicateContext);
-  }
-
-  public NOT(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.NOT, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSearchConditionNot) {
       listener.enterSearchConditionNot(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSearchConditionNot) {
@@ -4367,27 +4241,17 @@ export class PredicateContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_predicate;
   }
-
   public copyFrom(ctx: PredicateContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class ComparisonPredicateContext extends PredicateContext {
-  constructor(ctx: PredicateContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -4395,18 +4259,19 @@ export class ComparisonPredicateContext extends PredicateContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
   public comparisonOp(): ComparisonOpContext {
     return this.getRuleContext(0, ComparisonOpContext);
   }
-
+  constructor(ctx: PredicateContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterComparisonPredicate) {
       listener.enterComparisonPredicate(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitComparisonPredicate) {
@@ -4414,36 +4279,29 @@ export class ComparisonPredicateContext extends PredicateContext {
     }
   }
 }
-
 export class InVarPredicateContext extends PredicateContext {
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
+  public IN(): TerminalNode {
+    return this.getToken(QueryModificationParser.IN, 0);
+  }
+  public varRef(): VarRefContext {
+    return this.getRuleContext(0, VarRefContext);
+  }
+  public NOT(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.NOT, 0);
+  }
   constructor(ctx: PredicateContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
-  public IN(): TerminalNode {
-    return this.getToken(QueryModificationParser.IN, 0);
-  }
-
-  public varRef(): VarRefContext {
-    return this.getRuleContext(0, VarRefContext);
-  }
-
-  public NOT(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.NOT, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterInVarPredicate) {
       listener.enterInVarPredicate(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitInVarPredicate) {
@@ -4451,36 +4309,29 @@ export class InVarPredicateContext extends PredicateContext {
     }
   }
 }
-
 export class InPredicateContext extends PredicateContext {
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
+  public IN(): TerminalNode {
+    return this.getToken(QueryModificationParser.IN, 0);
+  }
+  public expressionList(): ExpressionListContext {
+    return this.getRuleContext(0, ExpressionListContext);
+  }
+  public NOT(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.NOT, 0);
+  }
   constructor(ctx: PredicateContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
-  public IN(): TerminalNode {
-    return this.getToken(QueryModificationParser.IN, 0);
-  }
-
-  public expressionList(): ExpressionListContext {
-    return this.getRuleContext(0, ExpressionListContext);
-  }
-
-  public NOT(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.NOT, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterInPredicate) {
       listener.enterInPredicate(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitInPredicate) {
@@ -4488,24 +4339,20 @@ export class InPredicateContext extends PredicateContext {
     }
   }
 }
-
 export class ParenPredicateContext extends PredicateContext {
+  public searchCondition(): SearchConditionContext {
+    return this.getRuleContext(0, SearchConditionContext);
+  }
   constructor(ctx: PredicateContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public searchCondition(): SearchConditionContext {
-    return this.getRuleContext(0, SearchConditionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterParenPredicate) {
       listener.enterParenPredicate(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitParenPredicate) {
@@ -4518,34 +4365,28 @@ export class ExpressionContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_expression;
   }
-
   public copyFrom(ctx: ExpressionContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class PrimitiveExpressionContext extends ExpressionContext {
+  public expressionAtom(): ExpressionAtomContext {
+    return this.getRuleContext(0, ExpressionAtomContext);
+  }
   constructor(ctx: ExpressionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public expressionAtom(): ExpressionAtomContext {
-    return this.getRuleContext(0, ExpressionAtomContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterPrimitiveExpression) {
       listener.enterPrimitiveExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitPrimitiveExpression) {
@@ -4553,17 +4394,9 @@ export class PrimitiveExpressionContext extends ExpressionContext {
     }
   }
 }
-
 export class FactorExpressionContext extends ExpressionContext {
-  constructor(ctx: ExpressionContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -4571,18 +4404,19 @@ export class FactorExpressionContext extends ExpressionContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
   public factorOp(): FactorOpContext {
     return this.getRuleContext(0, FactorOpContext);
   }
-
+  constructor(ctx: ExpressionContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFactorExpression) {
       listener.enterFactorExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFactorExpression) {
@@ -4590,24 +4424,20 @@ export class FactorExpressionContext extends ExpressionContext {
     }
   }
 }
-
 export class ParenExpressionContext extends ExpressionContext {
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: ExpressionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterParenExpression) {
       listener.enterParenExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitParenExpression) {
@@ -4615,28 +4445,23 @@ export class ParenExpressionContext extends ExpressionContext {
     }
   }
 }
-
 export class UnaryExpressionContext extends ExpressionContext {
+  public unaryOp(): UnaryOpContext {
+    return this.getRuleContext(0, UnaryOpContext);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: ExpressionContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public unaryOp(): UnaryOpContext {
-    return this.getRuleContext(0, UnaryOpContext);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterUnaryExpression) {
       listener.enterUnaryExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitUnaryExpression) {
@@ -4644,17 +4469,9 @@ export class UnaryExpressionContext extends ExpressionContext {
     }
   }
 }
-
 export class TermExpressionContext extends ExpressionContext {
-  constructor(ctx: ExpressionContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -4662,18 +4479,19 @@ export class TermExpressionContext extends ExpressionContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
   public termOp(): TermOpContext {
     return this.getRuleContext(0, TermOpContext);
   }
-
+  constructor(ctx: ExpressionContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTermExpression) {
       listener.enterTermExpression(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTermExpression) {
@@ -4686,34 +4504,28 @@ export class ExpressionAtomContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_expressionAtom;
   }
-
   public copyFrom(ctx: ExpressionAtomContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class FieldRefAtomContext extends ExpressionAtomContext {
+  public fieldRef(): FieldRefContext {
+    return this.getRuleContext(0, FieldRefContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public fieldRef(): FieldRefContext {
-    return this.getRuleContext(0, FieldRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFieldRefAtom) {
       listener.enterFieldRefAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFieldRefAtom) {
@@ -4721,24 +4533,20 @@ export class FieldRefAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class FunctionCallAtomContext extends ExpressionAtomContext {
+  public functionCall(): FunctionCallContext {
+    return this.getRuleContext(0, FunctionCallContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public functionCall(): FunctionCallContext {
-    return this.getRuleContext(0, FunctionCallContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFunctionCallAtom) {
       listener.enterFunctionCallAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFunctionCallAtom) {
@@ -4746,24 +4554,20 @@ export class FunctionCallAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class BuiltinCallAtomContext extends ExpressionAtomContext {
+  public builtinCall(): BuiltinCallContext {
+    return this.getRuleContext(0, BuiltinCallContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public builtinCall(): BuiltinCallContext {
-    return this.getRuleContext(0, BuiltinCallContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBuiltinCallAtom) {
       listener.enterBuiltinCallAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBuiltinCallAtom) {
@@ -4771,24 +4575,20 @@ export class BuiltinCallAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class RdfLiteralAtomContext extends ExpressionAtomContext {
+  public rdfLiteral(): RdfLiteralContext {
+    return this.getRuleContext(0, RdfLiteralContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public rdfLiteral(): RdfLiteralContext {
-    return this.getRuleContext(0, RdfLiteralContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterRdfLiteralAtom) {
       listener.enterRdfLiteralAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitRdfLiteralAtom) {
@@ -4796,24 +4596,20 @@ export class RdfLiteralAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class StringLiteralAtomContext extends ExpressionAtomContext {
+  public stringLiteral(): StringLiteralContext {
+    return this.getRuleContext(0, StringLiteralContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public stringLiteral(): StringLiteralContext {
-    return this.getRuleContext(0, StringLiteralContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStringLiteralAtom) {
       listener.enterStringLiteralAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStringLiteralAtom) {
@@ -4821,24 +4617,20 @@ export class StringLiteralAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class IriRefAtomContext extends ExpressionAtomContext {
+  public iriRef(): IriRefContext {
+    return this.getRuleContext(0, IriRefContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public iriRef(): IriRefContext {
-    return this.getRuleContext(0, IriRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIriRefAtom) {
       listener.enterIriRefAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIriRefAtom) {
@@ -4846,24 +4638,20 @@ export class IriRefAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class NumericLiteralAtomContext extends ExpressionAtomContext {
+  public numericLiteral(): NumericLiteralContext {
+    return this.getRuleContext(0, NumericLiteralContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public numericLiteral(): NumericLiteralContext {
-    return this.getRuleContext(0, NumericLiteralContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterNumericLiteralAtom) {
       listener.enterNumericLiteralAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitNumericLiteralAtom) {
@@ -4871,24 +4659,20 @@ export class NumericLiteralAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class BooleanLiteralAtomContext extends ExpressionAtomContext {
+  public booleanLiteral(): BooleanLiteralContext {
+    return this.getRuleContext(0, BooleanLiteralContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public booleanLiteral(): BooleanLiteralContext {
-    return this.getRuleContext(0, BooleanLiteralContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBooleanLiteralAtom) {
       listener.enterBooleanLiteralAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBooleanLiteralAtom) {
@@ -4896,24 +4680,20 @@ export class BooleanLiteralAtomContext extends ExpressionAtomContext {
     }
   }
 }
-
 export class VarRefAtomContext extends ExpressionAtomContext {
+  public varRef(): VarRefContext {
+    return this.getRuleContext(0, VarRefContext);
+  }
   constructor(ctx: ExpressionAtomContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public varRef(): VarRefContext {
-    return this.getRuleContext(0, VarRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterVarRefAtom) {
       listener.enterVarRefAtom(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitVarRefAtom) {
@@ -4926,38 +4706,31 @@ export class BuiltinCallContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_builtinCall;
   }
-
   public copyFrom(ctx: BuiltinCallContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class IsLiteralFuncContext extends BuiltinCallContext {
+  public ISLITERAL(): TerminalNode {
+    return this.getToken(QueryModificationParser.ISLITERAL, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ISLITERAL(): TerminalNode {
-    return this.getToken(QueryModificationParser.ISLITERAL, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIsLiteralFunc) {
       listener.enterIsLiteralFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIsLiteralFunc) {
@@ -4965,21 +4738,12 @@ export class IsLiteralFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrStartsFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public STRSTARTS(): TerminalNode {
     return this.getToken(QueryModificationParser.STRSTARTS, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -4987,14 +4751,16 @@ export class StrStartsFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrStartsFunc) {
       listener.enterStrStartsFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrStartsFunc) {
@@ -5002,21 +4768,12 @@ export class StrStartsFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class ReplaceFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public REPLACE(): TerminalNode {
     return this.getToken(QueryModificationParser.REPLACE, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -5024,14 +4781,16 @@ export class ReplaceFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterReplaceFunc) {
       listener.enterReplaceFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitReplaceFunc) {
@@ -5039,28 +4798,23 @@ export class ReplaceFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class BoundFuncContext extends BuiltinCallContext {
+  public BOUND(): TerminalNode {
+    return this.getToken(QueryModificationParser.BOUND, 0);
+  }
+  public fieldRef(): FieldRefContext {
+    return this.getRuleContext(0, FieldRefContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public BOUND(): TerminalNode {
-    return this.getToken(QueryModificationParser.BOUND, 0);
-  }
-
-  public fieldRef(): FieldRefContext {
-    return this.getRuleContext(0, FieldRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBoundFunc) {
       listener.enterBoundFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBoundFunc) {
@@ -5068,28 +4822,23 @@ export class BoundFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class Sha512FuncContext extends BuiltinCallContext {
+  public SHA512(): TerminalNode {
+    return this.getToken(QueryModificationParser.SHA512, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public SHA512(): TerminalNode {
-    return this.getToken(QueryModificationParser.SHA512, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSha512Func) {
       listener.enterSha512Func(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSha512Func) {
@@ -5097,28 +4846,23 @@ export class Sha512FuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class UcaseFuncContext extends BuiltinCallContext {
+  public UCASE(): TerminalNode {
+    return this.getToken(QueryModificationParser.UCASE, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public UCASE(): TerminalNode {
-    return this.getToken(QueryModificationParser.UCASE, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterUcaseFunc) {
       listener.enterUcaseFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitUcaseFunc) {
@@ -5126,28 +4870,23 @@ export class UcaseFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class EncodeForUriFuncContext extends BuiltinCallContext {
+  public ENCODE_FOR_URI(): TerminalNode {
+    return this.getToken(QueryModificationParser.ENCODE_FOR_URI, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ENCODE_FOR_URI(): TerminalNode {
-    return this.getToken(QueryModificationParser.ENCODE_FOR_URI, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterEncodeForUriFunc) {
       listener.enterEncodeForUriFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitEncodeForUriFunc) {
@@ -5155,28 +4894,23 @@ export class EncodeForUriFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class YearFuncContext extends BuiltinCallContext {
+  public YEAR(): TerminalNode {
+    return this.getToken(QueryModificationParser.YEAR, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public YEAR(): TerminalNode {
-    return this.getToken(QueryModificationParser.YEAR, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterYearFunc) {
       listener.enterYearFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitYearFunc) {
@@ -5184,21 +4918,12 @@ export class YearFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrBeforeFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public STRBEFORE(): TerminalNode {
     return this.getToken(QueryModificationParser.STRBEFORE, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -5206,14 +4931,16 @@ export class StrBeforeFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrBeforeFunc) {
       listener.enterStrBeforeFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrBeforeFunc) {
@@ -5221,28 +4948,23 @@ export class StrBeforeFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class Sha256FuncContext extends BuiltinCallContext {
+  public SHA256(): TerminalNode {
+    return this.getToken(QueryModificationParser.SHA256, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public SHA256(): TerminalNode {
-    return this.getToken(QueryModificationParser.SHA256, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSha256Func) {
       listener.enterSha256Func(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSha256Func) {
@@ -5250,28 +4972,23 @@ export class Sha256FuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class FloorFuncContext extends BuiltinCallContext {
+  public FLOOR(): TerminalNode {
+    return this.getToken(QueryModificationParser.FLOOR, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public FLOOR(): TerminalNode {
-    return this.getToken(QueryModificationParser.FLOOR, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFloorFunc) {
       listener.enterFloorFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFloorFunc) {
@@ -5279,28 +4996,23 @@ export class FloorFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class IriFuncContext extends BuiltinCallContext {
+  public IRI(): TerminalNode {
+    return this.getToken(QueryModificationParser.IRI, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public IRI(): TerminalNode {
-    return this.getToken(QueryModificationParser.IRI, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIriFunc) {
       listener.enterIriFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIriFunc) {
@@ -5308,21 +5020,12 @@ export class IriFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrEndsFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public STRENDS(): TerminalNode {
     return this.getToken(QueryModificationParser.STRENDS, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -5330,14 +5033,16 @@ export class StrEndsFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrEndsFunc) {
       listener.enterStrEndsFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrEndsFunc) {
@@ -5345,28 +5050,23 @@ export class StrEndsFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class LcaseFuncContext extends BuiltinCallContext {
+  public LCASE(): TerminalNode {
+    return this.getToken(QueryModificationParser.LCASE, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public LCASE(): TerminalNode {
-    return this.getToken(QueryModificationParser.LCASE, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterLcaseFunc) {
       listener.enterLcaseFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitLcaseFunc) {
@@ -5374,28 +5074,23 @@ export class LcaseFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class ConcatFuncContext extends BuiltinCallContext {
+  public CONCAT(): TerminalNode {
+    return this.getToken(QueryModificationParser.CONCAT, 0);
+  }
+  public expressionList(): ExpressionListContext {
+    return this.getRuleContext(0, ExpressionListContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public CONCAT(): TerminalNode {
-    return this.getToken(QueryModificationParser.CONCAT, 0);
-  }
-
-  public expressionList(): ExpressionListContext {
-    return this.getRuleContext(0, ExpressionListContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterConcatFunc) {
       listener.enterConcatFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitConcatFunc) {
@@ -5403,28 +5098,23 @@ export class ConcatFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrLenFuncContext extends BuiltinCallContext {
+  public STRLEN(): TerminalNode {
+    return this.getToken(QueryModificationParser.STRLEN, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public STRLEN(): TerminalNode {
-    return this.getToken(QueryModificationParser.STRLEN, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrLenFunc) {
       listener.enterStrLenFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrLenFunc) {
@@ -5432,28 +5122,23 @@ export class StrLenFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class TzFuncContext extends BuiltinCallContext {
+  public TZ(): TerminalNode {
+    return this.getToken(QueryModificationParser.TZ, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public TZ(): TerminalNode {
-    return this.getToken(QueryModificationParser.TZ, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTzFunc) {
       listener.enterTzFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTzFunc) {
@@ -5461,28 +5146,23 @@ export class TzFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class DatatypeFuncContext extends BuiltinCallContext {
+  public DATATYPE(): TerminalNode {
+    return this.getToken(QueryModificationParser.DATATYPE, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public DATATYPE(): TerminalNode {
-    return this.getToken(QueryModificationParser.DATATYPE, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterDatatypeFunc) {
       listener.enterDatatypeFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitDatatypeFunc) {
@@ -5490,21 +5170,12 @@ export class DatatypeFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class RegexFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public REGEX(): TerminalNode {
     return this.getToken(QueryModificationParser.REGEX, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -5512,14 +5183,16 @@ export class RegexFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterRegexFunc) {
       listener.enterRegexFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitRegexFunc) {
@@ -5527,21 +5200,12 @@ export class RegexFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class LangMatchesFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public LANGMATCHES(): TerminalNode {
     return this.getToken(QueryModificationParser.LANGMATCHES, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -5549,14 +5213,16 @@ export class LangMatchesFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterLangMatchesFunc) {
       listener.enterLangMatchesFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitLangMatchesFunc) {
@@ -5564,28 +5230,23 @@ export class LangMatchesFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class Sha384FuncContext extends BuiltinCallContext {
+  public SHA384(): TerminalNode {
+    return this.getToken(QueryModificationParser.SHA384, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public SHA384(): TerminalNode {
-    return this.getToken(QueryModificationParser.SHA384, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSha384Func) {
       listener.enterSha384Func(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSha384Func) {
@@ -5593,28 +5254,23 @@ export class Sha384FuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class MinutesFuncContext extends BuiltinCallContext {
+  public MINUTES(): TerminalNode {
+    return this.getToken(QueryModificationParser.MINUTES, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public MINUTES(): TerminalNode {
-    return this.getToken(QueryModificationParser.MINUTES, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterMinutesFunc) {
       listener.enterMinutesFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitMinutesFunc) {
@@ -5622,28 +5278,23 @@ export class MinutesFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class SecondsFuncContext extends BuiltinCallContext {
+  public SECONDS(): TerminalNode {
+    return this.getToken(QueryModificationParser.SECONDS, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public SECONDS(): TerminalNode {
-    return this.getToken(QueryModificationParser.SECONDS, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSecondsFunc) {
       listener.enterSecondsFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSecondsFunc) {
@@ -5651,21 +5302,12 @@ export class SecondsFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrLangFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public STRLANG(): TerminalNode {
     return this.getToken(QueryModificationParser.STRLANG, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -5673,14 +5315,16 @@ export class StrLangFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrLangFunc) {
       listener.enterStrLangFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrLangFunc) {
@@ -5688,28 +5332,23 @@ export class StrLangFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrUuidFuncContext extends BuiltinCallContext {
+  public STRUUID(): TerminalNode {
+    return this.getToken(QueryModificationParser.STRUUID, 0);
+  }
+  public EMPTY_PARENS(): TerminalNode {
+    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public STRUUID(): TerminalNode {
-    return this.getToken(QueryModificationParser.STRUUID, 0);
-  }
-
-  public EMPTY_PARENS(): TerminalNode {
-    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrUuidFunc) {
       listener.enterStrUuidFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrUuidFunc) {
@@ -5717,28 +5356,23 @@ export class StrUuidFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class AbsFuncContext extends BuiltinCallContext {
+  public ABS(): TerminalNode {
+    return this.getToken(QueryModificationParser.ABS, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ABS(): TerminalNode {
-    return this.getToken(QueryModificationParser.ABS, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterAbsFunc) {
       listener.enterAbsFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitAbsFunc) {
@@ -5746,28 +5380,23 @@ export class AbsFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class DayFuncContext extends BuiltinCallContext {
+  public DAY(): TerminalNode {
+    return this.getToken(QueryModificationParser.DAY, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public DAY(): TerminalNode {
-    return this.getToken(QueryModificationParser.DAY, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterDayFunc) {
       listener.enterDayFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitDayFunc) {
@@ -5775,28 +5404,23 @@ export class DayFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class NowFuncContext extends BuiltinCallContext {
+  public NOW(): TerminalNode {
+    return this.getToken(QueryModificationParser.NOW, 0);
+  }
+  public EMPTY_PARENS(): TerminalNode {
+    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public NOW(): TerminalNode {
-    return this.getToken(QueryModificationParser.NOW, 0);
-  }
-
-  public EMPTY_PARENS(): TerminalNode {
-    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterNowFunc) {
       listener.enterNowFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitNowFunc) {
@@ -5804,21 +5428,12 @@ export class NowFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrAfterFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public STRAFTER(): TerminalNode {
     return this.getToken(QueryModificationParser.STRAFTER, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -5826,14 +5441,16 @@ export class StrAfterFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrAfterFunc) {
       listener.enterStrAfterFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrAfterFunc) {
@@ -5841,28 +5458,23 @@ export class StrAfterFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class CeilFuncContext extends BuiltinCallContext {
+  public CEIL(): TerminalNode {
+    return this.getToken(QueryModificationParser.CEIL, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public CEIL(): TerminalNode {
-    return this.getToken(QueryModificationParser.CEIL, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterCeilFunc) {
       listener.enterCeilFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitCeilFunc) {
@@ -5870,28 +5482,23 @@ export class CeilFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class TimezoneFuncContext extends BuiltinCallContext {
+  public TIMEZONE(): TerminalNode {
+    return this.getToken(QueryModificationParser.TIMEZONE, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public TIMEZONE(): TerminalNode {
-    return this.getToken(QueryModificationParser.TIMEZONE, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTimezoneFunc) {
       listener.enterTimezoneFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTimezoneFunc) {
@@ -5899,21 +5506,12 @@ export class TimezoneFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class SameTermFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public SAMETERM(): TerminalNode {
     return this.getToken(QueryModificationParser.SAMETERM, 0);
   }
-
   public fieldRef(): FieldRefContext[];
-
   public fieldRef(i: number): FieldRefContext;
-
   public fieldRef(i?: number): FieldRefContext | FieldRefContext[] {
     if (i === undefined) {
       return this.getRuleContexts(FieldRefContext);
@@ -5921,14 +5519,16 @@ export class SameTermFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, FieldRefContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSameTermFunc) {
       listener.enterSameTermFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSameTermFunc) {
@@ -5936,28 +5536,23 @@ export class SameTermFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class IsBlankFuncContext extends BuiltinCallContext {
+  public ISBLANK(): TerminalNode {
+    return this.getToken(QueryModificationParser.ISBLANK, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ISBLANK(): TerminalNode {
-    return this.getToken(QueryModificationParser.ISBLANK, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIsBlankFunc) {
       listener.enterIsBlankFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIsBlankFunc) {
@@ -5965,28 +5560,23 @@ export class IsBlankFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class RandFuncContext extends BuiltinCallContext {
+  public RAND(): TerminalNode {
+    return this.getToken(QueryModificationParser.RAND, 0);
+  }
+  public EMPTY_PARENS(): TerminalNode {
+    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public RAND(): TerminalNode {
-    return this.getToken(QueryModificationParser.RAND, 0);
-  }
-
-  public EMPTY_PARENS(): TerminalNode {
-    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterRandFunc) {
       listener.enterRandFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitRandFunc) {
@@ -5994,28 +5584,23 @@ export class RandFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrFuncContext extends BuiltinCallContext {
+  public STR(): TerminalNode {
+    return this.getToken(QueryModificationParser.STR, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public STR(): TerminalNode {
-    return this.getToken(QueryModificationParser.STR, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrFunc) {
       listener.enterStrFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrFunc) {
@@ -6023,28 +5608,23 @@ export class StrFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class HoursFuncContext extends BuiltinCallContext {
+  public HOURS(): TerminalNode {
+    return this.getToken(QueryModificationParser.HOURS, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public HOURS(): TerminalNode {
-    return this.getToken(QueryModificationParser.HOURS, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterHoursFunc) {
       listener.enterHoursFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitHoursFunc) {
@@ -6052,28 +5632,23 @@ export class HoursFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class Md5FuncContext extends BuiltinCallContext {
+  public MD5(): TerminalNode {
+    return this.getToken(QueryModificationParser.MD5, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public MD5(): TerminalNode {
-    return this.getToken(QueryModificationParser.MD5, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterMd5Func) {
       listener.enterMd5Func(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitMd5Func) {
@@ -6081,21 +5656,12 @@ export class Md5FuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class ContainsFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public CONTAINS(): TerminalNode {
     return this.getToken(QueryModificationParser.CONTAINS, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -6103,14 +5669,16 @@ export class ContainsFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterContainsFunc) {
       listener.enterContainsFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitContainsFunc) {
@@ -6118,28 +5686,23 @@ export class ContainsFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class RoundFuncContext extends BuiltinCallContext {
+  public ROUND(): TerminalNode {
+    return this.getToken(QueryModificationParser.ROUND, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ROUND(): TerminalNode {
-    return this.getToken(QueryModificationParser.ROUND, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterRoundFunc) {
       listener.enterRoundFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitRoundFunc) {
@@ -6147,32 +5710,26 @@ export class RoundFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class StrDtFuncContext extends BuiltinCallContext {
+  public STRDT(): TerminalNode {
+    return this.getToken(QueryModificationParser.STRDT, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
+  public iriRefOrVarRef(): IriRefOrVarRefContext {
+    return this.getRuleContext(0, IriRefOrVarRefContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public STRDT(): TerminalNode {
-    return this.getToken(QueryModificationParser.STRDT, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
-  public iriRefOrVarRef(): IriRefOrVarRefContext {
-    return this.getRuleContext(0, IriRefOrVarRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStrDtFunc) {
       listener.enterStrDtFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStrDtFunc) {
@@ -6180,28 +5737,23 @@ export class StrDtFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class Sha1FuncContext extends BuiltinCallContext {
+  public SHA1(): TerminalNode {
+    return this.getToken(QueryModificationParser.SHA1, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public SHA1(): TerminalNode {
-    return this.getToken(QueryModificationParser.SHA1, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSha1Func) {
       listener.enterSha1Func(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSha1Func) {
@@ -6209,28 +5761,23 @@ export class Sha1FuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class MonthFuncContext extends BuiltinCallContext {
+  public MONTH(): TerminalNode {
+    return this.getToken(QueryModificationParser.MONTH, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public MONTH(): TerminalNode {
-    return this.getToken(QueryModificationParser.MONTH, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterMonthFunc) {
       listener.enterMonthFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitMonthFunc) {
@@ -6238,25 +5785,15 @@ export class MonthFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class IfFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public IF(): TerminalNode {
     return this.getToken(QueryModificationParser.IF, 0);
   }
-
   public predicate(): PredicateContext {
     return this.getRuleContext(0, PredicateContext);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -6264,14 +5801,16 @@ export class IfFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIfFunc) {
       listener.enterIfFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIfFunc) {
@@ -6279,28 +5818,23 @@ export class IfFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class IsIriFuncContext extends BuiltinCallContext {
+  public ISIRI(): TerminalNode {
+    return this.getToken(QueryModificationParser.ISIRI, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ISIRI(): TerminalNode {
-    return this.getToken(QueryModificationParser.ISIRI, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIsIriFunc) {
       listener.enterIsIriFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIsIriFunc) {
@@ -6308,21 +5842,12 @@ export class IsIriFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class SubstrFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public SUBSTR(): TerminalNode {
     return this.getToken(QueryModificationParser.SUBSTR, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -6330,14 +5855,16 @@ export class SubstrFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterSubstrFunc) {
       listener.enterSubstrFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitSubstrFunc) {
@@ -6345,28 +5872,23 @@ export class SubstrFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class IsNumericFuncContext extends BuiltinCallContext {
+  public ISNUMERIC(): TerminalNode {
+    return this.getToken(QueryModificationParser.ISNUMERIC, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ISNUMERIC(): TerminalNode {
-    return this.getToken(QueryModificationParser.ISNUMERIC, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIsNumericFunc) {
       listener.enterIsNumericFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIsNumericFunc) {
@@ -6374,28 +5896,23 @@ export class IsNumericFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class UuidFuncContext extends BuiltinCallContext {
+  public UUID(): TerminalNode {
+    return this.getToken(QueryModificationParser.UUID, 0);
+  }
+  public EMPTY_PARENS(): TerminalNode {
+    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public UUID(): TerminalNode {
-    return this.getToken(QueryModificationParser.UUID, 0);
-  }
-
-  public EMPTY_PARENS(): TerminalNode {
-    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterUuidFunc) {
       listener.enterUuidFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitUuidFunc) {
@@ -6403,28 +5920,23 @@ export class UuidFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class LangFuncContext extends BuiltinCallContext {
+  public LANG(): TerminalNode {
+    return this.getToken(QueryModificationParser.LANG, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public LANG(): TerminalNode {
-    return this.getToken(QueryModificationParser.LANG, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterLangFunc) {
       listener.enterLangFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitLangFunc) {
@@ -6432,32 +5944,26 @@ export class LangFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class CoalesceFuncContext extends BuiltinCallContext {
+  public COALESCE(): TerminalNode {
+    return this.getToken(QueryModificationParser.COALESCE, 0);
+  }
+  public iriRefOrVarRef(): IriRefOrVarRefContext {
+    return this.getRuleContext(0, IriRefOrVarRefContext);
+  }
+  public expressionList(): ExpressionListContext {
+    return this.getRuleContext(0, ExpressionListContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public COALESCE(): TerminalNode {
-    return this.getToken(QueryModificationParser.COALESCE, 0);
-  }
-
-  public iriRefOrVarRef(): IriRefOrVarRefContext {
-    return this.getRuleContext(0, IriRefOrVarRefContext);
-  }
-
-  public expressionList(): ExpressionListContext {
-    return this.getRuleContext(0, ExpressionListContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterCoalesceFunc) {
       listener.enterCoalesceFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitCoalesceFunc) {
@@ -6465,28 +5971,23 @@ export class CoalesceFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class IsURIFuncContext extends BuiltinCallContext {
+  public ISURI(): TerminalNode {
+    return this.getToken(QueryModificationParser.ISURI, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public ISURI(): TerminalNode {
-    return this.getToken(QueryModificationParser.ISURI, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIsURIFunc) {
       listener.enterIsURIFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIsURIFunc) {
@@ -6494,28 +5995,23 @@ export class IsURIFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class UriFuncContext extends BuiltinCallContext {
+  public URI(): TerminalNode {
+    return this.getToken(QueryModificationParser.URI, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
   constructor(ctx: BuiltinCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public URI(): TerminalNode {
-    return this.getToken(QueryModificationParser.URI, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterUriFunc) {
       listener.enterUriFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitUriFunc) {
@@ -6523,21 +6019,12 @@ export class UriFuncContext extends BuiltinCallContext {
     }
   }
 }
-
 export class ExistsFuncContext extends BuiltinCallContext {
-  constructor(ctx: BuiltinCallContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public EXISTS(): TerminalNode {
     return this.getToken(QueryModificationParser.EXISTS, 0);
   }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -6545,14 +6032,16 @@ export class ExistsFuncContext extends BuiltinCallContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(ctx: BuiltinCallContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterExistsFunc) {
       listener.enterExistsFunc(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitExistsFunc) {
@@ -6565,43 +6054,29 @@ export class PatternContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_pattern;
   }
-
   public copyFrom(ctx: PatternContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class TextMatchPatternContext extends PatternContext {
-  constructor(ctx: PatternContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public stringLiteralOrVarRef(): StringLiteralOrVarRefContext {
     return this.getRuleContext(0, StringLiteralOrVarRefContext);
   }
-
   public TEXTMATCH(): TerminalNode | undefined {
     return this.tryGetToken(QueryModificationParser.TEXTMATCH, 0);
   }
-
   public GEOMATCH(): TerminalNode | undefined {
     return this.tryGetToken(QueryModificationParser.GEOMATCH, 0);
   }
-
   public fieldRef(): FieldRefContext | undefined {
     return this.tryGetRuleContext(0, FieldRefContext);
   }
-
   public textMatchParam(): TextMatchParamContext[];
-
   public textMatchParam(i: number): TextMatchParamContext;
-
   public textMatchParam(
     i?: number
   ): TextMatchParamContext | TextMatchParamContext[] {
@@ -6611,14 +6086,16 @@ export class TextMatchPatternContext extends PatternContext {
       return this.getRuleContext(i, TextMatchParamContext);
     }
   }
-
+  constructor(ctx: PatternContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTextMatchPattern) {
       listener.enterTextMatchPattern(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTextMatchPattern) {
@@ -6626,40 +6103,32 @@ export class TextMatchPatternContext extends PatternContext {
     }
   }
 }
-
 export class GeoNearbyPatternContext extends PatternContext {
+  public WITHIN(): TerminalNode {
+    return this.getToken(QueryModificationParser.WITHIN, 0);
+  }
+  public proximitySpec(): ProximitySpecContext {
+    return this.getRuleContext(0, ProximitySpecContext);
+  }
+  public OF(): TerminalNode {
+    return this.getToken(QueryModificationParser.OF, 0);
+  }
+  public featureOrLatLon(): FeatureOrLatLonContext {
+    return this.getRuleContext(0, FeatureOrLatLonContext);
+  }
+  public fieldRef(): FieldRefContext | undefined {
+    return this.tryGetRuleContext(0, FieldRefContext);
+  }
   constructor(ctx: PatternContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public WITHIN(): TerminalNode {
-    return this.getToken(QueryModificationParser.WITHIN, 0);
-  }
-
-  public proximitySpec(): ProximitySpecContext {
-    return this.getRuleContext(0, ProximitySpecContext);
-  }
-
-  public OF(): TerminalNode {
-    return this.getToken(QueryModificationParser.OF, 0);
-  }
-
-  public featureOrLatLon(): FeatureOrLatLonContext {
-    return this.getRuleContext(0, FeatureOrLatLonContext);
-  }
-
-  public fieldRef(): FieldRefContext | undefined {
-    return this.tryGetRuleContext(0, FieldRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterGeoNearbyPattern) {
       listener.enterGeoNearbyPattern(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitGeoNearbyPattern) {
@@ -6672,38 +6141,31 @@ export class TextMatchParamContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_textMatchParam;
   }
-
   public copyFrom(ctx: TextMatchParamContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class TextMatchMinScoreParamContext extends TextMatchParamContext {
+  public MIN_SCORE(): TerminalNode {
+    return this.getToken(QueryModificationParser.MIN_SCORE, 0);
+  }
+  public DECIMAL(): TerminalNode {
+    return this.getToken(QueryModificationParser.DECIMAL, 0);
+  }
   constructor(ctx: TextMatchParamContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public MIN_SCORE(): TerminalNode {
-    return this.getToken(QueryModificationParser.MIN_SCORE, 0);
-  }
-
-  public DECIMAL(): TerminalNode {
-    return this.getToken(QueryModificationParser.DECIMAL, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTextMatchMinScoreParam) {
       listener.enterTextMatchMinScoreParam(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTextMatchMinScoreParam) {
@@ -6711,28 +6173,23 @@ export class TextMatchMinScoreParamContext extends TextMatchParamContext {
     }
   }
 }
-
 export class TextMatchMaxHitsParamContext extends TextMatchParamContext {
+  public MAX_HITS(): TerminalNode {
+    return this.getToken(QueryModificationParser.MAX_HITS, 0);
+  }
+  public INTEGER(): TerminalNode {
+    return this.getToken(QueryModificationParser.INTEGER, 0);
+  }
   constructor(ctx: TextMatchParamContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public MAX_HITS(): TerminalNode {
-    return this.getToken(QueryModificationParser.MAX_HITS, 0);
-  }
-
-  public INTEGER(): TerminalNode {
-    return this.getToken(QueryModificationParser.INTEGER, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTextMatchMaxHitsParam) {
       listener.enterTextMatchMaxHitsParam(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTextMatchMaxHitsParam) {
@@ -6740,28 +6197,23 @@ export class TextMatchMaxHitsParamContext extends TextMatchParamContext {
     }
   }
 }
-
 export class TextMatchBoostParamContext extends TextMatchParamContext {
+  public BOOST(): TerminalNode {
+    return this.getToken(QueryModificationParser.BOOST, 0);
+  }
+  public numericLiteral(): NumericLiteralContext {
+    return this.getRuleContext(0, NumericLiteralContext);
+  }
   constructor(ctx: TextMatchParamContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public BOOST(): TerminalNode {
-    return this.getToken(QueryModificationParser.BOOST, 0);
-  }
-
-  public numericLiteral(): NumericLiteralContext {
-    return this.getRuleContext(0, NumericLiteralContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTextMatchBoostParam) {
       listener.enterTextMatchBoostParam(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTextMatchBoostParam) {
@@ -6774,46 +6226,37 @@ export class BoostContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_boost;
   }
-
   public copyFrom(ctx: BoostContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class FollowsUserBoostContext extends BoostContext {
+  public numericLiteral(): NumericLiteralContext {
+    return this.getRuleContext(0, NumericLiteralContext);
+  }
+  public IF_FOLLOWS(): TerminalNode {
+    return this.getToken(QueryModificationParser.IF_FOLLOWS, 0);
+  }
+  public iriRefOrVarRef(): IriRefOrVarRefContext {
+    return this.getRuleContext(0, IriRefOrVarRefContext);
+  }
+  public BOOST(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.BOOST, 0);
+  }
   constructor(ctx: BoostContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public numericLiteral(): NumericLiteralContext {
-    return this.getRuleContext(0, NumericLiteralContext);
-  }
-
-  public IF_FOLLOWS(): TerminalNode {
-    return this.getToken(QueryModificationParser.IF_FOLLOWS, 0);
-  }
-
-  public iriRefOrVarRef(): IriRefOrVarRefContext {
-    return this.getRuleContext(0, IriRefOrVarRefContext);
-  }
-
-  public BOOST(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.BOOST, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFollowsUserBoost) {
       listener.enterFollowsUserBoost(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFollowsUserBoost) {
@@ -6821,36 +6264,29 @@ export class FollowsUserBoostContext extends BoostContext {
     }
   }
 }
-
 export class FollowedByUserBoostContext extends BoostContext {
+  public numericLiteral(): NumericLiteralContext {
+    return this.getRuleContext(0, NumericLiteralContext);
+  }
+  public IF_FOLLOWED_BY(): TerminalNode {
+    return this.getToken(QueryModificationParser.IF_FOLLOWED_BY, 0);
+  }
+  public iriRefOrVarRef(): IriRefOrVarRefContext {
+    return this.getRuleContext(0, IriRefOrVarRefContext);
+  }
+  public BOOST(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.BOOST, 0);
+  }
   constructor(ctx: BoostContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public numericLiteral(): NumericLiteralContext {
-    return this.getRuleContext(0, NumericLiteralContext);
-  }
-
-  public IF_FOLLOWED_BY(): TerminalNode {
-    return this.getToken(QueryModificationParser.IF_FOLLOWED_BY, 0);
-  }
-
-  public iriRefOrVarRef(): IriRefOrVarRefContext {
-    return this.getRuleContext(0, IriRefOrVarRefContext);
-  }
-
-  public BOOST(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.BOOST, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFollowedByUserBoost) {
       listener.enterFollowedByUserBoost(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFollowedByUserBoost) {
@@ -6860,38 +6296,31 @@ export class FollowedByUserBoostContext extends BoostContext {
 }
 
 export class BindingContext extends ParserRuleContext {
+  public BIND(): TerminalNode {
+    return this.getToken(QueryModificationParser.BIND, 0);
+  }
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
+  }
+  public AS(): TerminalNode {
+    return this.getToken(QueryModificationParser.AS, 0);
+  }
+  public VARNAME(): TerminalNode {
+    return this.getToken(QueryModificationParser.VARNAME, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_binding;
   }
-
-  public BIND(): TerminalNode {
-    return this.getToken(QueryModificationParser.BIND, 0);
-  }
-
-  public expression(): ExpressionContext {
-    return this.getRuleContext(0, ExpressionContext);
-  }
-
-  public AS(): TerminalNode {
-    return this.getToken(QueryModificationParser.AS, 0);
-  }
-
-  public VARNAME(): TerminalNode {
-    return this.getToken(QueryModificationParser.VARNAME, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBinding) {
       listener.enterBinding(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBinding) {
@@ -6901,19 +6330,8 @@ export class BindingContext extends ParserRuleContext {
 }
 
 export class ExpressionListContext extends ParserRuleContext {
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_expressionList;
-  }
-
   public expression(): ExpressionContext[];
-
   public expression(i: number): ExpressionContext;
-
   public expression(i?: number): ExpressionContext | ExpressionContext[] {
     if (i === undefined) {
       return this.getRuleContexts(ExpressionContext);
@@ -6921,14 +6339,19 @@ export class ExpressionListContext extends ParserRuleContext {
       return this.getRuleContext(i, ExpressionContext);
     }
   }
-
+  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+    super(parent, invokingState);
+  }
+  // @Override
+  public get ruleIndex(): number {
+    return QueryModificationParser.RULE_expressionList;
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterExpressionList) {
       listener.enterExpressionList(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitExpressionList) {
@@ -6941,34 +6364,28 @@ export class FeatureOrLatLonContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_featureOrLatLon;
   }
-
   public copyFrom(ctx: FeatureOrLatLonContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class FeatureContext extends FeatureOrLatLonContext {
+  public iriRef(): IriRefContext {
+    return this.getRuleContext(0, IriRefContext);
+  }
   constructor(ctx: FeatureOrLatLonContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public iriRef(): IriRefContext {
-    return this.getRuleContext(0, IriRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFeature) {
       listener.enterFeature(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFeature) {
@@ -6976,21 +6393,12 @@ export class FeatureContext extends FeatureOrLatLonContext {
     }
   }
 }
-
 export class LatLonContext extends FeatureOrLatLonContext {
-  constructor(ctx: FeatureOrLatLonContext) {
-    super(ctx.parent, ctx.invokingState);
-    this.copyFrom(ctx);
-  }
-
   public LATLON(): TerminalNode {
     return this.getToken(QueryModificationParser.LATLON, 0);
   }
-
   public varRef(): VarRefContext[];
-
   public varRef(i: number): VarRefContext;
-
   public varRef(i?: number): VarRefContext | VarRefContext[] {
     if (i === undefined) {
       return this.getRuleContexts(VarRefContext);
@@ -6998,11 +6406,8 @@ export class LatLonContext extends FeatureOrLatLonContext {
       return this.getRuleContext(i, VarRefContext);
     }
   }
-
   public numericLiteral(): NumericLiteralContext[];
-
   public numericLiteral(i: number): NumericLiteralContext;
-
   public numericLiteral(
     i?: number
   ): NumericLiteralContext | NumericLiteralContext[] {
@@ -7012,14 +6417,16 @@ export class LatLonContext extends FeatureOrLatLonContext {
       return this.getRuleContext(i, NumericLiteralContext);
     }
   }
-
+  constructor(ctx: FeatureOrLatLonContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterLatLon) {
       listener.enterLatLon(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitLatLon) {
@@ -7027,24 +6434,20 @@ export class LatLonContext extends FeatureOrLatLonContext {
     }
   }
 }
-
 export class VarFeatureContext extends FeatureOrLatLonContext {
+  public varRef(): VarRefContext {
+    return this.getRuleContext(0, VarRefContext);
+  }
   constructor(ctx: FeatureOrLatLonContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public varRef(): VarRefContext {
-    return this.getRuleContext(0, VarRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterVarFeature) {
       listener.enterVarFeature(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitVarFeature) {
@@ -7054,30 +6457,25 @@ export class VarFeatureContext extends FeatureOrLatLonContext {
 }
 
 export class ProximitySpecContext extends ParserRuleContext {
+  public numericLiteralOrVarRef(): NumericLiteralOrVarRefContext {
+    return this.getRuleContext(0, NumericLiteralOrVarRefContext);
+  }
+  public iriRefOrVarRef(): IriRefOrVarRefContext {
+    return this.getRuleContext(0, IriRefOrVarRefContext);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_proximitySpec;
   }
-
-  public numericLiteralOrVarRef(): NumericLiteralOrVarRefContext {
-    return this.getRuleContext(0, NumericLiteralOrVarRefContext);
-  }
-
-  public iriRefOrVarRef(): IriRefOrVarRefContext {
-    return this.getRuleContext(0, IriRefOrVarRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterProximitySpec) {
       listener.enterProximitySpec(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitProximitySpec) {
@@ -7090,42 +6488,34 @@ export class FunctionCallContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_functionCall;
   }
-
   public copyFrom(ctx: FunctionCallContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class FuncWithArgsContext extends FunctionCallContext {
+  public iriRef(): IriRefContext {
+    return this.getRuleContext(0, IriRefContext);
+  }
+  public prefixedName(): PrefixedNameContext {
+    return this.getRuleContext(0, PrefixedNameContext);
+  }
+  public expressionList(): ExpressionListContext {
+    return this.getRuleContext(0, ExpressionListContext);
+  }
   constructor(ctx: FunctionCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public iriRef(): IriRefContext {
-    return this.getRuleContext(0, IriRefContext);
-  }
-
-  public prefixedName(): PrefixedNameContext {
-    return this.getRuleContext(0, PrefixedNameContext);
-  }
-
-  public expressionList(): ExpressionListContext {
-    return this.getRuleContext(0, ExpressionListContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFuncWithArgs) {
       listener.enterFuncWithArgs(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFuncWithArgs) {
@@ -7133,32 +6523,26 @@ export class FuncWithArgsContext extends FunctionCallContext {
     }
   }
 }
-
 export class FuncWithoutArgsContext extends FunctionCallContext {
+  public iriRef(): IriRefContext {
+    return this.getRuleContext(0, IriRefContext);
+  }
+  public prefixedName(): PrefixedNameContext {
+    return this.getRuleContext(0, PrefixedNameContext);
+  }
+  public EMPTY_PARENS(): TerminalNode {
+    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
+  }
   constructor(ctx: FunctionCallContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public iriRef(): IriRefContext {
-    return this.getRuleContext(0, IriRefContext);
-  }
-
-  public prefixedName(): PrefixedNameContext {
-    return this.getRuleContext(0, PrefixedNameContext);
-  }
-
-  public EMPTY_PARENS(): TerminalNode {
-    return this.getToken(QueryModificationParser.EMPTY_PARENS, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFuncWithoutArgs) {
       listener.enterFuncWithoutArgs(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFuncWithoutArgs) {
@@ -7171,38 +6555,31 @@ export class RdfLiteralContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_rdfLiteral;
   }
-
   public copyFrom(ctx: RdfLiteralContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class LangRdfLiteralContext extends RdfLiteralContext {
+  public stringLiteral(): StringLiteralContext {
+    return this.getRuleContext(0, StringLiteralContext);
+  }
+  public LANGTAG(): TerminalNode {
+    return this.getToken(QueryModificationParser.LANGTAG, 0);
+  }
   constructor(ctx: RdfLiteralContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public stringLiteral(): StringLiteralContext {
-    return this.getRuleContext(0, StringLiteralContext);
-  }
-
-  public LANGTAG(): TerminalNode {
-    return this.getToken(QueryModificationParser.LANGTAG, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterLangRdfLiteral) {
       listener.enterLangRdfLiteral(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitLangRdfLiteral) {
@@ -7210,28 +6587,23 @@ export class LangRdfLiteralContext extends RdfLiteralContext {
     }
   }
 }
-
 export class DtRdfLiteralContext extends RdfLiteralContext {
+  public stringLiteral(): StringLiteralContext {
+    return this.getRuleContext(0, StringLiteralContext);
+  }
+  public iriRef(): IriRefContext {
+    return this.getRuleContext(0, IriRefContext);
+  }
   constructor(ctx: RdfLiteralContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public stringLiteral(): StringLiteralContext {
-    return this.getRuleContext(0, StringLiteralContext);
-  }
-
-  public iriRef(): IriRefContext {
-    return this.getRuleContext(0, IriRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterDtRdfLiteral) {
       listener.enterDtRdfLiteral(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitDtRdfLiteral) {
@@ -7244,34 +6616,28 @@ export class NumericLiteralContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_numericLiteral;
   }
-
   public copyFrom(ctx: NumericLiteralContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class DecimalLiteralContext extends NumericLiteralContext {
+  public DECIMAL(): TerminalNode {
+    return this.getToken(QueryModificationParser.DECIMAL, 0);
+  }
   constructor(ctx: NumericLiteralContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public DECIMAL(): TerminalNode {
-    return this.getToken(QueryModificationParser.DECIMAL, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterDecimalLiteral) {
       listener.enterDecimalLiteral(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitDecimalLiteral) {
@@ -7279,24 +6645,20 @@ export class DecimalLiteralContext extends NumericLiteralContext {
     }
   }
 }
-
 export class DoubleLiteralContext extends NumericLiteralContext {
+  public DOUBLE(): TerminalNode {
+    return this.getToken(QueryModificationParser.DOUBLE, 0);
+  }
   constructor(ctx: NumericLiteralContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public DOUBLE(): TerminalNode {
-    return this.getToken(QueryModificationParser.DOUBLE, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterDoubleLiteral) {
       listener.enterDoubleLiteral(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitDoubleLiteral) {
@@ -7304,24 +6666,20 @@ export class DoubleLiteralContext extends NumericLiteralContext {
     }
   }
 }
-
 export class IntegerLiteralContext extends NumericLiteralContext {
+  public INTEGER(): TerminalNode {
+    return this.getToken(QueryModificationParser.INTEGER, 0);
+  }
   constructor(ctx: NumericLiteralContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public INTEGER(): TerminalNode {
-    return this.getToken(QueryModificationParser.INTEGER, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIntegerLiteral) {
       listener.enterIntegerLiteral(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIntegerLiteral) {
@@ -7331,26 +6689,22 @@ export class IntegerLiteralContext extends NumericLiteralContext {
 }
 
 export class VarRefContext extends ParserRuleContext {
+  public VARNAME(): TerminalNode {
+    return this.getToken(QueryModificationParser.VARNAME, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_varRef;
   }
-
-  public VARNAME(): TerminalNode {
-    return this.getToken(QueryModificationParser.VARNAME, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterVarRef) {
       listener.enterVarRef(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitVarRef) {
@@ -7360,26 +6714,22 @@ export class VarRefContext extends ParserRuleContext {
 }
 
 export class FieldRefContext extends ParserRuleContext {
+  public VARNAME(): TerminalNode {
+    return this.getToken(QueryModificationParser.VARNAME, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_fieldRef;
   }
-
-  public VARNAME(): TerminalNode {
-    return this.getToken(QueryModificationParser.VARNAME, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFieldRef) {
       listener.enterFieldRef(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFieldRef) {
@@ -7392,19 +6742,16 @@ export class ComparisonOpContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_comparisonOp;
   }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterComparisonOp) {
       listener.enterComparisonOp(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitComparisonOp) {
@@ -7417,19 +6764,16 @@ export class UnaryOpContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_unaryOp;
   }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterUnaryOp) {
       listener.enterUnaryOp(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitUnaryOp) {
@@ -7442,19 +6786,16 @@ export class FactorOpContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_factorOp;
   }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterFactorOp) {
       listener.enterFactorOp(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitFactorOp) {
@@ -7467,19 +6808,16 @@ export class TermOpContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_termOp;
   }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterTermOp) {
       listener.enterTermOp(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitTermOp) {
@@ -7489,30 +6827,25 @@ export class TermOpContext extends ParserRuleContext {
 }
 
 export class StringLiteralContext extends ParserRuleContext {
+  public STRING_LITERAL1(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.STRING_LITERAL1, 0);
+  }
+  public STRING_LITERAL2(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.STRING_LITERAL2, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_stringLiteral;
   }
-
-  public STRING_LITERAL1(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.STRING_LITERAL1, 0);
-  }
-
-  public STRING_LITERAL2(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.STRING_LITERAL2, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStringLiteral) {
       listener.enterStringLiteral(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStringLiteral) {
@@ -7522,30 +6855,25 @@ export class StringLiteralContext extends ParserRuleContext {
 }
 
 export class StringLiteralOrVarRefContext extends ParserRuleContext {
+  public stringLiteral(): StringLiteralContext | undefined {
+    return this.tryGetRuleContext(0, StringLiteralContext);
+  }
+  public varRef(): VarRefContext | undefined {
+    return this.tryGetRuleContext(0, VarRefContext);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_stringLiteralOrVarRef;
   }
-
-  public stringLiteral(): StringLiteralContext | undefined {
-    return this.tryGetRuleContext(0, StringLiteralContext);
-  }
-
-  public varRef(): VarRefContext | undefined {
-    return this.tryGetRuleContext(0, VarRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterStringLiteralOrVarRef) {
       listener.enterStringLiteralOrVarRef(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitStringLiteralOrVarRef) {
@@ -7555,30 +6883,25 @@ export class StringLiteralOrVarRefContext extends ParserRuleContext {
 }
 
 export class BooleanLiteralContext extends ParserRuleContext {
+  public TRUE(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.TRUE, 0);
+  }
+  public FALSE(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.FALSE, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_booleanLiteral;
   }
-
-  public TRUE(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.TRUE, 0);
-  }
-
-  public FALSE(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.FALSE, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBooleanLiteral) {
       listener.enterBooleanLiteral(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBooleanLiteral) {
@@ -7588,30 +6911,25 @@ export class BooleanLiteralContext extends ParserRuleContext {
 }
 
 export class IriRefOrVarRefContext extends ParserRuleContext {
+  public iriRef(): IriRefContext | undefined {
+    return this.tryGetRuleContext(0, IriRefContext);
+  }
+  public varRef(): VarRefContext | undefined {
+    return this.tryGetRuleContext(0, VarRefContext);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_iriRefOrVarRef;
   }
-
-  public iriRef(): IriRefContext | undefined {
-    return this.tryGetRuleContext(0, IriRefContext);
-  }
-
-  public varRef(): VarRefContext | undefined {
-    return this.tryGetRuleContext(0, VarRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterIriRefOrVarRef) {
       listener.enterIriRefOrVarRef(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitIriRefOrVarRef) {
@@ -7621,30 +6939,25 @@ export class IriRefOrVarRefContext extends ParserRuleContext {
 }
 
 export class NumericLiteralOrVarRefContext extends ParserRuleContext {
+  public numericLiteral(): NumericLiteralContext | undefined {
+    return this.tryGetRuleContext(0, NumericLiteralContext);
+  }
+  public varRef(): VarRefContext | undefined {
+    return this.tryGetRuleContext(0, VarRefContext);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_numericLiteralOrVarRef;
   }
-
-  public numericLiteral(): NumericLiteralContext | undefined {
-    return this.tryGetRuleContext(0, NumericLiteralContext);
-  }
-
-  public varRef(): VarRefContext | undefined {
-    return this.tryGetRuleContext(0, VarRefContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterNumericLiteralOrVarRef) {
       listener.enterNumericLiteralOrVarRef(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitNumericLiteralOrVarRef) {
@@ -7657,34 +6970,28 @@ export class IriRefContext extends ParserRuleContext {
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_iriRef;
   }
-
   public copyFrom(ctx: IriRefContext): void {
     super.copyFrom(ctx);
   }
 }
-
 export class LiteralIriRefContext extends IriRefContext {
+  public IRI_REF(): TerminalNode {
+    return this.getToken(QueryModificationParser.IRI_REF, 0);
+  }
   constructor(ctx: IriRefContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public IRI_REF(): TerminalNode {
-    return this.getToken(QueryModificationParser.IRI_REF, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterLiteralIriRef) {
       listener.enterLiteralIriRef(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitLiteralIriRef) {
@@ -7692,24 +6999,20 @@ export class LiteralIriRefContext extends IriRefContext {
     }
   }
 }
-
 export class PrefixedNameIriRefContext extends IriRefContext {
+  public prefixedName(): PrefixedNameContext {
+    return this.getRuleContext(0, PrefixedNameContext);
+  }
   constructor(ctx: IriRefContext) {
     super(ctx.parent, ctx.invokingState);
     this.copyFrom(ctx);
   }
-
-  public prefixedName(): PrefixedNameContext {
-    return this.getRuleContext(0, PrefixedNameContext);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterPrefixedNameIriRef) {
       listener.enterPrefixedNameIriRef(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitPrefixedNameIriRef) {
@@ -7719,30 +7022,25 @@ export class PrefixedNameIriRefContext extends IriRefContext {
 }
 
 export class PrefixedNameContext extends ParserRuleContext {
+  public PNAME_LN(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.PNAME_LN, 0);
+  }
+  public PNAME_NS(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.PNAME_NS, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_prefixedName;
   }
-
-  public PNAME_LN(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.PNAME_LN, 0);
-  }
-
-  public PNAME_NS(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.PNAME_NS, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterPrefixedName) {
       listener.enterPrefixedName(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitPrefixedName) {
@@ -7752,30 +7050,25 @@ export class PrefixedNameContext extends ParserRuleContext {
 }
 
 export class BlankNodeContext extends ParserRuleContext {
+  public BLANK_NODE_LABEL(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.BLANK_NODE_LABEL, 0);
+  }
+  public ANON(): TerminalNode | undefined {
+    return this.tryGetToken(QueryModificationParser.ANON, 0);
+  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
-
   // @Override
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_blankNode;
   }
-
-  public BLANK_NODE_LABEL(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.BLANK_NODE_LABEL, 0);
-  }
-
-  public ANON(): TerminalNode | undefined {
-    return this.tryGetToken(QueryModificationParser.ANON, 0);
-  }
-
   // @Override
   public enterRule(listener: QueryModificationListener): void {
     if (listener.enterBlankNode) {
       listener.enterBlankNode(this);
     }
   }
-
   // @Override
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitBlankNode) {

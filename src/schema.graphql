@@ -1,84 +1,18 @@
-directive @id on FIELD_DEFINITION | SCHEMA
-
-directive @typename on FIELD_DEFINITION | SCHEMA
-
 type Connection {
   totalCount: Int!
   edges: [Edge]!
   moreEdges(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
   pageInfo: PageInfo!
 }
-
 scalar Date
-
 scalar DateTime
-
 scalar Duration
-
 type Edge {
   cursor: String!
   node: U_NodeObject!
 }
-
-type gn_Feature implements I_geo_SpatialThing {
-  __id: String! @id
-  __typename: String @typename
-  s_description: String
-  s_name: String
-  s_url: URL
-  gn_countryCode: String!
-  gn_featureClass: String!
-  gn_featureCode: String!
-  gn_geonamesID: String!
-  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
-  gn_neighbour: [gn_Feature]!
-  gn_officialName: String
-  gn_parentADM1: gn_Feature!
-  gn_parentADM2: gn_Feature
-  gn_parentADM3: gn_Feature
-  gn_parentADM4: gn_Feature
-  gn_parentCountry: gn_Feature!
-  gn_parentFeature: gn_Feature
-  gn_population: Int
-  gn_postalCode: [String]!
-  geo_alt: Float
-  geo_lat: Float!
-  geo_long: Float!
-  s_additionalProperty: s_PropertyValue
-  s_address: U_s_PostalAddress_OR_String
-  s_aggregateRating: s_AggregateRating
-  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
-  s_branchCode: String
-  s_containedInPlace: [s_Place]!
-  s_containsPlace: s_Place
-  s_event: s_Event
-  s_faxNumber: String
-  s_geo: U_s_GeoCoordinates_OR_s_GeoShape
-  s_globalLocationNumber: String
-  s_hasMap: U_s_Map_OR_URL
-  s_isAccessibleForFree: Boolean
-  s_isicV4: String
-  s_logo: U_s_ImageObject_OR_URL
-  s_maximumAttendeeCapacity: Int
-  s_openingHoursSpecification: s_OpeningHoursSpecification
-  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
-  s_publicAccess: Boolean
-  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
-  s_smokingAllowed: Boolean
-  s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
-  s_telephone: String
-  s_alternateName: [String]!
-  s_disambiguatingDescription: String
-  s_identifier: [U_s_PropertyValue_OR_URL]!
-  s_image: U_s_ImageObject_OR_URL
-  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
-  s_potentialAction: [s_Action]!
-  s_sameAs: [URL]!
-}
-
 interface I_geo_SpatialThing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -116,10 +50,8 @@ interface I_geo_SpatialThing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_gn_Feature {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -172,10 +104,8 @@ interface I_gn_Feature {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_j_CuratedPlace {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -231,10 +161,8 @@ interface I_j_CuratedPlace {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_j_ScorableAlternative {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -328,10 +256,8 @@ interface I_j_ScorableAlternative {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -343,10 +269,8 @@ interface I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Accommodation {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -385,10 +309,8 @@ interface I_s_Accommodation {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_AdministrativeArea {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -423,10 +345,8 @@ interface I_s_AdministrativeArea {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Article {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -522,10 +442,8 @@ interface I_s_Article {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Comment {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -618,10 +536,8 @@ interface I_s_Comment {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_ContactPoint {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -642,10 +558,8 @@ interface I_s_ContactPoint {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -735,10 +649,8 @@ interface I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Dataset {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -831,10 +743,8 @@ interface I_s_Dataset {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Enumeration {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -846,10 +756,8 @@ interface I_s_Enumeration {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Event {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -893,10 +801,8 @@ interface I_s_Event {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_FinancialProduct {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -930,10 +836,8 @@ interface I_s_FinancialProduct {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -945,10 +849,8 @@ interface I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Invoice {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -975,10 +877,8 @@ interface I_s_Invoice {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_ItemList {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -993,10 +893,8 @@ interface I_s_ItemList {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_MediaObject {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1100,10 +998,8 @@ interface I_s_MediaObject {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_MusicPlaylist {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1195,10 +1091,8 @@ interface I_s_MusicPlaylist {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Organization {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1251,10 +1145,8 @@ interface I_s_Organization {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_PerformingGroup {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1307,10 +1199,8 @@ interface I_s_PerformingGroup {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Place {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1345,10 +1235,8 @@ interface I_s_Place {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Product {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1392,10 +1280,8 @@ interface I_s_Product {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_PropertyValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1414,10 +1300,8 @@ interface I_s_PropertyValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Quantity {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1429,10 +1313,8 @@ interface I_s_Quantity {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Rating {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1448,10 +1330,8 @@ interface I_s_Rating {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_Service {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1482,10 +1362,8 @@ interface I_s_Service {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1497,10 +1375,8 @@ interface I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 interface I_s_TouristAttraction {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1537,10 +1413,168 @@ interface I_s_TouristAttraction {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
+type Mutation {
+  tripFilter(tripFilter: TripFilterInput!): Connection!
+}
+type O_Boolean {
+  value: Boolean
+}
+type O_Date {
+  value: Date
+}
+type O_DateTime {
+  value: DateTime
+}
+type O_Float {
+  value: Float
+}
+type O_Int {
+  value: Int
+}
+type O_String {
+  value: String
+}
+type O_URL {
+  value: URL
+}
+type O_s_GenderType {
+  value: s_GenderType
+}
+type O_s_ItemListOrderType {
+  value: s_ItemListOrderType
+}
+type O_s_PaymentMethod {
+  value: s_PaymentMethod
+}
+type O_s_PaymentStatusType {
+  value: s_PaymentStatusType
+}
+type PageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+type Query {
+  user(id: ID!): j_User
+  curatedPlace(id: ID!): j_CuratedPlace
+  curatedDestination(id: ID!): j_CuratedDestination
+  curatedAccommodation(id: ID!): j_CuratedAccommodation
+  curatedActivity(id: ID!): j_CuratedActivity
+  trip(id: ID!): j_Trip
+}
+scalar Time
+input TripFilterInput {
+  countryCode: String!
+}
+scalar URL
+union U_Boolean_OR_String = O_Boolean | O_String
+union U_Date_OR_DateTime = O_Date | O_DateTime
+union U_Int_OR_String = O_Int | O_String
+union U_NodeObject = j_BookedTrip | s_Comment | j_CuratedAccommodation | j_CuratedActivity | j_CuratedDestination | gn_Feature | j_Identity | s_ImageObject | j_Itinerary | s_LocationFeatureSpecification | s_Order | s_Photograph | s_Review | j_Session | j_TripProfile | j_User
+union U_URL_OR_DateTime = O_URL | O_DateTime
+union U_owl_Thing_OR_String = owl_Thing | O_String
+union U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String = s_AdministrativeArea | s_GeoShape | s_Place | O_String
+union U_s_Answer_OR_s_ItemList = s_Answer | s_ItemList
+union U_s_Audience_OR_String = s_Audience | O_String
+union U_s_Brand_OR_s_Organization = s_Brand | s_Organization
+union U_s_ContactPoint_OR_s_Place = s_ContactPoint | s_Place
+union U_s_Country_OR_String = s_Country | O_String
+union U_s_CreativeWork_OR_String = s_CreativeWork | O_String
+union U_s_CreativeWork_OR_URL = s_CreativeWork | O_URL
+union U_s_CreativeWork_OR_s_Product_OR_URL = s_CreativeWork | s_Product | O_URL
+union U_s_DataFeedItem_OR_owl_Thing_OR_String = s_DataFeedItem | owl_Thing | O_String
+union U_s_Distance_OR_s_QuantitativeValue = s_Distance | s_QuantitativeValue
+union U_s_EducationalOrganization_OR_s_Organization = s_EducationalOrganization | s_Organization
+union U_s_Enumeration_OR_s_PropertyValue_OR_s_QualitativeValue_OR_s_QuantitativeValue_OR_s_StructuredValue = s_Enumeration | s_PropertyValue | s_QualitativeValue | s_QuantitativeValue | s_StructuredValue
+union U_s_GenderType_OR_String = O_s_GenderType | O_String
+union U_s_GeoCoordinates_OR_s_GeoShape = s_GeoCoordinates | s_GeoShape
+union U_s_GeoShape_OR_s_Place_OR_String = s_GeoShape | s_Place | O_String
+union U_s_ImageObject_OR_URL = s_ImageObject | O_URL
+union U_s_ItemListOrderType_OR_String = O_s_ItemListOrderType | O_String
+union U_s_ItemList_OR_s_MusicRecording = s_ItemList | s_MusicRecording
+union U_s_Language_OR_String = s_Language | O_String
+union U_s_ListItem_OR_owl_Thing_OR_String = s_ListItem | owl_Thing | O_String
+union U_s_LoanOrCredit_OR_s_PaymentMethod = s_LoanOrCredit | O_s_PaymentMethod
+union U_s_Map_OR_URL = s_Map | O_URL
+union U_s_MonetaryAmount_OR_Float = s_MonetaryAmount | O_Float
+union U_s_MonetaryAmount_OR_String = s_MonetaryAmount | O_String
+union U_s_MonetaryAmount_OR_s_PriceSpecification = s_MonetaryAmount | s_PriceSpecification
+union U_s_MusicGroup_OR_s_Person = s_MusicGroup | s_Person
+union U_s_OrderItem_OR_s_Product = s_OrderItem | s_Product
+union U_s_Organization_OR_s_Person = s_Organization | s_Person
+union U_s_Organization_OR_s_ProgramMembership = s_Organization | s_ProgramMembership
+union U_s_OwnershipInfo_OR_s_Product = s_OwnershipInfo | s_Product
+union U_s_PaymentStatusType_OR_String = O_s_PaymentStatusType | O_String
+union U_s_Person_OR_URL = s_Person | O_URL
+union U_s_Place_OR_s_PostalAddress_OR_String = s_Place | s_PostalAddress | O_String
+union U_s_PostalAddress_OR_String = s_PostalAddress | O_String
+union U_s_ProductModel_OR_String = s_ProductModel | O_String
+union U_s_Product_OR_String = s_Product | O_String
+union U_s_Product_OR_URL = s_Product | O_URL
+union U_s_Product_OR_s_Service = s_Product | s_Service
+union U_s_PropertyValue_OR_String = s_PropertyValue | O_String
+union U_s_PropertyValue_OR_URL = s_PropertyValue | O_URL
+union U_s_QuantitativeValue_OR_Float = s_QuantitativeValue | O_Float
+union U_s_Rating_OR_String = s_Rating | O_String
+union U_s_SoftwareApplication_OR_s_WebSite = s_SoftwareApplication | s_WebSite
+union U_s_StructuredValue_OR_Boolean_OR_Float = s_StructuredValue | O_Boolean | O_Float
+type gn_Feature implements I_geo_SpatialThing {
+  _id: String!
+  s_description: String
+  s_name: String
+  s_url: URL
+  gn_countryCode: String!
+  gn_featureClass: String!
+  gn_featureCode: String!
+  gn_geonamesID: String!
+  gn_nearby(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  gn_neighbour: [gn_Feature]!
+  gn_officialName: String
+  gn_parentADM1: gn_Feature!
+  gn_parentADM2: gn_Feature
+  gn_parentADM3: gn_Feature
+  gn_parentADM4: gn_Feature
+  gn_parentCountry: gn_Feature!
+  gn_parentFeature: gn_Feature
+  gn_population: Int
+  gn_postalCode: [String]!
+  geo_alt: Float
+  geo_lat: Float!
+  geo_long: Float!
+  s_additionalProperty: s_PropertyValue
+  s_address: U_s_PostalAddress_OR_String
+  s_aggregateRating: s_AggregateRating
+  s_amenityFeature(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_branchCode: String
+  s_containedInPlace: [s_Place]!
+  s_containsPlace: s_Place
+  s_event: s_Event
+  s_faxNumber: String
+  s_geo: U_s_GeoCoordinates_OR_s_GeoShape
+  s_globalLocationNumber: String
+  s_hasMap: U_s_Map_OR_URL
+  s_isAccessibleForFree: Boolean
+  s_isicV4: String
+  s_logo: U_s_ImageObject_OR_URL
+  s_maximumAttendeeCapacity: Int
+  s_openingHoursSpecification: s_OpeningHoursSpecification
+  s_photo(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_publicAccess: Boolean
+  s_review(filter: String, sortBy: String, first: Int, after: String, last: Int, before: String): Connection!
+  s_smokingAllowed: Boolean
+  s_specialOpeningHoursSpecification: s_OpeningHoursSpecification
+  s_telephone: String
+  s_alternateName: [String]!
+  s_disambiguatingDescription: String
+  s_identifier: [U_s_PropertyValue_OR_URL]!
+  s_image: U_s_ImageObject_OR_URL
+  s_mainEntityOfPage: [U_s_CreativeWork_OR_URL]!
+  s_potentialAction: [s_Action]!
+  s_sameAs: [URL]!
+}
 type j_AccommodationElement implements I_j_ScorableAlternative {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1636,10 +1670,8 @@ type j_AccommodationElement implements I_j_ScorableAlternative {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_ActivityElement implements I_j_ScorableAlternative {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1735,10 +1767,8 @@ type j_ActivityElement implements I_j_ScorableAlternative {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_BookedTrip implements I_s_Invoice {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1767,10 +1797,8 @@ type j_BookedTrip implements I_s_Invoice {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_CuratedAccommodation implements I_s_Accommodation & I_j_CuratedPlace {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1830,10 +1858,8 @@ type j_CuratedAccommodation implements I_s_Accommodation & I_j_CuratedPlace {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_CuratedActivity implements I_j_CuratedPlace {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1889,10 +1915,8 @@ type j_CuratedActivity implements I_j_CuratedPlace {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_CuratedDestination implements I_j_CuratedPlace {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -1948,10 +1972,8 @@ type j_CuratedDestination implements I_j_CuratedPlace {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_CuratedPlace implements I_gn_Feature & I_s_TouristAttraction {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2007,10 +2029,8 @@ type j_CuratedPlace implements I_gn_Feature & I_s_TouristAttraction {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_DestinationElement implements I_j_ScorableAlternative {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2109,10 +2129,8 @@ type j_DestinationElement implements I_j_ScorableAlternative {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_Identity implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2143,7 +2161,6 @@ type j_Identity implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum j_IdentityProvider {
   j_AmazonProvider
   j_FacebookProvider
@@ -2152,10 +2169,8 @@ enum j_IdentityProvider {
   j_LinkedinProvider
   j_TwitterProvider
 }
-
 type j_Itinerary implements I_j_ScorableAlternative {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2253,17 +2268,14 @@ type j_Itinerary implements I_j_ScorableAlternative {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum j_LocalTransportType {
   j_HiredDriver
   j_PublicTransport
   j_SelfDriveAutomatic
   j_SelfDriveManual
 }
-
 type j_Session implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2277,27 +2289,22 @@ type j_Session implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_StayRange {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
   j_maxStay: Duration
   j_minStay: Duration
 }
-
 enum j_SurpriseItineraryType {
   j_KnowContinent
   j_KnowCountry
   j_KnowEverything
   j_KnowNothing
 }
-
 type j_TransportElement implements I_j_ScorableAlternative {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2395,15 +2402,6 @@ type j_TransportElement implements I_j_ScorableAlternative {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
-enum j_TravelerGroupType {
-  j_Couple
-  j_Family
-  j_Friends
-  j_Group
-  j_Solo
-}
-
 enum j_TravelMode {
   j_ByBike
   j_ByBoat
@@ -2414,16 +2412,20 @@ enum j_TravelMode {
   j_Flight
   j_Train
 }
-
 enum j_TravelRadiusType {
   j_Anywhere
   j_SameContinent
   j_SameCountry
 }
-
+enum j_TravelerGroupType {
+  j_Couple
+  j_Family
+  j_Friends
+  j_Group
+  j_Solo
+}
 type j_Trip implements I_s_Invoice {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2453,10 +2455,8 @@ type j_Trip implements I_s_Invoice {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_TripProfile implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2560,10 +2560,8 @@ type j_TripProfile implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type j_User implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2580,58 +2578,8 @@ type j_User implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
-type Mutation {
-  tripFilter(tripFilter: TripFilterInput!): Connection!
-}
-
-type O_Boolean {
-  value: Boolean
-}
-
-type O_Date {
-  value: Date
-}
-
-type O_DateTime {
-  value: DateTime
-}
-
-type O_Float {
-  value: Float
-}
-
-type O_Int {
-  value: Int
-}
-
-type O_s_GenderType {
-  value: s_GenderType
-}
-
-type O_s_ItemListOrderType {
-  value: s_ItemListOrderType
-}
-
-type O_s_PaymentMethod {
-  value: s_PaymentMethod
-}
-
-type O_s_PaymentStatusType {
-  value: s_PaymentStatusType
-}
-
-type O_String {
-  value: String
-}
-
-type O_URL {
-  value: URL
-}
-
 type owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2643,26 +2591,8 @@ type owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
-type PageInfo {
-  startCursor: String
-  endCursor: String
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-}
-
-type Query {
-  user(id: ID!): j_User
-  curatedPlace(id: ID!): j_CuratedPlace
-  curatedDestination(id: ID!): j_CuratedDestination
-  curatedAccommodation(id: ID!): j_CuratedAccommodation
-  curatedActivity(id: ID!): j_CuratedActivity
-  trip(id: ID!): j_Trip
-}
-
 type s_Action implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2685,17 +2615,14 @@ type s_Action implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_ActionStatusType {
   s_ActiveActionStatus
   s_CompletedActionStatus
   s_FailedActionStatus
   s_PotentialActionStatus
 }
-
 type s_AdministrativeArea implements I_s_Place {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2730,10 +2657,8 @@ type s_AdministrativeArea implements I_s_Place {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_AggregateRating implements I_s_Rating {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2752,10 +2677,8 @@ type s_AggregateRating implements I_s_Rating {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_AlignmentObject implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2772,10 +2695,8 @@ type s_AlignmentObject implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Answer implements I_s_Comment {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2868,10 +2789,8 @@ type s_Answer implements I_s_Comment {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Audience implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2885,10 +2804,8 @@ type s_Audience implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_AudioObject implements I_s_MediaObject {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -2993,10 +2910,8 @@ type s_AudioObject implements I_s_MediaObject {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Brand implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3011,10 +2926,8 @@ type s_Brand implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_BroadcastService implements I_s_Service {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3051,14 +2964,12 @@ type s_BroadcastService implements I_s_Service {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_BusinessEntityType {
   gr_Business
   gr_Enduser
   gr_PublicInstitution
   gr_Reseller
 }
-
 enum s_BusinessFunction {
   gr_Buy
   gr_ConstructionInstallation
@@ -3069,10 +2980,8 @@ enum s_BusinessFunction {
   gr_Repair
   gr_Sell
 }
-
 type s_Comment implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3165,10 +3074,8 @@ type s_Comment implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_ContactPoint implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3189,15 +3096,12 @@ type s_ContactPoint implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_ContactPointOption {
   s_HearingImpairedSupported
   s_TollFree
 }
-
 type s_Country implements I_s_AdministrativeArea {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3232,10 +3136,8 @@ type s_Country implements I_s_AdministrativeArea {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_CreativeWork implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3325,10 +3227,8 @@ type s_CreativeWork implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_DataCatalog implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3419,10 +3319,8 @@ type s_DataCatalog implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_DataDownload implements I_s_MediaObject {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3526,10 +3424,8 @@ type s_DataDownload implements I_s_MediaObject {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_DataFeed implements I_s_Dataset {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3623,10 +3519,8 @@ type s_DataFeed implements I_s_Dataset {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_DataFeedItem implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3642,10 +3536,8 @@ type s_DataFeedItem implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Dataset implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3738,7 +3630,6 @@ type s_Dataset implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_DayOfWeek {
   s_Friday
   s_Monday
@@ -3749,10 +3640,8 @@ enum s_DayOfWeek {
   s_Tuesday
   s_Wednesday
 }
-
 type s_DeliveryEvent implements I_s_Event {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3800,7 +3689,6 @@ type s_DeliveryEvent implements I_s_Event {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_DeliveryMethod {
   gr_DHL
   gr_DeliveryModeDirectDownload
@@ -3812,10 +3700,8 @@ enum s_DeliveryMethod {
   s_OnSitePickup
   gr_UPS
 }
-
 type s_Demand implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3859,10 +3745,8 @@ type s_Demand implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Distance implements I_s_Quantity {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3874,10 +3758,8 @@ type s_Distance implements I_s_Quantity {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_EducationalOrganization implements I_s_Organization {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3930,10 +3812,8 @@ type s_EducationalOrganization implements I_s_Organization {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_EntryPoint implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3951,10 +3831,8 @@ type s_EntryPoint implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Enumeration implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -3966,10 +3844,8 @@ type s_Enumeration implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Event implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4013,22 +3889,18 @@ type s_Event implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_EventStatusType {
   s_EventCancelled
   s_EventPostponed
   s_EventRescheduled
   s_EventScheduled
 }
-
 enum s_GenderType {
   s_Female
   s_Male
 }
-
 type s_GeoCoordinates implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4046,10 +3918,8 @@ type s_GeoCoordinates implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_GeoShape implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4069,10 +3939,8 @@ type s_GeoShape implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_ImageObject implements I_s_MediaObject {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4180,10 +4048,8 @@ type s_ImageObject implements I_s_MediaObject {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_InteractionCounter implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4198,10 +4064,8 @@ type s_InteractionCounter implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Invoice implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4228,7 +4092,6 @@ type s_Invoice implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_ItemAvailability {
   s_Discontinued
   s_InStock
@@ -4240,10 +4103,8 @@ enum s_ItemAvailability {
   s_PreSale
   s_SoldOut
 }
-
 type s_ItemList implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4258,16 +4119,13 @@ type s_ItemList implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_ItemListOrderType {
   s_ItemListOrderAscending
   s_ItemListOrderDescending
   s_ItemListUnordered
 }
-
 type s_Language implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4279,10 +4137,8 @@ type s_Language implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_ListItem implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4298,10 +4154,8 @@ type s_ListItem implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_LoanOrCredit implements I_s_FinancialProduct {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4338,10 +4192,8 @@ type s_LoanOrCredit implements I_s_FinancialProduct {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_LocationFeatureSpecification implements I_s_PropertyValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4363,10 +4215,8 @@ type s_LocationFeatureSpecification implements I_s_PropertyValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Map implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4457,17 +4307,14 @@ type s_Map implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_MapCategoryType {
   s_ParkingMap
   s_SeatingMap
   s_TransitMap
   s_VenueMap
 }
-
 type s_MediaObject implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4571,10 +4418,8 @@ type s_MediaObject implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_MonetaryAmount implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4592,10 +4437,8 @@ type s_MonetaryAmount implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_MusicAlbum implements I_s_MusicPlaylist {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4691,7 +4534,6 @@ type s_MusicAlbum implements I_s_MusicPlaylist {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_MusicAlbumProductionType {
   s_CompilationAlbum
   s_DJMixAlbum
@@ -4703,17 +4545,14 @@ enum s_MusicAlbumProductionType {
   s_SpokenWordAlbum
   s_StudioAlbum
 }
-
 enum s_MusicAlbumReleaseType {
   s_AlbumRelease
   s_BroadcastRelease
   s_EPRelease
   s_SingleRelease
 }
-
 type s_MusicComposition implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4813,10 +4652,8 @@ type s_MusicComposition implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_MusicGroup implements I_s_PerformingGroup {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4872,10 +4709,8 @@ type s_MusicGroup implements I_s_PerformingGroup {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_MusicPlaylist implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -4967,10 +4802,8 @@ type s_MusicPlaylist implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_MusicRecording implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5066,10 +4899,8 @@ type s_MusicRecording implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_MusicRelease implements I_s_MusicPlaylist {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5167,7 +4998,6 @@ type s_MusicRelease implements I_s_MusicPlaylist {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_MusicReleaseFormatType {
   s_CDFormat
   s_CassetteFormat
@@ -5177,10 +5007,8 @@ enum s_MusicReleaseFormatType {
   s_LaserDiscFormat
   s_VinylFormat
 }
-
 type s_NewsArticle implements I_s_Article {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5281,10 +5109,8 @@ type s_NewsArticle implements I_s_Article {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Offer implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5336,10 +5162,8 @@ type s_Offer implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_OfferCatalog implements I_s_ItemList {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5354,17 +5178,14 @@ type s_OfferCatalog implements I_s_ItemList {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_OfferItemCondition {
   s_DamagedCondition
   s_NewCondition
   s_RefurbishedCondition
   s_UsedCondition
 }
-
 type s_OpeningHoursSpecification implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5381,10 +5202,8 @@ type s_OpeningHoursSpecification implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Order implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5416,10 +5235,8 @@ type s_Order implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_OrderItem implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5436,7 +5253,6 @@ type s_OrderItem implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_OrderStatus {
   s_OrderCancelled
   s_OrderDelivered
@@ -5447,10 +5263,8 @@ enum s_OrderStatus {
   s_OrderProcessing
   s_OrderReturned
 }
-
 type s_Organization implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5503,10 +5317,8 @@ type s_Organization implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_OwnershipInfo implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5522,10 +5334,8 @@ type s_OwnershipInfo implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_ParcelDelivery implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5548,7 +5358,6 @@ type s_ParcelDelivery implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_PaymentMethod {
   gr_ByBankTransferInAdvance
   gr_ByInvoice
@@ -5560,7 +5369,6 @@ enum s_PaymentMethod {
   gr_PayPal
   gr_PaySwarm
 }
-
 enum s_PaymentStatusType {
   s_PaymentAutomaticallyApplied
   s_PaymentComplete
@@ -5568,10 +5376,8 @@ enum s_PaymentStatusType {
   s_PaymentDue
   s_PaymentPastDue
 }
-
 type s_Person implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5634,10 +5440,8 @@ type s_Person implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Photograph implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5727,10 +5531,8 @@ type s_Photograph implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Place implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5765,10 +5567,8 @@ type s_Place implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_PostalAddress implements I_s_ContactPoint {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5795,10 +5595,8 @@ type s_PostalAddress implements I_s_ContactPoint {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_PriceSpecification implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5819,10 +5617,8 @@ type s_PriceSpecification implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Product implements I_owl_Thing {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5866,10 +5662,8 @@ type s_Product implements I_owl_Thing {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_ProductModel implements I_s_Product {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5916,10 +5710,8 @@ type s_ProductModel implements I_s_Product {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_ProgramMembership implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5935,10 +5727,8 @@ type s_ProgramMembership implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_PropertyValue implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -5957,10 +5747,8 @@ type s_PropertyValue implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_PublicationEvent implements I_s_Event {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6005,10 +5793,8 @@ type s_PublicationEvent implements I_s_Event {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_QualitativeValue implements I_s_Enumeration {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6028,10 +5814,8 @@ type s_QualitativeValue implements I_s_Enumeration {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_QuantitativeValue implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6050,10 +5834,8 @@ type s_QuantitativeValue implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Question implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6148,10 +5930,8 @@ type s_Question implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Rating implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6167,10 +5947,8 @@ type s_Rating implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Review implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6263,10 +6041,8 @@ type s_Review implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_Service implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6297,10 +6073,8 @@ type s_Service implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_ServiceChannel implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6320,10 +6094,8 @@ type s_ServiceChannel implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_SoftwareApplication implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6435,10 +6207,8 @@ type s_SoftwareApplication implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_StructuredValue implements I_s_Intangible {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6450,10 +6220,8 @@ type s_StructuredValue implements I_s_Intangible {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_TypeAndQuantityNode implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6470,10 +6238,8 @@ type s_TypeAndQuantityNode implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_VideoObject implements I_s_MediaObject {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6585,10 +6351,8 @@ type s_VideoObject implements I_s_MediaObject {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 type s_WarrantyPromise implements I_s_StructuredValue {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6602,16 +6366,13 @@ type s_WarrantyPromise implements I_s_StructuredValue {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
 enum s_WarrantyScope {
   gr_Labor_BringIn
   gr_PartsAndLabor_BringIn
   gr_PartsAndLabor_PickUp
 }
-
 type s_WebSite implements I_s_CreativeWork {
-  __id: String! @id
-  __typename: String @typename
+  _id: String!
   s_description: String
   s_name: String
   s_url: URL
@@ -6702,114 +6463,10 @@ type s_WebSite implements I_s_CreativeWork {
   s_potentialAction: [s_Action]!
   s_sameAs: [URL]!
 }
-
-scalar Time
-
-input TripFilterInput {
-  countryCode: String!
+schema @id(fields: ["_id"]) {
+  query: Query
+  mutation: Mutation
 }
-
-union U_Boolean_OR_String = O_Boolean | O_String
-
-union U_Date_OR_DateTime = O_Date | O_DateTime
-
-union U_Int_OR_String = O_Int | O_String
-
-union U_NodeObject = j_BookedTrip | s_Comment | j_CuratedAccommodation | j_CuratedActivity | j_CuratedDestination | gn_Feature | j_Identity | s_ImageObject | j_Itinerary | s_LocationFeatureSpecification | s_Order | s_Photograph | s_Review | j_Session | j_TripProfile | j_User
-
-union U_owl_Thing_OR_String = owl_Thing | O_String
-
-union U_s_AdministrativeArea_OR_s_GeoShape_OR_s_Place_OR_String = s_AdministrativeArea | s_GeoShape | s_Place | O_String
-
-union U_s_Answer_OR_s_ItemList = s_Answer | s_ItemList
-
-union U_s_Audience_OR_String = s_Audience | O_String
-
-union U_s_Brand_OR_s_Organization = s_Brand | s_Organization
-
-union U_s_ContactPoint_OR_s_Place = s_ContactPoint | s_Place
-
-union U_s_Country_OR_String = s_Country | O_String
-
-union U_s_CreativeWork_OR_s_Product_OR_URL = s_CreativeWork | s_Product | O_URL
-
-union U_s_CreativeWork_OR_String = s_CreativeWork | O_String
-
-union U_s_CreativeWork_OR_URL = s_CreativeWork | O_URL
-
-union U_s_DataFeedItem_OR_owl_Thing_OR_String = s_DataFeedItem | owl_Thing | O_String
-
-union U_s_Distance_OR_s_QuantitativeValue = s_Distance | s_QuantitativeValue
-
-union U_s_EducationalOrganization_OR_s_Organization = s_EducationalOrganization | s_Organization
-
-union U_s_Enumeration_OR_s_PropertyValue_OR_s_QualitativeValue_OR_s_QuantitativeValue_OR_s_StructuredValue = s_Enumeration | s_PropertyValue | s_QualitativeValue | s_QuantitativeValue | s_StructuredValue
-
-union U_s_GenderType_OR_String = O_s_GenderType | O_String
-
-union U_s_GeoCoordinates_OR_s_GeoShape = s_GeoCoordinates | s_GeoShape
-
-union U_s_GeoShape_OR_s_Place_OR_String = s_GeoShape | s_Place | O_String
-
-union U_s_ImageObject_OR_URL = s_ImageObject | O_URL
-
-union U_s_ItemList_OR_s_MusicRecording = s_ItemList | s_MusicRecording
-
-union U_s_ItemListOrderType_OR_String = O_s_ItemListOrderType | O_String
-
-union U_s_Language_OR_String = s_Language | O_String
-
-union U_s_ListItem_OR_owl_Thing_OR_String = s_ListItem | owl_Thing | O_String
-
-union U_s_LoanOrCredit_OR_s_PaymentMethod = s_LoanOrCredit | O_s_PaymentMethod
-
-union U_s_Map_OR_URL = s_Map | O_URL
-
-union U_s_MonetaryAmount_OR_Float = s_MonetaryAmount | O_Float
-
-union U_s_MonetaryAmount_OR_s_PriceSpecification = s_MonetaryAmount | s_PriceSpecification
-
-union U_s_MonetaryAmount_OR_String = s_MonetaryAmount | O_String
-
-union U_s_MusicGroup_OR_s_Person = s_MusicGroup | s_Person
-
-union U_s_OrderItem_OR_s_Product = s_OrderItem | s_Product
-
-union U_s_Organization_OR_s_Person = s_Organization | s_Person
-
-union U_s_Organization_OR_s_ProgramMembership = s_Organization | s_ProgramMembership
-
-union U_s_OwnershipInfo_OR_s_Product = s_OwnershipInfo | s_Product
-
-union U_s_PaymentStatusType_OR_String = O_s_PaymentStatusType | O_String
-
-union U_s_Person_OR_URL = s_Person | O_URL
-
-union U_s_Place_OR_s_PostalAddress_OR_String = s_Place | s_PostalAddress | O_String
-
-union U_s_PostalAddress_OR_String = s_PostalAddress | O_String
-
-union U_s_Product_OR_s_Service = s_Product | s_Service
-
-union U_s_Product_OR_String = s_Product | O_String
-
-union U_s_Product_OR_URL = s_Product | O_URL
-
-union U_s_ProductModel_OR_String = s_ProductModel | O_String
-
-union U_s_PropertyValue_OR_String = s_PropertyValue | O_String
-
-union U_s_PropertyValue_OR_URL = s_PropertyValue | O_URL
-
-union U_s_QuantitativeValue_OR_Float = s_QuantitativeValue | O_Float
-
-union U_s_Rating_OR_String = s_Rating | O_String
-
-union U_s_SoftwareApplication_OR_s_WebSite = s_SoftwareApplication | s_WebSite
-
-union U_s_StructuredValue_OR_Boolean_OR_Float = s_StructuredValue | O_Boolean | O_Float
-
-union U_URL_OR_DateTime = O_URL | O_DateTime
-
-scalar URL
+directive @id(fields: [String!]) on FIELD_DEFINITION | OBJECT | INTERFACE | SCHEMA
+directive @resolve(with: String!) on FIELD_DEFINITION | OBJECT | INTERFACE | SCHEMA | FIELD | QUERY | FRAGMENT_DEFINITION | FRAGMENT_SPREAD | INLINE_FRAGMENT
 

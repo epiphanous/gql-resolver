@@ -4,6 +4,7 @@ import { GQLDirective } from './GQLDirective';
 import { GQLField } from './GQLSelection';
 import { GQLType } from './GQLType';
 import { GQLValue } from './GQLValue';
+import { GQLSchema } from './GQLSchema';
 
 interface IGQLTypeDefinition {
   name: string;

@@ -5,6 +5,9 @@ import { ATNDeserializer } from 'antlr4ts/atn/ATNDeserializer';
 import { CharStream } from 'antlr4ts/CharStream';
 import { Lexer } from 'antlr4ts/Lexer';
 import { LexerATNSimulator } from 'antlr4ts/atn/LexerATNSimulator';
+import { NotNull } from 'antlr4ts/Decorators';
+import { Override } from 'antlr4ts/Decorators';
+import { RuleContext } from 'antlr4ts/RuleContext';
 import { Vocabulary } from 'antlr4ts/Vocabulary';
 import { VocabularyImpl } from 'antlr4ts/VocabularyImpl';
 
@@ -266,9 +269,38 @@ export class GraphQLLexer extends Lexer {
   );
 
   // @Override
-  private static readonly _serializedATNSegments: number = 2;
-
+  // @NotNull
+  public get vocabulary(): Vocabulary {
+    return GraphQLLexer.VOCABULARY;
+  }
   // tslint:enable:no-trailing-whitespace
+
+  constructor(input: CharStream) {
+    super(input);
+    this._interp = new LexerATNSimulator(GraphQLLexer._ATN, this);
+  }
+
+  // @Override
+  public get grammarFileName(): string {
+    return 'GraphQL.g4';
+  }
+
+  // @Override
+  public get ruleNames(): string[] {
+    return GraphQLLexer.ruleNames;
+  }
+
+  // @Override
+  public get serializedATN(): string {
+    return GraphQLLexer._serializedATN;
+  }
+
+  // @Override
+  public get modeNames(): string[] {
+    return GraphQLLexer.modeNames;
+  }
+
+  private static readonly _serializedATNSegments: number = 2;
   private static readonly _serializedATNSegment0: string =
     '\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x02:\u02AE\b\x01' +
     '\x04\x02\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06' +
@@ -583,14 +615,7 @@ export class GraphQLLexer extends Lexer {
     [GraphQLLexer._serializedATNSegment0, GraphQLLexer._serializedATNSegment1],
     ''
   );
-
-  constructor(input: CharStream) {
-    super(input);
-    this._interp = new LexerATNSimulator(GraphQLLexer._ATN, this);
-  }
-
   public static __ATN: ATN;
-
   public static get _ATN(): ATN {
     if (!GraphQLLexer.__ATN) {
       GraphQLLexer.__ATN = new ATNDeserializer().deserialize(
@@ -599,30 +624,5 @@ export class GraphQLLexer extends Lexer {
     }
 
     return GraphQLLexer.__ATN;
-  }
-
-  // @NotNull
-  public get vocabulary(): Vocabulary {
-    return GraphQLLexer.VOCABULARY;
-  }
-
-  // @Override
-  public get grammarFileName(): string {
-    return 'GraphQL.g4';
-  }
-
-  // @Override
-  public get ruleNames(): string[] {
-    return GraphQLLexer.ruleNames;
-  }
-
-  // @Override
-  public get serializedATN(): string {
-    return GraphQLLexer._serializedATN;
-  }
-
-  // @Override
-  public get modeNames(): string[] {
-    return GraphQLLexer.modeNames;
   }
 }

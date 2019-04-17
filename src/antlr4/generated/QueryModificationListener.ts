@@ -2,136 +2,134 @@
 
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
 
-import {
-  AbsFuncContext,
-  BindingContext,
-  BindingsContext,
-  BlankNodeContext,
-  BooleanLiteralAtomContext,
-  BooleanLiteralContext,
-  BoostContext,
-  BoostersContext,
-  BoundFuncContext,
-  BuiltinCallAtomContext,
-  BuiltinCallContext,
-  CeilFuncContext,
-  CoalesceFuncContext,
-  ComparisonOpContext,
-  ComparisonPredicateContext,
-  ConcatFuncContext,
-  ContainsFuncContext,
-  DatatypeFuncContext,
-  DayFuncContext,
-  DecimalLiteralContext,
-  DoubleLiteralContext,
-  DtRdfLiteralContext,
-  EncodeForUriFuncContext,
-  ExistsFuncContext,
-  ExpressionAtomContext,
-  ExpressionContext,
-  ExpressionListContext,
-  FactorExpressionContext,
-  FactorOpContext,
-  FeatureContext,
-  FeatureOrLatLonContext,
-  FieldRefAtomContext,
-  FieldRefContext,
-  FilterContext,
-  FloorFuncContext,
-  FollowedByUserBoostContext,
-  FollowsUserBoostContext,
-  FunctionCallAtomContext,
-  FunctionCallContext,
-  FuncWithArgsContext,
-  FuncWithoutArgsContext,
-  GeoNearbyPatternContext,
-  HoursFuncContext,
-  IfFuncContext,
-  InPredicateContext,
-  IntegerLiteralContext,
-  InVarPredicateContext,
-  IriFuncContext,
-  IriRefAtomContext,
-  IriRefContext,
-  IriRefOrVarRefContext,
-  IsBlankFuncContext,
-  IsIriFuncContext,
-  IsLiteralFuncContext,
-  IsNumericFuncContext,
-  IsURIFuncContext,
-  LangFuncContext,
-  LangMatchesFuncContext,
-  LangRdfLiteralContext,
-  LatLonContext,
-  LcaseFuncContext,
-  LiteralIriRefContext,
-  Md5FuncContext,
-  MinutesFuncContext,
-  MonthFuncContext,
-  NowFuncContext,
-  NumericLiteralAtomContext,
-  NumericLiteralContext,
-  NumericLiteralOrVarRefContext,
-  OrderByContext,
-  OrderBysContext,
-  ParenExpressionContext,
-  ParenPredicateContext,
-  PatternContext,
-  PatternsContext,
-  PredicateContext,
-  PrefixedNameContext,
-  PrefixedNameIriRefContext,
-  PrimitiveExpressionContext,
-  ProximitySpecContext,
-  RandFuncContext,
-  RdfLiteralAtomContext,
-  RdfLiteralContext,
-  RegexFuncContext,
-  ReplaceFuncContext,
-  RoundFuncContext,
-  SameTermFuncContext,
-  SearchConditionAndContext,
-  SearchConditionContext,
-  SearchConditionNotContext,
-  SecondsFuncContext,
-  Sha1FuncContext,
-  Sha256FuncContext,
-  Sha384FuncContext,
-  Sha512FuncContext,
-  StrAfterFuncContext,
-  StrBeforeFuncContext,
-  StrDtFuncContext,
-  StrEndsFuncContext,
-  StrFuncContext,
-  StringLiteralAtomContext,
-  StringLiteralContext,
-  StringLiteralOrVarRefContext,
-  StrLangFuncContext,
-  StrLenFuncContext,
-  StrStartsFuncContext,
-  StrUuidFuncContext,
-  SubstrFuncContext,
-  TermExpressionContext,
-  TermOpContext,
-  TextMatchBoostParamContext,
-  TextMatchMaxHitsParamContext,
-  TextMatchMinScoreParamContext,
-  TextMatchParamContext,
-  TextMatchPatternContext,
-  TimezoneFuncContext,
-  TransformContext,
-  TransformsContext,
-  TzFuncContext,
-  UcaseFuncContext,
-  UnaryExpressionContext,
-  UnaryOpContext,
-  UriFuncContext,
-  UuidFuncContext,
-  VarFeatureContext,
-  VarRefAtomContext,
-  VarRefContext,
-  YearFuncContext,
-} from './QueryModificationParser';
+import { TextMatchPatternContext } from './QueryModificationParser';
+import { GeoNearbyPatternContext } from './QueryModificationParser';
+import { FeatureContext } from './QueryModificationParser';
+import { LatLonContext } from './QueryModificationParser';
+import { VarFeatureContext } from './QueryModificationParser';
+import { ComparisonPredicateContext } from './QueryModificationParser';
+import { InVarPredicateContext } from './QueryModificationParser';
+import { InPredicateContext } from './QueryModificationParser';
+import { ParenPredicateContext } from './QueryModificationParser';
+import { FieldRefAtomContext } from './QueryModificationParser';
+import { FunctionCallAtomContext } from './QueryModificationParser';
+import { BuiltinCallAtomContext } from './QueryModificationParser';
+import { RdfLiteralAtomContext } from './QueryModificationParser';
+import { StringLiteralAtomContext } from './QueryModificationParser';
+import { IriRefAtomContext } from './QueryModificationParser';
+import { NumericLiteralAtomContext } from './QueryModificationParser';
+import { BooleanLiteralAtomContext } from './QueryModificationParser';
+import { VarRefAtomContext } from './QueryModificationParser';
+import { LangRdfLiteralContext } from './QueryModificationParser';
+import { DtRdfLiteralContext } from './QueryModificationParser';
+import { DecimalLiteralContext } from './QueryModificationParser';
+import { DoubleLiteralContext } from './QueryModificationParser';
+import { IntegerLiteralContext } from './QueryModificationParser';
+import { PrimitiveExpressionContext } from './QueryModificationParser';
+import { FactorExpressionContext } from './QueryModificationParser';
+import { ParenExpressionContext } from './QueryModificationParser';
+import { UnaryExpressionContext } from './QueryModificationParser';
+import { TermExpressionContext } from './QueryModificationParser';
+import { TextMatchMinScoreParamContext } from './QueryModificationParser';
+import { TextMatchMaxHitsParamContext } from './QueryModificationParser';
+import { TextMatchBoostParamContext } from './QueryModificationParser';
+import { FuncWithArgsContext } from './QueryModificationParser';
+import { FuncWithoutArgsContext } from './QueryModificationParser';
+import { LiteralIriRefContext } from './QueryModificationParser';
+import { PrefixedNameIriRefContext } from './QueryModificationParser';
+import { IsLiteralFuncContext } from './QueryModificationParser';
+import { StrStartsFuncContext } from './QueryModificationParser';
+import { ReplaceFuncContext } from './QueryModificationParser';
+import { BoundFuncContext } from './QueryModificationParser';
+import { Sha512FuncContext } from './QueryModificationParser';
+import { UcaseFuncContext } from './QueryModificationParser';
+import { EncodeForUriFuncContext } from './QueryModificationParser';
+import { YearFuncContext } from './QueryModificationParser';
+import { StrBeforeFuncContext } from './QueryModificationParser';
+import { Sha256FuncContext } from './QueryModificationParser';
+import { FloorFuncContext } from './QueryModificationParser';
+import { IriFuncContext } from './QueryModificationParser';
+import { StrEndsFuncContext } from './QueryModificationParser';
+import { LcaseFuncContext } from './QueryModificationParser';
+import { ConcatFuncContext } from './QueryModificationParser';
+import { StrLenFuncContext } from './QueryModificationParser';
+import { TzFuncContext } from './QueryModificationParser';
+import { DatatypeFuncContext } from './QueryModificationParser';
+import { RegexFuncContext } from './QueryModificationParser';
+import { LangMatchesFuncContext } from './QueryModificationParser';
+import { Sha384FuncContext } from './QueryModificationParser';
+import { MinutesFuncContext } from './QueryModificationParser';
+import { SecondsFuncContext } from './QueryModificationParser';
+import { StrLangFuncContext } from './QueryModificationParser';
+import { StrUuidFuncContext } from './QueryModificationParser';
+import { AbsFuncContext } from './QueryModificationParser';
+import { DayFuncContext } from './QueryModificationParser';
+import { NowFuncContext } from './QueryModificationParser';
+import { StrAfterFuncContext } from './QueryModificationParser';
+import { CeilFuncContext } from './QueryModificationParser';
+import { TimezoneFuncContext } from './QueryModificationParser';
+import { SameTermFuncContext } from './QueryModificationParser';
+import { IsBlankFuncContext } from './QueryModificationParser';
+import { RandFuncContext } from './QueryModificationParser';
+import { StrFuncContext } from './QueryModificationParser';
+import { HoursFuncContext } from './QueryModificationParser';
+import { Md5FuncContext } from './QueryModificationParser';
+import { ContainsFuncContext } from './QueryModificationParser';
+import { RoundFuncContext } from './QueryModificationParser';
+import { StrDtFuncContext } from './QueryModificationParser';
+import { Sha1FuncContext } from './QueryModificationParser';
+import { MonthFuncContext } from './QueryModificationParser';
+import { IfFuncContext } from './QueryModificationParser';
+import { IsIriFuncContext } from './QueryModificationParser';
+import { SubstrFuncContext } from './QueryModificationParser';
+import { IsNumericFuncContext } from './QueryModificationParser';
+import { UuidFuncContext } from './QueryModificationParser';
+import { LangFuncContext } from './QueryModificationParser';
+import { CoalesceFuncContext } from './QueryModificationParser';
+import { IsURIFuncContext } from './QueryModificationParser';
+import { UriFuncContext } from './QueryModificationParser';
+import { ExistsFuncContext } from './QueryModificationParser';
+import { FollowsUserBoostContext } from './QueryModificationParser';
+import { FollowedByUserBoostContext } from './QueryModificationParser';
+import { FilterContext } from './QueryModificationParser';
+import { PatternsContext } from './QueryModificationParser';
+import { BoostersContext } from './QueryModificationParser';
+import { BindingsContext } from './QueryModificationParser';
+import { OrderBysContext } from './QueryModificationParser';
+import { OrderByContext } from './QueryModificationParser';
+import { TransformsContext } from './QueryModificationParser';
+import { TransformContext } from './QueryModificationParser';
+import { SearchConditionContext } from './QueryModificationParser';
+import { SearchConditionAndContext } from './QueryModificationParser';
+import { SearchConditionNotContext } from './QueryModificationParser';
+import { PredicateContext } from './QueryModificationParser';
+import { ExpressionContext } from './QueryModificationParser';
+import { ExpressionAtomContext } from './QueryModificationParser';
+import { BuiltinCallContext } from './QueryModificationParser';
+import { PatternContext } from './QueryModificationParser';
+import { TextMatchParamContext } from './QueryModificationParser';
+import { BoostContext } from './QueryModificationParser';
+import { BindingContext } from './QueryModificationParser';
+import { ExpressionListContext } from './QueryModificationParser';
+import { FeatureOrLatLonContext } from './QueryModificationParser';
+import { ProximitySpecContext } from './QueryModificationParser';
+import { FunctionCallContext } from './QueryModificationParser';
+import { RdfLiteralContext } from './QueryModificationParser';
+import { NumericLiteralContext } from './QueryModificationParser';
+import { VarRefContext } from './QueryModificationParser';
+import { FieldRefContext } from './QueryModificationParser';
+import { ComparisonOpContext } from './QueryModificationParser';
+import { UnaryOpContext } from './QueryModificationParser';
+import { FactorOpContext } from './QueryModificationParser';
+import { TermOpContext } from './QueryModificationParser';
+import { StringLiteralContext } from './QueryModificationParser';
+import { StringLiteralOrVarRefContext } from './QueryModificationParser';
+import { BooleanLiteralContext } from './QueryModificationParser';
+import { IriRefOrVarRefContext } from './QueryModificationParser';
+import { NumericLiteralOrVarRefContext } from './QueryModificationParser';
+import { IriRefContext } from './QueryModificationParser';
+import { PrefixedNameContext } from './QueryModificationParser';
+import { BlankNodeContext } from './QueryModificationParser';
 
 /**
  * This interface defines a complete listener for a parse tree produced by

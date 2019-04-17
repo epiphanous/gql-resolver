@@ -131,21 +131,32 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Make sure our fields list contains our resultType's id field(s).
    */
   private _initFields() {
-    let fds = List<GQLFieldDefinition>();
+    let ids = List<GQLFieldDefinition>();
     switch (this.resultType.constructor) {
       case GQLInterface:
-        fds = (this.resultType as GQLInterface).idFields();
+        const i = this.resultType as GQLInterface;
+        ids = i.idFields();
+        if (ids.isEmpty()) {
+          ids = this.idFields(i.directives);
+        }
         break;
       case GQLObjectType:
-        fds = (this.resultType as GQLObjectType).idFields();
+        const ot = this.resultType as GQLObjectType;
+        ids = ot.idFields();
+        if (ids.isEmpty()) {
+          ids = this.idFields(ot.directives);
+        }
         break;
       default:
         // noop
         break;
     }
+    if (ids.isEmpty()) {
+      ids = this.idFields(this.context.schema.schemaDirectives);
+    }
     const fields = this.allFields.filter(f => !f.isObject());
     const fieldNames = fields.map(f => f.name).toSet();
-    this.fields = fds
+    this.fields = ids
       .filter(fd => !fieldNames.contains(fd.name))
       .map(
         fd =>
@@ -398,5 +409,20 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       .flatMap(d => d.arg('with'))
       .map(a => a as string)
       .filter(s => this.isStrategyAvailable(s));
+  }
+
+  protected idFields(directives: List<GQLDirective>) {
+    return (
+      directives
+        .filter(d => d.name === 'id')
+        .flatMap(d =>
+          d
+            .arg('fields')
+            .map(a => a as List<string>)
+            .getOrElse(List<string>())
+        )
+        // todo: cleanup this nasty get ----------------------------v
+        .map(t => this.context.schema.getFieldDefinition(t).get())
+    );
   }
 }

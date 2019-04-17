@@ -298,7 +298,7 @@ directiveDefinition
 directiveLocations
   : 'on' '|'? directiveLocation (
     '|'? directiveLocation
-  )
+  )*
   ;
 
 directiveLocation
