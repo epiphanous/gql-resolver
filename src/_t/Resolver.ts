@@ -26,7 +26,8 @@ describe('Resolver', () => {
     const result = await resolver.resolve(
       `
     query test {
-      home: curatedDestination(id: 'yerevan') {
+      home: curatedDestination(filter: 's_name=\\"yerevan\\"') {
+        s_name
         gn_nearby(first: 3) {
           totalCount
           edges {

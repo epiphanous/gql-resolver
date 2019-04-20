@@ -15,6 +15,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   private fetcher = new SparqlEndpointFetcher();
   private DEFAULT_CURSOR_FIELD = 's:name';
   private DEFAULT_CURSOR_LABEL = '?cursor';
+  private DEFAULT_NEARBY_RADIUS = '100'; // km by default for Ontotext's GraphDB
   private SPECIAL_PROJECTIONS = OrderedMap({
     _id: 'j_id',
   });
@@ -59,6 +60,13 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     args: Map<string, any>,
     projections: List<any>
   ) {
+    if (this.isResolvingConnection()) {
+      return `
+        ${this.getPrefixes()}
+        PREFIX omgeo: <http://www.ontotext.com/owlim/geo#>
+        ${this.constructConnectionQuery()}
+      `;
+    }
     return `${this.getPrefixes()}
       SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ')} ${
       this.hasProperParent() ? '?parentId' : ''
@@ -103,7 +111,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
           });
           stream.on('end', () => {
             /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
-             * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _}, {...}}, {...}] => [['geo_lat': 123],...]]
+             * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _},{...}},{...}]=>[['geo_lat': 123],...]]
              * @type {{}[]}
              */
             const resultArrValues: Array<{}> = resultArr.map(entry => {
@@ -182,7 +190,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
    * @returns {GQLExecutionPlan}
    */
   protected hasProperParent() {
-    return !this.plan.parent.getSubjectIds().isEmpty();
+    return this.plan.parent && !this.plan.parent.getSubjectIds().isEmpty();
   }
 
   /**
@@ -297,6 +305,38 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       );
     }
     return '';
+  }
+
+  protected isAGeoSpatialQuery() {
+    const GEOSPATIAL_KEYWORDS = List(['gn_nearby']);
+    // add geospatial plan names to a config, i.e. => [gn_nearby, ...];
+    return GEOSPATIAL_KEYWORDS.includes(this.plan.name);
+  }
+  protected isResolvingConnection() {
+    return this.plan.resultType.name === 'Connection';
+  }
+
+  protected constructConnectionQuery() {
+    if (!this.fields.filter(field => field.name === 'totalCount').isEmpty()) {
+      const parentId = this.plan.parent.getSubjectIds().get(0);
+      // Probably needs some additional checks here
+      if (this.isAGeoSpatialQuery()) {
+        // Should get the totalCount
+        return `
+        SELECT (?s as ?parentId) (COUNT(DISTINCT ?id) AS ?totalCount)
+        WHERE {
+          ?s geo:lat ?latBase.
+          ?s geo:long ?longBase.
+          ?link omgeo:nearby(?latBase ?longBase ${this.DEFAULT_NEARBY_RADIUS}).
+          ?link j:id ?id
+          FILTER( ?s = <${parentId}>)
+        }
+        GROUP BY ?s
+      `;
+      } else {
+        // todo
+      }
+    }
   }
 
   protected addCursorOffset() {

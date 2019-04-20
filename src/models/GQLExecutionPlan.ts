@@ -123,7 +123,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
             f.fields
           )
       );
-
     this.resolveDefaultStrategy();
   }
 
@@ -132,27 +131,30 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    */
   private _initFields() {
     let ids = List<GQLFieldDefinition>();
-    switch (this.resultType.constructor) {
-      case GQLInterface:
-        const i = this.resultType as GQLInterface;
-        ids = i.idFields();
-        if (ids.isEmpty()) {
-          ids = this.idFields(i.directives);
-        }
-        break;
-      case GQLObjectType:
-        const ot = this.resultType as GQLObjectType;
-        ids = ot.idFields();
-        if (ids.isEmpty()) {
-          ids = this.idFields(ot.directives);
-        }
-        break;
-      default:
-        // noop
-        break;
-    }
-    if (ids.isEmpty()) {
-      ids = this.idFields(this.context.schema.schemaDirectives);
+    // todo we don't want the query object to include the _id scalar. Should probably add all of the types alike to a conf and check based off of that
+    if (this.resultType.name !== 'Query' && this.resultType.name !== 'Edge') {
+      switch (this.resultType.constructor) {
+        case GQLInterface:
+          const i = this.resultType as GQLInterface;
+          ids = i.idFields();
+          if (ids.isEmpty()) {
+            ids = this.idFields(i.directives);
+          }
+          break;
+        case GQLObjectType:
+          const ot = this.resultType as GQLObjectType;
+          ids = ot.idFields();
+          if (ids.isEmpty()) {
+            ids = this.idFields(ot.directives);
+          }
+          break;
+        default:
+          // noop
+          break;
+      }
+      if (ids.isEmpty()) {
+        ids = this.idFields(this.context.schema.schemaDirectives);
+      }
     }
     const fields = this.allFields.filter(f => !f.isObject());
     const fieldNames = fields.map(f => f.name).toSet();
@@ -160,11 +162,11 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       .filter(fd => !fieldNames.contains(fd.name))
       .map(
         fd =>
-          new GQLField({
-            name: fd.name,
-            outputType: fd.gqlType.xsdType(),
-            parentType: this.resultType.name,
-          })
+             new GQLField({
+              name: fd.name,
+              outputType: fd.gqlType.xsdType(),
+              parentType: this.resultType.name,
+            })
       )
       .concat(fields);
     console.log({
@@ -194,7 +196,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
         return acc;
       }, Map<string, string>().asMutable())
     );
-    this.processedArgs = queryBuilder.processArgs(this.args, fieldsToMap);
+    const allValidFields = Map((this.resultType as GQLObjectType).fields.map<[string, string]>(fd => [fd.name, fd.gqlType.name]));
+    this.processedArgs = queryBuilder.processArgs(this.args, allValidFields);
     this.scalars = List(await Promise.all(this.resolveFields()));
     this.objects = List(await Promise.all(this.resolvePlans(queryBuilder)));
     return this.makePlanResult();

@@ -73,6 +73,7 @@ export class RDFPrefixes {
     ['xml', new SimpleNamespace('xml', 'http://www.w3.org/XML/1998/namespace')],
     ['xsd', new SimpleNamespace('xsd', 'http://www.w3.org/2001/XMLSchema#')],
     ['j', new SimpleNamespace('j', 'http://jubel.co/jtv/')],
+    ['s', new SimpleNamespace('s', 'http://schema.org/')]
   ]);
 
   public static nameToPrefix = Map(
