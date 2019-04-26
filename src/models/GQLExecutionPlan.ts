@@ -1,4 +1,4 @@
-import { None, Option } from 'funfix';
+import { None, Option, Some } from 'funfix';
 import { List, Map, OrderedMap } from 'immutable';
 import GQLQueryBuilder from '../builders/graphql/GQLQueryBuilder';
 import QueryStrategy from '../strategies/QueryStrategy';
@@ -198,9 +198,21 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     );
     const allValidFields = Map((this.resultType as GQLObjectType).fields.map<[string, string]>(fd => [fd.name, fd.gqlType.name]));
     this.processedArgs = queryBuilder.processArgs(this.args, allValidFields);
+    if (this.isConnectionEdgesPlan()) {
+      this.processedArgs = this.getGrandParentPlan().nonEmpty() ?
+        this.getGrandParentPlan().get().processedArgs :
+        this.processedArgs;
+    }
     this.scalars = List(await Promise.all(this.resolveFields()));
     this.objects = List(await Promise.all(this.resolvePlans(queryBuilder)));
     return this.makePlanResult();
+  }
+
+  public getGrandParentPlan(): Option<GQLExecutionPlan> {
+    if (this.parent && this.parent.parent) {
+      return Some(this.parent.parent);
+    }
+    return None;
   }
 
   public isConnectionEdgesPlan() {
@@ -208,7 +220,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     const grandParent = parent && parent.parent;
     const greatGrandParent = grandParent && grandParent.parent;
     return (
-      greatGrandParent && greatGrandParent.resultType.name === 'Connection'
+      grandParent && grandParent.resultType.name === 'Connection'
     );
   }
 
@@ -286,6 +298,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     const mappedObjects = this.objects.map(sc => sc.data).has(0)
       ? this.objects.map(sc => sc.data).get(0)
       : OrderedMap({});
+    console.log('mappedObjects', JSON.stringify(mappedObjects, null, 2));
     this.result.merge(mappedScalars as OrderedMap<string, any>);
     this.result.merge(mappedObjects as OrderedMap<string, any>);
     this.finalizeResults();

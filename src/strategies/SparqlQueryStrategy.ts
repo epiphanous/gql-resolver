@@ -1,9 +1,10 @@
 import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint';
+import { None, Option, Some } from 'funfix';
 import { List, Map, OrderedMap } from 'immutable';
 import { GQLAny } from '../models/GQLAny';
 import { GQLExecutionPlan } from '../models/GQLExecutionPlan';
-import { GQLSortBy } from '../models/GQLSortBy';
 import { GQLField } from '../models/GQLSelection';
+import { GQLSortBy } from '../models/GQLSortBy';
 import QueryResult from '../models/QueryResult';
 import { RDFPrefixes } from '../models/RDFPrefixes';
 import QueryStrategy from './QueryStrategy';
@@ -15,7 +16,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   private fetcher = new SparqlEndpointFetcher();
   private DEFAULT_CURSOR_FIELD = 's:name';
   private DEFAULT_CURSOR_LABEL = '?cursor';
-  private DEFAULT_NEARBY_RADIUS = '100'; // km by default for Ontotext's GraphDB
+  private DEFAULT_NEARBY_RADIUS = '500'; // km by default for Ontotext's GraphDB
   private SPECIAL_PROJECTIONS = OrderedMap({
     _id: 'j_id',
   });
@@ -64,7 +65,13 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       return `
         ${this.getPrefixes()}
         PREFIX omgeo: <http://www.ontotext.com/owlim/geo#>
-        ${this.constructConnectionQuery()}
+        ${this.constructConnectionQuery(projections, args)}
+      `;
+    } else if (this.plan.isConnectionEdgesPlan()) {
+      return `
+        ${this.getPrefixes()}
+        PREFIX omgeo: <http://www.ontotext.com/owlim/geo#>
+        ${this.constructConnectionQuery(projections, args, false)}
       `;
     }
     return `${this.getPrefixes()}
@@ -223,12 +230,12 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     );
   }
 
-  protected spreadProjections(projections: List<any>) {
+  protected spreadProjections(projections: List<any>, overriddenSubject: Option<string> = None) {
     const projLen = projections.size;
     return projections
       .map(
         (a, i) =>
-          'optional {?s ' +
+          'optional {' + (overriddenSubject.isEmpty() ? '?s ' : overriddenSubject.get() + ' ') +
           a.name +
           ' ?' +
           a.projection +
@@ -278,13 +285,12 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addLimit() {
-    const anyArgs = this.plan.processedArgs.any;
-    const maybeFirst = anyArgs.find(arg => arg.name === 'first');
-    const maybeLast = anyArgs.find(arg => arg.name === 'last');
-    if (maybeFirst) {
-      return `LIMIT ${maybeFirst.value.get()}`;
-    } else if (maybeLast) {
-      return `LIMIT ${maybeLast.value.get()}`;
+    const optFirst = this.plan.processedArgs.first;
+    const optLast = this.plan.processedArgs.last;
+    if (this.plan.processedArgs.first.nonEmpty()) {
+      return `LIMIT ${optFirst.get()}`;
+    } else if (this.plan.processedArgs.last.nonEmpty()) {
+      return `LIMIT ${optLast.get()}`;
     } else {
       return '';
     }
@@ -312,31 +318,38 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     // add geospatial plan names to a config, i.e. => [gn_nearby, ...];
     return GEOSPATIAL_KEYWORDS.includes(this.plan.name);
   }
+
   protected isResolvingConnection() {
     return this.plan.resultType.name === 'Connection';
   }
 
-  protected constructConnectionQuery() {
-    if (!this.fields.filter(field => field.name === 'totalCount').isEmpty()) {
-      const parentId = this.plan.parent.getSubjectIds().get(0);
+  protected constructConnectionQuery(projections: List<any>,
+                                     args: Map<string, any>,
+                                     countOnly: boolean = true) {
+    // if (!this.fields.filter(field => field.name === 'totalCount').isEmpty()) {
+      const parentId = countOnly ? this.plan.parent.getSubjectIds().get(0) : this.plan.getGrandParentPlan().get().getSubjectIds().get(0);
       // Probably needs some additional checks here
-      if (this.isAGeoSpatialQuery()) {
-        // Should get the totalCount
-        return `
-        SELECT (?s as ?parentId) (COUNT(DISTINCT ?id) AS ?totalCount)
+      // if (this.isAGeoSpatialQuery()) {
+        // TODO really just a gn_nearby at the moment.. should be refactored regardless
+      return `
+        SELECT ${countOnly ?
+          '(?s as ?parentId) (COUNT(DISTINCT ?id) AS ?totalCount)' :
+          '?s ' + projections.map(a => `?${a.projection}`).join(' ')}
         WHERE {
           ?s geo:lat ?latBase.
           ?s geo:long ?longBase.
           ?link omgeo:nearby(?latBase ?longBase ${this.DEFAULT_NEARBY_RADIUS}).
           ?link j:id ?id
+          ${countOnly ? '' : this.spreadProjections(projections, Some('?link'))} ${args.isEmpty() ? '' : '.'}
           FILTER( ?s = <${parentId}>)
         }
-        GROUP BY ?s
-      `;
-      } else {
-        // todo
-      }
-    }
+        ${countOnly ? 'GROUP BY ?s' : ''}
+      `; // TODO add limits and other stuff above..
+      // }
+      // else {
+        // todo other connection-type queries..
+      // }
+    // }
   }
 
   protected addCursorOffset() {
