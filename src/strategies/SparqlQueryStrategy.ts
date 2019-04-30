@@ -128,8 +128,12 @@ export default class SparqlQueryStrategy extends QueryStrategy {
               }, {});
             });
             const om = OrderedMap<string, OrderedMap<string, any>>(
-              resultArrValues.map((row: { parentId: string; s: string }) => {
-                const k: string = this.hasProperParent() ? row.parentId : row.s;
+              resultArrValues.map((row: { parentId: string; s: string, j_id: string }) => {
+                const k: string = this.plan.isConnectionEdgesPlan() ?
+                  row.j_id :
+                  this.hasProperParent() ?
+                    row.parentId :
+                    row.s;
                 const v = OrderedMap<any>(
                   this.fields.map(f => {
                     const key: string = f.alias.getOrElse(f.name);
@@ -326,7 +330,6 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   protected constructConnectionQuery(projections: List<any>,
                                      args: Map<string, any>,
                                      countOnly: boolean = true) {
-    // if (!this.fields.filter(field => field.name === 'totalCount').isEmpty()) {
       const parentId = countOnly ? this.plan.parent.getSubjectIds().get(0) : this.plan.getGrandParentPlan().get().getSubjectIds().get(0);
       // Probably needs some additional checks here
       // if (this.isAGeoSpatialQuery()) {
@@ -344,12 +347,12 @@ export default class SparqlQueryStrategy extends QueryStrategy {
           FILTER( ?s = <${parentId}>)
         }
         ${countOnly ? 'GROUP BY ?s' : ''}
+        ${this.addLimit()}
       `; // TODO add limits and other stuff above..
       // }
       // else {
         // todo other connection-type queries..
       // }
-    // }
   }
 
   protected addCursorOffset() {

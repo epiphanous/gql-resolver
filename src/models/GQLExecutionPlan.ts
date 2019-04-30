@@ -298,7 +298,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     const mappedObjects = this.objects.map(sc => sc.data).has(0)
       ? this.objects.map(sc => sc.data).get(0)
       : OrderedMap({});
-    console.log('mappedObjects', JSON.stringify(mappedObjects, null, 2));
     this.result.merge(mappedScalars as OrderedMap<string, any>);
     this.result.merge(mappedObjects as OrderedMap<string, any>);
     this.finalizeResults();
@@ -310,6 +309,10 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * properly merged with the parent object
    */
   protected finalizeResults() {
+    if (this.isConnectionEdgesPlan()) {
+      // todo the line below is probably too hacky
+      this.name = this.getGrandParentPlan().get().getSubjectIds().get(0);
+    }
     if (this.parent) {
       // this is to handle situations where we have an array of n objects instead of just one object
       if (this.parent.scalars.isEmpty()) {
