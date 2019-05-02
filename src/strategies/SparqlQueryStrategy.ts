@@ -129,11 +129,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
             });
             const om = OrderedMap<string, OrderedMap<string, any>>(
               resultArrValues.map((row: { parentId: string; s: string, j_id: string }) => {
-                const k: string = this.plan.isConnectionEdgesPlan() ?
-                  row.j_id :
-                  this.hasProperParent() ?
-                    row.parentId :
-                    row.s;
+                const k: string = this.hasProperParent() ? row.parentId : row.s;
                 const v = OrderedMap<any>(
                   this.fields.map(f => {
                     const key: string = f.alias.getOrElse(f.name);
@@ -336,19 +332,23 @@ export default class SparqlQueryStrategy extends QueryStrategy {
         // TODO really just a gn_nearby at the moment.. should be refactored regardless
       return `
         SELECT ${countOnly ?
-          '(?s as ?parentId) (COUNT(DISTINCT ?id) AS ?totalCount)' :
-          '?s ' + projections.map(a => `?${a.projection}`).join(' ')}
+          '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)' :
+          '?s ?parentId ' + projections.map(a => `?${a.projection}`).join(' ')}
         WHERE {
-          ?s geo:lat ?latBase.
-          ?s geo:long ?longBase.
-          ?link omgeo:nearby(?latBase ?longBase ${this.DEFAULT_NEARBY_RADIUS}).
-          ?link j:id ?id
-          ${countOnly ? '' : this.spreadProjections(projections, Some('?link'))} ${args.isEmpty() ? '' : '.'}
-          FILTER( ?s = <${parentId}>)
+          ?parentId geo:lat ?latBase.
+          ?parentId geo:long ?longBase.
+          ?s omgeo:nearby(?latBase ?longBase ${this.DEFAULT_NEARBY_RADIUS}).
+          ?s j:id ?id
+          ${countOnly ? '' : this.spreadProjections(projections, Some('?s'))} ${args.isEmpty() ? '' : '.'}
+          FILTER(
+            ?parentId = <${parentId}> &&
+            ?parentId != ?s
+          )
         }
-        ${countOnly ? 'GROUP BY ?s' : ''}
+        ${countOnly ? 'GROUP BY ?parentId' : ''}
         ${this.addLimit()}
-      `; // TODO add limits and other stuff above..
+        ${this.addSortBy()}
+      `;
       // }
       // else {
         // todo other connection-type queries..
