@@ -199,8 +199,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     const allValidFields = Map((this.resultType as GQLObjectType).fields.map<[string, string]>(fd => [fd.name, fd.gqlType.name]));
     this.processedArgs = queryBuilder.processArgs(this.args, allValidFields);
     if (this.isConnectionEdgesPlan()) {
-      this.processedArgs = this.getGrandParentPlan().nonEmpty() ?
-        this.getGrandParentPlan().get().processedArgs :
+      this.processedArgs = this.grandParentPlan().nonEmpty() ?
+        this.grandParentPlan().get().processedArgs :
         this.processedArgs;
     }
     this.scalars = List(await Promise.all(this.resolveFields()));
@@ -208,7 +208,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.makePlanResult();
   }
 
-  public getGrandParentPlan(): Option<GQLExecutionPlan> {
+  public grandParentPlan(): Option<GQLExecutionPlan> {
     if (this.parent && this.parent.parent) {
       return Some(this.parent.parent);
     }
@@ -311,7 +311,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   protected finalizeResults() {
     if (this.isConnectionEdgesPlan()) {
       // todo the line below is probably too hacky
-      this.name = this.getGrandParentPlan().get().getSubjectIds().get(0);
+      this.name = this.grandParentPlan().get().getSubjectIds().get(0);
     }
     if (this.parent) {
       // this is to handle situations where we have an array of n objects instead of just one object

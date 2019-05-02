@@ -127,8 +127,9 @@ export default class SparqlQueryStrategy extends QueryStrategy {
                 return acc;
               }, {});
             });
+            const resultArrValuesPopped: Array<{}> = this.plan.isConnectionEdgesPlan() ? resultArrValues.slice(0, -1) : resultArrValues;
             const om = OrderedMap<string, OrderedMap<string, any>>(
-              resultArrValues.map((row: { parentId: string; s: string, j_id: string }) => {
+              resultArrValuesPopped.map((row: { parentId: string; s: string, j_id: string }) => {
                 const k: string = this.hasProperParent() ? row.parentId : row.s;
                 const v = OrderedMap<any>(
                   this.fields.map(f => {
@@ -145,6 +146,16 @@ export default class SparqlQueryStrategy extends QueryStrategy {
                 return returnValue;
               })
             );
+            if (this.plan.isConnectionEdgesPlan()) {
+              const key: string = this.plan.grandParentPlan().get().getSubjectIds().get(0);
+              const resultLength: number = resultArrValues && resultArrValues.length;
+              // TODO This seems afwully hacky, is there a different approach to this?
+              this.plan.grandParentPlan().get().result.data.merge(
+                OrderedMap({
+                  [key]: this.addPageInfoIfNeeded(resultLength)
+                })
+              );
+            }
             result.data = om;
             result.meta.errors.push(...errors);
             result.addMetadata();
@@ -285,12 +296,16 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addLimit() {
+    let extra: number = 0; // for pageInfo purpose, increases the limit by one
+    if (this.plan.isConnectionEdgesPlan()) {
+      extra += 1;
+    }
     const optFirst = this.plan.processedArgs.first;
     const optLast = this.plan.processedArgs.last;
     if (this.plan.processedArgs.first.nonEmpty()) {
-      return `LIMIT ${optFirst.get()}`;
+      return `LIMIT ${optFirst.get() + extra}`;
     } else if (this.plan.processedArgs.last.nonEmpty()) {
-      return `LIMIT ${optLast.get()}`;
+      return `LIMIT ${optLast.get() + extra}`;
     } else {
       return '';
     }
@@ -326,7 +341,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   protected constructConnectionQuery(projections: List<any>,
                                      args: Map<string, any>,
                                      countOnly: boolean = true) {
-      const parentId = countOnly ? this.plan.parent.getSubjectIds().get(0) : this.plan.getGrandParentPlan().get().getSubjectIds().get(0);
+      const parentId = countOnly ? this.plan.parent.getSubjectIds().get(0) : this.plan.grandParentPlan().get().getSubjectIds().get(0);
       // Probably needs some additional checks here
       // if (this.isAGeoSpatialQuery()) {
         // TODO really just a gn_nearby at the moment.. should be refactored regardless
@@ -356,16 +371,45 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addCursorOffset() {
-    if (this.args.get('before')) {
-      return `${this.DEFAULT_CURSOR_LABEL} > '${this.args.get('before')}'`;
+    if (this.plan.processedArgs.before.nonEmpty()) {
+      return `${this.DEFAULT_CURSOR_LABEL} > '${this.plan.processedArgs.before.get()}'`;
     }
-    if (this.args.get('after')) {
-      return `${this.DEFAULT_CURSOR_LABEL} < '${this.args.get('after')}'`;
+    if (this.plan.processedArgs.after.nonEmpty()) {
+      return `${this.DEFAULT_CURSOR_LABEL} < '${this.plan.processedArgs.after.get()}'`;
     }
     return '';
   }
 
   private normalizePrefix(prefix: string) {
     return prefix.split(']').join('');
+  }
+
+  protected addPageInfoIfNeeded(actualNumberOfResults: number = 0) {
+    if (this.plan.isConnectionEdgesPlan()) {
+      return this.addPageInfo(actualNumberOfResults);
+    } else {
+      return null;
+    }
+  }
+
+  protected addPageInfo(actualNumberOfResults: number = 0) {
+    const optFirst = this.plan.processedArgs.first;
+    const optLast = this.plan.processedArgs.last;
+    const optAfter = this.plan.processedArgs.after;
+    const optBefore = this.plan.processedArgs.before;
+    let hasNextPage: boolean = false;
+    let hasPreviousPage: boolean = false;
+    const requestedNumberOfResults = optFirst.getOrElse(optLast.getOrElse(0));
+    const possibleNumberOfResults = requestedNumberOfResults + 1;
+    if (actualNumberOfResults === possibleNumberOfResults) {
+      if (optFirst.nonEmpty() || optBefore.nonEmpty()) {
+        hasNextPage = true;
+      }
+      if (optLast.nonEmpty() || optAfter.nonEmpty()) {
+        hasPreviousPage = true;
+      }
+    }
+    // todo return only the pageInfo OM here, set the key in the parent function for more clarity.
+    return OrderedMap({ pageInfo: { hasNextPage, hasPreviousPage } });
   }
 }
