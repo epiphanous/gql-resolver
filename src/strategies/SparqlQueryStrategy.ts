@@ -358,6 +358,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
           FILTER(
             ?parentId = <${parentId}> &&
             ?parentId != ?s
+            ${this.addCursorOffset('?id')}
           )
         }
         ${countOnly ? 'GROUP BY ?parentId' : ''}
@@ -370,12 +371,12 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       // }
   }
 
-  protected addCursorOffset() {
+  protected addCursorOffset(cursorVar: string = null) {
     if (this.plan.processedArgs.before.nonEmpty()) {
-      return `${this.DEFAULT_CURSOR_LABEL} > '${this.plan.processedArgs.before.get()}'`;
+      return `&& ${cursorVar || this.DEFAULT_CURSOR_LABEL} > '${this.plan.processedArgs.before.get()}'`;
     }
     if (this.plan.processedArgs.after.nonEmpty()) {
-      return `${this.DEFAULT_CURSOR_LABEL} < '${this.plan.processedArgs.after.get()}'`;
+      return `&& ${cursorVar || this.DEFAULT_CURSOR_LABEL} < '${this.plan.processedArgs.after.get()}'`;
     }
     return '';
   }
