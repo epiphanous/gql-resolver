@@ -291,7 +291,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
-    // TODO drop the scalars & objects approach altogether?
     const mappedScalars = this.scalars.map(sc => sc.data).has(0)
       ? this.scalars.map(sc => sc.data).get(0)
       : OrderedMap({});

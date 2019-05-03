@@ -341,10 +341,13 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   protected constructConnectionQuery(projections: List<any>,
                                      args: Map<string, any>,
                                      countOnly: boolean = true) {
+      // I'm not sure that we'll ever need to get a subjectId that's not the first one in the statement below
       const parentId = countOnly ? this.plan.parent.getSubjectIds().get(0) : this.plan.grandParentPlan().get().getSubjectIds().get(0);
-      // Probably needs some additional checks here
       // if (this.isAGeoSpatialQuery()) {
-        // TODO really just a gn_nearby at the moment.. should be refactored regardless
+    /**
+     * TODO really just a gn_nearby at the moment.. should be refactored regardless, perhaps add a Map of corresponding statements, i.e.
+     * gn_nearby -> omgeo:nearby and such
+     */
       return `
         SELECT ${countOnly ?
           '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)' :
