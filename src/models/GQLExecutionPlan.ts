@@ -132,7 +132,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   private _initFields() {
     let ids = List<GQLFieldDefinition>();
     // todo we don't want the query object to include the _id scalar. Should probably add all of the types alike to a conf and check based off of that
-    if (this.resultType.name !== 'Query' && this.resultType.name !== 'Edge') {
+    if (this.resultType.name !== 'Query' && this.resultType.name !== 'Edge' && this.resultType.name !== 'Connection') {
       switch (this.resultType.constructor) {
         case GQLInterface:
           const i = this.resultType as GQLInterface;
@@ -300,6 +300,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.result.merge(mappedScalars as OrderedMap<string, any>);
     this.result.merge(mappedObjects as OrderedMap<string, any>);
     this.finalizeResults();
+    this.result.addMetadata();
     return this.result;
   }
 

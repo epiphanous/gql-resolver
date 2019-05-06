@@ -158,7 +158,6 @@ export default class SparqlQueryStrategy extends QueryStrategy {
             }
             result.data = om;
             result.meta.errors.push(...errors);
-            result.addMetadata();
             /**
              * TODO might want to stream this to an another service later
              */
