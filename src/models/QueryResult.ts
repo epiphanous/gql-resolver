@@ -1,5 +1,5 @@
 import { List, OrderedMap } from 'immutable';
-import sizeof from 'object-sizeof';
+import sizeof = require('object-sizeof');
 
 interface IMetaFields {
   startTime: number;
@@ -29,7 +29,7 @@ export default class QueryResult {
     this.meta.startTime = startTime || new Date().getTime();
     this.meta.duration = duration;
     this.meta.count = 0;
-    this.meta.errors = List<string>();
+    this.meta.errors = List<string>().asMutable();
   }
 
   public bps() {
@@ -38,7 +38,6 @@ export default class QueryResult {
 
   public async getResult() {
     try {
-      console.log('got at the end: ', JSON.stringify(this.data, null, 2));
       return this.data.toJS();
     } catch (err) {
       console.error(err);

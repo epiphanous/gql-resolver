@@ -299,9 +299,22 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       : OrderedMap({});
     this.result.merge(mappedScalars as OrderedMap<string, any>);
     this.result.merge(mappedObjects as OrderedMap<string, any>);
+    if (this.getScalarsErrors().isEmpty()) {
+      this.result.meta.errors = this.result.meta.errors.concat(...this.getSubPlansErrors());
+    } else {
+      this.result.meta.errors = this.result.meta.errors.concat(...this.getScalarsErrors());
+    }
     this.finalizeResults();
     this.result.addMetadata();
     return this.result;
+  }
+
+  protected getScalarsErrors() {
+    return this.scalars.flatMap(sc => sc.meta.errors);
+  }
+
+  protected getSubPlansErrors() {
+    return this.plans.flatMap(pl => pl.result.meta.errors);
   }
 
   /**

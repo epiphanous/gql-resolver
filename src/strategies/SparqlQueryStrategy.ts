@@ -105,79 +105,80 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       args.toJS()
     );
     return new Promise((resolve, reject) => {
-      this.fetcher
-        .fetchBindings(this.endpoint, query)
-        .then(stream => {
-          const resultArr: any[] = [];
-          const errors: any[] = [];
-          stream.on('data', data => {
-            resultArr.push(data);
-          });
-          stream.on('error', error => {
-            errors.push(error);
-          });
-          stream.on('end', () => {
-            /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
-             * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _},{...}},{...}]=>[['geo_lat': 123],...]]
-             * @type {{}[]}
-             */
-            const resultArrValues: Array<{}> = resultArr.map(entry => {
-              return Object.keys(entry).reduce((acc, key) => {
-                acc[key] = entry[key].value;
-                return acc;
-              }, {});
+        this.fetcher
+          .fetchBindings(this.endpoint, query)
+          .then(stream => {
+            const resultArr: any[] = [];
+            const errors: any[] = [];
+            stream.on('data', data => {
+              resultArr.push(data);
             });
-            const resultArrValuesPopped: Array<{}> = this.plan.isConnectionEdgesPlan() ? resultArrValues.slice(0, -1) : resultArrValues;
-            const om = OrderedMap<string, OrderedMap<string, any>>(
-              resultArrValuesPopped.map((row: { parentId: string; s: string, j_id: string }) => {
-                const k: string = this.hasProperParent() ? row.parentId : row.s;
-                const v = OrderedMap<any>(
-                  this.fields.map(f => {
-                    const key: string = f.alias.getOrElse(f.name);
-                    const rowValueByKey: any =
-                      row[key] ||
-                      row[this.SPECIAL_PROJECTIONS.get(key)] ||
-                      null;
-                    return [key, rowValueByKey];
-                  })
-                );
-                // to prevent lint errors..
-                const returnValue: [string, OrderedMap<string, any>] = [k, v];
-                return returnValue;
-              })
-            );
-            if (this.plan.isConnectionEdgesPlan()) {
-              const key: string = this.plan.grandParentPlan().get().getSubjectIds().get(0);
-              const resultLength: number = resultArrValues && resultArrValues.length;
-              // TODO This seems afwully hacky, is there a different approach to this?
-              this.plan.grandParentPlan().get().result.data.merge(
-                OrderedMap({
-                  [key]: this.addPageInfoIfNeeded(resultLength)
+            stream.on('error', error => {
+                errors.push(error);
+            });
+            stream.on('end', () => {
+              /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
+               * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _},{...}},{...}]=>[['geo_lat': 123],...]]
+               * @type {{}[]}
+               */
+              const resultArrValues: Array<{}> = resultArr.map(entry => {
+                return Object.keys(entry).reduce((acc, key) => {
+                  acc[key] = entry[key].value;
+                  return acc;
+                }, {});
+              });
+              const resultArrValuesPopped: Array<{}> = this.plan.isConnectionEdgesPlan() ? resultArrValues.slice(0, -1) : resultArrValues;
+              const om = OrderedMap<string, OrderedMap<string, any>>(
+                resultArrValuesPopped.map((row: { parentId: string; s: string, j_id: string }) => {
+                  const k: string = this.hasProperParent() ? row.parentId : row.s;
+                  const v = OrderedMap<any>(
+                    this.fields.map(f => {
+                      const key: string = f.alias.getOrElse(f.name);
+                      const rowValueByKey: any =
+                        row[key] ||
+                        row[this.SPECIAL_PROJECTIONS.get(key)] ||
+                        null;
+                      return [key, rowValueByKey];
+                    })
+                  );
+                  // to prevent lint errors..
+                  const returnValue: [string, OrderedMap<string, any>] = [k, v];
+                  return returnValue;
                 })
               );
-            }
-            result.data = om;
-            result.meta.errors.push(...errors);
-            /**
-             * TODO might want to stream this to an another service later
-             */
-            console.log(
-              JSON.stringify(
-                {
-                  query,
-                  ...result.meta,
-                },
-                null,
-                2
-              )
-            );
+              if (this.plan.isConnectionEdgesPlan()) {
+                const key: string = this.plan.grandParentPlan().get().getSubjectIds().get(0);
+                const resultLength: number = resultArrValues && resultArrValues.length;
+                // TODO This seems afwully hacky, is there a different approach to this?
+                this.plan.grandParentPlan().get().result.data.merge(
+                  OrderedMap({
+                    [key]: this.addPageInfoIfNeeded(resultLength)
+                  })
+                );
+              }
+              result.data = om;
+              result.meta.errors = List(errors);
+              /**
+               * TODO might want to stream this to an another service later
+               */
+              console.log(
+                JSON.stringify(
+                  {
+                    query,
+                    ...result.meta,
+                  },
+                  null,
+                  2
+                )
+              );
+              return resolve(result);
+            });
+          })
+          .catch(err => {
+            result.data = OrderedMap({});
+            result.meta.errors.push(err);
             return resolve(result);
           });
-        })
-        .catch(err => {
-          console.error(err);
-          reject(err);
-        });
     });
   }
 
@@ -349,7 +350,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
      */
       return `
         SELECT ${countOnly ?
-          '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)' :
+          '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)z' :
           '?s ?parentId ' + projections.map(a => `?${a.projection}`).join(' ')}
         WHERE {
           ?parentId geo:lat ?latBase.
