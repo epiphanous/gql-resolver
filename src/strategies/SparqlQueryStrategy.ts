@@ -350,7 +350,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
      */
       return `
         SELECT ${countOnly ?
-          '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)z' :
+          '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)' :
           '?s ?parentId ' + projections.map(a => `?${a.projection}`).join(' ')}
         WHERE {
           ?parentId geo:lat ?latBase.
