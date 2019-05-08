@@ -1,6 +1,7 @@
 {
   "outDir": "lib",
   "compilerOptions": {
+    "skipLibCheck": true,
     "module": "commonjs",
     "noImplicitAny": false,
     "target": "es6",
