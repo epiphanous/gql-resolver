@@ -1,6 +1,6 @@
 {
-  "outDir": "lib",
   "compilerOptions": {
+    "outDir": "lib",
     "skipLibCheck": true,
     "module": "commonjs",
     "noImplicitAny": false,
@@ -8,5 +8,9 @@
     "lib": ["es2018"],
     "moduleResolution": "node",
     "experimentalDecorators": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

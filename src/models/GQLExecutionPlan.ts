@@ -190,12 +190,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @return Promise<QueryResult>
    */
   public async execute(queryBuilder: GQLQueryBuilder) {
-    const fieldsToMap: Map<string, string> = Map<string, string>(
-      this.allFields.reduce((acc: Map<string, string>, field) => {
-        acc[field.alias.value || field.name] = field.outputType;
-        return acc;
-      }, Map<string, string>().asMutable())
-    );
     const allValidFields = Map((this.resultType as GQLObjectType).fields.map<[string, string]>(fd => [fd.name, fd.gqlType.name]));
     this.processedArgs = queryBuilder.processArgs(this.args, allValidFields);
     if (this.isConnectionEdgesPlan()) {
