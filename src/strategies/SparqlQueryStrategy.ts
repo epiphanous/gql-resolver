@@ -127,7 +127,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
                   return acc;
                 }, {});
               });
-              const resultArrValuesPopped: Array<{}> = this.plan.isConnectionEdgesPlan() ? resultArrValues.slice(0, -1) : resultArrValues;
+              const resultArrValuesPopped: Array<{}> = this.shouldPopFinalArray(resultArrValues.length) ? resultArrValues.slice(0, -1) : resultArrValues;
               const om = OrderedMap<string, OrderedMap<string, any>>(
                 resultArrValuesPopped.map((row: { parentId: string; s: string, j_id: string }) => {
                   const k: string = this.hasProperParent() ? row.parentId : row.s;
@@ -184,6 +184,29 @@ export default class SparqlQueryStrategy extends QueryStrategy {
 
   protected isReservedKeyword(word: string) {
     return this.RESERVED_KEYWORDS.contains(word);
+  }
+
+  /**
+   * Checks whether the resulting array should be popped, because we request an additional 1 resource from the database
+   * for pagination purposes.
+   * @param {number} resultArrLength - num of actual results from the database
+   * @returns {boolean}
+   */
+  protected shouldPopFinalArray(resultArrLength: number) {
+    if (this.plan.isConnectionEdgesPlan()) {
+      if (this.plan.processedArgs.first.nonEmpty()) {
+        if (this.plan.processedArgs.first.value === resultArrLength) {
+          return false;
+        }
+      }
+      if (this.plan.processedArgs.last.nonEmpty()) {
+        if (this.plan.processedArgs.last.value === resultArrLength) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   protected getProjections() {
