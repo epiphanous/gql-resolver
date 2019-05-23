@@ -23,17 +23,18 @@ a `Resolver` object:
 import Resolver, { ResolverContext, SparqlQueryStrategyFactory } from 'gql-resolver';
 import fs = require('fs');
 
-const schema = fs.readFileSync('schema.graphql', 'utf8');
+const schema = fs.readFileSync('swapi.graphql', 'utf8');
 const sparql = new SparqlQueryStrategyFactory();
+const sql = new SqlQueryStrategyFactory();
 const context = new ResolverContext({
   schema,
-  strategies: { sparql },
+  strategies: { sparql, sql },
   defaultStrategy: 'sparql'
 });
 const resolver = new Resolver(context);
 ```
 
-Then, later, use the resolve to resolve a query:
+Then, later, use `resolver` to resolve a query:
 
 ```js
 const query = ```query {
