@@ -3,6 +3,97 @@
 GQL resolver is a general GraphQL resolver with plugin query strategies,
 designed to support large schemas.
 
+## Installation
+
+```bash
+yarn add gql-resolver
+```
+
+or
+
+```bash
+npm install gql-resolver
+```
+
+## Usage
+
+Read in your schema, define your query strategies, set a default strategy and create
+a `Resolver` object:
+```js
+import Resolver, { ResolverContext, SparqlQueryStrategyFactory } from 'gql-resolver';
+import fs = require('fs');
+
+const schema = fs.readFileSync('schema.graphql', 'utf8');
+const sparql = new SparqlQueryStrategyFactory();
+const context = new ResolverContext({
+  schema,
+  strategies: { sparql },
+  defaultStrategy: 'sparql'
+});
+const resolver = new Resolver(context);
+```
+
+Then, later, use the resolve to resolve a query:
+
+```js
+const query = ```query {
+  allFilms(first: 1) {
+    films {
+      title
+      episodeID
+      characterConnection(first: 3, after:"YXJyYXljb25uZWN0aW9uOjg=") {
+        totalCount
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        characters {
+          name
+        }
+      }
+    }
+  }
+}```;
+const result = await resolver.resolve(query);
+```
+
+Resulting in:
+
+```json
+{
+  "data": {
+    "allFilms": {
+      "films": [
+        {
+          "title": "A New Hope",
+          "episodeID": 4,
+          "characterConnection": {
+            "totalCount": 18,
+            "pageInfo": {
+              "hasNextPage": true,
+              "endCursor": "YXJyYXljb25uZWN0aW9uOjEx"
+            },
+            "characters": [
+              {
+                "name": "Obi-Wan Kenobi"
+              },
+              {
+                "name": "Wilhuff Tarkin"
+              },
+              {
+                "name": "Chewbacca"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## Overview
+
 Each field of a GraphQL query can be resolved individually, from a different
 data source. The existing general methodology to resolve GraphQL queries is
 thus usually done per field, often leading to performing many separate database
