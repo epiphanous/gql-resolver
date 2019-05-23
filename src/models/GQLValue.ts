@@ -38,6 +38,7 @@ export class GQLNullValue extends GQLValue {
     super(null);
   }
 }
+
 export class GQLValueList extends GQLValue {
   public value: List<GQLValue>;
 

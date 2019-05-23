@@ -10,18 +10,6 @@ import IBuilder from './IBuilder';
 export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   public errors: BuilderError[] = [];
 
-  public parser(tokenStream: TokenStream): Parser {
-    throw new NotImplementedError('not implemented');
-  }
-
-  public lexer(inputStream: ANTLRInputStream): Lexer {
-    throw new NotImplementedError('not implemented');
-  }
-
-  public build(parser: Parser): Try<T> {
-    throw new NotImplementedError('not implemented');
-  }
-
   get errorCount() {
     return this.errors.filter(e => e.isError()).length;
   }
@@ -32,6 +20,18 @@ export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
 
   get errorReport() {
     return new BuildErrorReport(this.errors);
+  }
+
+  public parser(tokenStream: TokenStream): Parser {
+    throw new NotImplementedError('not implemented');
+  }
+
+  public lexer(inputStream: ANTLRInputStream): Lexer {
+    throw new NotImplementedError('not implemented');
+  }
+
+  public build(parser: Parser): Try<T> {
+    throw new NotImplementedError('not implemented');
   }
 
   public addError(error: BuilderError) {

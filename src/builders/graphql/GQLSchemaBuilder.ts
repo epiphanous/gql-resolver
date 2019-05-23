@@ -96,7 +96,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   public build(parser: GraphQLParser): Try<GQLSchema> {
     this.parseWith(parser);
     if (this.errorCount) {
-      Try.failure(this.errorReport.asThrowable());
+      return Try.failure(this.errorReport.asThrowable());
     } else {
       const s = Map<string, GQLScalarType>(
         this.scalarTypes
@@ -158,15 +158,15 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     ctx.operationTypeDefinition().forEach(otd => {
       const opNamedType = this.textOf(otd.namedType().NAME());
       const opType = otd.operationType().text;
-      if (this.operationTypes.has(opType)) {
-        const oldNamedType = this.operationTypes.get(opType);
-        this.check(
-          false,
-          `warning: operation type ${opType} changed from ${oldNamedType} to ${opNamedType}`,
-          ctx,
-          false
-        );
-      }
+      // if (this.operationTypes.has(opType)) {
+      //   const oldNamedType = this.operationTypes.get(opType);
+      //   this.check(
+      //     false,
+      //     `warning: operation type ${opType} changed from ${oldNamedType} to ${opNamedType}`,
+      //     ctx,
+      //     false
+      //   );
+      // }
       this.operationTypes.set(opType, opNamedType);
     });
     this.getDirectives(Option.of(ctx.directives())).forEach(d =>
@@ -528,7 +528,13 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         ctx
           .directiveLocations()
           .directiveLocation()
-          .map(dl => dl.typeSystemDirectiveLocation().text)
+          .map(
+            dl =>
+              (
+                dl.typeSystemDirectiveLocation() ||
+                dl.executableDirectiveLocation()
+              ).text
+          )
       );
 
       this.directives.add(

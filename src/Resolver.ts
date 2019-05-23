@@ -17,9 +17,9 @@ export class Resolver {
     vars: Map<string, any> = Map<string, any>(),
     operationName: Option<string> = None
   ) {
-    return Builder.parse<GQLQueryDocument>(
-      new GQLQueryBuilder(this.context, vars, operationName),
-      query
-    ).map(doc => doc.execute());
+    const queryBuilder = new GQLQueryBuilder(this.context, vars, operationName);
+    return Builder.parse<GQLQueryDocument>(queryBuilder, query).map(doc =>
+      doc.execute(queryBuilder)
+    );
   }
 }

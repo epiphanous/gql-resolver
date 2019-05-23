@@ -1,5 +1,5 @@
 import { NotImplementedError } from 'funfix';
-import { List, Set, Map } from 'immutable';
+import { List, Map, Set } from 'immutable';
 import { GQLSchema } from './GQLSchema';
 // import { GQLSearchExecutionPlan } from './GQLSearchExecutionPlan';
 import { GQLExecutionPlan } from './GQLExecutionPlan';

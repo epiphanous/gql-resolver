@@ -1,4 +1,3 @@
-import Record from 'dataclass';
 import { GQLObjectQueryModifierExpression } from './GQLObjectQueryModifierExpression';
 
 interface IGQLBinding {

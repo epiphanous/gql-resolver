@@ -1,11 +1,13 @@
 interface INamespace {
   getName(): string;
+
   getPrefix(): string;
 }
 
 export default class SimpleNamespace implements INamespace {
   private prefix: string;
   private name: string;
+
   constructor(prefix: string, name: string) {
     this.setPrefix(prefix);
     this.setName(name);

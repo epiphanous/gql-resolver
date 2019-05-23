@@ -5,6 +5,7 @@ interface IGQLFilter {
   expression: GQLObjectQueryModifierDisjunction;
   fields: Set<string>;
 }
+
 export class GQLFilter implements IGQLFilter {
   public expression: GQLObjectQueryModifierDisjunction;
   public fields: Set<string>;

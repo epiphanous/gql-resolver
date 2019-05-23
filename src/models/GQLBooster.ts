@@ -12,6 +12,7 @@ export class GQLBooster implements IGQLBooster {
 
 export class GQLFieldBooster extends GQLBooster {
   public field: string;
+
   constructor(boost: number, field: string) {
     super(boost);
     this.field = field;

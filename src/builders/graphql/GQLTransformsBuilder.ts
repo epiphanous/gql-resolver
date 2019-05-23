@@ -13,6 +13,7 @@ import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
 
 export default class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder {
   public result: List<GQLTransform>;
+
   constructor(prefixes: Set<string>, source: string = 'transforms') {
     super(Map(), Set<GQLVariableDefinition>(), Map(), prefixes, source);
   }

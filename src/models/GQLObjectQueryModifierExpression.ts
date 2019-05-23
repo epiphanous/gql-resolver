@@ -28,46 +28,20 @@ export class GQLObjectQueryModifierBasicExpression extends GQLObjectQueryModifie
 
 export class GQLObjectQueryModifierPrimitiveExpression extends GQLObjectQueryModifierExpression {}
 
-export class GQLObjectQueryModifierField extends GQLObjectQueryModifierPrimitiveExpression {}
-
-export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQueryModifierPrimitiveExpression {
-  public expression: string;
-  public dataType: string;
-  public underlyingValue: Option<any> = None;
-}
-
-export class GQLObjectQueryBasicComparisonPredicate extends GQLObjectQueryModifierExpression {
-  constructor(
-    lhs: GQLObjectQueryModifierExpression,
-    op: string,
-    rhs: GQLObjectQueryModifierExpression
-  ) {
-    super(`${lhs.expression} ${op} ${rhs.expression}`, 'xsd:boolean');
+export class GQLObjectQueryModifierField extends GQLObjectQueryModifierPrimitiveExpression {
+  public toString() {
+    return this.expression.toString();
   }
 }
 
-export class GQLObjectQueryModifierOptionalNegation extends GQLObjectQueryModifierExpression {
-  public hasNot: boolean;
-  public expr;
-  constructor(hasNot: boolean, expr: GQLObjectQueryModifierPredicate) {
-    super(`${hasNot ? '!' : ''}${expr.expression}`, 'xsd:boolean');
-    this.hasNot = hasNot;
+export class GQLObjectQueryModifierBasicPrimitiveExpression extends GQLObjectQueryModifierPrimitiveExpression {}
+
+export class GQLObjectQueryModifierParensExpression extends GQLObjectQueryModifierExpression {
+  public expr: GQLObjectQueryModifierExpression;
+
+  constructor(expr: GQLObjectQueryModifierExpression) {
+    super(`(${expr.expression})`, expr.dataType, expr.underlyingValue);
     this.expr = expr;
-  }
-}
-
-export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExpression {
-  public conjunctives: List<GQLObjectQueryModifierOptionalNegation>;
-  constructor(
-    conjunctives: List<GQLObjectQueryModifierOptionalNegation> = List<
-      GQLObjectQueryModifierOptionalNegation
-    >()
-  ) {
-    super(
-      conjunctives.map(x => `(${x.expression})`).join(' && '),
-      'xsd:boolean'
-    );
-    this.conjunctives = conjunctives;
   }
 }
 
@@ -76,6 +50,7 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
   public values: List<
     Map<GQLObjectQueryModifierField, GQLObjectQueryModifierPrimitiveExpression>
   >;
+
   constructor(
     disjunctives: List<GQLObjectQueryModifierConjunction>,
     values: List<
@@ -83,7 +58,12 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
         GQLObjectQueryModifierField,
         GQLObjectQueryModifierPrimitiveExpression
       >
-    >
+    > = List<
+      Map<
+        GQLObjectQueryModifierField,
+        GQLObjectQueryModifierPrimitiveExpression
+      >
+    >()
   ) {
     super(
       disjunctives.map(x => `(${x.expression})`).join(' || '),
@@ -94,16 +74,51 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
   }
 }
 
-export class GQLObjectQueryModifierParensExpression extends GQLObjectQueryModifierExpression {
-  public expr;
-  constructor(expr: GQLObjectQueryModifierExpression) {
-    super(`(${expr.expression})`, expr.dataType);
+export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExpression {
+  public conjunctives: List<GQLObjectQueryModifierOptionalNegation>;
+
+  constructor(conjunctives: List<GQLObjectQueryModifierOptionalNegation>) {
+    super(
+      conjunctives.map(x => `(${x.expression})`).join(' && '),
+      'xsd:boolean'
+    );
+    this.conjunctives = conjunctives;
+  }
+}
+
+export class GQLObjectQueryModifierOptionalNegation extends GQLObjectQueryModifierExpression {
+  public hasNot: boolean;
+  public expr: GQLObjectQueryModifierPredicate;
+
+  constructor(hasNot: boolean, expr: GQLObjectQueryModifierPredicate) {
+    super(`${hasNot ? '!' : ''}${expr.expression}`, 'xsd:boolean');
+    this.hasNot = hasNot;
     this.expr = expr;
   }
 }
 
 export class GQLObjectQueryModifierPredicate extends GQLObjectQueryModifierExpression {
+  public expr: GQLObjectQueryModifierExpression;
+
   constructor(expr: GQLObjectQueryModifierExpression) {
-    super(expr.expression, 'xsd:boolean');
+    super(expr.expression, 'xsd:boolean', expr.underlyingValue);
+    this.expr = expr;
+  }
+}
+
+export class GQLObjectQueryBasicComparisonPredicate extends GQLObjectQueryModifierExpression {
+  public lhs: GQLObjectQueryModifierExpression;
+  public rhs: GQLObjectQueryModifierExpression;
+  public op: string;
+
+  constructor(
+    lhs: GQLObjectQueryModifierExpression,
+    op: string,
+    rhs: GQLObjectQueryModifierExpression
+  ) {
+    super(`${lhs.expression} ${op} ${rhs.expression}`, 'xsd:boolean');
+    this.lhs = lhs;
+    this.rhs = rhs;
+    this.op = op;
   }
 }

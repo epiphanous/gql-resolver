@@ -1,4 +1,4 @@
-import { None, Option } from 'funfix';
+import { None } from 'funfix';
 import { List, Map } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
@@ -9,7 +9,6 @@ import { GQLVariableDefinition } from './GQLVariableDefinition';
 import ResolverContext from './ResolverContext';
 
 export interface IGQLOperation {
-  [key: string]: any;
   name: string;
   // operationType: 'query' | 'mutation' | 'subscription';
   operationType: string;
@@ -17,17 +16,20 @@ export interface IGQLOperation {
   variables: List<GQLVariable>;
   selections: List<GQLSelection>;
   outputType: string;
-  fields: List<GQLField>;
+  fields: List<[string, GQLField]>;
   isSelected: boolean;
+
+  [key: string]: any;
 }
 
 export class GQLOperation implements IGQLOperation {
   [key: string]: any;
+
   public name: string;
   // public operationType: 'query' | 'mutation' | 'subscription';
   public operationType: string;
   public outputType: string;
-  public fields: List<GQLField>;
+  public fields: List<[string, GQLField]>;
   public variables: List<GQLVariableDefinition>;
   public directives: List<GQLDirective> = List();
   public selections: List<GQLSelection> = List();
@@ -59,8 +61,7 @@ export class GQLOperation implements IGQLOperation {
       None,
       List<GQLArgument>(),
       this.directives,
-      this.fields,
-      this.outputType
+      this.fields
     );
   }
 

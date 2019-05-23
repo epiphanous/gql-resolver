@@ -1,15 +1,13 @@
-import { assert, expect } from 'chai';
-import fs = require('fs');
+import { expect } from 'chai';
 import { Some } from 'funfix';
-import { List, Map } from 'immutable';
+import { Map } from 'immutable';
 import 'mocha';
-import {inspect} from 'util';
 import ResolverContext from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
-import {SparqlQueryStrategyFactory} from '../strategies/SparqlQueryStrategyFactory';
+import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
+import fs = require('fs');
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
-
 describe('Resolver', () => {
   const rc = new ResolverContext(
     schema,
@@ -22,12 +20,27 @@ describe('Resolver', () => {
   const resolver = new Resolver(rc);
 
   it('resolves a query', async () => {
+    /**
+     * @type {Promise<QueryResult>}
+     */
     const result = await resolver.resolve(
-      `query test {
-      home: curatedDestination(first: 2) {
+      `
+    query test {
+      home: curatedDestination(filter: 's_name=\\"yerevan\\"') {
         s_name
+        gn_nearby(first: 3) {
+          totalCount
+          edges {
+            node {
+              ... on j_CuratedDestination {
+                s_name
+              }
+            }
+          }
+        }
       }
-    }`,
+    }
+    `,
       Map(),
       Some('test')
     );

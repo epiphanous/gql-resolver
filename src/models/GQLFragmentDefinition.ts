@@ -8,6 +8,7 @@ interface IGQLFragmentDefinition {
   directives: List<GQLDirective>;
   selections: List<GQLSelection>;
 }
+
 export class GQLFragmentDefinition implements IGQLFragmentDefinition {
   public name: string;
   public typeCondition: string;

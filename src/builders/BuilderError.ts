@@ -7,6 +7,7 @@ interface IBuilderError {
   position: number;
   exception: Option<RecognitionException>;
 }
+
 export default class BuilderError implements IBuilderError {
   public message: string;
   public line: number;

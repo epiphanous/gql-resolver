@@ -1,9 +1,9 @@
-interface IGQLOrderBy {
+interface IGQLSortBy {
   field: string;
   desc: boolean;
 }
 
-export class GQLOrderBy implements IGQLOrderBy {
+export class GQLSortBy implements IGQLSortBy {
   public field: string;
   public desc: boolean;
 
@@ -12,7 +12,7 @@ export class GQLOrderBy implements IGQLOrderBy {
     this.desc = desc;
   }
 
-  public toString() {
+  public toSparqlString() {
     return `${this.desc ? 'DESC(' : ''}${this.field}${this.desc ? ')' : ''}`;
   }
 }

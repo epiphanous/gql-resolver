@@ -1,6 +1,7 @@
 import { Option } from 'funfix';
 import { List, Map, Set } from 'immutable';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
+import { GQLFragmentDefinition } from './GQLFragmentDefinition';
 import { GQLOperation } from './GQLOperation';
 import {
   GQLField,
@@ -9,7 +10,6 @@ import {
   GQLSelection,
 } from './GQLSelection';
 import ResolverContext from './ResolverContext';
-import { GQLFragmentDefinition } from './GQLFragmentDefinition';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;
@@ -32,8 +32,8 @@ export class GQLQueryDocument {
     this.makeExecutionPlan();
   }
 
-  public async execute() {
-    return await this.plan.execute();
+  public async execute(queryBuilder) {
+    return await this.plan.execute(queryBuilder);
   }
 
   protected makeExecutionPlan() {
@@ -58,11 +58,12 @@ export class GQLQueryDocument {
     const operationOpt = this.context.schema
       .getTypeDefinition(outputTypeName)
       .map(td => {
-        const [outputType, fields] = this.flattenSelections(
+        const fields: List<[string, GQLField]> = this.flattenSelections(
           td.name,
           operation.selections
         );
-        return operation.copy({ outputType, fields });
+        const outputType = fields.get(0)[0];
+        return operation.copy({ fields, outputType });
       });
     if (operationOpt.isEmpty()) {
       throw new Error(`Can't find type ${outputTypeName}`);
@@ -73,13 +74,8 @@ export class GQLQueryDocument {
   protected flattenSelections(
     parentType: string,
     selections: List<GQLSelection>
-  ): [string, List<GQLField>] {
-    return [
-      parentType,
-      selections.flatMap(
-        (s: GQLSelection) => this.flattenSelection(parentType, s)[1]
-      ),
-    ];
+  ): List<[string, GQLField]> {
+    return selections.flatMap(s => this.flattenSelection(parentType, s));
   }
 
   protected flattenSelection(parentType: string, selection: GQLSelection) {
@@ -88,12 +84,11 @@ export class GQLQueryDocument {
         const field = selection as GQLField;
         const typedFieldOpt = this.context.schema
           .getFieldType(field.name)
-          .map<[string, List<GQLField>]>(ft => {
-            const [outputType, fields] = this.flattenSelections(
-              ft,
-              field.selections
-            );
-            return [parentType, List([field.copy({ outputType, fields })])];
+          .map(ft => {
+            const fields = this.flattenSelections(ft, field.selections);
+            return List<[string, GQLField]>([
+              [parentType, field.copy({ fields })],
+            ]);
           });
         if (typedFieldOpt.isEmpty()) {
           throw new Error(`can't find field definition ${field.name}`);
@@ -103,8 +98,9 @@ export class GQLQueryDocument {
       case GQLInlineFragment:
         const frag = selection as GQLInlineFragment;
         const inlineFragOpt = this.context.schema
-          .getFieldType(frag.typeCondition)
-          .map(ft => this.flattenSelections(ft, frag.selections));
+          // .getFieldType(frag.typeCondition)
+          .getTypeDefinition(frag.typeCondition)
+          .map(ft => this.flattenSelections(ft.name, frag.selections));
         if (inlineFragOpt.isEmpty()) {
           throw new Error(`can't find fragment type ${frag.typeCondition}`);
         }
@@ -119,8 +115,8 @@ export class GQLQueryDocument {
           throw new Error(`can't find fragment definition ${spread.name}`);
         }
         const fragOpt = this.context.schema
-          .getFieldType(fragDef.typeCondition)
-          .map(ft => this.flattenSelections(ft, fragDef.selections));
+          .getTypeDefinition(fragDef.typeCondition)
+          .map(ft => this.flattenSelections(ft.name, fragDef.selections));
         if (fragOpt.isEmpty()) {
           throw new Error(
             `can't find fragment ${spread.name} type ${fragDef.typeCondition}`

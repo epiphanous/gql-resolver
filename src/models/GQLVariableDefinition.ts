@@ -10,6 +10,7 @@ interface IGQLVariableDefinition {
   defaultValue: Option<GQLValue>;
   directives: List<GQLDirective>;
 }
+
 export class GQLVariableDefinition implements IGQLVariableDefinition {
   public name: string;
   public gqlType: GQLType;
