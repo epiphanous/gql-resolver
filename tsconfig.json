@@ -10,9 +10,9 @@
     "target": "es5",
     "removeComments": true,
     "strict": true,
-    //  "strictNullChecks": false,
-    "noImplicitAny": false,
-    "suppressImplicitAnyIndexErrors": true,
+//  "strictNullChecks": false,
+//  "noImplicitAny": false,
+//  "suppressImplicitAnyIndexErrors": true,
     "downlevelIteration": true
   },
   "include": ["src/**/*"],
