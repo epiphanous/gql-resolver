@@ -515,7 +515,6 @@ export class GQLSchema implements IGQLSchema {
     const membersOfParsedType = (str: string) =>
       this.typeMembers(nestedFragmentSelections(str), str); // TODO finish
     const listOfResTuples: Array<[string, List<GQLField>]> = [];
-    optField.map(fld => )
     for (const fld of [optField.value]) {
       for (const fieldType of [this.getFieldType(fld.name)]) {
         for (const parsedType of this.parseTypeInfo(
