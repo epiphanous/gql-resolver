@@ -9,7 +9,7 @@ import {
   GQLInlineFragment,
   GQLSelection,
 } from './GQLSelection';
-import ResolverContext from './ResolverContext';
+import { ResolverContext } from './ResolverContext';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;

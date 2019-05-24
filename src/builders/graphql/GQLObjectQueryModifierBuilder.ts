@@ -16,12 +16,10 @@ import {
   GQLObjectQueryModifierPrimitiveExpression,
 } from '../../models/GQLObjectQueryModifierExpression';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import BuilderBase from '../BuilderBase';
+import { BuilderBase } from '../BuilderBase';
 
 /* tslint:disable */
-export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
-  any
-> {
+export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
   public result: any;
   public PREFIXED_IRI_PATTERN: string;
   public rPREFIXED_IRI_PATTERN: RegExp;

@@ -7,9 +7,9 @@ import {
 } from '../../antlr4/generated/QueryModificationParser';
 import { GQLBinding } from '../../models/GQLBinding';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLBindingsBuilder extends GQLObjectQueryModifierBuilder {
+export class GQLBindingsBuilder extends GQLObjectQueryModifierBuilder {
   public result: List<GQLBinding>;
 
   constructor(

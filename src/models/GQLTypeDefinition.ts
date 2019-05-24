@@ -1,23 +1,21 @@
 import { None, Option } from 'funfix';
 import { List } from 'immutable';
 import { GQLDirective } from './GQLDirective';
-import { GQLField } from './GQLSelection';
 import { GQLType } from './GQLType';
 import { GQLValue } from './GQLValue';
-import { GQLSchema } from './GQLSchema';
 
-interface IGQLTypeDefinition {
+export interface IGQLTypeDefinition {
   name: string;
-  description?: Option<string>;
-  directives?: List<GQLDirective>;
+  description: Option<string>;
+  directives: List<GQLDirective>;
 
   deprecated(): Option<string>;
 }
 
 export class GQLTypeDefinition implements IGQLTypeDefinition {
   public name: string;
-  public description?: Option<string>;
-  public directives?: List<GQLDirective>;
+  public description: Option<string>;
+  public directives: List<GQLDirective>;
 
   constructor(
     name: string,
@@ -37,7 +35,7 @@ export class GQLTypeDefinition implements IGQLTypeDefinition {
   }
 }
 
-interface IGQLInterface extends IGQLTypeDefinition {
+export interface IGQLInterface extends IGQLTypeDefinition {
   fields: List<GQLFieldDefinition>;
 }
 
@@ -59,7 +57,7 @@ export class GQLInterface extends GQLTypeDefinition implements IGQLInterface {
   }
 }
 
-interface IGQLObjectType extends IGQLTypeDefinition {
+export interface IGQLObjectType extends IGQLTypeDefinition {
   fields: List<GQLFieldDefinition>;
   interfaces: List<string>;
 }
@@ -95,7 +93,7 @@ export class GQLObjectType extends GQLTypeDefinition implements IGQLObjectType {
   }
 }
 
-interface IGQLFieldDefinition extends IGQLTypeDefinition {
+export interface IGQLFieldDefinition extends IGQLTypeDefinition {
   gqlType: GQLType;
   args: List<GQLArgumentDefinition>;
 }
@@ -122,7 +120,7 @@ export class GQLFieldDefinition extends GQLTypeDefinition
   }
 }
 
-interface IGQLArgumentDefinition extends IGQLTypeDefinition {
+export interface IGQLArgumentDefinition extends IGQLTypeDefinition {
   gqlType: GQLType;
   defaultValue: Option<GQLValue>;
 }
@@ -145,7 +143,7 @@ export class GQLArgumentDefinition extends GQLTypeDefinition
   }
 }
 
-interface IGQLInputType extends IGQLTypeDefinition {
+export interface IGQLInputType extends IGQLTypeDefinition {
   args: List<GQLArgumentDefinition>;
 }
 
@@ -163,7 +161,7 @@ export class GQLInputType extends GQLTypeDefinition implements IGQLInputType {
   }
 }
 
-interface IGQLDirectiveDefinition extends IGQLTypeDefinition {
+export interface IGQLDirectiveDefinition extends IGQLTypeDefinition {
   args: List<GQLArgumentDefinition>;
   locations: List<string>;
 }
@@ -185,7 +183,7 @@ export class GQLDirectiveDefinition extends GQLTypeDefinition
   }
 }
 
-interface IGQLUnion extends IGQLTypeDefinition {
+export interface IGQLUnion extends IGQLTypeDefinition {
   gqlTypes: List<string>;
 }
 
@@ -213,7 +211,7 @@ export class GQLEnumValueDefinition extends GQLTypeDefinition {
   }
 }
 
-interface IGQLEnum extends IGQLTypeDefinition {
+export interface IGQLEnum extends IGQLTypeDefinition {
   values: List<GQLEnumValueDefinition>;
 }
 
@@ -231,7 +229,7 @@ export class GQLEnum extends GQLTypeDefinition implements IGQLEnum {
   }
 }
 
-interface IGQLScalarType extends IGQLTypeDefinition {
+export interface IGQLScalarType extends IGQLTypeDefinition {
   nativeType: string;
 }
 

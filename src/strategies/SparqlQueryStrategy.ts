@@ -1,20 +1,22 @@
 import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint';
 import { None, Option, Some } from 'funfix';
 import { List, Map, OrderedMap } from 'immutable';
-import { GQLAny } from '../models/GQLAny';
-import { GQLExecutionPlan } from '../models/GQLExecutionPlan';
-import { GQLField } from '../models/GQLSelection';
-import { GQLSortBy } from '../models/GQLSortBy';
-import QueryResult from '../models/QueryResult';
-import { RDFPrefixes } from '../models/RDFPrefixes';
-import QueryStrategy from './QueryStrategy';
+import { Literal } from 'rdf-js';
+import {
+  GQLAny,
+  GQLExecutionPlan,
+  GQLField,
+  QueryResult,
+  SimpleNamespace,
+} from '../models';
+import { QueryStrategy } from './QueryStrategy';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 
-export default class SparqlQueryStrategy extends QueryStrategy {
+export class SparqlQueryStrategy extends QueryStrategy {
   private endpoint: string;
+  private prefixes: Map<string, SimpleNamespace>;
   private fetcher = new SparqlEndpointFetcher();
-  private DEFAULT_CURSOR_FIELD = 's:name';
   private DEFAULT_CURSOR_LABEL = '?cursor';
   private DEFAULT_NEARBY_RADIUS = '500'; // km by default for Ontotext's GraphDB
   private SPECIAL_PROJECTIONS = OrderedMap({
@@ -34,14 +36,17 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   public constructor(
     fields: List<GQLField>,
     plan: GQLExecutionPlan,
-    endpoint: string
+    endpoint: string,
+    prefixes: Map<string, SimpleNamespace>
   ) {
     super(fields, plan);
     this.endpoint = endpoint;
+    this.prefixes = prefixes;
   }
 
   public getPrefixes() {
-    return RDFPrefixes.DEFAULT_PREFIXES.valueSeq()
+    return this.prefixes
+      .valueSeq()
       .map(
         sn =>
           `PREFIX ${sn.getPrefix()}: <${this.normalizePrefix(sn.getName())}>`
@@ -50,7 +55,6 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   /**
-   * TODO add jubel, schema org prefixes to default RDFPrefixes list
    * @param {string} objectType
    * @param {Map<string, any>} args
    * @param {List<any>} projections
@@ -64,13 +68,11 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     if (this.isResolvingConnection()) {
       return `
         ${this.getPrefixes()}
-        PREFIX omgeo: <http://www.ontotext.com/owlim/geo#>
         ${this.constructConnectionQuery(projections, args)}
       `;
     } else if (this.plan.isConnectionEdgesPlan()) {
       return `
         ${this.getPrefixes()}
-        PREFIX omgeo: <http://www.ontotext.com/owlim/geo#>
         ${this.constructConnectionQuery(projections, args, false)}
       `;
     }
@@ -105,38 +107,48 @@ export default class SparqlQueryStrategy extends QueryStrategy {
       args.toJS()
     );
     return new Promise((resolve, reject) => {
-        this.fetcher
-          .fetchBindings(this.endpoint, query)
-          .then(stream => {
-            const resultArr: any[] = [];
-            const errors: any[] = [];
-            stream.on('data', data => {
-              resultArr.push(data);
-            });
-            stream.on('error', error => {
-                errors.push(error);
-            });
-            stream.on('end', () => {
-              /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
-               * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _},{...}},{...}]=>[['geo_lat': 123],...]]
-               * @type {{}[]}
-               */
-              const resultArrValues: Array<{}> = resultArr.map(entry => {
-                return Object.keys(entry).reduce((acc, key) => {
-                  acc[key] = entry[key].value;
+      this.fetcher
+        .fetchBindings(this.endpoint, query)
+        .then(stream => {
+          const resultArr: Array<{ [key: string]: Literal }> = [];
+          const errors: any[] = [];
+          stream.on('data', data => {
+            resultArr.push(data);
+          });
+          stream.on('error', error => {
+            errors.push(error);
+          });
+          stream.on('end', () => {
+            /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
+             * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _},{...}},{...}]=>[{'geo_lat': 123},...]]
+             */
+            const resultArrValues = resultArr.map(entry => {
+              return Object.keys(entry).reduce(
+                (acc, key) => {
+                  const lit = entry[key];
+                  acc[key] = lit.value;
                   return acc;
-                }, {});
-              });
-              const resultArrValuesPopped: Array<{}> = this.shouldPopFinalArray(resultArrValues.length) ? resultArrValues.slice(0, -1) : resultArrValues;
-              const om = OrderedMap<string, OrderedMap<string, any>>(
-                resultArrValuesPopped.map((row: { parentId: string; s: string, j_id: string }) => {
-                  const k: string = this.hasProperParent() ? row.parentId : row.s;
+                },
+                { parentId: '', s: '', j_id: '' }
+              );
+            });
+            const resultArrValuesPopped = this.shouldPopFinalArray(
+              resultArrValues.length
+            )
+              ? resultArrValues.slice(0, -1)
+              : resultArrValues;
+            const om = OrderedMap<string, OrderedMap<string, any>>(
+              resultArrValuesPopped.map(
+                (row: { parentId: string; s: string; j_id: string }) => {
+                  const k: string = this.hasProperParent()
+                    ? row.parentId
+                    : row.s;
                   const v = OrderedMap<any>(
                     this.fields.map(f => {
                       const key: string = f.alias.getOrElse(f.name);
                       const rowValueByKey: any =
                         row[key] ||
-                        row[this.SPECIAL_PROJECTIONS.get(key)] ||
+                        row[this.SPECIAL_PROJECTIONS.get(key) || ''] ||
                         null;
                       return [key, rowValueByKey];
                     })
@@ -144,41 +156,50 @@ export default class SparqlQueryStrategy extends QueryStrategy {
                   // to prevent lint errors..
                   const returnValue: [string, OrderedMap<string, any>] = [k, v];
                   return returnValue;
-                })
-              );
-              if (this.plan.isConnectionEdgesPlan()) {
-                const key: string = this.plan.grandParentPlan().get().getSubjectIds().get(0);
-                const resultLength: number = resultArrValues && resultArrValues.length;
-                // TODO This seems afwully hacky, is there a different approach to this?
-                this.plan.grandParentPlan().get().result.data.merge(
+                }
+              )
+            );
+            if (this.plan.isConnectionEdgesPlan()) {
+              const key: string = this.plan
+                .grandParentPlan()
+                .get()
+                .getSubjectIds()
+                .get(0);
+              const resultLength: number =
+                resultArrValues && resultArrValues.length;
+              // TODO:å This seems awfully hacky, is there a different approach to this?
+              this.plan
+                .grandParentPlan()
+                .get()
+                .result.data.merge(
                   OrderedMap({
-                    [key]: this.addPageInfoIfNeeded(resultLength)
+                    [key]: this.addPageInfoIfNeeded(resultLength),
                   })
                 );
-              }
-              result.data = om;
-              result.meta.errors = List(errors);
-              /**
-               * TODO might want to stream this to an another service later
-               */
-              console.log(
-                JSON.stringify(
-                  {
-                    query,
-                    ...result.meta,
-                  },
-                  null,
-                  2
-                )
-              );
-              return resolve(result);
-            });
-          })
-          .catch(err => {
-            result.data = OrderedMap({});
-            result.meta.errors.push(err);
+            }
+            result.data = om;
+            result.meta.errors = List(errors);
+            /**
+             * TODO might want to stream this to an another service later
+             */
+            console.log(
+              JSON.stringify(
+                {
+                  query,
+                  ...result.meta,
+                },
+                null,
+                2
+              )
+            );
             return resolve(result);
           });
+        })
+        .catch(err => {
+          result.data = OrderedMap({});
+          result.meta.errors.push(err);
+          return resolve(result);
+        });
     });
   }
 
@@ -213,7 +234,7 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     const specialProjKeys = this.SPECIAL_PROJECTIONS.keySeq();
     return this.fields.map<{ name: string; projection: string }>(f => {
       if (specialProjKeys.includes(f.name)) {
-        const sp = this.SPECIAL_PROJECTIONS.get(f.name);
+        const sp = this.SPECIAL_PROJECTIONS.get(f.name) || '';
         return {
           name: prefixify(sp),
           projection: sp,
@@ -264,12 +285,18 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     );
   }
 
-  protected spreadProjections(projections: List<any>, overriddenSubject: Option<string> = None) {
+  protected spreadProjections(
+    projections: List<any>,
+    overriddenSubject: Option<string> = None
+  ) {
     const projLen = projections.size;
     return projections
       .map(
         (a, i) =>
-          'optional {' + (overriddenSubject.isEmpty() ? '?s ' : overriddenSubject.get() + ' ') +
+          'optional {' +
+          (overriddenSubject.isEmpty()
+            ? '?s '
+            : overriddenSubject.get() + ' ') +
           a.name +
           ' ?' +
           a.projection +
@@ -280,23 +307,28 @@ export default class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addFilters() {
-    const filter = this.plan.processedArgs.filter;
-    const expr = filter.value.expression;
-    if (expr.expression.length) {
-      return expr.expression;
-    } else {
-      const filterList = expr.values.get(0);
-      return filterList
-        .mapEntries(([key, val], index) => [
-          key.expression,
-          `${val.expression} ${
-            index !== filterList.entrySeq().size - 1 ? '&&' : ''
-          }`,
-        ])
-        .reduce((acc, value, key) => {
-          return acc + `${key} = ${value}`;
-        }, '');
-    }
+    this.plan.processedArgs.filter
+      .map(filter => {
+        const expr = filter.expression;
+        if (expr.expression.length) {
+          return expr.expression;
+        } else {
+          expr.values
+            .map(filterMap => {
+              const lastFilterIndex = filterMap.size - 1;
+              return filterMap
+                .mapEntries(([key, val], index) => [
+                  key.expression,
+                  `${val.expression} ${index < lastFilterIndex ? '&&' : ''}`,
+                ])
+                .reduce((acc, value, key) => {
+                  return acc + `${key} = ${value}`;
+                }, '');
+            })
+            .join('');
+        }
+      })
+      .getOrElse('');
   }
 
   /**
@@ -361,26 +393,41 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     return this.plan.resultType.name === 'Connection';
   }
 
-  protected constructConnectionQuery(projections: List<any>,
-                                     args: Map<string, any>,
-                                     countOnly: boolean = true) {
-      // I'm not sure that we'll ever need to get a subjectId that's not the first one in the statement below
-      const parentId = countOnly ? this.plan.parent.getSubjectIds().get(0) : this.plan.grandParentPlan().get().getSubjectIds().get(0);
-      // if (this.isAGeoSpatialQuery()) {
+  protected constructConnectionQuery(
+    projections: List<any>,
+    args: Map<string, any>,
+    countOnly: boolean = true
+  ) {
+    // I'm not sure that we'll ever need to get a subjectId that's not the first one in the statement below
+    const parentId = countOnly
+      ? this.plan.parent.getSubjectIds().get(0)
+      : this.plan
+          .grandParentPlan()
+          .get()
+          .getSubjectIds()
+          .get(0);
+    // if (this.isAGeoSpatialQuery()) {
     /**
-     * TODO really just a gn_nearby at the moment.. should be refactored regardless, perhaps add a Map of corresponding statements, i.e.
+     * TODO really just a gn_nearby at the moment..
+     * should be refactored regardless, perhaps add
+     * a Map of corresponding statements, i.e.
      * gn_nearby -> omgeo:nearby and such
      */
-      return `
-        SELECT ${countOnly ?
-          '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)' :
-          '?s ?parentId ' + projections.map(a => `?${a.projection}`).join(' ')}
+    return `
+        SELECT ${
+          countOnly
+            ? '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)'
+            : '?s ?parentId ' +
+              projections.map(a => `?${a.projection}`).join(' ')
+        }
         WHERE {
           ?parentId geo:lat ?latBase.
           ?parentId geo:long ?longBase.
           ?s omgeo:nearby(?latBase ?longBase ${this.DEFAULT_NEARBY_RADIUS}).
           ?s j:id ?id
-          ${countOnly ? '' : this.spreadProjections(projections, Some('?s'))} ${args.isEmpty() ? '' : '.'}
+          ${countOnly ? '' : this.spreadProjections(projections, Some('?s'))} ${
+      args.isEmpty() ? '' : '.'
+    }
           FILTER(
             ?parentId = <${parentId}> &&
             ?parentId != ?s
@@ -391,24 +438,22 @@ export default class SparqlQueryStrategy extends QueryStrategy {
         ${this.addLimit()}
         ${this.addSortBy()}
       `;
-      // }
-      // else {
-        // todo other connection-type queries..
-      // }
+    // }
+    // else {
+    // todo other connection-type queries..
+    // }
   }
 
-  protected addCursorOffset(cursorVar: string = null) {
+  protected addCursorOffset(cursorVar: string) {
     if (this.plan.processedArgs.before.nonEmpty()) {
-      return `&& ${cursorVar || this.DEFAULT_CURSOR_LABEL} > '${this.plan.processedArgs.before.get()}'`;
+      return `&& ${cursorVar ||
+        this.DEFAULT_CURSOR_LABEL} > '${this.plan.processedArgs.before.get()}'`;
     }
     if (this.plan.processedArgs.after.nonEmpty()) {
-      return `&& ${cursorVar || this.DEFAULT_CURSOR_LABEL} < '${this.plan.processedArgs.after.get()}'`;
+      return `&& ${cursorVar ||
+        this.DEFAULT_CURSOR_LABEL} < '${this.plan.processedArgs.after.get()}'`;
     }
     return '';
-  }
-
-  private normalizePrefix(prefix: string) {
-    return prefix.split(']').join('');
   }
 
   protected addPageInfoIfNeeded(actualNumberOfResults: number = 0) {
@@ -438,5 +483,9 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     }
     // todo return only the pageInfo OM here, set the key in the parent function for more clarity.
     return OrderedMap({ pageInfo: { hasNextPage, hasPreviousPage } });
+  }
+
+  private normalizePrefix(prefix: string) {
+    return prefix.split(']').join('');
   }
 }

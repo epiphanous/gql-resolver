@@ -18,9 +18,9 @@ import { GQLFieldBooster } from '../../models/GQLBooster';
 import { GQLObjectQueryModifierBasicExpression } from '../../models/GQLObjectQueryModifierExpression';
 import * as GQLP from '../../models/GQLPattern';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
+export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
   public validFields: Map<string, string>;
   public validVariables: Set<GQLVariableDefinition>;
   public vars: Map<string, string>;

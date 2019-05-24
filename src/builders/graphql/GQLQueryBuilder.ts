@@ -69,15 +69,15 @@ import {
 import { GQLStringValue, GQLVariableValue } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import ResolverContext from '../../models/ResolverContext';
-import Builder from '../Builder';
-import GQLBindingsBuilder from './GQLBindingsBuilder';
-import GQLBoostersBuilder from './GQLBoostersBuilder';
-import GQLDocumentBuilder from './GQLDocumentBuilder';
-import GQLFilterBuilder from './GQLFilterBuilder';
-import GQLOrderByBuilder from './GQLOrderByBuilder';
-import GQLPatternsBuilder from './GQLPatternsBuilder';
-import GQLTransformsBuilder from './GQLTransformsBuilder';
+import { ResolverContext } from '../../models/ResolverContext';
+import { Builder } from '../Builder';
+import { GQLBindingsBuilder } from './GQLBindingsBuilder';
+import { GQLBoostersBuilder } from './GQLBoostersBuilder';
+import { GQLDocumentBuilder } from './GQLDocumentBuilder';
+import { GQLFilterBuilder } from './GQLFilterBuilder';
+import { GQLOrderByBuilder } from './GQLOrderByBuilder';
+import { GQLPatternsBuilder } from './GQLPatternsBuilder';
+import { GQLTransformsBuilder } from './GQLTransformsBuilder';
 
 const ARG_TYPES = {
   ARG_BINDINGS: 'bindings',
@@ -94,9 +94,7 @@ const ARG_TYPES = {
   ARG_TRANSFORMS: 'transforms',
 };
 
-export default class GQLQueryBuilder extends GQLDocumentBuilder<
-  GQLQueryDocument
-> {
+export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
   public schema: GQLSchema;
   public context: ResolverContext;
   public vars: Map<string, any>;

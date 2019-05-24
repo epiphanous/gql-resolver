@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import 'mocha';
-import Namespace from '../Namespace';
+import { SimpleNamespace } from '../Namespace';
 
 describe('NamespaceTest', () => {
-  const ns = new Namespace('geo', 'Geonames');
+  const ns = new SimpleNamespace('geo', 'Geonames');
   it('shouldHaveProperPrefix', () => {
     expect(ns.getPrefix()).to.eql('geo');
   });
@@ -11,9 +11,9 @@ describe('NamespaceTest', () => {
     expect(ns.getName()).to.eql('Geonames');
   });
   it('shouldHaveNewNameAndPrefix', () => {
-    ns.setName('Jubel');
-    ns.setPrefix('j');
-    expect(ns.getName()).to.eql('Jubel');
-    expect(ns.getPrefix()).to.eql('j');
+    ns.setName('Test');
+    ns.setPrefix('t');
+    expect(ns.getName()).to.eql('Test');
+    expect(ns.getPrefix()).to.eql('t');
   });
 });

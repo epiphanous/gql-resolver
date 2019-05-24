@@ -7,9 +7,9 @@ import {
 } from '../../antlr4/generated/QueryModificationParser';
 import { GQLFilter } from '../../models/GQLFilter';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
+export class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   public validFields: Map<string, string>;
   public validVariables: Set<GQLVariableDefinition>;
   public vars: Map<string, string>;

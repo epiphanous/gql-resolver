@@ -1,16 +1,20 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
-    "skipLibCheck": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "lib": ["es6", "es7", "dom"],
     "module": "commonjs",
-    "noImplicitAny": false,
-    "target": "es6",
-    "lib": ["es2018"],
     "moduleResolution": "node",
-    "experimentalDecorators": true
+    "outDir": "lib",
+    "sourceMap": true,
+    "target": "es5",
+    "removeComments": true,
+    "strict": true,
+    //  "strictNullChecks": false,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "downlevelIteration": true
   },
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "lib/**/*.ts", "lib-esm", "**/_t/*"]
 }

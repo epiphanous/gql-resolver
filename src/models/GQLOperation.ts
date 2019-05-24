@@ -6,7 +6,7 @@ import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLField, GQLSelection } from './GQLSelection';
 import { GQLVariable } from './GQLVariable';
 import { GQLVariableDefinition } from './GQLVariableDefinition';
-import ResolverContext from './ResolverContext';
+import { ResolverContext } from './ResolverContext';
 
 export interface IGQLOperation {
   name: string;

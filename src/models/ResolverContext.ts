@@ -1,10 +1,17 @@
 import { Map } from 'immutable';
-import Builder from '../builders/Builder';
-import GQLSchemaBuilder from '../builders/graphql/GQLSchemaBuilder';
-import { GQLSchema } from './GQLSchema';
+import { Builder } from '../builders/Builder';
+import { GQLSchemaBuilder } from '../builders/graphql/GQLSchemaBuilder';
 import { QueryStrategyFactory } from '../strategies/QueryStrategyFactory';
+import { GQLSchema } from './GQLSchema';
+import { SparqlQueryStrategy } from '../strategies';
 
-export default class ResolverContext {
+export class ResolverContext {
+  public static buildSchema(schemaText: string): GQLSchema {
+    const builder = new GQLSchemaBuilder();
+    const schemaTry = Builder.parse<GQLSchema>(builder, schemaText);
+    return schemaTry.get();
+  }
+
   public schema: GQLSchema;
   public strategies: Map<string, QueryStrategyFactory>;
   public defaultStrategy: string;
@@ -24,13 +31,7 @@ export default class ResolverContext {
     this.defaultStrategy = defaultStrategy;
   }
 
-  public static buildSchema(schemaText: string): GQLSchema {
-    const builder = new GQLSchemaBuilder();
-    const schemaTry = Builder.parse<GQLSchema>(builder, schemaText);
-    return schemaTry.get();
-  }
-
-  public getStrategyFactory(name: string): QueryStrategyFactory {
+  public getStrategyFactory(name: string): QueryStrategyFactory | undefined {
     if (this.strategies.has(name)) {
       return this.strategies.get(name);
     } else {

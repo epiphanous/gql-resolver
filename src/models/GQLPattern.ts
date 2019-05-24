@@ -1,7 +1,7 @@
 import { None, Option } from 'funfix';
 import { GQLFieldBooster } from './GQLBooster';
 
-interface IGQLPattern {
+export interface IGQLPattern {
   field: string;
 }
 

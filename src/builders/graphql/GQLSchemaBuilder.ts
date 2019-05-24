@@ -53,7 +53,7 @@ import {
   GQLTypeDefinition,
   GQLUnion,
 } from '../../models/GQLTypeDefinition';
-import GQLDocumentBuilder from './GQLDocumentBuilder';
+import { GQLDocumentBuilder } from './GQLDocumentBuilder';
 
 const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
   bindings:
@@ -68,7 +68,7 @@ const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
     "Optional list of one or more 'textmatch', 'geomatch' or 'geonearby' patterns to match against",
 };
 
-export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
+export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   public operationTypes = Map<string, string>([
     ['query', 'Query'],
     ['mutation', 'Mutation'],

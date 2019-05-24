@@ -2,7 +2,7 @@ import { Option } from 'funfix';
 import { List, Map } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 
-interface IGQLDirective {
+export interface IGQLDirective {
   name: string;
   arguments: List<GQLArgument>;
 }

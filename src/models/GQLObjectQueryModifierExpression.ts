@@ -1,7 +1,7 @@
 import { None, Option } from 'funfix';
 import { List, Map } from 'immutable';
 
-interface IGQLObjectQueryModifierExpression {
+export interface IGQLObjectQueryModifierExpression {
   expression: string;
   dataType: string;
   underlyingValue: Option<any>;

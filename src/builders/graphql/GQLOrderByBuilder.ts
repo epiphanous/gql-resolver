@@ -8,9 +8,9 @@ import {
 } from '../../antlr4/generated/QueryModificationParser';
 import { GQLSortBy } from '../../models/GQLSortBy';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLOrderByBuilder extends GQLObjectQueryModifierBuilder {
+export class GQLOrderByBuilder extends GQLObjectQueryModifierBuilder {
   public result: List<GQLSortBy>;
 
   constructor(

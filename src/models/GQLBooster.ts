@@ -1,4 +1,4 @@
-interface IGQLBooster {
+export interface IGQLBooster {
   boost: number;
 }
 

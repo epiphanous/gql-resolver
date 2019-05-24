@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable';
 import { GQLVariable } from './GQLVariable';
 
-interface IGQLValue {
+export interface IGQLValue {
   value: any;
 }
 
@@ -30,7 +30,7 @@ export class GQLVariableValue implements GQLValue {
 }
 
 export class GQLBooleanValue extends GQLValue {
-  public value: boolean;
+  public value: boolean = false;
 }
 
 export class GQLNullValue extends GQLValue {
@@ -40,7 +40,7 @@ export class GQLNullValue extends GQLValue {
 }
 
 export class GQLValueList extends GQLValue {
-  public value: List<GQLValue>;
+  public value: List<GQLValue> = List<GQLValue>();
 
   public resolve(vars: Map<string, any>) {
     return this.value.map((v, k) => v.resolve(vars));
@@ -48,7 +48,7 @@ export class GQLValueList extends GQLValue {
 }
 
 export class GQLKeyedValueList extends GQLValue {
-  public value: Map<string, GQLValue>;
+  public value: Map<string, GQLValue> = Map<string, GQLValue>();
 
   public resolve(vars: Map<string, any>) {
     return this.value.map((v, k) => v.resolve(vars));
@@ -56,17 +56,17 @@ export class GQLKeyedValueList extends GQLValue {
 }
 
 export class GQLIntValue extends GQLValue {
-  public value: number;
+  public value: number = 0;
 }
 
 export class GQLFloatValue extends GQLValue {
-  public value: number;
+  public value: number = 0.0;
 }
 
 export class GQLEnumValue extends GQLValue {
-  public value: string;
+  public value: string = '';
 }
 
 export class GQLStringValue extends GQLValue {
-  public value: string;
+  public value: string = '';
 }

@@ -1,7 +1,7 @@
 import { List, OrderedMap } from 'immutable';
-import sizeof = require('object-sizeof');
+import sizeof from 'object-sizeof';
 
-interface IMetaFields {
+export interface IMetaFields {
   startTime: number;
   duration: number;
   bytes: number;
@@ -12,8 +12,8 @@ interface IMetaFields {
   bps: number;
 }
 
-export default class QueryResult {
-  public data = OrderedMap().asMutable();
+export class QueryResult {
+  public data = OrderedMap<string, any>().asMutable();
   public meta: IMetaFields = {
     startTime: new Date().getTime(),
     duration: 0,

@@ -3,11 +3,11 @@ import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { NotImplementedError, Option, Try } from 'funfix';
-import BuilderError from './BuilderError';
+import { BuilderError } from './BuilderError';
 import { BuildErrorReport } from './BuildErrorReport';
-import IBuilder from './IBuilder';
+import { IBuilder } from './IBuilder';
 
-export default class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
+export class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   public errors: BuilderError[] = [];
 
   get errorCount() {

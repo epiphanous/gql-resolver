@@ -20,7 +20,7 @@ npm install gql-resolver
 Read in your schema, define your query strategies, set a default strategy and create
 a `Resolver` object:
 ```js
-import Resolver, { ResolverContext, SparqlQueryStrategyFactory } from 'gql-resolver';
+import { Resolver, ResolverContext, SparqlQueryStrategyFactory } from 'gql-resolver';
 import fs = require('fs');
 
 const schema = fs.readFileSync('swapi.graphql', 'utf8');

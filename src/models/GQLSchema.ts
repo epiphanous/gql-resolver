@@ -1,5 +1,6 @@
 import { None, Option, Some, TNone, TSome } from 'funfix';
 import { List, Map, Seq, Set } from 'immutable';
+import { GQLDirective } from './GQLDirective';
 import { GQLField, GQLInlineFragment, GQLSelection } from './GQLSelection';
 import {
   GQLArgumentDefinition,
@@ -13,9 +14,8 @@ import {
   GQLTypeDefinition,
   GQLUnion,
 } from './GQLTypeDefinition';
-import { GQLDirective } from './GQLDirective';
 
-interface IGQLSchema {
+export interface IGQLSchema {
   allFields: Map<string, GQLFieldDefinition>;
   allTypes: Map<string, GQLTypeDefinition>;
   directives: Map<string, GQLDirectiveDefinition>;
@@ -506,7 +506,7 @@ export class GQLSchema implements IGQLSchema {
   public inlineFragmentChildFieldMappingsOf(
     selections: List<GQLSelection>,
     field: string
-  ): Map<string, Seq<any, any>> {
+  ): Map<string, List<GQLField>> {
     const nestedFieldSelections = (fieldStr: string) =>
       this.nestedField(selections, fieldStr);
     const optField = nestedFieldSelections(field);
@@ -514,22 +514,18 @@ export class GQLSchema implements IGQLSchema {
       this.nestedFragment(selections, someStr);
     const membersOfParsedType = (str: string) =>
       this.typeMembers(nestedFragmentSelections(str), str); // TODO finish
-    const listOfResTuples = List();
-    const typeMembersMappings = () => {
-      for (const fld of [optField.value]) {
-        for (const fieldType of [this.getFieldType(fld.name)]) {
-          for (const parsedType of this.parseTypeInfo(
-            fieldType.value
-          ).toArray()) {
-            listOfResTuples.push([parsedType, membersOfParsedType(parsedType)]);
-          }
+    const listOfResTuples: Array<[string, List<GQLField>]> = [];
+    optField.map(fld => )
+    for (const fld of [optField.value]) {
+      for (const fieldType of [this.getFieldType(fld.name)]) {
+        for (const parsedType of this.parseTypeInfo(
+          fieldType.value
+        ).toArray()) {
+          listOfResTuples.push([parsedType, membersOfParsedType(parsedType)]);
         }
       }
-      return listOfResTuples;
-    };
-    return typeMembersMappings().reduce((acc, item) => {
-      return acc + item;
-    }, Map<string, List<GQLField>>());
+    }
+    return Map(listOfResTuples);
   }
 
   private _scalarsObjects(

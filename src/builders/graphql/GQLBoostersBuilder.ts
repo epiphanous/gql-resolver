@@ -7,9 +7,9 @@ import {
   GQLUserIsFollowedBooster,
 } from '../../models/GQLBooster';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
+export class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
   public result: List<GQLBooster>;
 
   constructor(

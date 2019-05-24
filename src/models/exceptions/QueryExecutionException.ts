@@ -1,4 +1,4 @@
-export default class QueryExecutionException extends Error {
+export class QueryExecutionException extends Error {
   constructor(errString: string) {
     super(errString);
     Object.setPrototypeOf(this, QueryExecutionException.prototype);

@@ -1,17 +1,21 @@
 import { expect } from 'chai';
+import fs = require('fs');
 import { Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
-import ResolverContext from '../models/ResolverContext';
+import { ResolverContext } from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
 import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
-import fs = require('fs');
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
   const rc = new ResolverContext(
     schema,
-    Map({ sparql: new SparqlQueryStrategyFactory() }),
+    Map({
+      sparql: new SparqlQueryStrategyFactory(
+        'http://localhost:7200/repositories/test'
+      ),
+    }),
     'sparql'
   );
   it('creates a resolver context', () => {

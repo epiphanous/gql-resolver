@@ -9,9 +9,9 @@ import {
 } from '../../antlr4/generated/QueryModificationParser';
 import { GQLTransform } from '../../models/GQLTransform';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder {
+export class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder {
   public result: List<GQLTransform>;
 
   constructor(prefixes: Set<string>, source: string = 'transforms') {

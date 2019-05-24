@@ -1,6 +1,6 @@
 import { GQLObjectQueryModifierExpression } from './GQLObjectQueryModifierExpression';
 
-interface IGQLBinding {
+export interface IGQLBinding {
   name: string;
   expression: GQLObjectQueryModifierExpression;
 }

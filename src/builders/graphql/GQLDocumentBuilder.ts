@@ -36,9 +36,9 @@ import {
   GQLVariableValue,
 } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
-import BuilderBase from '../BuilderBase';
+import { BuilderBase } from '../BuilderBase';
 
-export default class GQLDocumentBuilder<T> extends BuilderBase<T>
+export class GQLDocumentBuilder<T> extends BuilderBase<T>
   implements GraphQLListener {
   public lexer(inputStream: ANTLRInputStream) {
     return new GraphQLLexer(inputStream);

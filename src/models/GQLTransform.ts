@@ -1,6 +1,6 @@
 import { None, Option } from 'funfix';
 
-interface IGQLTransform {
+export interface IGQLTransform {
   name: string;
   arg: Option<string>;
 }

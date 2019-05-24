@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 import { GQLValue } from './GQLValue';
 
-interface IGQLArgument {
+export interface IGQLArgument {
   name: string;
   value: GQLValue;
 
