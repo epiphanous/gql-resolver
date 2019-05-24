@@ -1304,12 +1304,11 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
       const optOfVarRef = Option.of(context.varRef());
       if (optOfVarRef.nonEmpty()) {
         return this.processVarRef(optOfVarRef.value);
-      } else {
-        return new QME.GQLObjectQueryModifierBasicExpression(
-          context.text,
-          'error'
-        );
       }
+      return new QME.GQLObjectQueryModifierBasicExpression(
+        context.text,
+        'error'
+      );
     }
   }
 
@@ -1330,12 +1329,10 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         'xsd:decimal'
       );
     }
-    if (context instanceof QMP.DoubleLiteralContext) {
-      return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(
-        context.text,
-        'xsd:double'
-      );
-    }
+    return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(
+      context.text,
+      'xsd:double'
+    );
   }
 
   public processBooleanLiteralAtom(context: QMP.BooleanLiteralAtomContext) {
@@ -1362,6 +1359,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         'iri'
       );
     }
+    throw new Error("Unknown format for IriRef");
   }
 
   public processFieldRefAtom(

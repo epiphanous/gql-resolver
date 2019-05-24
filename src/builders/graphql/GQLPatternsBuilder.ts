@@ -6,7 +6,7 @@ import {
   FeatureContext,
   IriRefContext,
   LatLonContext,
-  NumericLiteralContext,
+  NumericLiteralContext, TextMatchParamContext,
   VarFeatureContext,
   VarRefContext,
 } from '../../antlr4/generated/QueryModificationParser';
@@ -21,13 +21,13 @@ import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
 export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
-  public validFields: Map<string, string>;
-  public validVariables: Set<GQLVariableDefinition>;
-  public vars: Map<string, string>;
-  public prefixes: Set<string>;
-  public source: string;
-  public referencedFields: Set<string>;
-  public result: List<GQLP.GQLPattern>;
+  public validFields!: Map<string, string>;
+  public validVariables!: Set<GQLVariableDefinition>;
+  public vars!: Map<string, string>;
+  public prefixes!: Set<string>;
+  public source!: string;
+  public referencedFields!: Set<string>;
+  public result!: List<GQLP.GQLPattern>;
 
   constructor(
     validFields: Map<string, string>,
@@ -48,7 +48,7 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
   }
 
   public processPatterns(context: QMP.PatternsContext) {
-    return List(context.pattern()).map(a => this.processPattern(a));
+    return List(context.pattern()).map((a: PatternContext) => this.processPattern(a));
   }
 
   // public processRaceCountPattern Guessing we don't need this one..
@@ -81,11 +81,11 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
       context.stringLiteralOrVarRef()
     );
     this.check(!!text, `text match text is empty for ${field}`, context);
-    const params = Map(
-      List(context.textMatchParam()).map(a => this.processTextMatchParam(a))
+    const params = Map<string, any>(
+      List(context.textMatchParam()).map((a: QMP.TextMatchParamContext) => this.processTextMatchParam(a))
     );
     const booster = new GQLFieldBooster(field, params.get('boost', '1'));
-    const minScore = params.get('minScore').map(a => a.toFixed(2));
+    const minScore = params.get('minScore').map((a: number) => a.toFixed(2));
     this.check(
       minScore.get('1.00') > 0,
       `text match param 'minScore' is non-positive for ${field}`,

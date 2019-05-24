@@ -47,16 +47,16 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public alias: Option<string>;
   public args: List<GQLArgument>;
   public directives: List<GQLDirective>;
-  public fields: List<GQLField>;
+  public fields!: List<GQLField>;
   public resultType: GQLTypeDefinition;
-  public processedArgs: GQLQueryArguments;
+  public processedArgs!: GQLQueryArguments;
 
   public plans: List<GQLExecutionPlan>;
-  public scalars: List<QueryResult>;
-  public objects: List<QueryResult>;
+  public scalars!: List<QueryResult>;
+  public objects!: List<QueryResult>;
   public result: QueryResult = new QueryResult();
   public allFields: List<GQLField>;
-  public defaultStrategy: string;
+  public defaultStrategy!: string;
 
   /**
    * Construct a new execution plan.
@@ -229,7 +229,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Executes all sub plans and returns a combined promise of their query results.
    * @returns Promise<QueryResult[]>
    */
-  protected resolvePlans(queryBuilder) {
+  protected resolvePlans(queryBuilder: GQLQueryBuilder) {
     // Promise.all<QueryResult>(
     return this.plans.map(plan => plan.execute(queryBuilder));
     // );

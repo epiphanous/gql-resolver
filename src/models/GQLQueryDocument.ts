@@ -14,8 +14,8 @@ import { ResolverContext } from './ResolverContext';
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;
   public fragmentDefinitions: Set<GQLFragmentDefinition>;
-  public selectedOperation: GQLOperation;
-  public plan: GQLExecutionPlan;
+  public selectedOperation!: GQLOperation;
+  public plan!: GQLExecutionPlan;
   public context: ResolverContext;
   public vars: Map<string, any>;
 

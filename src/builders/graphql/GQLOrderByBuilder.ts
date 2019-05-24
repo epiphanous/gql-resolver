@@ -11,7 +11,7 @@ import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
 export class GQLOrderByBuilder extends GQLObjectQueryModifierBuilder {
-  public result: List<GQLSortBy>;
+  public result!: List<GQLSortBy>;
 
   constructor(
     validFields: Map<string, string>,

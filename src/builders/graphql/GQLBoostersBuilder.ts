@@ -8,9 +8,10 @@ import {
 } from '../../models/GQLBooster';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
+import {BoostContext} from '../../antlr4/generated/QueryModificationParser';
 
 export class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
-  public result: List<GQLBooster>;
+  public result!: List<GQLBooster>;
 
   constructor(
     validFields: Map<string, string>,
@@ -30,20 +31,21 @@ export class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
     this.result = this.processBoosters(context);
   }
 
-  public processBoosters(context: QMP.BoostersContext) {
-    return List(context.boost()).map(a => this.processBooster(a));
+  public processBoosters(context: QMP.BoostersContext): List<GQLBooster> {
+    return List(context.boost()).map((a: BoostContext) => this.processBooster(a));
   }
 
   /**
    * I'll leave the method here even though we might not need these statements inside
    */
-  public processBooster(context: QMP.BoostContext) {
+  public processBooster(context: QMP.BoostContext): GQLBooster {
     if (context instanceof QMP.FollowsUserBoostContext) {
       return this.processFollowsUser(context);
     }
     if (context instanceof QMP.FollowedByUserBoostContext) {
       return this.processedFollowedByUser(context);
     }
+    throw new Error('Unsupported BoostContext' + context);
   }
 
   public processFollowsUser(context: QMP.FollowsUserBoostContext) {

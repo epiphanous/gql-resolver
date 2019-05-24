@@ -10,7 +10,7 @@ import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
 export class GQLBindingsBuilder extends GQLObjectQueryModifierBuilder {
-  public result: List<GQLBinding>;
+  public result!: List<GQLBinding>;
 
   constructor(
     validFields: Map<string, string>,

@@ -10,13 +10,13 @@ import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
 export class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
-  public validFields: Map<string, string>;
-  public validVariables: Set<GQLVariableDefinition>;
-  public vars: Map<string, string>;
-  public prefixes: Set<string>;
-  public source: string;
-  public referencedFields: Set<string> = Set<string>().asMutable();
-  public result: GQLFilter;
+  public validFields!: Map<string, string>;
+  public validVariables!: Set<GQLVariableDefinition>;
+  public vars!: Map<string, string>;
+  public prefixes!: Set<string>;
+  public source!: string;
+  public referencedFields!: Set<string>;
+  public result!: GQLFilter;
 
   public parseWith(parser: QueryModificationParser) {
     return parser.filter();

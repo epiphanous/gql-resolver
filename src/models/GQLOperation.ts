@@ -25,12 +25,12 @@ export interface IGQLOperation {
 export class GQLOperation implements IGQLOperation {
   [key: string]: any;
 
-  public name: string;
+  public name!: string;
   // public operationType: 'query' | 'mutation' | 'subscription';
-  public operationType: string;
-  public outputType: string;
-  public fields: List<[string, GQLField]>;
-  public variables: List<GQLVariableDefinition>;
+  public operationType!: string;
+  public outputType!: string;
+  public fields!: List<[string, GQLField]>;
+  public variables!: List<GQLVariableDefinition>;
   public directives: List<GQLDirective> = List();
   public selections: List<GQLSelection> = List();
   public isSelected = false;

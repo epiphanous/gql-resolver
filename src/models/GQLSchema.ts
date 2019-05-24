@@ -320,11 +320,11 @@ export class GQLSchema implements IGQLSchema {
     // console.log(fields);
 
     fields
-      .flatMap<[string, GQLField]>(tf => {
+      .flatMap<[string, GQLField]>((tf: [string, GQLField]) => {
         console.log(tf);
         const [objType, field] = tf;
         if (objType.startsWith('U_')) {
-          List<[string, GQLField]>(
+          return List<[string, GQLField]>(
             objType
               .slice(2)
               .split('_OR_')
@@ -421,7 +421,7 @@ export class GQLSchema implements IGQLSchema {
     selections: List<GQLSelection | GQLField | GQLInlineFragment>,
     fieldName: string
   ): Option<GQLField> {
-    const result = selections.reduce((acc, node) => {
+    const result = selections.reduce((acc: Set<GQLField | undefined>, node: GQLSelection | GQLField | GQLInlineFragment) => {
       if (node.constructor.name === 'GQLField') {
         if (node.name === fieldName) {
           return acc.add(node as GQLField);
@@ -456,7 +456,7 @@ export class GQLSchema implements IGQLSchema {
     fieldType: string
   ): Option<[GQLInlineFragment, Option<GQLField>]> {
     let fragmentOwner: TSome<GQLField> | TNone = None;
-    const result = selections.reduce((acc, node) => {
+    const result = selections.reduce((acc: Set<[GQLInlineFragment, Option<GQLField>] | undefined>, node: GQLSelection | GQLField | GQLInlineFragment) => {
       if (node.constructor.name === 'GQLInlineFragment') {
         if ((node as GQLInlineFragment).typeCondition === fieldType) {
           return acc.add([node as GQLInlineFragment, fragmentOwner]);
@@ -492,14 +492,9 @@ export class GQLSchema implements IGQLSchema {
     typeInfo: string
   ): List<GQLField> {
     return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
-      return fragmentInfo[0].selections.map(selection => {
-        if (selection.constructor.name === 'GQLField') {
-          return selection as GQLField;
-        } else {
-          console.warn(`no idea how to handle ${selection}`);
-          return null;
-        }
-      });
+      return fragmentInfo && fragmentInfo[0].selections
+        .filter(selection => selection.constructor.name === 'GQLField')
+        .map(selection => selection as GQLField);
     });
   }
 

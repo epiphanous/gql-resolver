@@ -12,7 +12,7 @@ import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
 export class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder {
-  public result: List<GQLTransform>;
+  public result!: List<GQLTransform>;
 
   constructor(prefixes: Set<string>, source: string = 'transforms') {
     super(Map(), Set<GQLVariableDefinition>(), Map(), prefixes, source);

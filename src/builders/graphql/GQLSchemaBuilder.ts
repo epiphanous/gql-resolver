@@ -430,6 +430,7 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
     if (!def) {
+      // TODO needs fixing, not sure what the idea here was
       def.values.withMutations(v =>
         v.merge(this.getEnumValues(Option.of(ctx.enumValuesDefinition())))
       );
@@ -437,7 +438,7 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         d.merge(this.getDirectives(Option.of(ctx.directives())))
       );
     } else {
-      this.check(false, `can't extend non-existant enum ${name}`, ctx, true);
+      this.check(false, `can't extend non-existent enum ${name}`, ctx, true);
     }
   }
 
@@ -447,11 +448,11 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
     if (!def) {
-      def.directives.withMutations(d =>
+      this.directives.withMutations(d =>
         d.merge(this.getDirectives(Option.of(ctx.directives())))
       );
     } else {
-      this.check(false, `can't extend non-existant enum ${name}`, ctx, true);
+      this.check(false, `can't extend non-existent enum ${name}`, ctx, true);
     }
   }
 
