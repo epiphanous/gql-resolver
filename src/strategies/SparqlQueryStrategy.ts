@@ -148,11 +148,10 @@ export default class SparqlQueryStrategy extends QueryStrategy {
               );
               if (this.plan.isConnectionEdgesPlan()) {
                 const key: string = this.plan.grandParentPlan().get().getSubjectIds().get(0);
-                const resultLength: number = resultArrValues && resultArrValues.length;
                 // TODO This seems afwully hacky, is there a different approach to this?
                 this.plan.grandParentPlan().get().result.data.merge(
                   OrderedMap({
-                    [key]: this.addPageInfoIfNeeded(resultLength)
+                    [key]: this.addPageInfoIfNeeded(resultArrValuesPopped)
                   })
                 );
               }
@@ -411,15 +410,17 @@ export default class SparqlQueryStrategy extends QueryStrategy {
     return prefix.split(']').join('');
   }
 
-  protected addPageInfoIfNeeded(actualNumberOfResults: number = 0) {
+  protected addPageInfoIfNeeded(actualResults: Array<{}> = []) {
     if (this.plan.isConnectionEdgesPlan()) {
-      return this.addPageInfo(actualNumberOfResults);
+      return this.addPageInfo(actualResults);
     } else {
       return null;
     }
   }
 
-  protected addPageInfo(actualNumberOfResults: number = 0) {
+  protected addPageInfo(actualResults: Array<{}> = Array<{}>()) {
+    const actualNumberOfResults: number = actualResults && actualResults.length;
+    let endCursor: string = null;
     const optFirst = this.plan.processedArgs.first;
     const optLast = this.plan.processedArgs.last;
     const optAfter = this.plan.processedArgs.after;
@@ -436,7 +437,10 @@ export default class SparqlQueryStrategy extends QueryStrategy {
         hasPreviousPage = true;
       }
     }
-    // todo return only the pageInfo OM here, set the key in the parent function for more clarity.
-    return OrderedMap({ pageInfo: { hasNextPage, hasPreviousPage } });
+    if (actualNumberOfResults > 0) {
+      const lastResult = actualResults.pop();
+      endCursor = lastResult['j_id'];
+    }
+    return OrderedMap({ pageInfo: { hasNextPage, hasPreviousPage, endCursor } });
   }
 }
