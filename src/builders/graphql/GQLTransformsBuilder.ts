@@ -31,10 +31,14 @@ export class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder {
   }
 
   public processTransform(context: TransformContext) {
-    const func = this.textOf(context.children[0] as TerminalNode);
-    const iriRef = Option.of(context.iriRefOrVarRef())
-      .map(a => this.processIriRefOrVarRef(a))
-      .map(e => e.expression as string);
-    return new GQLTransform(func, iriRef);
+    if (!context || !context.children || context.children.length === 0) {
+      throw new Error('No children in context' + context);
+    } else {
+      const func = this.textOf(context.children[0] as TerminalNode);
+      const iriRef = Option.of(context.iriRefOrVarRef())
+        .map(a => this.processIriRefOrVarRef(a))
+        .map(e => e.expression as string);
+      return new GQLTransform(func, iriRef);
+    }
   }
 }

@@ -6,20 +6,21 @@ export interface IGQLType {
 
 export class GQLType implements IGQLType {
   public static _xsdType(name: string) {
+    const xsdTypeMap: { [key: string]: string } = {
+      ID: 'xsd:anyURI',
+      Boolean: 'xsd:boolean',
+      Float: 'xsd:float',
+      Int: 'xsd:integer',
+      String: 'xsd:string',
+      URL: 'xsd:anyURI',
+      URI: 'xsd:anyURI',
+      Date: 'xsd:date',
+      Time: 'xsd:time',
+      DateTime: 'xsd:dateTime',
+      Duration: 'xsd:duration',
+    };
     return (
-      {
-        ID: 'xsd:anyURI',
-        Boolean: 'xsd:boolean',
-        Float: 'xsd:float',
-        Int: 'xsd:integer',
-        String: 'xsd:string',
-        URL: 'xsd:anyURI',
-        URI: 'xsd:anyURI',
-        Date: 'xsd:date',
-        Time: 'xsd:time',
-        DateTime: 'xsd:dateTime',
-        Duration: 'xsd:duration',
-      }[name] || name
+      xsdTypeMap[name] || name
     );
   }
 

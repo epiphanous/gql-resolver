@@ -10,11 +10,12 @@ import {
   GQLSelection,
 } from './GQLSelection';
 import { ResolverContext } from './ResolverContext';
+import {GQLQueryBuilder} from '../builders/graphql/GQLQueryBuilder';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;
   public fragmentDefinitions: Set<GQLFragmentDefinition>;
-  public selectedOperation!: GQLOperation;
+  public selectedOperation!: GQLOperation | null;
   public plan!: GQLExecutionPlan;
   public context: ResolverContext;
   public vars: Map<string, any>;
@@ -32,7 +33,7 @@ export class GQLQueryDocument {
     this.makeExecutionPlan();
   }
 
-  public async execute(queryBuilder) {
+  public async execute(queryBuilder: GQLQueryBuilder) {
     return await this.plan.execute(queryBuilder);
   }
 
@@ -44,38 +45,51 @@ export class GQLQueryDocument {
         'GQLQueryDocument initialized without a selected operation'
       );
     }
-    this.selectedOperation = this.withFlattenedSelections(operation);
+    this.selectedOperation = this.withFlattenedSelections(Option.of(operation));
     this.plan = this.selectedOperation.getExecutionPlan(
       this.context,
       this.vars
     );
   }
 
-  protected withFlattenedSelections(operation: GQLOperation) {
-    const outputTypeName = this.context.schema.operationTypes.get(
-      operation.operationType
-    );
-    const operationOpt = this.context.schema
-      .getTypeDefinition(outputTypeName)
-      .map(td => {
-        const fields: List<[string, GQLField]> = this.flattenSelections(
-          td.name,
-          operation.selections
-        );
-        const outputType = fields.get(0)[0];
-        return operation.copy({ fields, outputType });
-      });
-    if (operationOpt.isEmpty()) {
-      throw new Error(`Can't find type ${outputTypeName}`);
+  protected withFlattenedSelections(operation: Option<GQLOperation>) {
+    if (operation.nonEmpty()) {
+      const operationVal = operation.get();
+      const outputTypeName = this.context.schema.operationTypes.get(
+        operationVal.operationType,
+        'query'
+      );
+      const operationOpt = this.context.schema
+        .getTypeDefinition(outputTypeName)
+        .map(td => {
+          const fields: List<[string, GQLField]> = this.flattenSelections(
+            td.name,
+            operationVal.selections
+          );
+          const firstField = fields.get(0);
+          if (!firstField) {
+            throw new Error('No field accessible!');
+          } else {
+            const outputType = firstField[0];
+            return operationVal.copy({ fields, outputType });
+          }
+        });
+      if (operationOpt.isEmpty()) {
+        throw new Error(`Can't find type ${outputTypeName}`);
+      }
+      return operationOpt.get();
     }
-    return operationOpt.get();
+    throw new Error(`Op doesn't exist: ${operation}`);
   }
 
   protected flattenSelections(
     parentType: string,
     selections: List<GQLSelection>
   ): List<[string, GQLField]> {
-    return selections.flatMap(s => this.flattenSelection(parentType, s));
+    if (!selections.isEmpty()) {
+      return selections.flatMap(s => this.flattenSelection(parentType, s));
+    }
+    return List<[string, GQLField]>();
   }
 
   protected flattenSelection(parentType: string, selection: GQLSelection) {
@@ -123,6 +137,8 @@ export class GQLQueryDocument {
           );
         }
         return fragOpt.get();
+      default:
+        return List<[string, GQLField]>();
     }
   }
 }

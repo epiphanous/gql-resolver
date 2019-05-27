@@ -17,7 +17,7 @@ export class BuilderErrorListener<T> implements ANTLRErrorListener<any> {
     line: number,
     position: number,
     message: string,
-    exception: RecognitionException
+    exception: RecognitionException | undefined
   ) {
     this.builder.addError(
       new BuilderError(message, line, position, Option.of(exception))

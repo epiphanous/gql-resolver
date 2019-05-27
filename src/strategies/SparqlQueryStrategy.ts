@@ -124,7 +124,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
              */
             const resultArrValues = resultArr.map(entry => {
               return Object.keys(entry).reduce(
-                (acc, key) => {
+                (acc: { [key: string]: string }, key) => {
                   const lit = entry[key];
                   acc[key] = lit.value;
                   return acc;
@@ -139,7 +139,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
               : resultArrValues;
             const om = OrderedMap<string, OrderedMap<string, any>>(
               resultArrValuesPopped.map(
-                (row: { parentId: string; s: string; j_id: string }) => {
+                (row: { [key: string]: string }) => {
                   const k: string = this.hasProperParent()
                     ? row.parentId
                     : row.s;
@@ -336,8 +336,8 @@ export class SparqlQueryStrategy extends QueryStrategy {
    */
   protected addParentConstraints() {
     if (this.hasProperParent()) {
-      // todo add supp for multiple parents
-      const ids = this.plan.parent.getSubjectIds().reduce((acc, sid) => {
+      // todo add support for multiple parents
+      const ids = this.plan.parent!.getSubjectIds().reduce((acc, sid) => {
         return (acc += `<${sid}> \n`);
       }, '');
       return `VALUES ?parentId {
@@ -400,7 +400,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
   ) {
     // I'm not sure that we'll ever need to get a subjectId that's not the first one in the statement below
     const parentId = countOnly
-      ? this.plan.parent.getSubjectIds().get(0)
+      ? this.plan.parent!.getSubjectIds().get(0)
       : this.plan
           .grandParentPlan()
           .get()

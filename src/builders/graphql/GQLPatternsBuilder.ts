@@ -6,7 +6,7 @@ import {
   FeatureContext,
   IriRefContext,
   LatLonContext,
-  NumericLiteralContext, TextMatchParamContext,
+  NumericLiteralContext, PatternContext, TextMatchParamContext,
   VarFeatureContext,
   VarRefContext,
 } from '../../antlr4/generated/QueryModificationParser';
@@ -27,7 +27,7 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
   public prefixes!: Set<string>;
   public source!: string;
   public referencedFields!: Set<string>;
-  public result!: List<GQLP.GQLPattern>;
+  public result!: List<GQLP.GQLPattern | undefined>;
 
   constructor(
     validFields: Map<string, string>,
@@ -68,7 +68,7 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
     let field;
     if (Option.of(context.fieldRef()).nonEmpty()) {
       field = this.processFieldRef(
-        Option.of(context.fieldRef()).value
+        Option.of(context.fieldRef()).value!
       ).expression.substring(1);
     } else {
       if (isGeo) {
@@ -107,7 +107,7 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
     );
   }
 
-  public asDouble(n) {
+  public asDouble(n: any) {
     switch (typeof n) {
       case 'string':
       case 'number':
@@ -162,7 +162,7 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
       Option.of(unitsOptions[1]).nonEmpty()
     ) {
       units = this.processVarRef(unitsOptions[1].value).underlyingValue.map(
-        a => a as string
+        (a: string) => a as string
       )['unit:MileUSStatute'];
     } else if (
       Option.of(unitsOptions[1]).isEmpty() &&

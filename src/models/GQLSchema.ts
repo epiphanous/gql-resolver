@@ -137,7 +137,7 @@ export class GQLSchema implements IGQLSchema {
     const name = this.getTypeName(t);
     if (this.unions.has(name)) {
       const u = this.unions.get(name);
-      return u.gqlTypes.filterNot(x => this.isScalarLike(x)).isEmpty();
+      return u!.gqlTypes.filterNot(x => this.isScalarLike(x)).isEmpty();
     }
     return false;
   }
@@ -237,7 +237,7 @@ export class GQLSchema implements IGQLSchema {
   }
 
   public getFieldSubjectObjectTypes(f: string): Set<string> {
-    return this.objectTypesForField.get(f);
+    return this.objectTypesForField.get(f)!;
   }
 
   public getFieldType(f: string): Option<string> {
@@ -258,14 +258,14 @@ export class GQLSchema implements IGQLSchema {
 
   public validFieldsForType(t: string): Map<string, string> {
     let types: Set<string>;
-    switch (this.getTypeDefinition(t).value.constructor.name) {
+    switch (this.getTypeDefinition(t).value!.constructor.name) {
       case 'GQLUnion':
         types = this.getTypeDefinition(t)
-          .value.constructor()
+          .value!.constructor()
           .gqlTypes.toSet();
         break;
       case 'GQLTypeDefinition':
-        types = Set(this.getTypeDefinition(t).value.constructor().name);
+        types = Set(this.getTypeDefinition(t).value!.constructor().name);
         break;
       default:
         types = Set<string>();
@@ -275,7 +275,7 @@ export class GQLSchema implements IGQLSchema {
       .map(p => {
         if (this.isScalarObjectType(t)) {
           // This probably won't work..
-          return this.objectTypes.get(p).fields.map(f => {
+          return this.objectTypes.get(p)!.fields.map(f => {
             const key = f.gqlType.xsdType + '_' + f.name;
             const val = f.gqlType.xsdType;
             return [key, val];
@@ -287,12 +287,12 @@ export class GQLSchema implements IGQLSchema {
           if (fbt) {
             if (fbt.has('s')) {
               s = fbt
-                .get('s')
+                .get('s')!
                 .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
             }
             if (fbt.has('o')) {
               o = fbt
-                .get('o')
+                .get('o')!
                 .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
             }
           }
@@ -345,31 +345,33 @@ export class GQLSchema implements IGQLSchema {
       .map(tf => {
         const [objType, field] = tf;
         const fieldStrArrPair = this.fieldsByType.get(objType);
-        const toValues = fieldStrArrPair[1]
-          .map((opt: Option<List<string>>) => opt.value)
-          .filter(optval => optval);
-        const grouped = toValues.reduce((acc, current) => {
-          if (acc[current[0]]) {
-            acc[current[0]].push(current[1]);
+        if (fieldStrArrPair) {
+          const toValues = fieldStrArrPair[1]
+            .map((opt: Option<List<string>>) => opt.value)
+            .filter((optval: string) => optval);
+          const grouped = toValues.reduce((acc, current) => {
+            if (acc[current[0]]) {
+              acc[current[0]].push(current[1]);
+            } else {
+              acc[current[0]] = [current[1]];
+            }
+            return acc;
+          }, {});
+          const so = Map(grouped);
+          const s = Option.of(so.get('s'));
+          const o = Option.of(so.get('o'));
+          if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
+            scalars.push(tf);
+          } else if (
+            o.nonEmpty() &&
+            (o.value as List<string>).includes(field.name)
+          ) {
+            objects.push(tf);
           } else {
-            acc[current[0]] = [current[1]];
+            errors.push(
+              new Error(`field '${field.name}' not in type '${objType}'`)
+            );
           }
-          return acc;
-        }, {});
-        const so = Map(grouped);
-        const s = Option.of(so.get('s'));
-        const o = Option.of(so.get('o'));
-        if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
-          scalars.push(tf);
-        } else if (
-          o.nonEmpty() &&
-          (o.value as List<string>).includes(field.name)
-        ) {
-          objects.push(tf);
-        } else {
-          errors.push(
-            new Error(`field '${field.name}' not in type '${objType}'`)
-          );
         }
       });
     return [List(scalars), List(objects), List(errors)];
@@ -511,9 +513,9 @@ export class GQLSchema implements IGQLSchema {
       this.typeMembers(nestedFragmentSelections(str), str); // TODO finish
     const listOfResTuples: Array<[string, List<GQLField>]> = [];
     for (const fld of [optField.value]) {
-      for (const fieldType of [this.getFieldType(fld.name)]) {
+      for (const fieldType of [this.getFieldType(fld!.name)]) {
         for (const parsedType of this.parseTypeInfo(
-          fieldType.value
+          fieldType.value!
         ).toArray()) {
           listOfResTuples.push([parsedType, membersOfParsedType(parsedType)]);
         }

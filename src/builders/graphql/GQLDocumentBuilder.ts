@@ -53,7 +53,7 @@ export class GQLDocumentBuilder<T> extends BuilderBase<T>
     const isList = lt.nonEmpty();
     const typ = lt.map(t => t.type()).getOrElse(ctx);
     return new GQLType(
-      this.textOf(typ.namedType().NAME()),
+      this.textOf(typ.namedType()!.NAME()),
       isList,
       Option.of(ctx.nonNullType()).nonEmpty()
     );
@@ -136,6 +136,7 @@ export class GQLDocumentBuilder<T> extends BuilderBase<T>
         )
       );
     }
+    throw new Error('Unsupported ValueContext ' + ctx);
   }
 
   public processDefaultValue(ctxOpt: Option<DefaultValueContext>) {

@@ -17,7 +17,7 @@ import { ResolverContext } from './ResolverContext';
 import { stringify } from 'querystring';
 
 export interface IGQLExecutionPlan {
-  parent: GQLExecutionPlan;
+  parent: GQLExecutionPlan | null;
   context: ResolverContext;
   vars: Map<string, any>;
   name: string;
@@ -40,7 +40,7 @@ export interface IGQLExecutionPlan {
  * An execution plan for a graphql query.
  */
 export class GQLExecutionPlan implements IGQLExecutionPlan {
-  public parent: GQLExecutionPlan;
+  public parent: GQLExecutionPlan | null;
   public context: ResolverContext;
   public vars: Map<string, any>;
   public name: string;
@@ -70,7 +70,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @param fields the non-object fields this plan resolves
    */
   constructor(
-    parent: GQLExecutionPlan,
+    parent: GQLExecutionPlan | null,
     context: ResolverContext,
     vars: Map<string, any>,
     name: string,
@@ -185,7 +185,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     if (fieldWithIdDirective) {
       const fieldName = fieldWithIdDirective.name;
       return fields
-        .get(0)
+        .get(0)!
         .valueSeq()
         .reduce(
           (acc, value: OrderedMap<string, any>) =>
@@ -195,7 +195,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     }
 
     const fieldsMarkedId = fields
-      .get(0)
+      .get(0)!
       .valueSeq()
       .filter((field: GQLField) => field.name === 'id')
       .toList();
@@ -205,7 +205,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     }
 
     return fields
-      .get(0)
+      .get(0)!
       .keySeq()
       .toList();
   }
@@ -239,14 +239,10 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
-    const scData = this.scalars.map(sc => sc.data);
-    const mappedScalars = scData.isEmpty()
-      ? OrderedMap<string, any>()
-      : scData.get(0);
+    const scData: List<OrderedMap<string, any>> = this.scalars.map(sc => sc.data);
+    const mappedScalars = scData.get(0) || OrderedMap<string, any>();
     const obData = this.objects.map(sc => sc.data);
-    const mappedObjects = obData.isEmpty()
-      ? OrderedMap<string, any>()
-      : obData.get(0);
+    const mappedObjects = obData.get(0) || OrderedMap<string, any>();
     this.result.merge(mappedScalars);
     this.result.merge(mappedObjects);
     const scErrors = this.getScalarsErrors();
@@ -310,7 +306,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.fields
       .groupBy(f => this.getStrategyFor(f))
       .map((fields, qs) =>
-        this.context.getStrategyFactory(qs).create(fields.toList(), this)
+        this.context.getStrategyFactory(qs)!.create(fields.toList(), this)
       )
       .valueSeq()
       .toList();
@@ -331,7 +327,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     let strategy: Option<string> = None;
 
     // first search up through the query
-    let parent = this as GQLExecutionPlan;
+    let parent: GQLExecutionPlan | null = this as GQLExecutionPlan;
     while (parent && strategy.isEmpty()) {
       strategy = this.resolveWith(parent.directives);
       parent = parent.parent;

@@ -79,7 +79,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
             disjunction.disjunctives.size == 1 &&
             disjunction.values.isEmpty()
           ) {
-            result = disjunction.disjunctives.get(0).conjunctives;
+            result = disjunction.disjunctives.get(0)!.conjunctives;
           }
         }
       }
@@ -102,12 +102,12 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
           let result = List([disjunctive]);
           if (
             conjunction.conjunctives.size === 1 &&
-            !conjunction.conjunctives.get(0).hasNot
+            !conjunction.conjunctives.get(0)!.hasNot
           ) {
             let disjunctionOpt: Option<
               QME.GQLObjectQueryModifierDisjunction
             > = None;
-            const expr2 = conjunction.conjunctives.get(0).expr.expr;
+            const expr2 = conjunction.conjunctives.get(0)!.expr.expr;
             if (
               expr2 instanceof QME.GQLObjectQueryModifierParensExpression &&
               expr2.expr instanceof QME.GQLObjectQueryModifierDisjunction
@@ -196,6 +196,8 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
                 .map(a => a.expression)
                 .toSet()
             );
+          } else {
+            return Set<string>();
           }
         }, fieldsInHead);
       }
@@ -261,22 +263,23 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         predicate = this.processComparisonPredicate(
           context as QMP.ComparisonPredicateContext
         );
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
       case 'InPredicateContext':
         predicate = this.processInPredicate(context as QMP.InPredicateContext);
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
       case 'InVarPredicateContext':
         predicate = this.processInVarPredicate(
           context as QMP.InVarPredicateContext
         );
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
       case 'ParenPredicateContext':
         predicate = this.processParenPredicate(
           context as QMP.ParenPredicateContext
         );
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
+      default:
+        throw new Error('Unsupported context type:' + context.constructor.name);
     }
-    return new QME.GQLObjectQueryModifierPredicate(predicate);
   }
 
   public processComparisonPredicate(
@@ -464,6 +467,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
       case 'VarRefAtomContext':
         return this.processVarRefAtom(atom as QMP.VarRefAtomContext);
     }
+    throw new Error('Unsupported atom context! ' + atom.constructor.name);
   }
 
   public processBuiltInCallAtom(
@@ -580,6 +584,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
       case 'YearFuncContext':
         return this.processYearFunc(builtin as QMP.YearFuncContext);
     }
+    throw new Error('Unsupported AtomContext: ' + context.builtinCall().constructor.name);
   }
 
   public NArgBuiltin(
@@ -591,7 +596,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
     const expr = List(expressions).map(ex => this.processExpression(ex));
     expr.forEach((e, index) => {
-      const tl = inTypes.size < index ? inTypes.last : inTypes[index];
+      const tl = inTypes.size < index ? inTypes.last(List<string>()) : inTypes.get(index, List<string>());
       this.check(
         tl.contains(e.dataType),
         // tslint: disable-next-line
@@ -1255,6 +1260,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     if (val instanceof QMP.FuncWithArgsContext) {
       return this.processFuncWithArgs(val);
     }
+    throw new Error('Unsupported AtomContext' + context.functionCall());
   }
 
   public processRdfLiteralAtom(context: QMP.RdfLiteralAtomContext) {
@@ -1271,6 +1277,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         val.iriRef().text
       );
     }
+    throw new Error('Unsupported AtomContext' + context.rdfLiteral());
   }
 
   public processStringLiteralAtom(context: QMP.StringLiteralAtomContext) {
@@ -1403,7 +1410,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
       context
     );
     const filterExpr = this.asDataType(value.getOrElse('error'));
-    const t = vd ? vd[0].gqlType.xsdType : 'error';
+    // const t = vd ? vd[0].gqlType.xsdType : 'error';
     // TODO this.check() whether filterExpr.dataType == t
     return filterExpr;
   }
@@ -1470,7 +1477,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     if (typeof value === 'string') {
       if (GQLObjectQueryModifierBuilderTypes.rDATETIME_PATTERN.test(value)) {
         const regexed = GQLObjectQueryModifierBuilderTypes.rDATETIME_PATTERN
-          .exec(value)[0]
+          .exec(value)![0]
           .split('-');
         // tslint:disable-next-line
         return this.quotedDataType(
@@ -1488,7 +1495,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         return this.quotedDataType(value, Some('xsd:anyURI'));
       }
       if (this.rPREFIXED_IRI_PATTERN.test(value)) {
-        const regexed = this.rPREFIXED_IRI_PATTERN.exec(value)[0].split('_');
+        const regexed = this.rPREFIXED_IRI_PATTERN.exec(value)![0].split('_');
         return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(
           `${regexed[0]}:${regexed[1]}`,
           'iri'
@@ -1503,6 +1510,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         return this.quotedDataType(value, None);
       }
     }
+    throw new Error('Unsupported expression' + value);
   }
 
   public processParenExpression(context: QMP.ParenExpressionContext) {
