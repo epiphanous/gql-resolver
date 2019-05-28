@@ -326,7 +326,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
 
   public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
     const operation = new GQLOperation({
-      name: this.textOf(ctx.NAME()),
+      name: this.textOf(ctx.NAME()!),
       operationType: ctx.operationType().text,
       variables: this.processVariableDefinitions(
         Option.of(ctx.variableDefinitions())
@@ -419,6 +419,8 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
               return this.processFragmentSpread(
                 (sc as FragmentSpreadSelectionContext).fragmentSpread()
               );
+            default:
+              throw new Error('Unsupported context' + sc.constructor);
           }
         })
       );
@@ -436,7 +438,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
       alias,
       args: this.getArguments(Option.of(ctx.arguments()), fdOpt),
       directives: this.processDirectives(Option.of(ctx.directives())),
-      selections: this.processSelectionSet(ctx.selectionSet()),
+      selections: this.processSelectionSet(ctx.selectionSet()!),
     });
   }
 
@@ -486,7 +488,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
       return new GQLInvalidArgument(name, new GQLStringValue('error'));
     } else {
       const argDef = argDefOpt.get();
-      const expectedType = argDef.gqlType.name;
+      const expectedType = argDef!.gqlType.name;
       const v = this.processValue(ctx.value());
       let typeOk = false;
       switch (v.constructor.name) {
@@ -552,7 +554,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
     return new GQLInlineFragment(
       this.textOf(
         ctx
-          .typeCondition()
+          .typeCondition()!
           .namedType()
           .NAME()
       ),

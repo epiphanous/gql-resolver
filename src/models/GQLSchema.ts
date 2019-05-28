@@ -344,20 +344,20 @@ export class GQLSchema implements IGQLSchema {
       })
       .map(tf => {
         const [objType, field] = tf;
-        const fieldStrArrPair = this.fieldsByType.get(objType);
-        if (fieldStrArrPair) {
-          const toValues = fieldStrArrPair[1]
-            .map((opt: Option<List<string>>) => opt.value)
-            .filter((optval: string) => optval);
-          const grouped = toValues.reduce((acc, current) => {
-            if (acc[current[0]]) {
-              acc[current[0]].push(current[1]);
-            } else {
-              acc[current[0]] = [current[1]];
-            }
-            return acc;
-          }, {});
-          const so = Map(grouped);
+        const so: Map<string, List<string>> = this.fieldsByType.get(objType, Map<string, List<string>>());
+        if (so && !so.isEmpty()) {
+          // const toValues = fieldStrArrPair.get(1)
+          //   .map((opt: Option<List<string>>) => opt.value)
+          //   .filter((optval: string) => optval);
+          // const grouped = toValues.reduce((acc: any, current: any) => {
+          //   if (acc[current[0]]) {
+          //     acc[current[0]].push(current[1]);
+          //   } else {
+          //     acc[current[0]] = [current[1]];
+          //   }
+          //   return acc;
+          // }, {});
+          // const so = Map(grouped);
           const s = Option.of(so.get('s'));
           const o = Option.of(so.get('o'));
           if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
@@ -496,7 +496,7 @@ export class GQLSchema implements IGQLSchema {
     return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
       return fragmentInfo && fragmentInfo[0].selections
         .filter(selection => selection.constructor.name === 'GQLField')
-        .map(selection => selection as GQLField);
+        .map(selection => selection as GQLField) || List();
     });
   }
 

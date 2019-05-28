@@ -13,12 +13,13 @@ export class SparqlQueryStrategyFactory extends QueryStrategyFactory {
   constructor(endpoint: string, prefixes: Array<[string, string]> = []) {
     super();
     this.endpoint = endpoint;
-    this.prefixes = DEFAULT_PREFIXES.merge(
-      prefixes.map(([prefix, url]) => [
+    const prefixesSN: Map<string, SimpleNamespace> = Map(
+      prefixes.map<[string, SimpleNamespace]>(([prefix, url]) => [
         prefix,
-        new SimpleNamespace(prefix, url),
+        new SimpleNamespace(prefix, url)
       ])
     );
+    this.prefixes = DEFAULT_PREFIXES.merge(prefixesSN);
   }
 
   public create(

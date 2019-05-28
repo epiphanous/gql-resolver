@@ -532,8 +532,8 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
           .map(
             dl =>
               (
-                dl.typeSystemDirectiveLocation() ||
-                dl.executableDirectiveLocation()
+                dl.typeSystemDirectiveLocation()! ||
+                dl.executableDirectiveLocation()!
               ).text
           )
       );
