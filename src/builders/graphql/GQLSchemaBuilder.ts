@@ -429,8 +429,7 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   ) {
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
-    if (!def) {
-      // TODO needs fixing, not sure what the idea here was
+    if (def) {
       def.values.withMutations(v =>
         v.merge(this.getEnumValues(Option.of(ctx.enumValuesDefinition())))
       );
@@ -480,7 +479,7 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   ) {
     const name = this.textOf(ctx.NAME());
     const def = this.inputTypes.find(d => d.name === name);
-    if (!def) {
+    if (def) {
       def.args.withMutations(a =>
         a.merge(
           this.getArgumentDefinitions(Option.of(ctx.inputFieldsDefinition()))
@@ -504,7 +503,7 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   ) {
     const name = this.textOf(ctx.NAME());
     const def = this.inputTypes.find(d => d.name === name);
-    if (!def) {
+    if (def) {
       def.directives.withMutations(d =>
         d.merge(this.getDirectives(Option.of(ctx.directives())))
       );
