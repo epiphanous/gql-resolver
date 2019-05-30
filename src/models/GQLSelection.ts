@@ -85,7 +85,7 @@ export class GQLInlineFragment extends GQLSelection
     selections: List<GQLSelection>,
     directives: List<GQLDirective> = List<GQLDirective>()
   ) {
-    super(id64.gen());
+    super(id64.gen(false));
     this.typeCondition = typeCondition;
     this.selections = selections;
     this.directives = directives;
