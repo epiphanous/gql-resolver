@@ -3,7 +3,12 @@ import { Builder } from '../builders/Builder';
 import { GQLSchemaBuilder } from '../builders/graphql/GQLSchemaBuilder';
 import { QueryStrategyFactory } from '../strategies/QueryStrategyFactory';
 import { GQLSchema } from './GQLSchema';
-import { SparqlQueryStrategy } from '../strategies';
+
+interface IResolverCtxParams {
+  schema: string;
+  strategies: {};
+  defaultStrategy: string;
+}
 
 export class ResolverContext {
   public static buildSchema(schemaText: string): GQLSchema {
@@ -16,19 +21,15 @@ export class ResolverContext {
   public strategies: Map<string, QueryStrategyFactory>;
   public defaultStrategy: string;
 
-  constructor(
-    schemaText: string,
-    strategies: Map<string, QueryStrategyFactory>,
-    defaultStrategy: string
-  ) {
-    if (!strategies.has(defaultStrategy)) {
+  constructor(params: IResolverCtxParams) {
+    this.strategies = Map(params.strategies);
+    if (!this.strategies || !this.strategies.has(params.defaultStrategy)) {
       throw new Error(
-        `default query strategy factory '${defaultStrategy} not provided in strategies initializer`
+        `default query strategy factory '${params.defaultStrategy} not provided in strategies initializer`
       );
     }
-    this.schema = ResolverContext.buildSchema(schemaText);
-    this.strategies = strategies;
-    this.defaultStrategy = defaultStrategy;
+    this.schema = ResolverContext.buildSchema(params.schema);
+    this.defaultStrategy = params.defaultStrategy;
   }
 
   public getStrategyFactory(name: string): QueryStrategyFactory | undefined {
