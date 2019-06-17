@@ -54,7 +54,7 @@ export const DEFAULT_PREFIXES = Map([
     'rdfs',
     new SimpleNamespace('rdfs', 'http://www.w3.org/2000/01/rdf-schema#'),
   ],
-  ['s', new SimpleNamespace('schema', 'http://schema.org/')],
+  ['s', new SimpleNamespace('s', 'http://schema.org/')],
   ['schema', new SimpleNamespace('schema', 'http://schema.org/')],
   ['skos', new SimpleNamespace('skos', 'http://www.w3.org/2004/02/skos/core#')],
   ['swrlb', new SimpleNamespace('swrlb', 'http://www.w3.org/2003/11/swrlb#')],
