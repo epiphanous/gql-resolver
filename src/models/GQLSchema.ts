@@ -344,7 +344,10 @@ export class GQLSchema implements IGQLSchema {
       })
       .map(tf => {
         const [objType, field] = tf;
-        const so: Map<string, List<string>> = this.fieldsByType.get(objType, Map<string, List<string>>());
+        const so: Map<string, List<string>> = this.fieldsByType.get(
+          objType,
+          Map<string, List<string>>()
+        );
         if (so && !so.isEmpty()) {
           // const toValues = fieldStrArrPair.get(1)
           //   .map((opt: Option<List<string>>) => opt.value)
@@ -423,33 +426,39 @@ export class GQLSchema implements IGQLSchema {
     selections: List<GQLSelection | GQLField | GQLInlineFragment>,
     fieldName: string
   ): Option<GQLField> {
-    const result = selections.reduce((acc: Set<GQLField | undefined>, node: GQLSelection | GQLField | GQLInlineFragment) => {
-      if (node.constructor.name === 'GQLField') {
-        if (node.name === fieldName) {
-          return acc.add(node as GQLField);
-        } else {
+    const result = selections.reduce(
+      (
+        acc: Set<GQLField | undefined>,
+        node: GQLSelection | GQLField | GQLInlineFragment
+      ) => {
+        if (node.constructor.name === 'GQLField') {
+          if (node.name === fieldName) {
+            return acc.add(node as GQLField);
+          } else {
+            return acc.union(
+              Set([
+                this.nestedField(
+                  (node as GQLField).selections as List<GQLField>,
+                  fieldName
+                ).value,
+              ])
+            );
+          }
+        } else if (node.constructor.name === 'GQLInlineFragment') {
           return acc.union(
             Set([
               this.nestedField(
-                (node as GQLField).selections as List<GQLField>,
+                (node as GQLInlineFragment).selections as List<GQLField>,
                 fieldName
               ).value,
             ])
           );
+        } else {
+          throw new Error(`No idea how to handle ${node}`);
         }
-      } else if (node.constructor.name === 'GQLInlineFragment') {
-        return acc.union(
-          Set([
-            this.nestedField(
-              (node as GQLInlineFragment).selections as List<GQLField>,
-              fieldName
-            ).value,
-          ])
-        );
-      } else {
-        throw new Error(`No idea how to handle ${node}`);
-      }
-    }, Set<GQLField>());
+      },
+      Set<GQLField>()
+    );
     return Option.of(result.first());
   }
 
@@ -458,11 +467,26 @@ export class GQLSchema implements IGQLSchema {
     fieldType: string
   ): Option<[GQLInlineFragment, Option<GQLField>]> {
     let fragmentOwner: TSome<GQLField> | TNone = None;
-    const result = selections.reduce((acc: Set<[GQLInlineFragment, Option<GQLField>] | undefined>, node: GQLSelection | GQLField | GQLInlineFragment) => {
-      if (node.constructor.name === 'GQLInlineFragment') {
-        if ((node as GQLInlineFragment).typeCondition === fieldType) {
-          return acc.add([node as GQLInlineFragment, fragmentOwner]);
-        } else {
+    const result = selections.reduce(
+      (
+        acc: Set<[GQLInlineFragment, Option<GQLField>] | undefined>,
+        node: GQLSelection | GQLField | GQLInlineFragment
+      ) => {
+        if (node.constructor.name === 'GQLInlineFragment') {
+          if ((node as GQLInlineFragment).typeCondition === fieldType) {
+            return acc.add([node as GQLInlineFragment, fragmentOwner]);
+          } else {
+            return acc.union(
+              Set([
+                this.nestedFragment(
+                  (node as GQLInlineFragment).selections,
+                  fieldType
+                ).value,
+              ])
+            );
+          }
+        } else if (node.constructor.name === 'GQLField') {
+          fragmentOwner = Some(node as GQLField);
           return acc.union(
             Set([
               this.nestedFragment(
@@ -471,21 +495,12 @@ export class GQLSchema implements IGQLSchema {
               ).value,
             ])
           );
+        } else {
+          throw new Error(`No idea how to handle ${node}`);
         }
-      } else if (node.constructor.name === 'GQLField') {
-        fragmentOwner = Some(node as GQLField);
-        return acc.union(
-          Set([
-            this.nestedFragment(
-              (node as GQLInlineFragment).selections,
-              fieldType
-            ).value,
-          ])
-        );
-      } else {
-        throw new Error(`No idea how to handle ${node}`);
-      }
-    }, Set<[GQLInlineFragment, Option<GQLField>]>());
+      },
+      Set<[GQLInlineFragment, Option<GQLField>]>()
+    );
     return Option.of(result.first());
   }
 
@@ -494,9 +509,13 @@ export class GQLSchema implements IGQLSchema {
     typeInfo: string
   ): List<GQLField> {
     return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
-      return fragmentInfo && fragmentInfo[0].selections
-        .filter(selection => selection.constructor.name === 'GQLField')
-        .map(selection => selection as GQLField) || List();
+      return (
+        (fragmentInfo &&
+          fragmentInfo[0].selections
+            .filter(selection => selection.constructor.name === 'GQLField')
+            .map(selection => selection as GQLField)) ||
+        List()
+      );
     });
   }
 

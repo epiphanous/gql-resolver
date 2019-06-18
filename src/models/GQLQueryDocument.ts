@@ -10,7 +10,7 @@ import {
   GQLSelection,
 } from './GQLSelection';
 import { ResolverContext } from './ResolverContext';
-import {GQLQueryBuilder} from '../builders/graphql/GQLQueryBuilder';
+import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;

@@ -19,9 +19,7 @@ export class GQLType implements IGQLType {
       DateTime: 'xsd:dateTime',
       Duration: 'xsd:duration',
     };
-    return (
-      xsdTypeMap[name] || name
-    );
+    return xsdTypeMap[name] || name;
   }
 
   public name: string;

@@ -239,7 +239,9 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
-    const scData: List<OrderedMap<string, any>> = this.scalars.map(sc => sc.data);
+    const scData: List<OrderedMap<string, any>> = this.scalars.map(
+      sc => sc.data
+    );
     const mappedScalars = scData.get(0) || OrderedMap<string, any>();
     const obData = this.objects.map(sc => sc.data);
     const mappedObjects = obData.get(0) || OrderedMap<string, any>();

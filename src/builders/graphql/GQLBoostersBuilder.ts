@@ -8,7 +8,7 @@ import {
 } from '../../models/GQLBooster';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
 import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
-import {BoostContext} from '../../antlr4/generated/QueryModificationParser';
+import { BoostContext } from '../../antlr4/generated/QueryModificationParser';
 
 export class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
   public result!: List<GQLBooster>;
@@ -32,7 +32,9 @@ export class GQLBoostersBuilder extends GQLObjectQueryModifierBuilder {
   }
 
   public processBoosters(context: QMP.BoostersContext): List<GQLBooster> {
-    return List(context.boost()).map((a: BoostContext) => this.processBooster(a));
+    return List(context.boost()).map((a: BoostContext) =>
+      this.processBooster(a)
+    );
   }
 
   /**

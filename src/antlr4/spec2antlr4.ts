@@ -8,7 +8,7 @@ const sourceCharMap = {
   noleqs: '~["\'\\r\\n\\u0085\\u2028\\u2029\\\\]',
 };
 
-const lexicals: { [ key: string ]: boolean } = {};
+const lexicals: { [key: string]: boolean } = {};
 
 const addToLexicals: string[] = [];
 

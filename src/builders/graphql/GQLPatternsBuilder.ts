@@ -6,7 +6,9 @@ import {
   FeatureContext,
   IriRefContext,
   LatLonContext,
-  NumericLiteralContext, PatternContext, TextMatchParamContext,
+  NumericLiteralContext,
+  PatternContext,
+  TextMatchParamContext,
   VarFeatureContext,
   VarRefContext,
 } from '../../antlr4/generated/QueryModificationParser';
@@ -48,7 +50,9 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
   }
 
   public processPatterns(context: QMP.PatternsContext) {
-    return List(context.pattern()).map((a: PatternContext) => this.processPattern(a));
+    return List(context.pattern()).map((a: PatternContext) =>
+      this.processPattern(a)
+    );
   }
 
   // public processRaceCountPattern Guessing we don't need this one..
@@ -82,7 +86,9 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
     );
     this.check(!!text, `text match text is empty for ${field}`, context);
     const params = Map<string, any>(
-      List(context.textMatchParam()).map((a: QMP.TextMatchParamContext) => this.processTextMatchParam(a)!)
+      List(context.textMatchParam()).map(
+        (a: QMP.TextMatchParamContext) => this.processTextMatchParam(a)!
+      )
     );
     const booster = new GQLFieldBooster(params.get('boost', '1'), field);
     const minScore = params.get('minScore').map((a: number) => a.toFixed(2));
@@ -135,7 +141,9 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
     let distance: number;
     if (proximityOptions[0].isEmpty() && proximityOptions[1].nonEmpty()) {
       const v = this.processVarRef(proximityOptions[1].value);
-      distance = v.underlyingValue.map(a => Number(this.asDouble(a))).getOrElse(1.0);
+      distance = v.underlyingValue
+        .map(a => Number(this.asDouble(a)))
+        .getOrElse(1.0);
     } else if (
       proximityOptions[0].nonEmpty() &&
       proximityOptions[1].isEmpty()
@@ -161,9 +169,9 @@ export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
       Option.of(unitsOptions[0]).isEmpty() &&
       Option.of(unitsOptions[1]).nonEmpty()
     ) {
-      units = this.processVarRef(unitsOptions[1].value!).underlyingValue.map(
-        (a: string) => a as string
-      ).getOrElse('unit:MileUSStatute');
+      units = this.processVarRef(unitsOptions[1].value!)
+        .underlyingValue.map((a: string) => a as string)
+        .getOrElse('unit:MileUSStatute');
     } else if (
       Option.of(unitsOptions[1]).isEmpty() &&
       Option.of(unitsOptions[0]).nonEmpty()

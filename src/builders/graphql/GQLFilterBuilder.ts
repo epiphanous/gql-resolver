@@ -15,7 +15,7 @@ export class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   public vars!: Map<string, string>;
   public prefixes!: Set<string>;
   public source!: string;
-  public referencedFields!: Set<string>;
+  public referencedFields: Set<string> = Set<string>().asMutable();
   public result!: GQLFilter;
 
   public parseWith(parser: QueryModificationParser) {

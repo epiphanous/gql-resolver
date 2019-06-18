@@ -92,7 +92,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
     `;
   }
 
-  public async resolve(): Promise<QueryResult> {
+  public resolve(): Promise<QueryResult> {
     const result = new QueryResult();
     const objectType = prefixify(this.plan.resultType.name);
     const args = this.getArgs(this.plan);
@@ -138,26 +138,22 @@ export class SparqlQueryStrategy extends QueryStrategy {
               ? resultArrValues.slice(0, -1)
               : resultArrValues;
             const om = OrderedMap<string, OrderedMap<string, any>>(
-              resultArrValuesPopped.map(
-                (row: { [key: string]: string }) => {
-                  const k: string = this.hasProperParent()
-                    ? row.parentId
-                    : row.s;
-                  const v = OrderedMap<any>(
-                    this.fields.map(f => {
-                      const key: string = f.alias.getOrElse(f.name);
-                      const rowValueByKey: any =
-                        row[key] ||
-                        row[this.SPECIAL_PROJECTIONS.get(key) || ''] ||
-                        null;
-                      return [key, rowValueByKey];
-                    })
-                  );
-                  // to prevent lint errors..
-                  const returnValue: [string, OrderedMap<string, any>] = [k, v];
-                  return returnValue;
-                }
-              )
+              resultArrValuesPopped.map((row: { [key: string]: string }) => {
+                const k: string = this.hasProperParent() ? row.parentId : row.s;
+                const v = OrderedMap<any>(
+                  this.fields.map(f => {
+                    const key: string = f.alias.getOrElse(f.name);
+                    const rowValueByKey: any =
+                      row[key] ||
+                      row[this.SPECIAL_PROJECTIONS.get(key) || ''] ||
+                      null;
+                    return [key, rowValueByKey];
+                  })
+                );
+                // to prevent lint errors..
+                const returnValue: [string, OrderedMap<string, any>] = [k, v];
+                return returnValue;
+              })
             );
             if (this.plan.isConnectionEdgesPlan()) {
               const key: string = this.plan

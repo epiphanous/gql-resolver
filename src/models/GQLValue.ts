@@ -17,11 +17,11 @@ export class GQLValue implements IGQLValue {
   }
 }
 
-export class GQLVariableValue implements GQLValue {
-  public value: GQLVariable;
+export class GQLVariableValue extends GQLValue {
+  public value!: GQLVariable;
 
-  constructor(value: GQLVariable) {
-    this.value = value;
+  constructor(value: GQLVariable = new GQLVariable('unknown')) {
+    super(value);
   }
 
   public resolve(vars: Map<string, any>): any {
@@ -30,7 +30,10 @@ export class GQLVariableValue implements GQLValue {
 }
 
 export class GQLBooleanValue extends GQLValue {
-  public value: boolean = false;
+  public value!: boolean;
+  constructor(value: boolean = false) {
+    super(value);
+  }
 }
 
 export class GQLNullValue extends GQLValue {
@@ -40,7 +43,11 @@ export class GQLNullValue extends GQLValue {
 }
 
 export class GQLValueList extends GQLValue {
-  public value: List<GQLValue> = List<GQLValue>();
+  public value!: List<GQLValue>;
+
+  constructor(value: List<GQLValue> = List<GQLValue>()) {
+    super(value);
+  }
 
   public resolve(vars: Map<string, any>) {
     return this.value.map((v, k) => v.resolve(vars));
@@ -48,7 +55,11 @@ export class GQLValueList extends GQLValue {
 }
 
 export class GQLKeyedValueList extends GQLValue {
-  public value: Map<string, GQLValue> = Map<string, GQLValue>();
+  public value!: Map<string, GQLValue>;
+
+  constructor(value: Map<string, GQLValue> = Map<string, GQLValue>()) {
+    super(value);
+  }
 
   public resolve(vars: Map<string, any>) {
     return this.value.map((v, k) => v.resolve(vars));
@@ -56,17 +67,29 @@ export class GQLKeyedValueList extends GQLValue {
 }
 
 export class GQLIntValue extends GQLValue {
-  public value: number = 0;
+  public value!: number;
+  constructor(value: number = 0) {
+    super(value);
+  }
 }
 
 export class GQLFloatValue extends GQLValue {
-  public value: number = 0.0;
+  public value!: number;
+  constructor(value: number = 0.0) {
+    super(value);
+  }
 }
 
 export class GQLEnumValue extends GQLValue {
-  public value: string = '';
+  public value!: string;
+  constructor(value: string = '') {
+    super(value);
+  }
 }
 
 export class GQLStringValue extends GQLValue {
-  public value: string = '';
+  public value!: string;
+  constructor(value: string = '') {
+    super(value);
+  }
 }

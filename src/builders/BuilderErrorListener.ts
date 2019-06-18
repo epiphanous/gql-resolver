@@ -19,6 +19,7 @@ export class BuilderErrorListener<T> implements ANTLRErrorListener<any> {
     message: string,
     exception: RecognitionException | undefined
   ) {
+    console.log('SYNTAX ERROR', { message, offendingSymbol, line, position });
     this.builder.addError(
       new BuilderError(message, line, position, Option.of(exception))
     );

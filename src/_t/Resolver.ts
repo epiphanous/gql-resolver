@@ -9,15 +9,16 @@ import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFac
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
-  const rc = new ResolverContext(
+  const rc = new ResolverContext({
     schema,
-    Map({
+    strategies: Map({
       sparql: new SparqlQueryStrategyFactory(
-        'http://localhost:7200/repositories/test'
+        'http://localhost:7200/repositories/test',
+        [['j', 'http://jubel.co/jtv/']]
       ),
     }),
-    'sparql'
-  );
+    defaultStrategy: 'sparql',
+  });
   it('creates a resolver context', () => {
     expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
   });
@@ -28,9 +29,8 @@ describe('Resolver', () => {
      * @type {Promise<QueryResult>}
      */
     const result = await resolver.resolve(
-      `
-    query test {
-      home: curatedDestination(filter: 's_name=\\"yerevan\\"') {
+      `query test {
+      home: curatedDestination(filter: "s_name='yerevan'") {
         s_name
         gn_nearby(first: 3) {
           totalCount

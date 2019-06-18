@@ -16,7 +16,7 @@ export class SparqlQueryStrategyFactory extends QueryStrategyFactory {
     const prefixesSN: Map<string, SimpleNamespace> = Map(
       prefixes.map<[string, SimpleNamespace]>(([prefix, url]) => [
         prefix,
-        new SimpleNamespace(prefix, url)
+        new SimpleNamespace(prefix, url),
       ])
     );
     this.prefixes = DEFAULT_PREFIXES.merge(prefixesSN);

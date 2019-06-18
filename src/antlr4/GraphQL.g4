@@ -384,13 +384,14 @@ fragment SIGN
 
 STRING_VALUE
   : '"' STRING_CHARACTER* '"'
-  | '\'' STRING_CHARACTER* '\''
+//  | '\'' STRING_CHARACTER* '\''
   | '"""' BLOCK_STRING_CHARACTER* '"""'
-  | '\'\'\'' BLOCK_STRING_CHARACTER* '\'\'\''
+//  | '\'\'\'' BLOCK_STRING_CHARACTER* '\'\'\''
   ;
 
 fragment STRING_CHARACTER
-  : ~["'\r\n\f\\]
+//  : ~["'\r\n\f\\]
+  : ~["\r\n\f\\]
   | '\\u' ESCAPED_UNICODE
   | '\\' ESCAPED_CHARACTER
   ;
@@ -404,11 +405,13 @@ fragment ESCAPED_UNICODE
   ;
 
 fragment ESCAPED_CHARACTER
-  : ["'/bfnrt]
+//  : ["'/bfnrt]
+  : ["/bfnrt]
   ;
 
 fragment BLOCK_STRING_CHARACTER
-  : ~["'\\]
+//  : ~["'\\]
+  : ~["\\]
   | '\\u' ESCAPED_UNICODE
   | '\\' ESCAPED_CHARACTER
   ;

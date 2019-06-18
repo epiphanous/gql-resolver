@@ -25,7 +25,9 @@ export class ResolverContext {
     this.strategies = Map(params.strategies);
     if (!this.strategies || !this.strategies.has(params.defaultStrategy)) {
       throw new Error(
-        `default query strategy factory '${params.defaultStrategy} not provided in strategies initializer`
+        `default query strategy factory '${
+          params.defaultStrategy
+        } not provided in strategies initializer`
       );
     }
     this.schema = ResolverContext.buildSchema(params.schema);

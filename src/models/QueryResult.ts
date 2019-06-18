@@ -51,7 +51,7 @@ export class QueryResult {
   public addMetadata() {
     this.meta.count = this.data.count();
     // tslint:disable-next-line
-    this.meta.bytes = sizeof(this.data);
+    this.meta.bytes = 3; //sizeof(this.data);
     this.meta.duration = new Date().getTime() - this.meta.startTime;
     this.meta.bps = this.bps();
     if (!this.meta.errors.isEmpty()) {

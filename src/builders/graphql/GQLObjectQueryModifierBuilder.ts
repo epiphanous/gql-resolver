@@ -40,6 +40,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
     this.validVariables = validVariables;
     this.vars = vars;
     this.source = source;
+    console.log('OM constructor: <', source, '>');
     this.PREFIXED_IRI_PATTERN = `(${prefixes.join('|')})_(.*)`;
     this.rPREFIXED_IRI_PATTERN = new RegExp(this.PREFIXED_IRI_PATTERN);
   }
@@ -584,7 +585,9 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
       case 'YearFuncContext':
         return this.processYearFunc(builtin as QMP.YearFuncContext);
     }
-    throw new Error('Unsupported AtomContext: ' + context.builtinCall().constructor.name);
+    throw new Error(
+      'Unsupported AtomContext: ' + context.builtinCall().constructor.name
+    );
   }
 
   public NArgBuiltin(
@@ -596,7 +599,10 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
     const expr = List(expressions).map(ex => this.processExpression(ex));
     expr.forEach((e, index) => {
-      const tl = inTypes.size < index ? inTypes.last(List<string>()) : inTypes.get(index, List<string>());
+      const tl =
+        inTypes.size < index
+          ? inTypes.last(List<string>())
+          : inTypes.get(index, List<string>());
       this.check(
         tl.contains(e.dataType),
         // tslint: disable-next-line
@@ -1366,7 +1372,7 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
         'iri'
       );
     }
-    throw new Error("Unknown format for IriRef");
+    throw new Error('Unknown format for IriRef');
   }
 
   public processFieldRefAtom(

@@ -30,7 +30,13 @@ export class GQLTypeDefinition implements IGQLTypeDefinition {
   public deprecated() {
     return Option.of(this.directives.find(d => d.name === 'deprecated'))
       .map(d => d.arguments.find(arg => arg.name === 'reason'))
-      .map(arg => { if (arg) { return arg.value; } else { throw new Error('Undefined argument'); }})
+      .map(arg => {
+        if (arg) {
+          return arg.value;
+        } else {
+          throw new Error('Undefined argument');
+        }
+      })
       .map(v => v.value as string);
   }
 }
