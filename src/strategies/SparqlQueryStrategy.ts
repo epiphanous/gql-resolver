@@ -166,7 +166,6 @@ export class SparqlQueryStrategy extends QueryStrategy {
   /**
    * Formulates a union query based on the given query
    * At the moment, it just loops through the subjectIds
-   * TODO make this more generic?
    * @param {string} pageInfo
    */
   public constructUnionQueryFromProvidedQueries(pageInfo: boolean = true) {
@@ -176,7 +175,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
       ${this.plan.grandParentPlan().get()!.parent!.getSubjectIds()
       .map(subjectId => `{ ${pageInfo ?
         this.constructPageInfoQuery(true, subjectId) :
-        this.constructDataQuery('bla', Map<string, any>(), List()) // todo finish!
+        this.constructDataQuery('maybe', Map<string, any>(), List()) // TODO is there a usecase for UNIONs in our data queries?
       } }`).join(' union ')}
     }`;
   }
@@ -213,7 +212,6 @@ export class SparqlQueryStrategy extends QueryStrategy {
     const queryResult = new QueryResult();
     queryResult.data = this.mapResultsObjectToOrderedMap(this.mapLiteralResultsToObjects(rows));
     queryResult.meta.errors = errors;
-    console.log('QUERY RES', JSON.stringify(queryResult.data, null, 2));
     return queryResult;
   }
 
@@ -275,36 +273,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
         const pageInfo = this.processPageInfo(await this.executeQuery(this.constructPageInfoQuery()));
         this.injectPageInfo(pageInfo);
       }
-      console.log('results', JSON.stringify(results, null, 2));
       resolve(results);
     });
   }
 
   protected isReservedKeyword(word: string) {
     return this.RESERVED_KEYWORDS.contains(word);
-  }
-
-  /**
-   * Checks whether the resulting array should be popped, because we request an additional 1 resource from the database
-   * for pagination purposes.
-   * @param {number} resultArrLength - num of actual results from the database
-   * @returns {boolean}
-   */
-  protected shouldPopFinalArray(resultArrLength: number) {
-    if (this.plan.isConnectionEdgesPlan()) {
-      if (this.plan.processedArgs.first.nonEmpty()) {
-        if (this.plan.processedArgs.first.value === resultArrLength) {
-          return false;
-        }
-      }
-      if (this.plan.processedArgs.last.nonEmpty()) {
-        if (this.plan.processedArgs.last.value === resultArrLength) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
   }
 
   protected getProjections() {
@@ -332,17 +306,6 @@ export class SparqlQueryStrategy extends QueryStrategy {
    */
   protected hasProperParent() {
     return this.plan.parent && !this.plan.parent.getSubjectIds().isEmpty();
-  }
-
-  /**
-   * In case of multiple SparQL statements
-   */
-  protected addConditionalOperator(
-    len: number,
-    index: number,
-    operator: string
-  ) {
-    return index === len - 1 ? '' : operator;
   }
 
   protected spreadArguments() {
@@ -500,35 +463,6 @@ export class SparqlQueryStrategy extends QueryStrategy {
       return `&& ${cursorVar} < '${this.plan.processedArgs.after.get()}'`;
     }
     return '';
-  }
-
-  protected addPageInfoIfNeeded(actualNumberOfResults: number = 0) {
-    if (this.plan.isConnectionEdgesPlan()) {
-      return this.addPageInfo(actualNumberOfResults);
-    } else {
-      return null;
-    }
-  }
-
-  protected addPageInfo(actualNumberOfResults: number = 0) {
-    const optFirst = this.plan.processedArgs.first;
-    const optLast = this.plan.processedArgs.last;
-    const optAfter = this.plan.processedArgs.after;
-    const optBefore = this.plan.processedArgs.before;
-    let hasNextPage: boolean = false;
-    let hasPreviousPage: boolean = false;
-    const requestedNumberOfResults = optFirst.getOrElse(optLast.getOrElse(0));
-    const possibleNumberOfResults = requestedNumberOfResults + 1;
-    if (actualNumberOfResults === possibleNumberOfResults) {
-      if (optBefore.nonEmpty()) {
-        hasNextPage = true;
-      }
-      if (optAfter.nonEmpty()) {
-        hasPreviousPage = true;
-      }
-    }
-    // todo return only the pageInfo OM here, set the key in the parent function for more clarity.
-    return OrderedMap({ pageInfo: { hasNextPage, hasPreviousPage } });
   }
 
   private normalizePrefix(prefix: string) {

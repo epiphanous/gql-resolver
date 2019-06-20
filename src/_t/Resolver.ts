@@ -32,7 +32,7 @@ describe('Resolver', () => {
       `query test {
       home: curatedDestination(filter: "s_name='yerevan' || s_name='tbilisi'") {
         s_name
-        gn_nearby(first: 50, before: "3T_pXF6w6P.q0JPsc1wi") {
+        gn_nearby(first: 100, before: "3T_pXF6w6P.q0JPsc1wi") {
           totalCount
           edges {
             node {
