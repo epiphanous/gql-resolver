@@ -13,7 +13,7 @@ describe('Resolver', () => {
     schema,
     strategies: Map({
       sparql: new SparqlQueryStrategyFactory(
-        'http://localhost:7200/repositories/test',
+        'http://localhost:7200/repositories/jubel',
         [['j', 'http://jubel.co/jtv/']]
       ),
     }),
@@ -30,9 +30,9 @@ describe('Resolver', () => {
      */
     const result = await resolver.resolve(
       `query test {
-      home: curatedDestination(filter: "s_name='yerevan'") {
+      home: curatedDestination(filter: "s_name='yerevan' || s_name='tbilisi'") {
         s_name
-        gn_nearby(first: 3) {
+        gn_nearby(first: 50, before: "3T_pXF6w6P.q0JPsc1wi") {
           totalCount
           edges {
             node {
@@ -50,6 +50,7 @@ describe('Resolver', () => {
     );
     const resValue = await result.get();
     const resValueObject = await resValue.getResult();
+    console.log('result', JSON.stringify(resValueObject, null, 2));
     expect(resValueObject).to.be.an('object');
   });
 });
