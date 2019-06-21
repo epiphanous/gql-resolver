@@ -11,6 +11,7 @@ import {
 } from '../models';
 import { QueryStrategy } from './QueryStrategy';
 import {GQLObjectQueryModifierDisjunction} from '../models/GQLObjectQueryModifierExpression';
+import * as memoize from 'memoizee';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 
@@ -35,6 +36,8 @@ export class SparqlQueryStrategy extends QueryStrategy {
     'before',
     'sortBy',
   ]);
+  private prefixesMemo!: any;
+  private parentConstraintsMemo!: any;
 
   public constructor(
     fields: List<GQLField>,
@@ -45,6 +48,8 @@ export class SparqlQueryStrategy extends QueryStrategy {
     super(fields, plan);
     this.endpoint = endpoint;
     this.prefixes = prefixes;
+    this.prefixesMemo = memoize(this.getPrefixes);
+    this.parentConstraintsMemo = memoize(this.addParentConstraints);
   }
 
   public getPrefixes() {
@@ -66,8 +71,6 @@ export class SparqlQueryStrategy extends QueryStrategy {
   public processPageInfo(rows: any) {
     const optFirst = this.plan.processedArgs.first;
     const optLast = this.plan.processedArgs.last;
-    const optAfter = this.plan.processedArgs.after;
-    const optBefore = this.plan.processedArgs.before;
     // Perhaps remove this V ?
     const remapped = rows[0].map((entry: any) => {
       return Object.keys(entry).reduce(
@@ -109,10 +112,10 @@ export class SparqlQueryStrategy extends QueryStrategy {
       return this.constructUnionQueryFromProvidedQueries(true);
     }
     return `
-        ${!injectable ? this.getPrefixes() : ''}
+        ${!injectable ? this.prefixesMemo() : ''}
         SELECT ?parentId (COUNT(DISTINCT ?s) AS ?totalCount)
         WHERE {
-          ${injectable ? `VALUES ?parentId { <${parentConstraint}> } ${this.addGeoNearbyConstraint()}` : this.addParentConstraints()}
+          ${injectable ? `VALUES ?parentId { <${parentConstraint}> } ${this.addGeoNearbyConstraint()}` : this.parentConstraintsMemo()}
           ${this.addCursorField()}
           FILTER(
             ?parentId != ?s
@@ -133,10 +136,10 @@ export class SparqlQueryStrategy extends QueryStrategy {
   ): string {
     return this.plan.isConnectionEdgesPlan() ?
       `
-        ${this.getPrefixes()}
+        ${this.prefixesMemo()}
         SELECT ${'?s ?parentId ' + projections.map(a => `?${a.projection}`).join(' ')}
         WHERE {
-          ${this.addParentConstraints()}
+          ${this.parentConstraintsMemo()}
           ${this.spreadProjections(projections, Some('?s'))}
           ${this.addCursorField()}
           FILTER(
@@ -147,13 +150,13 @@ export class SparqlQueryStrategy extends QueryStrategy {
         ${this.addLimit()}
         ${this.addSortBy()}
       ` : // Not an edges plan, just a plain query
-      `${this.getPrefixes()}
+      `${this.prefixesMemo()}
         SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ')} ${
         this.hasProperParent() ? '?parentId' : ''
         }
         WHERE {
           ${!this.hasProperParent() ? ` ?s a ${objectType}.` : ''}
-          ${this.addParentConstraints()}
+          ${this.parentConstraintsMemo()}
           ${this.spreadProjections(projections)}
           ${this.spreadArguments()}
           ${this.hasFilters() ? `FILTER ( ${this.addFilters()} )` : ''}
@@ -170,7 +173,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
    */
   public constructUnionQueryFromProvidedQueries(pageInfo: boolean = true) {
     return `
-      ${this.getPrefixes()}
+      ${this.prefixesMemo()}
       SELECT * {
       ${this.plan.grandParentPlan().get()!.parent!.getSubjectIds()
       .map(subjectId => `{ ${pageInfo ?
@@ -457,10 +460,10 @@ export class SparqlQueryStrategy extends QueryStrategy {
 
   protected addCursorOffset(cursorVar: string = this.DEFAULT_CURSOR_LABEL) {
     if (this.plan.processedArgs.before.nonEmpty()) {
-      return `&& ${cursorVar} > '${this.plan.processedArgs.before.get()}'`;
+      return `&& ${cursorVar} < '${this.plan.processedArgs.before.get()}'`;
     }
     if (this.plan.processedArgs.after.nonEmpty()) {
-      return `&& ${cursorVar} < '${this.plan.processedArgs.after.get()}'`;
+      return `&& ${cursorVar} > '${this.plan.processedArgs.after.get()}'`;
     }
     return '';
   }
