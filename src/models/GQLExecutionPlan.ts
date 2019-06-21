@@ -57,6 +57,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public result: QueryResult = new QueryResult();
   public allFields: List<GQLField>;
   public defaultStrategy!: string;
+  public multipleSubjectIds: List<string> = List<string>();
 
   /**
    * Construct a new execution plan.
@@ -163,6 +164,10 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       return Some(this.parent.parent);
     }
     return None;
+  }
+
+  public greatGrandParentPlan(): Option<GQLExecutionPlan> {
+    return Option.of(this.grandParentPlan().value && this.grandParentPlan().value!.parent);
   }
 
   public isConnectionEdgesPlan() {
@@ -274,21 +279,32 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    */
   protected finalizeResults() {
     if (this.isConnectionEdgesPlan()) {
-      // todo the line below is probably too hacky
-      this.name = this.grandParentPlan()
+      const grandParentPlanSubjectIds = this.grandParentPlan()
         .get()
-        .getSubjectIds()
-        .get(0);
+        .parent!
+        .getSubjectIds();
+      if (grandParentPlanSubjectIds.size > 1) {
+        this.multipleSubjectIds = grandParentPlanSubjectIds;
+      } else {
+        this.name = grandParentPlanSubjectIds.get(0);
+      }
     }
     if (this.parent) {
       // this is to handle situations where we have an array of n objects instead of just one object
       if (this.parent.scalars.isEmpty()) {
-        const newResArr = this.result.data.valueSeq().toList();
-        this.result.data = OrderedMap({
-          [this.alias.getOrElse(this.name)]: newResArr,
-        });
+        // In case we have a single subjectId
+        if (this.multipleSubjectIds.isEmpty()) {
+          const newResArr = this.result.data.valueSeq().toList();
+          this.result.data = OrderedMap({
+            [this.alias.getOrElse(this.name)]: newResArr,
+          });
+        } else {
+          this.result.data = OrderedMap(
+            this.multipleSubjectIds.map<[string, any]>(subjId => [subjId, this.result.data.get(subjId)])
+          );
+        }
       } else {
-        // we want each value to be mapped to its proper parent via parent's ID, TODO will this work in all cases?
+        // we want each value to be mapped to its proper parent via parent's ID
         this.result.data.map(value => {
           return OrderedMap({ [this.alias.getOrElse(this.name)]: value });
         });

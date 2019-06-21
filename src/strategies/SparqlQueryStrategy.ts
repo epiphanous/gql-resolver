@@ -10,6 +10,8 @@ import {
   SimpleNamespace,
 } from '../models';
 import { QueryStrategy } from './QueryStrategy';
+import {GQLObjectQueryModifierDisjunction} from '../models/GQLObjectQueryModifierExpression';
+import * as memoize from 'memoizee';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 
@@ -18,6 +20,8 @@ export class SparqlQueryStrategy extends QueryStrategy {
   private prefixes: Map<string, SimpleNamespace>;
   private fetcher = new SparqlEndpointFetcher();
   private DEFAULT_CURSOR_LABEL = '?cursor';
+  private DEFAULT_CURSOR_PREDICATE = 'j:id';
+  private IGNORED_PROJECTIONS = List(['totalCount']);
   private DEFAULT_NEARBY_RADIUS = '500'; // km by default for Ontotext's GraphDB
   private SPECIAL_PROJECTIONS = OrderedMap({
     _id: 'j_id',
@@ -32,6 +36,8 @@ export class SparqlQueryStrategy extends QueryStrategy {
     'before',
     'sortBy',
   ]);
+  private prefixesMemo!: any;
+  private parentConstraintsMemo!: any;
 
   public constructor(
     fields: List<GQLField>,
@@ -42,6 +48,8 @@ export class SparqlQueryStrategy extends QueryStrategy {
     super(fields, plan);
     this.endpoint = endpoint;
     this.prefixes = prefixes;
+    this.prefixesMemo = memoize(this.getPrefixes);
+    this.parentConstraintsMemo = memoize(this.addParentConstraints);
   }
 
   public getPrefixes() {
@@ -55,49 +63,205 @@ export class SparqlQueryStrategy extends QueryStrategy {
   }
 
   /**
-   * @param {string} objectType
-   * @param {Map<string, any>} args
-   * @param {List<any>} projections
-   * @returns {string}
+   * Processes page info from a pageInfo query. Should return a complete pageInfo
+   * object for injection into the grandparent plan (assuming it's called from a conn edges plan).
+   * Returns null if the plan isn't a connection edges plan
+   * @param rows
    */
-  public constructSparqlQuery(
-    objectType: string,
-    args: Map<string, any>,
-    projections: List<any>
-  ) {
-    if (this.isResolvingConnection()) {
-      return `
-        ${this.getPrefixes()}
-        ${this.constructConnectionQuery(projections, args)}
-      `;
-    } else if (this.plan.isConnectionEdgesPlan()) {
-      return `
-        ${this.getPrefixes()}
-        ${this.constructConnectionQuery(projections, args, false)}
-      `;
-    }
-    return `${this.getPrefixes()}
-      SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ')} ${
-      this.hasProperParent() ? '?parentId' : ''
-    }
-      WHERE {
-        ${!this.hasProperParent() ? ` ?s a ${objectType}.` : ''}
-        ${this.addParentConstraints()}
-        ${this.spreadProjections(projections)} ${args.isEmpty() ? '' : '.'}
-        ${this.spreadArguments()}
-        ${this.hasFilters() ? `FILTER ( ${this.addFilters()} )` : ''}
-      }
-      ${this.addSortBy()}
-      ${this.addLimit()}
-    `;
+  public processPageInfo(rows: any) {
+    const optFirst = this.plan.processedArgs.first;
+    const optLast = this.plan.processedArgs.last;
+    // Perhaps remove this V ?
+    const remapped = rows[0].map((entry: any) => {
+      return Object.keys(entry).reduce(
+        (acc: { [key: string]: any }, key) => {
+          let hasNextPage = false;
+          let hasPreviousPage = false;
+          const lit = entry[key];
+          if (key === 'parentId') {
+            acc.s = lit.value;
+            acc.parentId = lit.value;
+            return acc;
+          }
+          if (key === 'totalCount') {
+            const count = entry[key];
+            hasNextPage = (optFirst.value && (Number(count) > (optFirst.value as number))) || false;
+            hasPreviousPage = (optLast.value && (Number(count) > (optLast.value as number))) || false;
+          }
+          acc[key] = lit.value;
+          acc.pageInfo = { hasNextPage, hasPreviousPage };
+          return acc;
+        },
+      { totalCount: '', parentId: '', pageInfo: {} }
+      );
+    });
+    return remapped;
   }
 
-  public resolve(): Promise<QueryResult> {
-    const result = new QueryResult();
+  public moreThanOneSubjectId() {
+    return (this.plan.grandParentPlan().get() &&
+      this.plan.grandParentPlan().get()!.parent &&
+      this.plan.grandParentPlan().get()!.parent!.getSubjectIds().size > 1);
+  }
+
+  /**
+   * Constructs a page info query (count only)
+   */
+  public constructPageInfoQuery(injectable: boolean = false, parentConstraint: string = ''): string {
+    if (this.moreThanOneSubjectId() && (this.plan.processedArgs.before || this.plan.processedArgs.after) && !injectable) {
+      return this.constructUnionQueryFromProvidedQueries(true);
+    }
+    return `
+        ${!injectable ? this.prefixesMemo() : ''}
+        SELECT ?parentId (COUNT(DISTINCT ?s) AS ?totalCount)
+        WHERE {
+          ${injectable ? `VALUES ?parentId { <${parentConstraint}> } ${this.addGeoNearbyConstraint()}` : this.parentConstraintsMemo()}
+          ${this.addCursorField()}
+          FILTER(
+            ?parentId != ?s
+            ${this.addCursorOffset(this.DEFAULT_CURSOR_LABEL)}
+          )
+        }
+        GROUP BY ?parentId
+      `;
+  }
+
+  /**
+   * Constructs a data query
+   */
+  public constructDataQuery(
+    objectType: string,
+    args: Map<string, any>,
+    projections: List<{ [key: string]: string }>
+  ): string {
+    return this.plan.isConnectionEdgesPlan() ?
+      `
+        ${this.prefixesMemo()}
+        SELECT ${'?s ?parentId ' + projections.map(a => `?${a.projection}`).join(' ')}
+        WHERE {
+          ${this.parentConstraintsMemo()}
+          ${this.spreadProjections(projections, Some('?s'))}
+          ${this.addCursorField()}
+          FILTER(
+            ?parentId != ?s
+            ${this.addCursorOffset()}
+          )
+        }
+        ${this.addLimit()}
+        ${this.addSortBy()}
+      ` : // Not an edges plan, just a plain query
+      `${this.prefixesMemo()}
+        SELECT ?s ${projections.map(a => `?${a.projection}`).join(' ')} ${
+        this.hasProperParent() ? '?parentId' : ''
+        }
+        WHERE {
+          ${!this.hasProperParent() ? ` ?s a ${objectType}.` : ''}
+          ${this.parentConstraintsMemo()}
+          ${this.spreadProjections(projections)}
+          ${this.spreadArguments()}
+          ${this.hasFilters() ? `FILTER ( ${this.addFilters()} )` : ''}
+        }
+        ${this.addSortBy()}
+        ${this.addLimit()}
+      `;
+  }
+
+  /**
+   * Formulates a union query based on the given query
+   * At the moment, it just loops through the subjectIds
+   * @param {string} pageInfo
+   */
+  public constructUnionQueryFromProvidedQueries(pageInfo: boolean = true) {
+    return `
+      ${this.prefixesMemo()}
+      SELECT * {
+      ${this.plan.grandParentPlan().get()!.parent!.getSubjectIds()
+      .map(subjectId => `{ ${pageInfo ?
+        this.constructPageInfoQuery(true, subjectId) :
+        this.constructDataQuery('maybe', Map<string, any>(), List()) // TODO is there a usecase for UNIONs in our data queries?
+      } }`).join(' union ')}
+    }`;
+  }
+
+  /**
+   * Executes a query, returns rows
+   * @param {string} query
+   */
+  public executeQuery(query: string): Promise<any> {
+    console.log('Executing query:', query);
+    return new Promise((resolve) => {
+      this.fetcher
+        .fetchBindings(this.endpoint, query)
+        .then(stream => {
+          const rows: Array<{ [key: string]: Literal }> = [];
+          const errors: any[] = [];
+          stream.on('data', data => {
+            rows.push(data);
+          });
+          stream.on('error', error => {
+            errors.push(error);
+          });
+          stream.on('end', () => resolve([rows, errors]));
+        });
+    });
+  }
+
+  /**
+   * Processes the data from a data query. Returns a QueryResult instance;
+   * @param rows
+   * @param errors
+   */
+  public processData([rows, errors]: any[]) {
+    const queryResult = new QueryResult();
+    queryResult.data = this.mapResultsObjectToOrderedMap(this.mapLiteralResultsToObjects(rows));
+    queryResult.meta.errors = errors;
+    return queryResult;
+  }
+
+  /**
+   * Injects page info into the result of the grandparent plan
+   * (run on a connection edges plan, inject into the connection plan's result)
+   */
+  public injectPageInfo(pageInfo: Array<{[key: string]: string}>) {
+    pageInfo.forEach((pageInfoObject: {[key: string]: string}) => {
+      this.plan.grandParentPlan().get()!.result.data.merge(OrderedMap({[pageInfoObject.s]: pageInfoObject}));
+    });
+  }
+
+  // self-explanatory
+  public mapLiteralResultsToObjects(results: Array<{ [key: string]: Literal }>) {
+    return results.map(entry => {
+      return Object.keys(entry).reduce(
+        (acc: { [key: string]: string }, key) => {
+          const lit = entry[key];
+          acc[key] = lit.value;
+          return acc;
+        },
+        { parentId: '', s: '', j_id: '' }
+      );
+    });
+  }
+
+  // [{}, {}] => OM<{[key: string] -> resVal}>
+  public mapResultsObjectToOrderedMap(results: Array<{[key: string]: string}>): OrderedMap<string, any> {
+    const fieldsAliases = this.fields.map(field => field.alias.getOrElse(field.name));
+    const remapToOnlyRequestedFields = (listOfResultObjects: {[key: string]: any}) => listOfResultObjects.map((obj: {[key: string]: any}) => getOnlyRequestedFields(obj));
+    const getOnlyRequestedFields = (singleResultObjectOrList: {[key: string]: any}): {[key: string]: any} => {
+      return Object.assign({}, ...Object.keys(singleResultObjectOrList)
+        .map(key => { if (fieldsAliases.includes(key)) { return ({[key]: singleResultObjectOrList[key]}); }}));
+    };
+    return List(results)
+      .groupBy(row => (this.hasProperParent() || this.plan.greatGrandParentPlan().value ? row.parentId : row.s))
+      .toOrderedMap()
+      .map(x => List.isList(x) ?
+        (x.size <= 1 ? OrderedMap(getOnlyRequestedFields(x.get(0))) : remapToOnlyRequestedFields(x)) :
+        remapToOnlyRequestedFields(x));
+  }
+
+  public async resolve(): Promise<QueryResult> {
     const objectType = prefixify(this.plan.resultType.name);
     const args = this.getArgs(this.plan);
     const projections = this.getProjections();
-    const query = this.constructSparqlQuery(objectType, args, projections);
     console.log(
       'resolving',
       objectType,
@@ -106,96 +270,13 @@ export class SparqlQueryStrategy extends QueryStrategy {
       '}',
       args.toJS()
     );
-    return new Promise((resolve, reject) => {
-      this.fetcher
-        .fetchBindings(this.endpoint, query)
-        .then(stream => {
-          const resultArr: Array<{ [key: string]: Literal }> = [];
-          const errors: any[] = [];
-          stream.on('data', data => {
-            resultArr.push(data);
-          });
-          stream.on('error', error => {
-            errors.push(error);
-          });
-          stream.on('end', () => {
-            /** Extracts 'value' string from each Literal{} query result so that it ends up as an List of keyval tuples
-             * i.e: [{geo_lat: Literal{value: 123, type:NamedNode, language: _},{...}},{...}]=>[{'geo_lat': 123},...]]
-             */
-            const resultArrValues = resultArr.map(entry => {
-              return Object.keys(entry).reduce(
-                (acc: { [key: string]: string }, key) => {
-                  const lit = entry[key];
-                  acc[key] = lit.value;
-                  return acc;
-                },
-                { parentId: '', s: '', j_id: '' }
-              );
-            });
-            const resultArrValuesPopped = this.shouldPopFinalArray(
-              resultArrValues.length
-            )
-              ? resultArrValues.slice(0, -1)
-              : resultArrValues;
-            const om = OrderedMap<string, OrderedMap<string, any>>(
-              resultArrValuesPopped.map((row: { [key: string]: string }) => {
-                const k: string = this.hasProperParent() ? row.parentId : row.s;
-                const v = OrderedMap<any>(
-                  this.fields.map(f => {
-                    const key: string = f.alias.getOrElse(f.name);
-                    const rowValueByKey: any =
-                      row[key] ||
-                      row[this.SPECIAL_PROJECTIONS.get(key) || ''] ||
-                      null;
-                    return [key, rowValueByKey];
-                  })
-                );
-                // to prevent lint errors..
-                const returnValue: [string, OrderedMap<string, any>] = [k, v];
-                return returnValue;
-              })
-            );
-            if (this.plan.isConnectionEdgesPlan()) {
-              const key: string = this.plan
-                .grandParentPlan()
-                .get()
-                .getSubjectIds()
-                .get(0);
-              const resultLength: number =
-                resultArrValues && resultArrValues.length;
-              // TODO:å This seems awfully hacky, is there a different approach to this?
-              this.plan
-                .grandParentPlan()
-                .get()
-                .result.data.merge(
-                  OrderedMap({
-                    [key]: this.addPageInfoIfNeeded(resultLength),
-                  })
-                );
-            }
-            result.data = om;
-            result.meta.errors = List(errors);
-            /**
-             * TODO might want to stream this to an another service later
-             */
-            console.log(
-              JSON.stringify(
-                {
-                  query,
-                  ...result.meta,
-                },
-                null,
-                2
-              )
-            );
-            return resolve(result);
-          });
-        })
-        .catch(err => {
-          result.data = OrderedMap({});
-          result.meta.errors.push(err);
-          return resolve(result);
-        });
+    return new Promise(async (resolve, _) => {
+      const results = this.processData(await this.executeQuery(this.constructDataQuery(objectType, args, projections)));
+      if (this.plan.isConnectionEdgesPlan()) {
+        const pageInfo = this.processPageInfo(await this.executeQuery(this.constructPageInfoQuery()));
+        this.injectPageInfo(pageInfo);
+      }
+      resolve(results);
     });
   }
 
@@ -203,44 +284,23 @@ export class SparqlQueryStrategy extends QueryStrategy {
     return this.RESERVED_KEYWORDS.contains(word);
   }
 
-  /**
-   * Checks whether the resulting array should be popped, because we request an additional 1 resource from the database
-   * for pagination purposes.
-   * @param {number} resultArrLength - num of actual results from the database
-   * @returns {boolean}
-   */
-  protected shouldPopFinalArray(resultArrLength: number) {
-    if (this.plan.isConnectionEdgesPlan()) {
-      if (this.plan.processedArgs.first.nonEmpty()) {
-        if (this.plan.processedArgs.first.value === resultArrLength) {
-          return false;
-        }
-      }
-      if (this.plan.processedArgs.last.nonEmpty()) {
-        if (this.plan.processedArgs.last.value === resultArrLength) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
   protected getProjections() {
     const specialProjKeys = this.SPECIAL_PROJECTIONS.keySeq();
-    return this.fields.map<{ name: string; projection: string }>(f => {
-      if (specialProjKeys.includes(f.name)) {
-        const sp = this.SPECIAL_PROJECTIONS.get(f.name) || '';
+    return this.fields
+      .filter((f: GQLField) => !this.IGNORED_PROJECTIONS.contains(f.name))
+      .map<{ name: string; projection: string }>(f => {
+        if (specialProjKeys.includes(f.name)) {
+          const sp = this.SPECIAL_PROJECTIONS.get(f.name) || '';
+          return {
+            name: prefixify(sp),
+            projection: sp,
+          };
+        }
         return {
-          name: prefixify(sp),
-          projection: sp,
+          name: prefixify(f.name),
+          projection: f.alias.getOrElse(f.name),
         };
-      }
-      return {
-        name: prefixify(f.name),
-        projection: f.alias.getOrElse(f.name),
-      };
-    });
+      });
   }
 
   /**
@@ -249,17 +309,6 @@ export class SparqlQueryStrategy extends QueryStrategy {
    */
   protected hasProperParent() {
     return this.plan.parent && !this.plan.parent.getSubjectIds().isEmpty();
-  }
-
-  /**
-   * In case of multiple SparQL statements
-   */
-  protected addConditionalOperator(
-    len: number,
-    index: number,
-    operator: string
-  ) {
-    return index === len - 1 ? '' : operator;
   }
 
   protected spreadArguments() {
@@ -296,50 +345,61 @@ export class SparqlQueryStrategy extends QueryStrategy {
           a.name +
           ' ?' +
           a.projection +
-          '}' +
-          this.addConditionalOperator(projLen, i, '.')
+          '}'
       )
-      .join(' ');
+      .join('.');
   }
 
   protected addFilters() {
-    this.plan.processedArgs.filter
+    return this.plan.processedArgs.filter
       .map(filter => {
         const expr = filter.expression;
+        const separator = expr instanceof GQLObjectQueryModifierDisjunction ? '|| ' : '&& ';
         if (expr.expression.length) {
           return expr.expression;
         } else {
-          expr.values
+          return expr.values
             .map(filterMap => {
-              const lastFilterIndex = filterMap.size - 1;
+              const lastFilterIndex = expr.values.size - 1;
               return filterMap
-                .mapEntries(([key, val], index) => [
-                  key.expression,
-                  `${val.expression} ${index < lastFilterIndex ? '&&' : ''}`,
-                ])
-                .reduce((acc, value, key) => {
-                  return acc + `${key} = ${value}`;
-                }, '');
+                .keySeq()
+                .map(key => `${key.expression} = ${filterMap.get(key)!.expression}`)
+                .get(0);
             })
-            .join('');
+            .join(separator);
         }
       })
       .getOrElse('');
+  }
+
+  protected addGeoNearbyConstraint() {
+    return `?parentId geo:lat ?latBase.
+          ?parentId geo:long ?longBase.
+          ?s omgeo:nearby(?latBase ?longBase ${this.DEFAULT_NEARBY_RADIUS}).`;
   }
 
   /**
    * Using the VALUES keyword
    */
   protected addParentConstraints() {
-    if (this.hasProperParent()) {
-      // todo add support for multiple parents
-      const ids = this.plan.parent!.getSubjectIds().reduce((acc, sid) => {
-        return (acc += `<${sid}> \n`);
-      }, '');
+    if (this.hasProperParent() || (this.plan.grandParentPlan().value && this.plan.grandParentPlan()!.value!.name === 'gn_nearby')) {
+      const planName = this.plan.name;
+      const ids: string = this.plan.isConnectionEdgesPlan() ?
+        this.plan.grandParentPlan().get()!.parent!.getSubjectIds().reduce((acc, sid) => {
+          return (acc += `<${sid}> \n`);
+        }, '') :
+        this.plan.parent!.getSubjectIds().reduce((acc, sid) => {
+          return (acc += `<${sid}> \n`);
+        }, '');
+      const parentConstraint = this.plan.grandParentPlan().get()!.name === 'gn_nearby' ?
+         this.addGeoNearbyConstraint() :
+        `?parentId ${this.plan.isConnectionEdgesPlan() ?
+          prefixify(this.plan.grandParentPlan().get().name) :
+          prefixify(planName)} ?s`;
       return `VALUES ?parentId {
         ${ids}
       }
-      ?parentId ${prefixify(this.plan.name)} ?s
+      ${parentConstraint}
       `;
     } else {
       return '';
@@ -379,6 +439,11 @@ export class SparqlQueryStrategy extends QueryStrategy {
     return '';
   }
 
+  /**
+   * TODO: Method's not finished, should be expanded & implemented in
+   * case we need more geospatial-type queries.
+   * @returns {boolean}
+   */
   protected isAGeoSpatialQuery() {
     const GEOSPATIAL_KEYWORDS = List(['gn_nearby']);
     // add geospatial plan names to a config, i.e. => [gn_nearby, ...];
@@ -389,96 +454,18 @@ export class SparqlQueryStrategy extends QueryStrategy {
     return this.plan.resultType.name === 'Connection';
   }
 
-  protected constructConnectionQuery(
-    projections: List<any>,
-    args: Map<string, any>,
-    countOnly: boolean = true
-  ) {
-    // I'm not sure that we'll ever need to get a subjectId that's not the first one in the statement below
-    const parentId = countOnly
-      ? this.plan.parent!.getSubjectIds().get(0)
-      : this.plan
-          .grandParentPlan()
-          .get()
-          .getSubjectIds()
-          .get(0);
-    // if (this.isAGeoSpatialQuery()) {
-    /**
-     * TODO really just a gn_nearby at the moment..
-     * should be refactored regardless, perhaps add
-     * a Map of corresponding statements, i.e.
-     * gn_nearby -> omgeo:nearby and such
-     */
-    return `
-        SELECT ${
-          countOnly
-            ? '?parentId (COUNT(DISTINCT ?id) AS ?totalCount)'
-            : '?s ?parentId ' +
-              projections.map(a => `?${a.projection}`).join(' ')
-        }
-        WHERE {
-          ?parentId geo:lat ?latBase.
-          ?parentId geo:long ?longBase.
-          ?s omgeo:nearby(?latBase ?longBase ${this.DEFAULT_NEARBY_RADIUS}).
-          ?s j:id ?id
-          ${countOnly ? '' : this.spreadProjections(projections, Some('?s'))} ${
-      args.isEmpty() ? '' : '.'
-    }
-          FILTER(
-            ?parentId = <${parentId}> &&
-            ?parentId != ?s
-            ${this.addCursorOffset('?id')}
-          )
-        }
-        ${countOnly ? 'GROUP BY ?parentId' : ''}
-        ${this.addLimit()}
-        ${this.addSortBy()}
-      `;
-    // }
-    // else {
-    // todo other connection-type queries..
-    // }
+  protected addCursorField(subjectToBindTo: string = '?s') {
+    return `${subjectToBindTo} ${this.DEFAULT_CURSOR_PREDICATE} ${this.DEFAULT_CURSOR_LABEL}`;
   }
 
-  protected addCursorOffset(cursorVar: string) {
+  protected addCursorOffset(cursorVar: string = this.DEFAULT_CURSOR_LABEL) {
     if (this.plan.processedArgs.before.nonEmpty()) {
-      return `&& ${cursorVar ||
-        this.DEFAULT_CURSOR_LABEL} > '${this.plan.processedArgs.before.get()}'`;
+      return `&& ${cursorVar} < '${this.plan.processedArgs.before.get()}'`;
     }
     if (this.plan.processedArgs.after.nonEmpty()) {
-      return `&& ${cursorVar ||
-        this.DEFAULT_CURSOR_LABEL} < '${this.plan.processedArgs.after.get()}'`;
+      return `&& ${cursorVar} > '${this.plan.processedArgs.after.get()}'`;
     }
     return '';
-  }
-
-  protected addPageInfoIfNeeded(actualNumberOfResults: number = 0) {
-    if (this.plan.isConnectionEdgesPlan()) {
-      return this.addPageInfo(actualNumberOfResults);
-    } else {
-      return null;
-    }
-  }
-
-  protected addPageInfo(actualNumberOfResults: number = 0) {
-    const optFirst = this.plan.processedArgs.first;
-    const optLast = this.plan.processedArgs.last;
-    const optAfter = this.plan.processedArgs.after;
-    const optBefore = this.plan.processedArgs.before;
-    let hasNextPage: boolean = false;
-    let hasPreviousPage: boolean = false;
-    const requestedNumberOfResults = optFirst.getOrElse(optLast.getOrElse(0));
-    const possibleNumberOfResults = requestedNumberOfResults + 1;
-    if (actualNumberOfResults === possibleNumberOfResults) {
-      if (optFirst.nonEmpty() || optBefore.nonEmpty()) {
-        hasNextPage = true;
-      }
-      if (optLast.nonEmpty() || optAfter.nonEmpty()) {
-        hasPreviousPage = true;
-      }
-    }
-    // todo return only the pageInfo OM here, set the key in the parent function for more clarity.
-    return OrderedMap({ pageInfo: { hasNextPage, hasPreviousPage } });
   }
 
   private normalizePrefix(prefix: string) {

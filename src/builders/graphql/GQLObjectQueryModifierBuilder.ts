@@ -135,8 +135,11 @@ export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
   ): QME.GQLObjectQueryModifierDisjunction {
     const basicDisjunction = this.simplifyDisjunction(
       new QME.GQLObjectQueryModifierDisjunction(
-        List(context.searchConditionAnd()).map(a =>
-          this.processSearchConditionAnd(a)
+        List(context.searchConditionAnd()).map(a => {
+          const bla = this.processSearchConditionAnd(a);
+          return bla;
+        }
+
         )
       )
     );
