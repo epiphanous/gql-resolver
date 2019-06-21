@@ -8,7 +8,7 @@ import { GQLPattern } from './GQLPattern';
 import { GQLSortBy } from './GQLSortBy';
 import { GQLTransform } from './GQLTransform';
 
-interface IGQLQueryArguments {
+export interface IGQLQueryArguments {
   after?: Option<string>;
   any?: List<GQLAny>;
   before?: Option<string>;

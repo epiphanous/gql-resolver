@@ -7,6 +7,8 @@ import {
   IriRefContext,
   LatLonContext,
   NumericLiteralContext,
+  PatternContext,
+  TextMatchParamContext,
   VarFeatureContext,
   VarRefContext,
 } from '../../antlr4/generated/QueryModificationParser';
@@ -18,16 +20,16 @@ import { GQLFieldBooster } from '../../models/GQLBooster';
 import { GQLObjectQueryModifierBasicExpression } from '../../models/GQLObjectQueryModifierExpression';
 import * as GQLP from '../../models/GQLPattern';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
-  public validFields: Map<string, string>;
-  public validVariables: Set<GQLVariableDefinition>;
-  public vars: Map<string, string>;
-  public prefixes: Set<string>;
-  public source: string;
-  public referencedFields: Set<string>;
-  public result: List<GQLP.GQLPattern>;
+export class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
+  public validFields!: Map<string, string>;
+  public validVariables!: Set<GQLVariableDefinition>;
+  public vars!: Map<string, string>;
+  public prefixes!: Set<string>;
+  public source!: string;
+  public referencedFields!: Set<string>;
+  public result!: List<GQLP.GQLPattern | undefined>;
 
   constructor(
     validFields: Map<string, string>,
@@ -48,7 +50,9 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
   }
 
   public processPatterns(context: QMP.PatternsContext) {
-    return List(context.pattern()).map(a => this.processPattern(a));
+    return List(context.pattern()).map((a: PatternContext) =>
+      this.processPattern(a)
+    );
   }
 
   // public processRaceCountPattern Guessing we don't need this one..
@@ -68,7 +72,7 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
     let field;
     if (Option.of(context.fieldRef()).nonEmpty()) {
       field = this.processFieldRef(
-        Option.of(context.fieldRef()).value
+        Option.of(context.fieldRef()).value!
       ).expression.substring(1);
     } else {
       if (isGeo) {
@@ -81,17 +85,19 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
       context.stringLiteralOrVarRef()
     );
     this.check(!!text, `text match text is empty for ${field}`, context);
-    const params = Map(
-      List(context.textMatchParam()).map(a => this.processTextMatchParam(a))
+    const params = Map<string, any>(
+      List(context.textMatchParam()).map(
+        (a: QMP.TextMatchParamContext) => this.processTextMatchParam(a)!
+      )
     );
-    const booster = new GQLFieldBooster(field, params.get('boost', '1'));
-    const minScore = params.get('minScore').map(a => a.toFixed(2));
+    const booster = new GQLFieldBooster(params.get('boost', '1'), field);
+    const minScore = params.get('minScore').map((a: number) => a.toFixed(2));
     this.check(
       minScore.get('1.00') > 0,
       `text match param 'minScore' is non-positive for ${field}`,
       context
     );
-    const maxHits = params.get('maxHits').map(a => parseInt(a, 10));
+    const maxHits = params.get('maxHits').map((a: string) => parseInt(a, 10));
     this.check(
       maxHits.get(1) > 0,
       `text match param 'maxHits' is non-positive for ${field}`,
@@ -107,7 +113,7 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
     );
   }
 
-  public asDouble(n) {
+  public asDouble(n: any) {
     switch (typeof n) {
       case 'string':
       case 'number':
@@ -120,7 +126,7 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
   public processGeoNearbyPattern(context: QMP.GeoNearbyPatternContext) {
     let field;
     if (Option.of(context.fieldRef()).nonEmpty()) {
-      field = this.processFieldRef(context.fieldRef()).expression.substring(1);
+      field = this.processFieldRef(context.fieldRef()!).expression.substring(1);
     } else {
       field = DEFAULT_GEO_BINDING;
     }
@@ -132,16 +138,18 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
       Option.of(proximityCtx.numericLiteral()),
       Option.of(proximityCtx.varRef()),
     ];
-    let distance;
+    let distance: number;
     if (proximityOptions[0].isEmpty() && proximityOptions[1].nonEmpty()) {
       const v = this.processVarRef(proximityOptions[1].value);
-      distance = v.underlyingValue.map(a => this.asDouble(a))[1];
+      distance = v.underlyingValue
+        .map(a => Number(this.asDouble(a)))
+        .getOrElse(1.0);
     } else if (
       proximityOptions[0].nonEmpty() &&
       proximityOptions[1].isEmpty()
     ) {
       const n = this.processNumericLiteral(proximityOptions[0].value);
-      distance = Number(n.expression).toFixed(1);
+      distance = Number(Number(n.expression).toFixed(1));
     } else {
       distance = 1.0;
     }
@@ -161,14 +169,14 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
       Option.of(unitsOptions[0]).isEmpty() &&
       Option.of(unitsOptions[1]).nonEmpty()
     ) {
-      units = this.processVarRef(unitsOptions[1].value).underlyingValue.map(
-        a => a as string
-      )['unit:MileUSStatute'];
+      units = this.processVarRef(unitsOptions[1].value!)
+        .underlyingValue.map((a: string) => a as string)
+        .getOrElse('unit:MileUSStatute');
     } else if (
       Option.of(unitsOptions[1]).isEmpty() &&
       Option.of(unitsOptions[0]).nonEmpty()
     ) {
-      units = this.processIriRef(unitsOptions[0].value).expression;
+      units = this.processIriRef(unitsOptions[0].value!).expression;
     } else {
       console.warn('unhandled proximity options');
       units = 'unit:MileUSStatute';
@@ -181,15 +189,15 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
         this.processVarRef(
           (context.featureOrLatLon() as VarFeatureContext).varRef()
         ).expression,
-        distance,
-        units
+        units,
+        distance
       );
     } else if (context.featureOrLatLon() instanceof QMP.FeatureContext) {
       return new GQLP.GQLGeoNearFeaturePattern(
         field,
         this.processFeature(context.featureOrLatLon() as FeatureContext),
-        distance,
-        units
+        units,
+        distance
       );
     } else if (context.featureOrLatLon() instanceof QMP.LatLonContext) {
       const lat = this.processLatLonCoordinate(
@@ -204,8 +212,8 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
         field,
         lat.expression,
         lon.expression,
-        distance,
-        units
+        units,
+        distance
       );
     }
   }
@@ -215,13 +223,13 @@ export default class GQLPatternsBuilder extends GQLObjectQueryModifierBuilder {
       Option.of(latlon.varRef(coord)).nonEmpty() &&
       Option.of(latlon.numericLiteral(coord)).isEmpty()
     ) {
-      return this.processVarRef(Option.of(latlon.varRef(coord)).value);
+      return this.processVarRef(Option.of(latlon.varRef(coord)).value!);
     } else if (
       Option.of(latlon.varRef(coord)).isEmpty() &&
       Option.of(latlon.numericLiteral(coord)).nonEmpty()
     ) {
       return this.processNumericLiteral(
-        Option.of(latlon.numericLiteral(coord)).value
+        Option.of(latlon.numericLiteral(coord)).value!
       );
     } else {
       return new GQLObjectQueryModifierBasicExpression('error', 'error');

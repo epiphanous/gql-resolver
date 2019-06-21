@@ -1,11 +1,11 @@
+import fs = require('fs');
 import { Map } from 'immutable';
 import 'mocha';
 import { GQLQueryDocument } from '../../../models/GQLQueryDocument';
-import ResolverContext from '../../../models/ResolverContext';
+import { ResolverContext } from '../../../models/ResolverContext';
 import { SparqlQueryStrategyFactory } from '../../../strategies/SparqlQueryStrategyFactory';
-import Builder from '../../Builder';
-import GQLQueryBuilder from '../GQLQueryBuilder';
-import fs = require('fs');
+import { Builder } from '../../Builder';
+import { GQLQueryBuilder } from '../GQLQueryBuilder';
 
 describe('GQLQueryBuilder', () => {
   let context: ResolverContext = null;

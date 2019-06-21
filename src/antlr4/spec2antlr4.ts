@@ -1,4 +1,4 @@
-const cheerio = require('cheerio');
+import cheerio = require('cheerio');
 import fetch from 'node-fetch';
 
 const sourceCharMap = {
@@ -8,9 +8,9 @@ const sourceCharMap = {
   noleqs: '~["\'\\r\\n\\u0085\\u2028\\u2029\\\\]',
 };
 
-const lexicals = {};
+const lexicals: { [key: string]: boolean } = {};
 
-const addToLexicals = [];
+const addToLexicals: string[] = [];
 
 const ruleStart = '\n  : ';
 const ruleSep = '\n  | ';
@@ -261,7 +261,7 @@ function parseRule($: CheerioStatic, rule: Cheerio): Rule {
         .map((_, el) => parseToken($, $(el)))
         .get()
     );
-  } else if (rule.hasClass('spec-oneof')) {
+  } /*if (rule.hasClass('spec-oneof'))*/ else {
     result = new Rule(
       'spec-oneof',
       rule

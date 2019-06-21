@@ -1,9 +1,9 @@
 import { None, Option } from 'funfix';
 import { Map } from 'immutable';
-import Builder from './builders/Builder';
-import GQLQueryBuilder from './builders/graphql/GQLQueryBuilder';
+import { Builder } from './builders/Builder';
+import { GQLQueryBuilder } from './builders/graphql/GQLQueryBuilder';
 import { GQLQueryDocument } from './models/GQLQueryDocument';
-import ResolverContext from './models/ResolverContext';
+import { ResolverContext } from './models/ResolverContext';
 
 export class Resolver {
   public context: ResolverContext;

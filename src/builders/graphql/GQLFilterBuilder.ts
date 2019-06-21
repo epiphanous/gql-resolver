@@ -7,16 +7,16 @@ import {
 } from '../../antlr4/generated/QueryModificationParser';
 import { GQLFilter } from '../../models/GQLFilter';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
-  public validFields: Map<string, string>;
-  public validVariables: Set<GQLVariableDefinition>;
-  public vars: Map<string, string>;
-  public prefixes: Set<string>;
-  public source: string;
+export class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
+  public validFields!: Map<string, string>;
+  public validVariables!: Set<GQLVariableDefinition>;
+  public vars!: Map<string, string>;
+  public prefixes!: Set<string>;
+  public source!: string;
   public referencedFields: Set<string> = Set<string>().asMutable();
-  public result: GQLFilter;
+  public result!: GQLFilter;
 
   public parseWith(parser: QueryModificationParser) {
     return parser.filter();

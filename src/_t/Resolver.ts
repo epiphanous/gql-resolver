@@ -1,19 +1,24 @@
 import { expect } from 'chai';
+import fs = require('fs');
 import { Some } from 'funfix';
 import { Map } from 'immutable';
 import 'mocha';
-import ResolverContext from '../models/ResolverContext';
+import { ResolverContext } from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
 import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
-import fs = require('fs');
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
-  const rc = new ResolverContext(
+  const rc = new ResolverContext({
     schema,
-    Map({ sparql: new SparqlQueryStrategyFactory() }),
-    'sparql'
-  );
+    strategies: Map({
+      sparql: new SparqlQueryStrategyFactory(
+        'http://localhost:7200/repositories/jubel',
+        [['j', 'http://jubel.co/jtv/']]
+      ),
+    }),
+    defaultStrategy: 'sparql',
+  });
   it('creates a resolver context', () => {
     expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
   });
@@ -24,11 +29,10 @@ describe('Resolver', () => {
      * @type {Promise<QueryResult>}
      */
     const result = await resolver.resolve(
-      `
-    query test {
-      home: curatedDestination(filter: 's_name=\\"yerevan\\"') {
+      `query test {
+      home: curatedDestination(filter: "s_name='yerevan' || s_name='tbilisi'") {
         s_name
-        gn_nearby(first: 3) {
+        gn_nearby(first: 100, before: "3T_pXF6w6P.q0JPsc1wi") {
           totalCount
           edges {
             node {
@@ -46,6 +50,7 @@ describe('Resolver', () => {
     );
     const resValue = await result.get();
     const resValueObject = await resValue.getResult();
+    console.log('result', JSON.stringify(resValueObject, null, 2));
     expect(resValueObject).to.be.an('object');
   });
 });

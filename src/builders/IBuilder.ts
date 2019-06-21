@@ -1,8 +1,8 @@
 import { ANTLRInputStream, Lexer, Parser, TokenStream } from 'antlr4ts';
 import { Try } from 'funfix';
-import BuilderError from './BuilderError';
+import { BuilderError } from './BuilderError';
 
-export default interface IBuilder<T> {
+export interface IBuilder<T> {
   errors: BuilderError[];
 
   lexer(inputStream: ANTLRInputStream): Lexer;

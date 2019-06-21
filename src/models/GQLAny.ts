@@ -1,6 +1,6 @@
 import { None, Option } from 'funfix';
 
-interface IGQLAny {
+export interface IGQLAny {
   name: string;
   value: Option<any>;
 }

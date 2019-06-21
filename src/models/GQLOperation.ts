@@ -6,7 +6,7 @@ import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLField, GQLSelection } from './GQLSelection';
 import { GQLVariable } from './GQLVariable';
 import { GQLVariableDefinition } from './GQLVariableDefinition';
-import ResolverContext from './ResolverContext';
+import { ResolverContext } from './ResolverContext';
 
 export interface IGQLOperation {
   name: string;
@@ -25,12 +25,12 @@ export interface IGQLOperation {
 export class GQLOperation implements IGQLOperation {
   [key: string]: any;
 
-  public name: string;
+  public name!: string;
   // public operationType: 'query' | 'mutation' | 'subscription';
-  public operationType: string;
-  public outputType: string;
-  public fields: List<[string, GQLField]>;
-  public variables: List<GQLVariableDefinition>;
+  public operationType!: string;
+  public outputType!: string;
+  public fields!: List<[string, GQLField]>;
+  public variables!: List<GQLVariableDefinition>;
   public directives: List<GQLDirective> = List();
   public selections: List<GQLSelection> = List();
   public isSelected = false;

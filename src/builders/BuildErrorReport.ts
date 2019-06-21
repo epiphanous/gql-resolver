@@ -1,4 +1,4 @@
-import BuilderError from './BuilderError';
+import { BuilderError } from './BuilderError';
 
 export class BuildErrorReport {
   public issues: BuilderError[] = [];

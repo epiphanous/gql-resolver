@@ -1,10 +1,10 @@
-import { Map, Set } from 'immutable';
-import ResolverContext from '../../models/ResolverContext';
-import GQLOrderByBuilder from '../../builders/graphql/GQLOrderByBuilder';
-import { GQLObjectType } from '../../models/GQLTypeDefinition';
-import Builder from '../Builder';
 import { expect } from 'chai';
 import fs = require('fs');
+import { Map, Set } from 'immutable';
+import { GQLOrderByBuilder } from '../../builders/graphql/GQLOrderByBuilder';
+import { GQLObjectType } from '../../models/GQLTypeDefinition';
+import { ResolverContext } from '../../models/ResolverContext';
+import { Builder } from '../Builder';
 
 describe('GQLOrderByBuilder test', () => {
   const schema = ResolverContext.buildSchema(

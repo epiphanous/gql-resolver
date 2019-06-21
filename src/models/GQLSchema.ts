@@ -1,5 +1,6 @@
 import { None, Option, Some, TNone, TSome } from 'funfix';
 import { List, Map, Seq, Set } from 'immutable';
+import { GQLDirective } from './GQLDirective';
 import { GQLField, GQLInlineFragment, GQLSelection } from './GQLSelection';
 import {
   GQLArgumentDefinition,
@@ -13,9 +14,8 @@ import {
   GQLTypeDefinition,
   GQLUnion,
 } from './GQLTypeDefinition';
-import { GQLDirective } from './GQLDirective';
 
-interface IGQLSchema {
+export interface IGQLSchema {
   allFields: Map<string, GQLFieldDefinition>;
   allTypes: Map<string, GQLTypeDefinition>;
   directives: Map<string, GQLDirectiveDefinition>;
@@ -137,7 +137,7 @@ export class GQLSchema implements IGQLSchema {
     const name = this.getTypeName(t);
     if (this.unions.has(name)) {
       const u = this.unions.get(name);
-      return u.gqlTypes.filterNot(x => this.isScalarLike(x)).isEmpty();
+      return u!.gqlTypes.filterNot(x => this.isScalarLike(x)).isEmpty();
     }
     return false;
   }
@@ -237,7 +237,7 @@ export class GQLSchema implements IGQLSchema {
   }
 
   public getFieldSubjectObjectTypes(f: string): Set<string> {
-    return this.objectTypesForField.get(f);
+    return this.objectTypesForField.get(f)!;
   }
 
   public getFieldType(f: string): Option<string> {
@@ -258,14 +258,14 @@ export class GQLSchema implements IGQLSchema {
 
   public validFieldsForType(t: string): Map<string, string> {
     let types: Set<string>;
-    switch (this.getTypeDefinition(t).value.constructor.name) {
+    switch (this.getTypeDefinition(t).value!.constructor.name) {
       case 'GQLUnion':
         types = this.getTypeDefinition(t)
-          .value.constructor()
+          .value!.constructor()
           .gqlTypes.toSet();
         break;
       case 'GQLTypeDefinition':
-        types = Set(this.getTypeDefinition(t).value.constructor().name);
+        types = Set(this.getTypeDefinition(t).value!.constructor().name);
         break;
       default:
         types = Set<string>();
@@ -275,7 +275,7 @@ export class GQLSchema implements IGQLSchema {
       .map(p => {
         if (this.isScalarObjectType(t)) {
           // This probably won't work..
-          return this.objectTypes.get(p).fields.map(f => {
+          return this.objectTypes.get(p)!.fields.map(f => {
             const key = f.gqlType.xsdType + '_' + f.name;
             const val = f.gqlType.xsdType;
             return [key, val];
@@ -287,12 +287,12 @@ export class GQLSchema implements IGQLSchema {
           if (fbt) {
             if (fbt.has('s')) {
               s = fbt
-                .get('s')
+                .get('s')!
                 .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
             }
             if (fbt.has('o')) {
               o = fbt
-                .get('o')
+                .get('o')!
                 .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
             }
           }
@@ -320,11 +320,11 @@ export class GQLSchema implements IGQLSchema {
     // console.log(fields);
 
     fields
-      .flatMap<[string, GQLField]>(tf => {
+      .flatMap<[string, GQLField]>((tf: [string, GQLField]) => {
         console.log(tf);
         const [objType, field] = tf;
         if (objType.startsWith('U_')) {
-          List<[string, GQLField]>(
+          return List<[string, GQLField]>(
             objType
               .slice(2)
               .split('_OR_')
@@ -344,32 +344,37 @@ export class GQLSchema implements IGQLSchema {
       })
       .map(tf => {
         const [objType, field] = tf;
-        const fieldStrArrPair = this.fieldsByType.get(objType);
-        const toValues = fieldStrArrPair[1]
-          .map((opt: Option<List<string>>) => opt.value)
-          .filter(optval => optval);
-        const grouped = toValues.reduce((acc, current) => {
-          if (acc[current[0]]) {
-            acc[current[0]].push(current[1]);
+        const so: Map<string, List<string>> = this.fieldsByType.get(
+          objType,
+          Map<string, List<string>>()
+        );
+        if (so && !so.isEmpty()) {
+          // const toValues = fieldStrArrPair.get(1)
+          //   .map((opt: Option<List<string>>) => opt.value)
+          //   .filter((optval: string) => optval);
+          // const grouped = toValues.reduce((acc: any, current: any) => {
+          //   if (acc[current[0]]) {
+          //     acc[current[0]].push(current[1]);
+          //   } else {
+          //     acc[current[0]] = [current[1]];
+          //   }
+          //   return acc;
+          // }, {});
+          // const so = Map(grouped);
+          const s = Option.of(so.get('s'));
+          const o = Option.of(so.get('o'));
+          if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
+            scalars.push(tf);
+          } else if (
+            o.nonEmpty() &&
+            (o.value as List<string>).includes(field.name)
+          ) {
+            objects.push(tf);
           } else {
-            acc[current[0]] = [current[1]];
+            errors.push(
+              new Error(`field '${field.name}' not in type '${objType}'`)
+            );
           }
-          return acc;
-        }, {});
-        const so = Map(grouped);
-        const s = Option.of(so.get('s'));
-        const o = Option.of(so.get('o'));
-        if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
-          scalars.push(tf);
-        } else if (
-          o.nonEmpty() &&
-          (o.value as List<string>).includes(field.name)
-        ) {
-          objects.push(tf);
-        } else {
-          errors.push(
-            new Error(`field '${field.name}' not in type '${objType}'`)
-          );
         }
       });
     return [List(scalars), List(objects), List(errors)];
@@ -421,33 +426,39 @@ export class GQLSchema implements IGQLSchema {
     selections: List<GQLSelection | GQLField | GQLInlineFragment>,
     fieldName: string
   ): Option<GQLField> {
-    const result = selections.reduce((acc, node) => {
-      if (node.constructor.name === 'GQLField') {
-        if (node.name === fieldName) {
-          return acc.add(node as GQLField);
-        } else {
+    const result = selections.reduce(
+      (
+        acc: Set<GQLField | undefined>,
+        node: GQLSelection | GQLField | GQLInlineFragment
+      ) => {
+        if (node.constructor.name === 'GQLField') {
+          if (node.name === fieldName) {
+            return acc.add(node as GQLField);
+          } else {
+            return acc.union(
+              Set([
+                this.nestedField(
+                  (node as GQLField).selections as List<GQLField>,
+                  fieldName
+                ).value,
+              ])
+            );
+          }
+        } else if (node.constructor.name === 'GQLInlineFragment') {
           return acc.union(
             Set([
               this.nestedField(
-                (node as GQLField).selections as List<GQLField>,
+                (node as GQLInlineFragment).selections as List<GQLField>,
                 fieldName
               ).value,
             ])
           );
+        } else {
+          throw new Error(`No idea how to handle ${node}`);
         }
-      } else if (node.constructor.name === 'GQLInlineFragment') {
-        return acc.union(
-          Set([
-            this.nestedField(
-              (node as GQLInlineFragment).selections as List<GQLField>,
-              fieldName
-            ).value,
-          ])
-        );
-      } else {
-        throw new Error(`No idea how to handle ${node}`);
-      }
-    }, Set<GQLField>());
+      },
+      Set<GQLField>()
+    );
     return Option.of(result.first());
   }
 
@@ -456,11 +467,26 @@ export class GQLSchema implements IGQLSchema {
     fieldType: string
   ): Option<[GQLInlineFragment, Option<GQLField>]> {
     let fragmentOwner: TSome<GQLField> | TNone = None;
-    const result = selections.reduce((acc, node) => {
-      if (node.constructor.name === 'GQLInlineFragment') {
-        if ((node as GQLInlineFragment).typeCondition === fieldType) {
-          return acc.add([node as GQLInlineFragment, fragmentOwner]);
-        } else {
+    const result = selections.reduce(
+      (
+        acc: Set<[GQLInlineFragment, Option<GQLField>] | undefined>,
+        node: GQLSelection | GQLField | GQLInlineFragment
+      ) => {
+        if (node.constructor.name === 'GQLInlineFragment') {
+          if ((node as GQLInlineFragment).typeCondition === fieldType) {
+            return acc.add([node as GQLInlineFragment, fragmentOwner]);
+          } else {
+            return acc.union(
+              Set([
+                this.nestedFragment(
+                  (node as GQLInlineFragment).selections,
+                  fieldType
+                ).value,
+              ])
+            );
+          }
+        } else if (node.constructor.name === 'GQLField') {
+          fragmentOwner = Some(node as GQLField);
           return acc.union(
             Set([
               this.nestedFragment(
@@ -469,21 +495,12 @@ export class GQLSchema implements IGQLSchema {
               ).value,
             ])
           );
+        } else {
+          throw new Error(`No idea how to handle ${node}`);
         }
-      } else if (node.constructor.name === 'GQLField') {
-        fragmentOwner = Some(node as GQLField);
-        return acc.union(
-          Set([
-            this.nestedFragment(
-              (node as GQLInlineFragment).selections,
-              fieldType
-            ).value,
-          ])
-        );
-      } else {
-        throw new Error(`No idea how to handle ${node}`);
-      }
-    }, Set<[GQLInlineFragment, Option<GQLField>]>());
+      },
+      Set<[GQLInlineFragment, Option<GQLField>]>()
+    );
     return Option.of(result.first());
   }
 
@@ -492,21 +509,20 @@ export class GQLSchema implements IGQLSchema {
     typeInfo: string
   ): List<GQLField> {
     return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
-      return fragmentInfo[0].selections.map(selection => {
-        if (selection.constructor.name === 'GQLField') {
-          return selection as GQLField;
-        } else {
-          console.warn(`no idea how to handle ${selection}`);
-          return null;
-        }
-      });
+      return (
+        (fragmentInfo &&
+          fragmentInfo[0].selections
+            .filter(selection => selection.constructor.name === 'GQLField')
+            .map(selection => selection as GQLField)) ||
+        List()
+      );
     });
   }
 
   public inlineFragmentChildFieldMappingsOf(
     selections: List<GQLSelection>,
     field: string
-  ): Map<string, Seq<any, any>> {
+  ): Map<string, List<GQLField>> {
     const nestedFieldSelections = (fieldStr: string) =>
       this.nestedField(selections, fieldStr);
     const optField = nestedFieldSelections(field);
@@ -514,22 +530,17 @@ export class GQLSchema implements IGQLSchema {
       this.nestedFragment(selections, someStr);
     const membersOfParsedType = (str: string) =>
       this.typeMembers(nestedFragmentSelections(str), str); // TODO finish
-    const listOfResTuples = List();
-    const typeMembersMappings = () => {
-      for (const fld of [optField.value]) {
-        for (const fieldType of [this.getFieldType(fld.name)]) {
-          for (const parsedType of this.parseTypeInfo(
-            fieldType.value
-          ).toArray()) {
-            listOfResTuples.push([parsedType, membersOfParsedType(parsedType)]);
-          }
+    const listOfResTuples: Array<[string, List<GQLField>]> = [];
+    for (const fld of [optField.value]) {
+      for (const fieldType of [this.getFieldType(fld!.name)]) {
+        for (const parsedType of this.parseTypeInfo(
+          fieldType.value!
+        ).toArray()) {
+          listOfResTuples.push([parsedType, membersOfParsedType(parsedType)]);
         }
       }
-      return listOfResTuples;
-    };
-    return typeMembersMappings().reduce((acc, item) => {
-      return acc + item;
-    }, Map<string, List<GQLField>>());
+    }
+    return Map(listOfResTuples);
   }
 
   private _scalarsObjects(

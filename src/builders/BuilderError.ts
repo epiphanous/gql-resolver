@@ -1,14 +1,14 @@
 import { RecognitionException } from 'antlr4ts/RecognitionException';
 import { None, Option } from 'funfix';
 
-interface IBuilderError {
+export interface IBuilderError {
   message: string;
   line: number;
   position: number;
   exception: Option<RecognitionException>;
 }
 
-export default class BuilderError implements IBuilderError {
+export class BuilderError implements IBuilderError {
   public message: string;
   public line: number;
   public position: number;

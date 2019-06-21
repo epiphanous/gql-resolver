@@ -1,7 +1,7 @@
 import { None, Option, Some } from 'funfix';
 import { List, Map, OrderedMap } from 'immutable';
-import GQLQueryBuilder from '../builders/graphql/GQLQueryBuilder';
-import QueryStrategy from '../strategies/QueryStrategy';
+import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
+import { QueryExecutionException } from './exceptions/QueryExecutionException';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLQueryArguments } from './GQLQueryArguments';
@@ -12,12 +12,12 @@ import {
   GQLObjectType,
   GQLTypeDefinition,
 } from './GQLTypeDefinition';
-import QueryResult from './QueryResult';
-import ResolverContext from './ResolverContext';
-import QueryExecutionException from './exceptions/QueryExecutionException';
+import { QueryResult } from './QueryResult';
+import { ResolverContext } from './ResolverContext';
+import { stringify } from 'querystring';
 
 export interface IGQLExecutionPlan {
-  parent: GQLExecutionPlan;
+  parent: GQLExecutionPlan | null;
   context: ResolverContext;
   vars: Map<string, any>;
   name: string;
@@ -40,23 +40,24 @@ export interface IGQLExecutionPlan {
  * An execution plan for a graphql query.
  */
 export class GQLExecutionPlan implements IGQLExecutionPlan {
-  public parent: GQLExecutionPlan;
+  public parent: GQLExecutionPlan | null;
   public context: ResolverContext;
   public vars: Map<string, any>;
   public name: string;
   public alias: Option<string>;
   public args: List<GQLArgument>;
   public directives: List<GQLDirective>;
-  public fields: List<GQLField>;
+  public fields!: List<GQLField>;
   public resultType: GQLTypeDefinition;
-  public processedArgs: GQLQueryArguments;
+  public processedArgs!: GQLQueryArguments;
 
   public plans: List<GQLExecutionPlan>;
-  public scalars: List<QueryResult>;
-  public objects: List<QueryResult>;
+  public scalars!: List<QueryResult>;
+  public objects!: List<QueryResult>;
   public result: QueryResult = new QueryResult();
   public allFields: List<GQLField>;
-  public defaultStrategy: string;
+  public defaultStrategy!: string;
+  public multipleSubjectIds: List<string> = List<string>();
 
   /**
    * Construct a new execution plan.
@@ -70,7 +71,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @param fields the non-object fields this plan resolves
    */
   constructor(
-    parent: GQLExecutionPlan,
+    parent: GQLExecutionPlan | null,
     context: ResolverContext,
     vars: Map<string, any>,
     name: string,
@@ -126,55 +127,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.resolveDefaultStrategy();
   }
 
-  /**
-   * Make sure our fields list contains our resultType's id field(s).
-   */
-  private _initFields() {
-    let ids = List<GQLFieldDefinition>();
-    // todo we don't want the query object to include the _id scalar. Should probably add all of the types alike to a conf and check based off of that
-    if (this.resultType.name !== 'Query' && this.resultType.name !== 'Edge' && this.resultType.name !== 'Connection') {
-      switch (this.resultType.constructor) {
-        case GQLInterface:
-          const i = this.resultType as GQLInterface;
-          ids = i.idFields();
-          if (ids.isEmpty()) {
-            ids = this.idFields(i.directives);
-          }
-          break;
-        case GQLObjectType:
-          const ot = this.resultType as GQLObjectType;
-          ids = ot.idFields();
-          if (ids.isEmpty()) {
-            ids = this.idFields(ot.directives);
-          }
-          break;
-        default:
-          // noop
-          break;
-      }
-      if (ids.isEmpty()) {
-        ids = this.idFields(this.context.schema.schemaDirectives);
-      }
-    }
-    const fields = this.allFields.filter(f => !f.isObject());
-    const fieldNames = fields.map(f => f.name).toSet();
-    this.fields = ids
-      .filter(fd => !fieldNames.contains(fd.name))
-      .map(
-        fd =>
-             new GQLField({
-              name: fd.name,
-              outputType: fd.gqlType.xsdType(),
-              parentType: this.resultType.name,
-            })
-      )
-      .concat(fields);
-    console.log({
-      type: this.resultType.name,
-      fields: this.fields.map(f => f.name).toArray(),
-    });
-  }
-
   // public dumpOut(fields: List<[string, GQLField]>, indent = '') {
   //   fields.forEach(([t, f]) => {
   //     console.log(`${indent} ${t} ${f.name}`);
@@ -190,12 +142,17 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @return Promise<QueryResult>
    */
   public async execute(queryBuilder: GQLQueryBuilder) {
-    const allValidFields = Map((this.resultType as GQLObjectType).fields.map<[string, string]>(fd => [fd.name, fd.gqlType.name]));
+    const allValidFields = Map(
+      (this.resultType as GQLObjectType).fields.map<[string, string]>(fd => [
+        fd.name,
+        fd.gqlType.name,
+      ])
+    );
     this.processedArgs = queryBuilder.processArgs(this.args, allValidFields);
     if (this.isConnectionEdgesPlan()) {
-      this.processedArgs = this.grandParentPlan().nonEmpty() ?
-        this.grandParentPlan().get().processedArgs :
-        this.processedArgs;
+      this.processedArgs = this.grandParentPlan().nonEmpty()
+        ? this.grandParentPlan().get().processedArgs
+        : this.processedArgs;
     }
     this.scalars = List(await Promise.all(this.resolveFields()));
     this.objects = List(await Promise.all(this.resolvePlans(queryBuilder)));
@@ -209,13 +166,15 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return None;
   }
 
+  public greatGrandParentPlan(): Option<GQLExecutionPlan> {
+    return Option.of(this.grandParentPlan().value && this.grandParentPlan().value!.parent);
+  }
+
   public isConnectionEdgesPlan() {
     const parent = this.parent;
     const grandParent = parent && parent.parent;
     const greatGrandParent = grandParent && grandParent.parent;
-    return (
-      grandParent && grandParent.resultType.name === 'Connection'
-    );
+    return grandParent && grandParent.resultType.name === 'Connection';
   }
 
   public getSubjectIds(): List<any> {
@@ -231,7 +190,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     if (fieldWithIdDirective) {
       const fieldName = fieldWithIdDirective.name;
       return fields
-        .get(0)
+        .get(0)!
         .valueSeq()
         .reduce(
           (acc, value: OrderedMap<string, any>) =>
@@ -241,7 +200,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     }
 
     const fieldsMarkedId = fields
-      .get(0)
+      .get(0)!
       .valueSeq()
       .filter((field: GQLField) => field.name === 'id')
       .toList();
@@ -251,7 +210,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     }
 
     return fields
-      .get(0)
+      .get(0)!
       .keySeq()
       .toList();
   }
@@ -275,7 +234,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Executes all sub plans and returns a combined promise of their query results.
    * @returns Promise<QueryResult[]>
    */
-  protected resolvePlans(queryBuilder) {
+  protected resolvePlans(queryBuilder: GQLQueryBuilder) {
     // Promise.all<QueryResult>(
     return this.plans.map(plan => plan.execute(queryBuilder));
     // );
@@ -285,18 +244,21 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
-    const mappedScalars = this.scalars.map(sc => sc.data).has(0)
-      ? this.scalars.map(sc => sc.data).get(0)
-      : OrderedMap({});
-    const mappedObjects = this.objects.map(sc => sc.data).has(0)
-      ? this.objects.map(sc => sc.data).get(0)
-      : OrderedMap({});
-    this.result.merge(mappedScalars as OrderedMap<string, any>);
-    this.result.merge(mappedObjects as OrderedMap<string, any>);
-    if (this.getScalarsErrors().isEmpty()) {
-      this.result.meta.errors = this.result.meta.errors.concat(...this.getSubPlansErrors());
+    const scData: List<OrderedMap<string, any>> = this.scalars.map(
+      sc => sc.data
+    );
+    const mappedScalars = scData.get(0) || OrderedMap<string, any>();
+    const obData = this.objects.map(sc => sc.data);
+    const mappedObjects = obData.get(0) || OrderedMap<string, any>();
+    this.result.merge(mappedScalars);
+    this.result.merge(mappedObjects);
+    const scErrors = this.getScalarsErrors();
+    if (scErrors.isEmpty()) {
+      this.result.meta.errors = this.result.meta.errors.concat(
+        ...this.getSubPlansErrors()
+      );
     } else {
-      this.result.meta.errors = this.result.meta.errors.concat(...this.getScalarsErrors());
+      this.result.meta.errors = this.result.meta.errors.concat(...scErrors);
     }
     this.finalizeResults();
     this.result.addMetadata();
@@ -317,18 +279,32 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    */
   protected finalizeResults() {
     if (this.isConnectionEdgesPlan()) {
-      // todo the line below is probably too hacky
-      this.name = this.grandParentPlan().get().getSubjectIds().get(0);
+      const grandParentPlanSubjectIds = this.grandParentPlan()
+        .get()
+        .parent!
+        .getSubjectIds();
+      if (grandParentPlanSubjectIds.size > 1) {
+        this.multipleSubjectIds = grandParentPlanSubjectIds;
+      } else {
+        this.name = grandParentPlanSubjectIds.get(0);
+      }
     }
     if (this.parent) {
       // this is to handle situations where we have an array of n objects instead of just one object
       if (this.parent.scalars.isEmpty()) {
-        const newResArr = this.result.data.valueSeq().toList();
-        this.result.data = OrderedMap({
-          [this.alias.getOrElse(this.name)]: newResArr,
-        });
+        // In case we have a single subjectId
+        if (this.multipleSubjectIds.isEmpty()) {
+          const newResArr = this.result.data.valueSeq().toList();
+          this.result.data = OrderedMap({
+            [this.alias.getOrElse(this.name)]: newResArr,
+          });
+        } else {
+          this.result.data = OrderedMap(
+            this.multipleSubjectIds.map<[string, any]>(subjId => [subjId, this.result.data.get(subjId)])
+          );
+        }
       } else {
-        // we want each value to be mapped to its proper parent via parent's ID, TODO will this work in all cases?
+        // we want each value to be mapped to its proper parent via parent's ID
         this.result.data.map(value => {
           return OrderedMap({ [this.alias.getOrElse(this.name)]: value });
         });
@@ -348,7 +324,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.fields
       .groupBy(f => this.getStrategyFor(f))
       .map((fields, qs) =>
-        this.context.getStrategyFactory(qs).create(fields.toList(), this)
+        this.context.getStrategyFactory(qs)!.create(fields.toList(), this)
       )
       .valueSeq()
       .toList();
@@ -369,7 +345,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     let strategy: Option<string> = None;
 
     // first search up through the query
-    let parent = this as GQLExecutionPlan;
+    let parent: GQLExecutionPlan | null = this as GQLExecutionPlan;
     while (parent && strategy.isEmpty()) {
       strategy = this.resolveWith(parent.directives);
       parent = parent.parent;
@@ -450,5 +426,59 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
         // todo: cleanup this nasty get ----------------------------v
         .map(t => this.context.schema.getFieldDefinition(t).get())
     );
+  }
+
+  /**
+   * Make sure our fields list contains our resultType's id field(s).
+   */
+  private _initFields() {
+    let ids = List<GQLFieldDefinition>();
+    // todo we don't want the query object to include the _id scalar.
+    // Should probably add all of the types alike to a conf and check based off of that
+    if (
+      this.resultType.name !== 'Query' &&
+      this.resultType.name !== 'Edge' &&
+      this.resultType.name !== 'Connection'
+    ) {
+      switch (this.resultType.constructor) {
+        case GQLInterface:
+          const i = this.resultType as GQLInterface;
+          ids = i.idFields();
+          if (ids.isEmpty()) {
+            ids = this.idFields(i.directives);
+          }
+          break;
+        case GQLObjectType:
+          const ot = this.resultType as GQLObjectType;
+          ids = ot.idFields();
+          if (ids.isEmpty()) {
+            ids = this.idFields(ot.directives);
+          }
+          break;
+        default:
+          // noop
+          break;
+      }
+      if (ids.isEmpty()) {
+        ids = this.idFields(this.context.schema.schemaDirectives);
+      }
+    }
+    const fields = this.allFields.filter(f => !f.isObject());
+    const fieldNames = fields.map(f => f.name).toSet();
+    this.fields = ids
+      .filter(fd => !fieldNames.contains(fd.name))
+      .map(
+        fd =>
+          new GQLField({
+            name: fd.name,
+            outputType: fd.gqlType.xsdType(),
+            parentType: this.resultType.name,
+          })
+      )
+      .concat(fields);
+    console.log({
+      type: this.resultType.name,
+      fields: this.fields.map(f => f.name).toArray(),
+    });
   }
 }

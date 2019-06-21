@@ -1,10 +1,10 @@
+import fs = require('fs');
 import { Map, Set } from 'immutable';
 import { GQLFilter } from '../../models/GQLFilter';
-import ResolverContext from '../../models/ResolverContext';
-import GQLFilterBuilder from '../graphql/GQLFilterBuilder';
 import { GQLObjectType } from '../../models/GQLTypeDefinition';
-import Builder from '../Builder';
-import fs = require('fs');
+import { ResolverContext } from '../../models/ResolverContext';
+import { Builder } from '../Builder';
+import { GQLFilterBuilder } from '../graphql/GQLFilterBuilder';
 
 describe('GQLFilterBuilder test', () => {
   const schema = ResolverContext.buildSchema(

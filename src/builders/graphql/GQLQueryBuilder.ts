@@ -69,15 +69,15 @@ import {
 import { GQLStringValue, GQLVariableValue } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import ResolverContext from '../../models/ResolverContext';
-import Builder from '../Builder';
-import GQLBindingsBuilder from './GQLBindingsBuilder';
-import GQLBoostersBuilder from './GQLBoostersBuilder';
-import GQLDocumentBuilder from './GQLDocumentBuilder';
-import GQLFilterBuilder from './GQLFilterBuilder';
-import GQLOrderByBuilder from './GQLOrderByBuilder';
-import GQLPatternsBuilder from './GQLPatternsBuilder';
-import GQLTransformsBuilder from './GQLTransformsBuilder';
+import { ResolverContext } from '../../models/ResolverContext';
+import { Builder } from '../Builder';
+import { GQLBindingsBuilder } from './GQLBindingsBuilder';
+import { GQLBoostersBuilder } from './GQLBoostersBuilder';
+import { GQLDocumentBuilder } from './GQLDocumentBuilder';
+import { GQLFilterBuilder } from './GQLFilterBuilder';
+import { GQLOrderByBuilder } from './GQLOrderByBuilder';
+import { GQLPatternsBuilder } from './GQLPatternsBuilder';
+import { GQLTransformsBuilder } from './GQLTransformsBuilder';
 
 const ARG_TYPES = {
   ARG_BINDINGS: 'bindings',
@@ -94,9 +94,7 @@ const ARG_TYPES = {
   ARG_TRANSFORMS: 'transforms',
 };
 
-export default class GQLQueryBuilder extends GQLDocumentBuilder<
-  GQLQueryDocument
-> {
+export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
   public schema: GQLSchema;
   public context: ResolverContext;
   public vars: Map<string, any>;
@@ -214,16 +212,20 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
 
   public processFilter(filterExpr: string, validFields: Map<string, string>) {
     // For cases where we have nested str identifiers in the GQL query but need to pass onto other builders
-    const exprWithoutDoubleEscape = filterExpr.replace(/\\/g, '');
+    console.log('filter expression', filterExpr);
+    const builtFilter = new GQLFilterBuilder(
+      validFields,
+      this.variables,
+      this.vars,
+      Set(this.getPrefixes().keys()),
+      filterExpr
+    );
+    console.log('variables', this.variables.toJSON());
+    console.log('builtFilter', builtFilter);
+    // const exprWithoutDoubleEscape = filterExpr.replace(/\\/g, '');
     return Builder.parse<GQLFilter>(
-      new GQLFilterBuilder(
-        validFields,
-        this.variables,
-        this.vars,
-        Set(this.getPrefixes().keys()),
-        exprWithoutDoubleEscape
-      ),
-      exprWithoutDoubleEscape
+      builtFilter,
+      filterExpr
     ).get();
   }
 
@@ -328,7 +330,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
 
   public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
     const operation = new GQLOperation({
-      name: this.textOf(ctx.NAME()),
+      name: this.textOf(ctx.NAME()!),
       operationType: ctx.operationType().text,
       variables: this.processVariableDefinitions(
         Option.of(ctx.variableDefinitions())
@@ -421,6 +423,8 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
               return this.processFragmentSpread(
                 (sc as FragmentSpreadSelectionContext).fragmentSpread()
               );
+            default:
+              throw new Error('Unsupported context' + sc.constructor);
           }
         })
       );
@@ -438,7 +442,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       alias,
       args: this.getArguments(Option.of(ctx.arguments()), fdOpt),
       directives: this.processDirectives(Option.of(ctx.directives())),
-      selections: this.processSelectionSet(ctx.selectionSet()),
+      selections: this.processSelectionSet(ctx.selectionSet()!),
     });
   }
 
@@ -488,7 +492,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
       return new GQLInvalidArgument(name, new GQLStringValue('error'));
     } else {
       const argDef = argDefOpt.get();
-      const expectedType = argDef.gqlType.name;
+      const expectedType = argDef!.gqlType.name;
       const v = this.processValue(ctx.value());
       let typeOk = false;
       switch (v.constructor.name) {
@@ -554,7 +558,7 @@ export default class GQLQueryBuilder extends GQLDocumentBuilder<
     return new GQLInlineFragment(
       this.textOf(
         ctx
-          .typeCondition()
+          .typeCondition()!
           .namedType()
           .NAME()
       ),

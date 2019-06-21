@@ -53,7 +53,7 @@ import {
   GQLTypeDefinition,
   GQLUnion,
 } from '../../models/GQLTypeDefinition';
-import GQLDocumentBuilder from './GQLDocumentBuilder';
+import { GQLDocumentBuilder } from './GQLDocumentBuilder';
 
 const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
   bindings:
@@ -68,7 +68,7 @@ const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
     "Optional list of one or more 'textmatch', 'geomatch' or 'geonearby' patterns to match against",
 };
 
-export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
+export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   public operationTypes = Map<string, string>([
     ['query', 'Query'],
     ['mutation', 'Mutation'],
@@ -429,7 +429,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   ) {
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
-    if (!def) {
+    if (def) {
       def.values.withMutations(v =>
         v.merge(this.getEnumValues(Option.of(ctx.enumValuesDefinition())))
       );
@@ -437,7 +437,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
         d.merge(this.getDirectives(Option.of(ctx.directives())))
       );
     } else {
-      this.check(false, `can't extend non-existant enum ${name}`, ctx, true);
+      this.check(false, `can't extend non-existent enum ${name}`, ctx, true);
     }
   }
 
@@ -447,11 +447,11 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
     if (!def) {
-      def.directives.withMutations(d =>
+      this.directives.withMutations(d =>
         d.merge(this.getDirectives(Option.of(ctx.directives())))
       );
     } else {
-      this.check(false, `can't extend non-existant enum ${name}`, ctx, true);
+      this.check(false, `can't extend non-existent enum ${name}`, ctx, true);
     }
   }
 
@@ -479,7 +479,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   ) {
     const name = this.textOf(ctx.NAME());
     const def = this.inputTypes.find(d => d.name === name);
-    if (!def) {
+    if (def) {
       def.args.withMutations(a =>
         a.merge(
           this.getArgumentDefinitions(Option.of(ctx.inputFieldsDefinition()))
@@ -503,7 +503,7 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   ) {
     const name = this.textOf(ctx.NAME());
     const def = this.inputTypes.find(d => d.name === name);
-    if (!def) {
+    if (def) {
       def.directives.withMutations(d =>
         d.merge(this.getDirectives(Option.of(ctx.directives())))
       );
@@ -531,8 +531,8 @@ export default class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
           .map(
             dl =>
               (
-                dl.typeSystemDirectiveLocation() ||
-                dl.executableDirectiveLocation()
+                dl.typeSystemDirectiveLocation()! ||
+                dl.executableDirectiveLocation()!
               ).text
           )
       );

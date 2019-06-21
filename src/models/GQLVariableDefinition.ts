@@ -4,7 +4,7 @@ import { GQLDirective } from './GQLDirective';
 import { GQLType } from './GQLType';
 import { GQLValue, GQLVariableValue } from './GQLValue';
 
-interface IGQLVariableDefinition {
+export interface IGQLVariableDefinition {
   name: string;
   gqlType: GQLType;
   defaultValue: Option<GQLValue>;

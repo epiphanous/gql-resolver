@@ -36,9 +36,9 @@ import {
   GQLVariableValue,
 } from '../../models/GQLValue';
 import { GQLVariable } from '../../models/GQLVariable';
-import BuilderBase from '../BuilderBase';
+import { BuilderBase } from '../BuilderBase';
 
-export default class GQLDocumentBuilder<T> extends BuilderBase<T>
+export class GQLDocumentBuilder<T> extends BuilderBase<T>
   implements GraphQLListener {
   public lexer(inputStream: ANTLRInputStream) {
     return new GraphQLLexer(inputStream);
@@ -53,7 +53,7 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
     const isList = lt.nonEmpty();
     const typ = lt.map(t => t.type()).getOrElse(ctx);
     return new GQLType(
-      this.textOf(typ.namedType().NAME()),
+      this.textOf(typ.namedType()!.NAME()),
       isList,
       Option.of(ctx.nonNullType()).nonEmpty()
     );
@@ -136,6 +136,7 @@ export default class GQLDocumentBuilder<T> extends BuilderBase<T>
         )
       );
     }
+    throw new Error('Unsupported ValueContext ' + ctx);
   }
 
   public processDefaultValue(ctxOpt: Option<DefaultValueContext>) {

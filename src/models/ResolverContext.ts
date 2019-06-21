@@ -1,36 +1,40 @@
 import { Map } from 'immutable';
-import Builder from '../builders/Builder';
-import GQLSchemaBuilder from '../builders/graphql/GQLSchemaBuilder';
-import { GQLSchema } from './GQLSchema';
+import { Builder } from '../builders/Builder';
+import { GQLSchemaBuilder } from '../builders/graphql/GQLSchemaBuilder';
 import { QueryStrategyFactory } from '../strategies/QueryStrategyFactory';
+import { GQLSchema } from './GQLSchema';
 
-export default class ResolverContext {
-  public schema: GQLSchema;
-  public strategies: Map<string, QueryStrategyFactory>;
-  public defaultStrategy: string;
+interface IResolverCtxParams {
+  schema: string;
+  strategies: {};
+  defaultStrategy: string;
+}
 
-  constructor(
-    schemaText: string,
-    strategies: Map<string, QueryStrategyFactory>,
-    defaultStrategy: string
-  ) {
-    if (!strategies.has(defaultStrategy)) {
-      throw new Error(
-        `default query strategy factory '${defaultStrategy} not provided in strategies initializer`
-      );
-    }
-    this.schema = ResolverContext.buildSchema(schemaText);
-    this.strategies = strategies;
-    this.defaultStrategy = defaultStrategy;
-  }
-
+export class ResolverContext {
   public static buildSchema(schemaText: string): GQLSchema {
     const builder = new GQLSchemaBuilder();
     const schemaTry = Builder.parse<GQLSchema>(builder, schemaText);
     return schemaTry.get();
   }
 
-  public getStrategyFactory(name: string): QueryStrategyFactory {
+  public schema: GQLSchema;
+  public strategies: Map<string, QueryStrategyFactory>;
+  public defaultStrategy: string;
+
+  constructor(params: IResolverCtxParams) {
+    this.strategies = Map(params.strategies);
+    if (!this.strategies || !this.strategies.has(params.defaultStrategy)) {
+      throw new Error(
+        `default query strategy factory '${
+          params.defaultStrategy
+        } not provided in strategies initializer`
+      );
+    }
+    this.schema = ResolverContext.buildSchema(params.schema);
+    this.defaultStrategy = params.defaultStrategy;
+  }
+
+  public getStrategyFactory(name: string): QueryStrategyFactory | undefined {
     if (this.strategies.has(name)) {
       return this.strategies.get(name);
     } else {

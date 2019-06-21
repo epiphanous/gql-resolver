@@ -1,7 +1,7 @@
 import { None, Option } from 'funfix';
 import { List, Map } from 'immutable';
 
-interface IGQLObjectQueryModifierExpression {
+export interface IGQLObjectQueryModifierExpression {
   expression: string;
   dataType: string;
   underlyingValue: Option<any>;
@@ -66,7 +66,7 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
     >()
   ) {
     super(
-      disjunctives.map(x => `(${x.expression})`).join(' || '),
+      disjunctives.size === 0 ? '' : (disjunctives.size > 1 ? disjunctives.map(x => `(${x.expression})`).join(' || ') : disjunctives.get(0)!.expression),
       'xsd:boolean'
     );
     this.disjunctives = disjunctives;
@@ -79,7 +79,7 @@ export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExp
 
   constructor(conjunctives: List<GQLObjectQueryModifierOptionalNegation>) {
     super(
-      conjunctives.map(x => `(${x.expression})`).join(' && '),
+      conjunctives.size === 0 ? '' : (conjunctives.size > 1 ? conjunctives.map(x => `(${x.expression})`).join(' && ') : conjunctives.get(0)!.expression),
       'xsd:boolean'
     );
     this.conjunctives = conjunctives;

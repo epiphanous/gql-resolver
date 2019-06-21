@@ -16,12 +16,10 @@ import {
   GQLObjectQueryModifierPrimitiveExpression,
 } from '../../models/GQLObjectQueryModifierExpression';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import BuilderBase from '../BuilderBase';
+import { BuilderBase } from '../BuilderBase';
 
 /* tslint:disable */
-export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
-  any
-> {
+export abstract class GQLObjectQueryModifierBuilder extends BuilderBase<any> {
   public result: any;
   public PREFIXED_IRI_PATTERN: string;
   public rPREFIXED_IRI_PATTERN: RegExp;
@@ -42,6 +40,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
     this.validVariables = validVariables;
     this.vars = vars;
     this.source = source;
+    console.log('OM constructor: <', source, '>');
     this.PREFIXED_IRI_PATTERN = `(${prefixes.join('|')})_(.*)`;
     this.rPREFIXED_IRI_PATTERN = new RegExp(this.PREFIXED_IRI_PATTERN);
   }
@@ -81,7 +80,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
             disjunction.disjunctives.size == 1 &&
             disjunction.values.isEmpty()
           ) {
-            result = disjunction.disjunctives.get(0).conjunctives;
+            result = disjunction.disjunctives.get(0)!.conjunctives;
           }
         }
       }
@@ -104,12 +103,12 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
           let result = List([disjunctive]);
           if (
             conjunction.conjunctives.size === 1 &&
-            !conjunction.conjunctives.get(0).hasNot
+            !conjunction.conjunctives.get(0)!.hasNot
           ) {
             let disjunctionOpt: Option<
               QME.GQLObjectQueryModifierDisjunction
             > = None;
-            const expr2 = conjunction.conjunctives.get(0).expr.expr;
+            const expr2 = conjunction.conjunctives.get(0)!.expr.expr;
             if (
               expr2 instanceof QME.GQLObjectQueryModifierParensExpression &&
               expr2.expr instanceof QME.GQLObjectQueryModifierDisjunction
@@ -136,8 +135,11 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
   ): QME.GQLObjectQueryModifierDisjunction {
     const basicDisjunction = this.simplifyDisjunction(
       new QME.GQLObjectQueryModifierDisjunction(
-        List(context.searchConditionAnd()).map(a =>
-          this.processSearchConditionAnd(a)
+        List(context.searchConditionAnd()).map(a => {
+          const bla = this.processSearchConditionAnd(a);
+          return bla;
+        }
+
         )
       )
     );
@@ -198,6 +200,8 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
                 .map(a => a.expression)
                 .toSet()
             );
+          } else {
+            return Set<string>();
           }
         }, fieldsInHead);
       }
@@ -263,22 +267,23 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
         predicate = this.processComparisonPredicate(
           context as QMP.ComparisonPredicateContext
         );
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
       case 'InPredicateContext':
         predicate = this.processInPredicate(context as QMP.InPredicateContext);
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
       case 'InVarPredicateContext':
         predicate = this.processInVarPredicate(
           context as QMP.InVarPredicateContext
         );
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
       case 'ParenPredicateContext':
         predicate = this.processParenPredicate(
           context as QMP.ParenPredicateContext
         );
-        break;
+        return new QME.GQLObjectQueryModifierPredicate(predicate);
+      default:
+        throw new Error('Unsupported context type:' + context.constructor.name);
     }
-    return new QME.GQLObjectQueryModifierPredicate(predicate);
   }
 
   public processComparisonPredicate(
@@ -466,6 +471,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       case 'VarRefAtomContext':
         return this.processVarRefAtom(atom as QMP.VarRefAtomContext);
     }
+    throw new Error('Unsupported atom context! ' + atom.constructor.name);
   }
 
   public processBuiltInCallAtom(
@@ -582,6 +588,9 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       case 'YearFuncContext':
         return this.processYearFunc(builtin as QMP.YearFuncContext);
     }
+    throw new Error(
+      'Unsupported AtomContext: ' + context.builtinCall().constructor.name
+    );
   }
 
   public NArgBuiltin(
@@ -593,7 +602,10 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
   ): QME.GQLObjectQueryModifierBasicPrimitiveExpression {
     const expr = List(expressions).map(ex => this.processExpression(ex));
     expr.forEach((e, index) => {
-      const tl = inTypes.size < index ? inTypes.last : inTypes[index];
+      const tl =
+        inTypes.size < index
+          ? inTypes.last(List<string>())
+          : inTypes.get(index, List<string>());
       this.check(
         tl.contains(e.dataType),
         // tslint: disable-next-line
@@ -1257,6 +1269,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
     if (val instanceof QMP.FuncWithArgsContext) {
       return this.processFuncWithArgs(val);
     }
+    throw new Error('Unsupported AtomContext' + context.functionCall());
   }
 
   public processRdfLiteralAtom(context: QMP.RdfLiteralAtomContext) {
@@ -1273,6 +1286,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
         val.iriRef().text
       );
     }
+    throw new Error('Unsupported AtomContext' + context.rdfLiteral());
   }
 
   public processStringLiteralAtom(context: QMP.StringLiteralAtomContext) {
@@ -1306,12 +1320,11 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       const optOfVarRef = Option.of(context.varRef());
       if (optOfVarRef.nonEmpty()) {
         return this.processVarRef(optOfVarRef.value);
-      } else {
-        return new QME.GQLObjectQueryModifierBasicExpression(
-          context.text,
-          'error'
-        );
       }
+      return new QME.GQLObjectQueryModifierBasicExpression(
+        context.text,
+        'error'
+      );
     }
   }
 
@@ -1332,12 +1345,10 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
         'xsd:decimal'
       );
     }
-    if (context instanceof QMP.DoubleLiteralContext) {
-      return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(
-        context.text,
-        'xsd:double'
-      );
-    }
+    return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(
+      context.text,
+      'xsd:double'
+    );
   }
 
   public processBooleanLiteralAtom(context: QMP.BooleanLiteralAtomContext) {
@@ -1364,6 +1375,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
         'iri'
       );
     }
+    throw new Error('Unknown format for IriRef');
   }
 
   public processFieldRefAtom(
@@ -1407,7 +1419,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
       context
     );
     const filterExpr = this.asDataType(value.getOrElse('error'));
-    const t = vd ? vd[0].gqlType.xsdType : 'error';
+    // const t = vd ? vd[0].gqlType.xsdType : 'error';
     // TODO this.check() whether filterExpr.dataType == t
     return filterExpr;
   }
@@ -1474,7 +1486,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
     if (typeof value === 'string') {
       if (GQLObjectQueryModifierBuilderTypes.rDATETIME_PATTERN.test(value)) {
         const regexed = GQLObjectQueryModifierBuilderTypes.rDATETIME_PATTERN
-          .exec(value)[0]
+          .exec(value)![0]
           .split('-');
         // tslint:disable-next-line
         return this.quotedDataType(
@@ -1492,7 +1504,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
         return this.quotedDataType(value, Some('xsd:anyURI'));
       }
       if (this.rPREFIXED_IRI_PATTERN.test(value)) {
-        const regexed = this.rPREFIXED_IRI_PATTERN.exec(value)[0].split('_');
+        const regexed = this.rPREFIXED_IRI_PATTERN.exec(value)![0].split('_');
         return new QME.GQLObjectQueryModifierBasicPrimitiveExpression(
           `${regexed[0]}:${regexed[1]}`,
           'iri'
@@ -1507,6 +1519,7 @@ export default abstract class GQLObjectQueryModifierBuilder extends BuilderBase<
         return this.quotedDataType(value, None);
       }
     }
+    throw new Error('Unsupported expression' + value);
   }
 
   public processParenExpression(context: QMP.ParenExpressionContext) {

@@ -4,7 +4,7 @@ import { List } from 'immutable';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 
-interface IGQLSelection {
+export interface IGQLSelection {
   name: string;
 }
 
@@ -16,7 +16,7 @@ export class GQLSelection implements IGQLSelection {
   }
 }
 
-interface IGQLField extends IGQLSelection {
+export interface IGQLField extends IGQLSelection {
   alias?: Option<string>;
   args?: List<GQLArgument>;
   directives?: List<GQLDirective>;
@@ -33,10 +33,10 @@ export class GQLField extends GQLSelection implements IGQLField {
   public selections = List<GQLSelection>();
   public outputType: string = 'xsd:string';
   public fields = List<[string, GQLField]>();
-  public parentType: string;
+  public parentType: string = '';
 
   constructor(data: Partial<IGQLField> = {}) {
-    super(data.name);
+    super(data.name || 'unknown');
     Object.assign<GQLField, Partial<IGQLField>>(this, data);
   }
 
@@ -51,7 +51,7 @@ export class GQLField extends GQLSelection implements IGQLField {
   }
 }
 
-interface IGQLFragmentSpread extends IGQLSelection {
+export interface IGQLFragmentSpread extends IGQLSelection {
   directives: List<GQLDirective>;
 }
 
@@ -68,7 +68,7 @@ export class GQLFragmentSpread extends GQLSelection
   }
 }
 
-interface IGQLInlineFragment extends IGQLSelection {
+export interface IGQLInlineFragment extends IGQLSelection {
   typeCondition: string;
   directives: List<GQLDirective>;
   selections: List<GQLSelection>;
@@ -85,7 +85,7 @@ export class GQLInlineFragment extends GQLSelection
     selections: List<GQLSelection>,
     directives: List<GQLDirective> = List<GQLDirective>()
   ) {
-    super(id64.gen());
+    super(id64.gen(false));
     this.typeCondition = typeCondition;
     this.selections = selections;
     this.directives = directives;

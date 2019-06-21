@@ -1,4 +1,4 @@
-interface IGQLSortBy {
+export interface IGQLSortBy {
   field: string;
   desc: boolean;
 }

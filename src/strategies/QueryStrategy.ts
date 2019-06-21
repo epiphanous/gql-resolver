@@ -2,13 +2,13 @@ import { Option } from 'funfix';
 import { List, Map } from 'immutable';
 import { GQLExecutionPlan } from '../models/GQLExecutionPlan';
 import { GQLField } from '../models/GQLSelection';
-import QueryResult from '../models/QueryResult';
+import { QueryResult } from '../models/QueryResult';
 import {
   QueryResultCache,
   QueryResultMemoryCache,
 } from '../models/QueryResultCache';
 
-interface IQueryStrategy {
+export interface IQueryStrategy {
   cache?: QueryResultCache;
   fields: List<GQLField>;
   plan: GQLExecutionPlan;
@@ -16,7 +16,7 @@ interface IQueryStrategy {
   resolve(): Promise<QueryResult>;
 }
 
-export default abstract class QueryStrategy implements IQueryStrategy {
+export abstract class QueryStrategy implements IQueryStrategy {
   public cache: QueryResultCache = new QueryResultMemoryCache();
   public fields: List<GQLField>;
   public plan: GQLExecutionPlan;

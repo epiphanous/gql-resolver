@@ -275,7 +275,7 @@ termOp
 
 stringLiteral
   : STRING_LITERAL1
-  | STRING_LITERAL2
+//  | STRING_LITERAL2
   ;
 
 stringLiteralOrVarRef

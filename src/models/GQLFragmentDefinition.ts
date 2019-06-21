@@ -2,7 +2,7 @@ import { List } from 'immutable';
 import { GQLDirective } from './GQLDirective';
 import { GQLSelection } from './GQLSelection';
 
-interface IGQLFragmentDefinition {
+export interface IGQLFragmentDefinition {
   name: string;
   typeCondition: string;
   directives: List<GQLDirective>;

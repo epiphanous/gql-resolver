@@ -9,10 +9,10 @@ import {
 } from '../../antlr4/generated/QueryModificationParser';
 import { GQLTransform } from '../../models/GQLTransform';
 import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import GQLObjectQueryModifierBuilder from './GQLObjectQueryModifierBuilder';
+import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
 
-export default class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder {
-  public result: List<GQLTransform>;
+export class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder {
+  public result!: List<GQLTransform>;
 
   constructor(prefixes: Set<string>, source: string = 'transforms') {
     super(Map(), Set<GQLVariableDefinition>(), Map(), prefixes, source);
@@ -31,10 +31,14 @@ export default class GQLTransformsBuilder extends GQLObjectQueryModifierBuilder 
   }
 
   public processTransform(context: TransformContext) {
-    const func = this.textOf(context.children[0] as TerminalNode);
-    const iriRef = Option.of(context.iriRefOrVarRef())
-      .map(a => this.processIriRefOrVarRef(a))
-      .map(e => e.expression as string);
-    return new GQLTransform(func, iriRef);
+    if (!context || !context.children || context.children.length === 0) {
+      throw new Error('No children in context' + context);
+    } else {
+      const func = this.textOf(context.children[0] as TerminalNode);
+      const iriRef = Option.of(context.iriRefOrVarRef())
+        .map(a => this.processIriRefOrVarRef(a))
+        .map(e => e.expression as string);
+      return new GQLTransform(func, iriRef);
+    }
   }
 }
