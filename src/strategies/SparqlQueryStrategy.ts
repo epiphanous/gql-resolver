@@ -38,6 +38,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
   ]);
   private prefixesMemo!: any;
   private parentConstraintsMemo!: any;
+  private lastCursorPerSubject: Map<string, string> = Map<string, string>().asMutable();
 
   public constructor(
     fields: List<GQLField>,
@@ -77,11 +78,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
         (acc: { [key: string]: any }, key) => {
           let hasNextPage = false;
           let hasPreviousPage = false;
+          let lastCursor = '';
           const lit = entry[key];
           if (key === 'parentId') {
             acc.s = lit.value;
             acc.parentId = lit.value;
-            return acc;
+            lastCursor = this.lastCursorPerSubject.get(lit.value, '');
           }
           if (key === 'totalCount') {
             const count = entry[key];
@@ -89,7 +91,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
             hasPreviousPage = (optLast.value && (Number(count) > (optLast.value as number))) || false;
           }
           acc[key] = lit.value;
-          acc.pageInfo = { hasNextPage, hasPreviousPage };
+          acc.pageInfo = { hasNextPage, hasPreviousPage, lastCursor };
           return acc;
         },
       { totalCount: '', parentId: '', pageInfo: {} }
@@ -247,8 +249,18 @@ export class SparqlQueryStrategy extends QueryStrategy {
     const fieldsAliases = this.fields.map(field => field.alias.getOrElse(field.name));
     const remapToOnlyRequestedFields = (listOfResultObjects: {[key: string]: any}) => listOfResultObjects.map((obj: {[key: string]: any}) => getOnlyRequestedFields(obj));
     const getOnlyRequestedFields = (singleResultObjectOrList: {[key: string]: any}): {[key: string]: any} => {
+      console.log('singleResultObjectOrList', JSON.stringify(singleResultObjectOrList, null, 2));
       return Object.assign({}, ...Object.keys(singleResultObjectOrList)
-        .map(key => { if (fieldsAliases.includes(key)) { return ({[key]: singleResultObjectOrList[key]}); }}));
+        .map(key => { if (fieldsAliases.includes(key)) {
+          return ({[key]: singleResultObjectOrList[key]});
+        } else if (this.SPECIAL_PROJECTIONS.includes(key)) {
+          // For lastCursor (pageInfo) purposes
+          if (key === 'j_id') {
+            this.lastCursorPerSubject.set(
+              singleResultObjectOrList.parentId || singleResultObjectOrList.s,
+              singleResultObjectOrList.j_id);
+          }
+        }}));
     };
     return List(results)
       .groupBy(row => (this.hasProperParent() || this.plan.greatGrandParentPlan().value ? row.parentId : row.s))
