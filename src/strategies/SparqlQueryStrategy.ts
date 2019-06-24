@@ -38,7 +38,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
   ]);
   private prefixesMemo!: any;
   private parentConstraintsMemo!: any;
-  private lastCursorPerSubject: Map<string, string> = Map<string, string>().asMutable();
+  private endCursorPerSubject: Map<string, string> = Map<string, string>().asMutable();
 
   public constructor(
     fields: List<GQLField>,
@@ -78,12 +78,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
         (acc: { [key: string]: any }, key) => {
           let hasNextPage = false;
           let hasPreviousPage = false;
-          let lastCursor = '';
+          let endCursor = '';
           const lit = entry[key];
           if (key === 'parentId') {
             acc.s = lit.value;
             acc.parentId = lit.value;
-            lastCursor = this.lastCursorPerSubject.get(lit.value, '');
+            endCursor = this.endCursorPerSubject.get(lit.value, '');
           }
           if (key === 'totalCount') {
             const count = entry[key];
@@ -91,7 +91,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
             hasPreviousPage = (optLast.value && (Number(count) > (optLast.value as number))) || false;
           }
           acc[key] = lit.value;
-          acc.pageInfo = { hasNextPage, hasPreviousPage, lastCursor };
+          acc.pageInfo = { hasNextPage, hasPreviousPage, endCursor };
           return acc;
         },
       { totalCount: '', parentId: '', pageInfo: {} }
@@ -254,9 +254,9 @@ export class SparqlQueryStrategy extends QueryStrategy {
         .map(key => { if (fieldsAliases.includes(key)) {
           return ({[key]: singleResultObjectOrList[key]});
         } else if (this.SPECIAL_PROJECTIONS.includes(key)) {
-          // For lastCursor (pageInfo) purposes
+          // For endCursor (pageInfo) purposes
           if (key === 'j_id') {
-            this.lastCursorPerSubject.set(
+            this.endCursorPerSubject.set(
               singleResultObjectOrList.parentId || singleResultObjectOrList.s,
               singleResultObjectOrList.j_id);
           }
