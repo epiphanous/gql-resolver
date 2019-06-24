@@ -38,6 +38,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
   ]);
   private prefixesMemo!: any;
   private parentConstraintsMemo!: any;
+  private endCursorPerSubject: Map<string, string> = Map<string, string>().asMutable();
 
   public constructor(
     fields: List<GQLField>,
@@ -77,11 +78,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
         (acc: { [key: string]: any }, key) => {
           let hasNextPage = false;
           let hasPreviousPage = false;
+          let endCursor = '';
           const lit = entry[key];
           if (key === 'parentId') {
             acc.s = lit.value;
             acc.parentId = lit.value;
-            return acc;
+            endCursor = this.endCursorPerSubject.get(lit.value, '');
           }
           if (key === 'totalCount') {
             const count = entry[key];
@@ -89,7 +91,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
             hasPreviousPage = (optLast.value && (Number(count) > (optLast.value as number))) || false;
           }
           acc[key] = lit.value;
-          acc.pageInfo = { hasNextPage, hasPreviousPage };
+          acc.pageInfo = { hasNextPage, hasPreviousPage, endCursor };
           return acc;
         },
       { totalCount: '', parentId: '', pageInfo: {} }
@@ -247,8 +249,18 @@ export class SparqlQueryStrategy extends QueryStrategy {
     const fieldsAliases = this.fields.map(field => field.alias.getOrElse(field.name));
     const remapToOnlyRequestedFields = (listOfResultObjects: {[key: string]: any}) => listOfResultObjects.map((obj: {[key: string]: any}) => getOnlyRequestedFields(obj));
     const getOnlyRequestedFields = (singleResultObjectOrList: {[key: string]: any}): {[key: string]: any} => {
+      console.log('singleResultObjectOrList', JSON.stringify(singleResultObjectOrList, null, 2));
       return Object.assign({}, ...Object.keys(singleResultObjectOrList)
-        .map(key => { if (fieldsAliases.includes(key)) { return ({[key]: singleResultObjectOrList[key]}); }}));
+        .map(key => { if (fieldsAliases.includes(key)) {
+          return ({[key]: singleResultObjectOrList[key]});
+        } else if (this.SPECIAL_PROJECTIONS.includes(key)) {
+          // For endCursor (pageInfo) purposes
+          if (key === 'j_id') {
+            this.endCursorPerSubject.set(
+              singleResultObjectOrList.parentId || singleResultObjectOrList.s,
+              singleResultObjectOrList.j_id);
+          }
+        }}));
     };
     return List(results)
       .groupBy(row => (this.hasProperParent() || this.plan.greatGrandParentPlan().value ? row.parentId : row.s))
@@ -407,16 +419,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addLimit() {
-    let extra: number = 0; // for pageInfo purpose, increases the limit by one
-    if (this.plan.isConnectionEdgesPlan()) {
-      extra += 1;
-    }
     const optFirst = this.plan.processedArgs.first;
     const optLast = this.plan.processedArgs.last;
     if (this.plan.processedArgs.first.nonEmpty()) {
-      return `LIMIT ${optFirst.get() + extra}`;
+      return `LIMIT ${optFirst.get()}`;
     } else if (this.plan.processedArgs.last.nonEmpty()) {
-      return `LIMIT ${optLast.get() + extra}`;
+      return `LIMIT ${optLast.get()}`;
     } else {
       return '';
     }

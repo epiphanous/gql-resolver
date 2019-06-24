@@ -261,6 +261,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       this.result.meta.errors = this.result.meta.errors.concat(...scErrors);
     }
     this.finalizeResults();
+    this.result.data = this.removeUnwantedFields(this.result.data);
     this.result.addMetadata();
     return this.result;
   }
@@ -314,6 +315,27 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
         [this.alias.getOrElse(this.name)]: this.result.data,
       });
     }
+  }
+
+  /**
+   * Filters out unwanted, residual properties that were needed for resolution.
+   * @param {OrderedMap<any, any>} resultObject
+   * @returns {OrderedMap<string, any>}
+   */
+  protected removeUnwantedFields(resultObject: OrderedMap<string, any>): OrderedMap<string, any> {
+    const removeUnwanted = (obj: { [key: string]: any }) => {
+      Object.keys(obj).forEach((key: string) => {
+        if (['s', 'parentId'].includes(key)) {
+          delete obj[key];
+        } else if (obj[key] && typeof obj[key] === 'object') {
+          removeUnwanted(obj[key]);
+        }
+        return obj;
+      });
+      return obj;
+    };
+    const resObj = resultObject.toJS();
+    return OrderedMap(removeUnwanted(resObj));
   }
 
   /**
