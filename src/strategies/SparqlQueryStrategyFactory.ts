@@ -17,6 +17,9 @@ export class SparqlQueryStrategyFactory extends QueryStrategyFactory {
 
   constructor(params: ISparqlQueryStrategyFactoryParams) {
     super();
+    if (!params.endpoint) {
+      throw new URIError('SPARQL endpoint URL must not be empty!');
+    }
     this.endpoint = params.endpoint;
     const prefixesSN: Map<string, SimpleNamespace> = Map(
       params.prefixes.map<[string, SimpleNamespace]>(([prefix, url]) => [
