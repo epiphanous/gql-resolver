@@ -407,16 +407,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected addLimit() {
-    let extra: number = 0; // for pageInfo purpose, increases the limit by one
-    if (this.plan.isConnectionEdgesPlan()) {
-      extra += 1;
-    }
     const optFirst = this.plan.processedArgs.first;
     const optLast = this.plan.processedArgs.last;
     if (this.plan.processedArgs.first.nonEmpty()) {
-      return `LIMIT ${optFirst.get() + extra}`;
+      return `LIMIT ${optFirst.get()}`;
     } else if (this.plan.processedArgs.last.nonEmpty()) {
-      return `LIMIT ${optLast.get() + extra}`;
+      return `LIMIT ${optLast.get()}`;
     } else {
       return '';
     }
