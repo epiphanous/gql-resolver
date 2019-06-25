@@ -6,15 +6,23 @@ import { SimpleNamespace } from '../models/Namespace';
 import { QueryStrategyFactory } from './QueryStrategyFactory';
 import { SparqlQueryStrategy } from './SparqlQueryStrategy';
 
+interface ISparqlQueryStrategyFactoryParams {
+  endpoint: string;
+  prefixes: Array<[string, string]>;
+}
+
 export class SparqlQueryStrategyFactory extends QueryStrategyFactory {
   public endpoint: string;
   public prefixes: Map<string, SimpleNamespace>;
 
-  constructor(endpoint: string, prefixes: Array<[string, string]> = []) {
+  constructor(params: ISparqlQueryStrategyFactoryParams) {
     super();
-    this.endpoint = endpoint;
+    if (!params.endpoint) {
+      throw new URIError('SPARQL endpoint URL must not be empty!');
+    }
+    this.endpoint = params.endpoint;
     const prefixesSN: Map<string, SimpleNamespace> = Map(
-      prefixes.map<[string, SimpleNamespace]>(([prefix, url]) => [
+      params.prefixes.map<[string, SimpleNamespace]>(([prefix, url]) => [
         prefix,
         new SimpleNamespace(prefix, url),
       ])

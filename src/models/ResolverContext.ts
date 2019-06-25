@@ -6,7 +6,7 @@ import { GQLSchema } from './GQLSchema';
 
 interface IResolverCtxParams {
   schema: string;
-  strategies: {};
+  strategies: { [key: string]: QueryStrategyFactory };
   defaultStrategy: string;
 }
 
