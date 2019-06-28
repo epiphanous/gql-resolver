@@ -1,7 +1,5 @@
 import { expect } from 'chai';
 import fs = require('fs');
-import { Some } from 'funfix';
-import { Map } from 'immutable';
 import 'mocha';
 import { ResolverContext } from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
@@ -9,15 +7,16 @@ import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFac
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
+  const sparqlEndpoint = process.env.SPARQL_ENDPOINT || '';
   const rc = new ResolverContext({
     schema,
-    strategies: Map({
-      sparql: new SparqlQueryStrategyFactory(
-        'http://localhost:7200/repositories/jubel',
-        [['j', 'http://jubel.co/jtv/']]
-      ),
-    }),
-    defaultStrategy: 'sparql',
+    strategies: {
+      sparql: new SparqlQueryStrategyFactory({
+        endpoint: sparqlEndpoint,
+        prefixes: [['testv', 'http://test.com/testv/']]
+      })
+    },
+    defaultStrategy: 'sparql'
   });
   it('creates a resolver context', () => {
     expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
@@ -32,7 +31,7 @@ describe('Resolver', () => {
       `query test {
       home: curatedDestination(filter: "s_name='yerevan' || s_name='tbilisi'") {
         s_name
-        gn_nearby(first: 100, before: "3T_pXF6w6P.q0JPsc1wi") {
+        gn_nearby(first: 100, after: "3T_pXF6w6P.q0JPsc1wi") {
           totalCount
           edges {
             node {
@@ -45,8 +44,8 @@ describe('Resolver', () => {
       }
     }
     `,
-      Map(),
-      Some('test')
+      {},
+      'test'
     );
     const resValue = await result.get();
     const resValueObject = await resValue.getResult();
