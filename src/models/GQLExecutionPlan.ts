@@ -14,7 +14,6 @@ import {
 } from './GQLTypeDefinition';
 import { QueryResult } from './QueryResult';
 import { ResolverContext } from './ResolverContext';
-import { stringify } from 'querystring';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan | null;
@@ -32,7 +31,7 @@ export interface IGQLExecutionPlan {
   result: QueryResult;
   allFields: List<GQLField>;
   defaultStrategy: string;
-
+  operationType: string;
   execute(queryBuilder: GQLQueryBuilder): Promise<QueryResult>; // Promise
 }
 
@@ -51,13 +50,14 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public resultType: GQLTypeDefinition;
   public processedArgs!: GQLQueryArguments;
 
-  public plans: List<GQLExecutionPlan>;
+  public plans!: List<GQLExecutionPlan>;
   public scalars!: List<QueryResult>;
   public objects!: List<QueryResult>;
   public result: QueryResult = new QueryResult();
   public allFields: List<GQLField>;
   public defaultStrategy!: string;
   public multipleSubjectIds: List<string> = List<string>();
+  public operationType: string = '';
 
   /**
    * Construct a new execution plan.
@@ -69,6 +69,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @param args the query args for this plan
    * @param directives the directives for this plan
    * @param fields the non-object fields this plan resolves
+   * @param operationType - type of the overarching operation
    */
   constructor(
     parent: GQLExecutionPlan | null,
@@ -78,7 +79,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     alias: Option<string>,
     args: List<GQLArgument>,
     directives: List<GQLDirective>,
-    fields: List<[string, GQLField]>
+    fields: List<[string, GQLField]>,
+    operationType: string
   ) {
     this.parent = parent;
     this.context = context;
@@ -87,10 +89,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.alias = alias;
     this.args = args;
     this.directives = directives;
-
-    // if (!parent) {
-    //   this.dumpOut(fields);
-    // }
+    this.operationType = operationType;
 
     this.allFields = fields.map(v => v[1]);
     const resultTypes = fields.map(v => v[0]).toSet();
@@ -108,33 +107,9 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.resultType = rtype.get();
 
     this._initFields();
-
-    this.plans = this.allFields
-      .filter((f, i) => f.isObject())
-      .map(
-        f =>
-          new GQLExecutionPlan(
-            this,
-            context,
-            vars,
-            f.name,
-            f.alias,
-            f.args,
-            f.directives,
-            f.fields
-          )
-      );
+    this._initSubPlans(context, vars);
     this.resolveDefaultStrategy();
   }
-
-  // public dumpOut(fields: List<[string, GQLField]>, indent = '') {
-  //   fields.forEach(([t, f]) => {
-  //     console.log(`${indent} ${t} ${f.name}`);
-  //     if (f.fields.size > 0) {
-  //       this.dumpOut(f.fields, `${indent}  `);
-  //     }
-  //   });
-  // }
 
   /**
    * Main entry point for this class. Resolves requested fields, then executes
@@ -480,5 +455,34 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       type: this.resultType.name,
       fields: this.fields.map(f => f.name).toArray(),
     });
+  }
+
+  /**
+   * Creates subplans from fields that are objects.
+   * Depending on the scenario (operation type), we might or might not need
+   * subPlans and execPlan nesting. We'll only need it in query types (for now?).
+   * @private
+   */
+  private _initSubPlans(context: ResolverContext, vars: Map<string, any>) {
+    if (this.operationType === 'query') {
+      this.plans = this.allFields
+        .filter((f, i) => f.isObject())
+        .map(
+          f =>
+            new GQLExecutionPlan(
+              this,
+              context,
+              vars,
+              f.name,
+              f.alias,
+              f.args,
+              f.directives,
+              f.fields,
+              this.operationType
+            )
+        );
+    } else {
+      this.plans = List();
+    }
   }
 }
