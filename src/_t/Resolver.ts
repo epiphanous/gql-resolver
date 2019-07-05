@@ -1,7 +1,5 @@
 import { expect } from 'chai';
 import fs = require('fs');
-import { Some } from 'funfix';
-import { Map } from 'immutable';
 import 'mocha';
 import { ResolverContext } from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
@@ -72,8 +70,8 @@ describe('Resolver', () => {
       }
     }
     `,
-      Map(),
-      Some('test')
+      {},
+      'test'
     );
     const resValue = await result.get();
     const resValueObject = await resValue.getResult();

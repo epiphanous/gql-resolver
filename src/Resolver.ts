@@ -1,4 +1,4 @@
-import { None, Option } from 'funfix';
+import { None, Some } from 'funfix';
 import { Map } from 'immutable';
 import { Builder } from './builders/Builder';
 import { GQLQueryBuilder } from './builders/graphql/GQLQueryBuilder';
@@ -14,10 +14,14 @@ export class Resolver {
 
   public resolve(
     query: string,
-    vars: Map<string, any> = Map<string, any>(),
-    operationName: Option<string> = None
+    vars: { [key: string]: any } = {},
+    operationName: string = ''
   ) {
-    const queryBuilder = new GQLQueryBuilder(this.context, vars, operationName);
+    const queryBuilder = new GQLQueryBuilder(
+      this.context,
+      Map(vars),
+      operationName ? Some(operationName) : None
+    );
     return Builder.parse<GQLQueryDocument>(queryBuilder, query).map(doc =>
       doc.execute(queryBuilder)
     );
