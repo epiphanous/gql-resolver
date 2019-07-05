@@ -6,25 +6,42 @@ import 'mocha';
 import { ResolverContext } from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
 import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
-import { KinesisQueryStrategy } from '../strategies/KinesisQueryStrategy';
-import {KinesisQueryStrategyFactory} from '../strategies/KinesisQueryStrategyFactory';
+import { KinesisQueryStrategyFactory } from '../strategies/KinesisQueryStrategyFactory';
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
+  const sparqlEndpoint = process.env.SPARQL_ENDPOINT || '';
   const rc = new ResolverContext({
     schema,
     strategies: Map({
-      sparql: new SparqlQueryStrategyFactory(
-        'http://localhost:7200/repositories/jubel',
-        [['j', 'http://jubel.co/jtv/']]
-      ),
+      sparql: new SparqlQueryStrategyFactory({
+        endpoint: sparqlEndpoint,
+        prefixes: [['testv', 'http://test.com/testv/']]
+      }),
       kinesis: new KinesisQueryStrategyFactory({
         accessKeyId: '',
         secretAccessKey: '',
-        region: ''
-      }, {
-        StreamName: '',
-        PartitionKey: ''
+        region: '',
+        streamName: (data) => {
+          /**
+           * Compute the stream name from data, or in this case,
+           * hardcode it to a string value
+           */
+          const streamName = 'cascadingFlow';
+          return streamName || process.env.AWS_STREAM_NAME;
+        },
+        partitionKey: (data) => {
+          /**
+           * Compute the partition key from data, or in this case, 
+           * hardcode it to a string w/ length of < 256 chars
+           */
+          const partitionKey = 'partitionKey123';
+          if (partitionKey.length > 256) {
+            throw new Error('Partition key length cannot be larger than 256 chars.');
+          } else {
+            return partitionKey;
+          }
+        }
       }),
     }),
     defaultStrategy: 'sparql',

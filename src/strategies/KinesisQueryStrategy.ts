@@ -1,26 +1,25 @@
 import { Kinesis } from 'aws-sdk';
 import {List, OrderedMap} from 'immutable';
 import { QueryResult } from '../models/QueryResult';
-import { IAWSCreds, IAWSKinesisConfig } from './KinesisQueryStrategyFactory';
+import { IAWSKinesisConfig } from './KinesisQueryStrategyFactory';
 import { QueryStrategy } from './QueryStrategy';
 
 interface IRecordParams {
   Data: Buffer | string;
-  PartitionKey: string | undefined;
-  StreamName: string | undefined;
+  PartitionKey: string;
+  StreamName: string;
 }
 
 export class KinesisQueryStrategy extends QueryStrategy {
-  private kinesis: any;
+  private kinesis!: Kinesis;
   private kinesisConfig: IAWSKinesisConfig;
   public constructor(
     fields: any,
     plan: any,
-    AWSCreds: IAWSCreds,
     kinesisConfig: IAWSKinesisConfig
   ) {
     super(fields, plan);
-    this.instantiateKinesis(AWSCreds);
+    this.instantiateKinesis(kinesisConfig);
     this.kinesisConfig = kinesisConfig;
   }
 
@@ -32,8 +31,8 @@ export class KinesisQueryStrategy extends QueryStrategy {
   public createParams(data: { [key: string]: any }): IRecordParams {
     return {
       Data: Buffer.from(JSON.stringify(data)),
-      StreamName: this.kinesisConfig.StreamName || process.env.AWS_STREAM_NAME,
-      PartitionKey: this.kinesisConfig.PartitionKey || process.env.AWS_PARTITION_KEY || 'PKey_1'
+      StreamName: this.kinesisConfig.streamName(data),
+      PartitionKey: this.kinesisConfig.partitionKey(data)
     };
   }
 
@@ -41,7 +40,7 @@ export class KinesisQueryStrategy extends QueryStrategy {
    * Tries to instantiate an AWS SDK Kinesis class. Throws an error if it fails.
    * @param {IAWSCreds} AWSCreds
    */
-  public instantiateKinesis(AWSCreds: IAWSCreds) {
+  public instantiateKinesis(AWSCreds: IAWSKinesisConfig) {
     this.kinesis = new Kinesis({
       accessKeyId: AWSCreds.accessKeyId || process.env.AWS_ACCESS_KEY,
       secretAccessKey: AWSCreds.secretAccessKey || process.env.SECRET_ACCESS_KEY,
@@ -52,7 +51,7 @@ export class KinesisQueryStrategy extends QueryStrategy {
     }
   }
 
-  public emitToKinesis(data: object): Promise<any> {
+  public emitToKinesis(data: {[key: string]: any}): Promise<any> {
     return new Promise((resolve, reject) => {
       this.kinesis.putRecord(this.createParams(data), (err: any, res: any) => {
         if (err) {
