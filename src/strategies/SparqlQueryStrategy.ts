@@ -14,6 +14,19 @@ import {GQLObjectQueryModifierDisjunction} from '../models/GQLObjectQueryModifie
 import * as memoize from 'memoizee';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
+/**
+ * Should trim things such as interface prefixes, connection suffixes etc
+ * @param {string} name
+ */
+const trimResultTypeName = (name: string) => {
+  if (name.startsWith('I_')) {
+    name = name.split('I_').slice(1).join('I_');
+  }
+  if (name.endsWith('Connection')) {
+    name = name.split('Connection')[0];
+  }
+  return name;
+}
 
 export class SparqlQueryStrategy extends QueryStrategy {
   private endpoint: string;
@@ -24,7 +37,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
   private IGNORED_PROJECTIONS = List(['totalCount']);
   private DEFAULT_NEARBY_RADIUS = '500'; // km by default for Ontotext's GraphDB
   private SPECIAL_PROJECTIONS = OrderedMap({
-    _id: 'j_id',
+    j__id: 'j_id',
   });
   private RESERVED_KEYWORDS = List([
     'limit',
@@ -249,7 +262,6 @@ export class SparqlQueryStrategy extends QueryStrategy {
     const fieldsAliases = this.fields.map(field => field.alias.getOrElse(field.name));
     const remapToOnlyRequestedFields = (listOfResultObjects: {[key: string]: any}) => listOfResultObjects.map((obj: {[key: string]: any}) => getOnlyRequestedFields(obj));
     const getOnlyRequestedFields = (singleResultObjectOrList: {[key: string]: any}): {[key: string]: any} => {
-      console.log('singleResultObjectOrList', JSON.stringify(singleResultObjectOrList, null, 2));
       return Object.assign({}, ...Object.keys(singleResultObjectOrList)
         .map(key => { if (fieldsAliases.includes(key)) {
           return ({[key]: singleResultObjectOrList[key]});
@@ -259,6 +271,10 @@ export class SparqlQueryStrategy extends QueryStrategy {
             this.endCursorPerSubject.set(
               singleResultObjectOrList.parentId || singleResultObjectOrList.s,
               singleResultObjectOrList.j_id);
+          }
+          const specProjKey: string = this.SPECIAL_PROJECTIONS.findKey((v, k) => v === key)!;
+          if (fieldsAliases.includes(specProjKey)) {
+            return ({[specProjKey]: singleResultObjectOrList[key]});
           }
         }}));
     };
@@ -271,7 +287,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
   }
 
   public async resolve(): Promise<QueryResult> {
-    const objectType = prefixify(this.plan.resultType.name);
+    const objectType = prefixify(trimResultTypeName(this.plan.resultType.name));
     const args = this.getArgs(this.plan);
     const projections = this.getProjections();
     console.log(
