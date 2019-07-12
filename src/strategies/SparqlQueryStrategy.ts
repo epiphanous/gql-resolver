@@ -260,7 +260,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
   // [{}, {}] => OM<{[key: string] -> resVal}>
   public mapResultsObjectToOrderedMap(results: Array<{[key: string]: string}>): OrderedMap<string, any> {
     const fieldsAliases = this.fields.map(field => field.alias.getOrElse(field.name));
-    const remapToOnlyRequestedFields = (listOfResultObjects: {[key: string]: any}) => listOfResultObjects.map((obj: {[key: string]: any}) => getOnlyRequestedFields(obj));
+    const remapToOnlyRequestedFields = (listOfResultObjects: {[key: string]: any}) =>
+      listOfResultObjects.map((obj: {[key: string]: any}) =>
+        this.plan.isConnectionEdgesPlan() ?
+          ({ [this.plan.name]: getOnlyRequestedFields(obj) }) :
+          getOnlyRequestedFields(obj)
+      );
     const getOnlyRequestedFields = (singleResultObjectOrList: {[key: string]: any}): {[key: string]: any} => {
       return Object.assign({}, ...Object.keys(singleResultObjectOrList)
         .map(key => { if (fieldsAliases.includes(key)) {
