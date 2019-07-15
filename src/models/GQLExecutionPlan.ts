@@ -90,10 +90,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.args = args;
     this.directives = directives;
 
-    // if (!parent) {
-    //   this.dumpOut(fields);
-    // }
-
     const resultTypes = fields.map(v => v[0]).toSet();
     if (resultTypes.size > 1) {
       throw new QueryExecutionException(
@@ -137,17 +133,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.alias.getOrElse(this.name);
   }
 
-  // public dumpOut(fields: List<[string, GQLField]>, indent = '') {
-  //   fields.forEach(([t, f]) => {
-  //     console.log(`${indent} ${t} ${f.name}`);
-  //     if (f.fields.size > 0) {
-  //       this.dumpOut(f.fields, `${indent}  `);
-  //     }
-  //   });
-  // }
-
   public toString() {
-    return `ExecutionPlan[${this.name}:(${this.fields
+    return `ExecutionPlan[${this.getAliasOrName()}:(${this.fields
       .map(f => f.name)
       .join(', ')})]`;
   }
