@@ -26,8 +26,6 @@ export interface IGQLExecutionPlan {
   fields: List<GQLField>;
   resultType: GQLTypeDefinition;
   plans: List<GQLExecutionPlan>;
-  // scalars: List<QueryResult>;
-  // objects: List<QueryResult>;
   result: QueryResult;
   allFields: List<GQLField>;
   subjectIdFields: List<GQLField>;
