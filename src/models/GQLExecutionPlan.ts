@@ -58,6 +58,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public defaultStrategy!: string;
   public multipleSubjectIds: List<string> = List<string>();
   public operationType: string = '';
+  // Fields that are NOT supposed to trigger strategy construction for themselves
+  private FIELDS_TO_IGNORE = List<string>(['cursor']);
 
   /**
    * Construct a new execution plan.
@@ -342,6 +344,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    */
   protected strategies() {
     return this.fields
+      .filter(f => !this.FIELDS_TO_IGNORE.includes(f.name))
       .groupBy(f => this.getStrategyFor(f))
       .map((fields, qs) =>
         this.context.getStrategyFactory(qs)!.create(fields.toList(), this)

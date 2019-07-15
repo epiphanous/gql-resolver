@@ -66,6 +66,15 @@ export class SparqlQueryStrategy extends QueryStrategy {
     this.parentConstraintsMemo = memoize(this.addParentConstraints);
   }
 
+  public getFieldsAliases(fields: List<GQLField>) {
+    return fields.map(field => field.alias.getOrElse(field.name));
+  }
+
+  public isCursorRequested() {
+    return this.plan.parent!.name === 'edges' &&
+      this.getFieldsAliases(this.plan.parent!.allFields).includes('cursor');
+  }
+
   public getPrefixes() {
     return this.prefixes
       .valueSeq()
@@ -102,8 +111,10 @@ export class SparqlQueryStrategy extends QueryStrategy {
             const count = entry[key];
             hasNextPage = (optFirst.value && (Number(count) > (optFirst.value as number))) || false;
             hasPreviousPage = (optLast.value && (Number(count) > (optLast.value as number))) || false;
+            acc[key] = Number(lit.value);
+          } else {
+            acc[key] = lit.value;
           }
-          acc[key] = lit.value;
           acc.pageInfo = { hasNextPage, hasPreviousPage, endCursor };
           return acc;
         },
@@ -259,13 +270,22 @@ export class SparqlQueryStrategy extends QueryStrategy {
 
   // [{}, {}] => OM<{[key: string] -> resVal}>
   public mapResultsObjectToOrderedMap(results: Array<{[key: string]: string}>): OrderedMap<string, any> {
-    const fieldsAliases = this.fields.map(field => field.alias.getOrElse(field.name));
+    const fieldsAliases = this.getFieldsAliases(this.fields);
     const remapToOnlyRequestedFields = (listOfResultObjects: {[key: string]: any}) =>
-      listOfResultObjects.map((obj: {[key: string]: any}) =>
-        this.plan.isConnectionEdgesPlan() ?
-          ({ [this.plan.name]: getOnlyRequestedFields(obj) }) :
-          getOnlyRequestedFields(obj)
-      );
+      listOfResultObjects.map((obj: {[key: string]: any}) => {
+      if (this.plan.isConnectionEdgesPlan()) {
+        if (this.isCursorRequested()) {
+          // Perhaps clean up the way cursors are built here? Should suffice for now..
+          return ({
+            [this.plan.name]: getOnlyRequestedFields(obj),
+            cursor: obj[this.DEFAULT_CURSOR_PREDICATE.replace(':', '_')]
+          });
+        }
+        return ({ [this.plan.name]: getOnlyRequestedFields(obj) });
+      } else {
+        return getOnlyRequestedFields(obj);
+      }
+      });
     const getOnlyRequestedFields = (singleResultObjectOrList: {[key: string]: any}): {[key: string]: any} => {
       return Object.assign({}, ...Object.keys(singleResultObjectOrList)
         .map(key => { if (fieldsAliases.includes(key)) {
