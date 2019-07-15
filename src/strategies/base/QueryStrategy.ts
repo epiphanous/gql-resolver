@@ -1,12 +1,12 @@
 import { Option } from 'funfix';
 import { List, Map } from 'immutable';
-import { GQLExecutionPlan } from '../models/GQLExecutionPlan';
-import { GQLField } from '../models/GQLSelection';
-import { QueryResult } from '../models/QueryResult';
+import { GQLExecutionPlan } from '../../models/GQLExecutionPlan';
+import { GQLField } from '../../models/GQLSelection';
+import { QueryResult } from '../../models/QueryResult';
 import {
   QueryResultCache,
   QueryResultMemoryCache,
-} from '../models/QueryResultCache';
+} from '../../models/QueryResultCache';
 
 export interface IQueryStrategy {
   cache?: QueryResultCache;

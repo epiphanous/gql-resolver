@@ -1,8 +1,8 @@
 import { List, Map } from 'immutable';
-import { GQLExecutionPlan } from '../models/GQLExecutionPlan';
-import { GQLField } from '../models/GQLSelection';
-import { QueryResult } from '../models/QueryResult';
-import { QueryResultCache } from '../models/QueryResultCache';
+import { GQLExecutionPlan } from '../../models/GQLExecutionPlan';
+import { GQLField } from '../../models/GQLSelection';
+import { QueryResult } from '../../models/QueryResult';
+import { QueryResultCache } from '../../models/QueryResultCache';
 export interface IQueryStrategy {
     cache?: QueryResultCache;
     fields: List<GQLField>;

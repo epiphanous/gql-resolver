@@ -1,9 +1,9 @@
 import { List, Map } from 'immutable';
-import { DEFAULT_PREFIXES } from '../models/Constants';
-import { GQLExecutionPlan } from '../models/GQLExecutionPlan';
-import { GQLField } from '../models/GQLSelection';
-import { SimpleNamespace } from '../models/Namespace';
-import { QueryStrategyFactory } from './QueryStrategyFactory';
+import { DEFAULT_PREFIXES } from '../../models/Constants';
+import { GQLExecutionPlan } from '../../models/GQLExecutionPlan';
+import { GQLField } from '../../models/GQLSelection';
+import { SimpleNamespace } from '../../models/Namespace';
+import { QueryStrategyFactory } from '../base/QueryStrategyFactory';
 import { SparqlQueryStrategy } from './SparqlQueryStrategy';
 
 interface ISparqlQueryStrategyFactoryParams {
