@@ -1,7 +1,7 @@
 import { None, Option, Some } from 'funfix';
 import { List, Map, OrderedMap } from 'immutable';
-import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
-import { QueryExecutionException } from './exceptions/QueryExecutionException';
+import { GQLQueryBuilder } from '../builders/graphql';
+import { QueryExecutionException } from './exceptions';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLQueryArguments } from './GQLQueryArguments';
@@ -30,6 +30,10 @@ export interface IGQLExecutionPlan {
   allFields: List<GQLField>;
   subjectIdFields: List<GQLField>;
   defaultStrategy: string;
+  isConnectionPlan: boolean;
+  isConnectionEdgesPlan: boolean;
+  isConnectionEdgesNodePlan: boolean;
+  isConnectionPageInfoPlan: boolean;
 
   execute(queryBuilder: GQLQueryBuilder): Promise<QueryResult>; // Promise
 }
@@ -38,7 +42,6 @@ export interface IGQLExecutionPlan {
  * An execution plan for a graphql query.
  */
 export class GQLExecutionPlan implements IGQLExecutionPlan {
-  public static QUERY_PLAN_TYPE: string = 'Query';
   public static CONNECTION_PLAN_TYPE: string = 'Connection';
   public static EDGES_PLAN_NAME: string = 'edges';
   public static PAGE_INFO_PLAN_NAME: string = 'pageInfo';
@@ -60,6 +63,10 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public allFields: List<GQLField>;
   public subjectIdFields: List<GQLField> = List<GQLField>();
   public defaultStrategy!: string;
+  public isConnectionEdgesNodePlan: boolean = false;
+  public isConnectionEdgesPlan: boolean = false;
+  public isConnectionPageInfoPlan: boolean = false;
+  public isConnectionPlan: boolean = false;
 
   /**
    * Construct a new execution plan.
@@ -127,6 +134,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
           )
       );
     this.resolveDefaultStrategy();
+    this.resolvePlanType();
   }
 
   public getAliasOrName() {
@@ -158,13 +166,13 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   }
 
   public getConnectionPlan(): Option<GQLExecutionPlan> {
-    if (this.isConnectionPlan()) {
+    if (this.isConnectionPlan) {
       return Some(this);
     }
-    if (this.isConnectionPageInfoPlan() || this.isConnectionEdgesPlan()) {
+    if (this.isConnectionPageInfoPlan || this.isConnectionEdgesPlan) {
       return Option.of(this.parent);
     }
-    if (this.isConnectionEdgesNodePlan()) {
+    if (this.isConnectionEdgesNodePlan) {
       return Option.of(this.parent!.parent);
     }
     return None;
@@ -179,45 +187,6 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
 
   public greatGrandParentPlan(): Option<GQLExecutionPlan> {
     return this.parent ? this.parent.grandParentPlan() : None;
-  }
-
-  public isTopPlan() {
-    return this.parent === null;
-  }
-
-  public isQueryPlan() {
-    return this.resultType.name === GQLExecutionPlan.QUERY_PLAN_TYPE;
-  }
-
-  public isConnectionPlan() {
-    return this.resultType.name === GQLExecutionPlan.CONNECTION_PLAN_TYPE;
-  }
-
-  public isConnectionPageInfoPlan() {
-    return (
-      this.name === GQLExecutionPlan.PAGE_INFO_PLAN_NAME &&
-      Option.of(this.parent)
-        .map(p => p.isConnectionPlan())
-        .getOrElse(false)
-    );
-  }
-
-  public isConnectionEdgesPlan() {
-    return (
-      this.name === GQLExecutionPlan.EDGES_PLAN_NAME &&
-      Option.of(this.parent)
-        .map(p => p.isConnectionPlan())
-        .getOrElse(false)
-    );
-  }
-
-  public isConnectionEdgesNodePlan() {
-    return (
-      this.name === GQLExecutionPlan.NODE_PLAN_NAME &&
-      this.grandParentPlan()
-        .map(p => p.isConnectionPlan())
-        .getOrElse(false)
-    );
   }
 
   public getSubjectIds() {
@@ -262,7 +231,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
-    return this.result;
+    return this.result; // TODO: maybe remove unneeded objects?
   }
 
   // this.scalars.concat(this.objects).forEach(qr => this.result.combine(qr));
@@ -338,23 +307,23 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @param {OrderedMap<any, any>} resultObject
    * @returns {OrderedMap<string, any>}
    */
-  protected removeUnwantedFields(
-    resultObject: OrderedMap<string, any>
-  ): OrderedMap<string, any> {
-    const removeUnwanted = (obj: { [key: string]: any }) => {
-      Object.keys(obj).forEach((key: string) => {
-        if (['s', 'parentId'].includes(key)) {
-          delete obj[key];
-        } else if (obj[key] && typeof obj[key] === 'object') {
-          removeUnwanted(obj[key]);
-        }
-        return obj;
-      });
-      return obj;
-    };
-    const resObj = resultObject.toJS();
-    return OrderedMap(removeUnwanted(resObj));
-  }
+  // protected removeUnwantedFields(
+  //   resultObject: OrderedMap<string, any>
+  // ): OrderedMap<string, any> {
+  //   const removeUnwanted = (obj: { [key: string]: any }) => {
+  //     Object.keys(obj).forEach((key: string) => {
+  //       if (['s', 'parentId'].includes(key)) {
+  //         delete obj[key];
+  //       } else if (obj[key] && typeof obj[key] === 'object') {
+  //         removeUnwanted(obj[key]);
+  //       }
+  //       return obj;
+  //     });
+  //     return obj;
+  //   };
+  //   const resObj = resultObject.toJS();
+  //   return OrderedMap(removeUnwanted(resObj));
+  // }
 
   /**
    * Compute a list of strategies to resolve our fields.
@@ -475,16 +444,13 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * Make sure our fields list contains our resultType's id field(s).
    */
   private getMarkedFields(mark: string) {
-    // create list of subject id fields
-    // create list of parent id fields
-    // method to merge subject and parent ids into scalar field list
     let marked = List<GQLFieldDefinition>();
 
     if (
       !(
-        this.isQueryPlan() ||
-        this.isConnectionEdgesPlan() ||
-        this.isConnectionPlan()
+        this.isConnectionEdgesPlan ||
+        this.isConnectionPlan ||
+        this.isConnectionPageInfoPlan
       )
     ) {
       switch (this.resultType.constructor) {
@@ -518,5 +484,26 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
           parentType: this.resultType.name,
         })
     );
+  }
+
+  private resolvePlanType() {
+    this.isTopPlan = this.parent === null;
+    this.isConnectionPlan =
+      this.resultType.name === GQLExecutionPlan.CONNECTION_PLAN_TYPE;
+    this.isConnectionPageInfoPlan =
+      this.name === GQLExecutionPlan.PAGE_INFO_PLAN_NAME &&
+      Option.of(this.parent)
+        .map(p => p.isConnectionPlan)
+        .getOrElse(false);
+    this.isConnectionEdgesPlan =
+      this.name === GQLExecutionPlan.EDGES_PLAN_NAME &&
+      Option.of(this.parent)
+        .map(p => p.isConnectionPlan)
+        .getOrElse(false);
+    this.isConnectionEdgesNodePlan =
+      this.name === GQLExecutionPlan.NODE_PLAN_NAME &&
+      this.grandParentPlan()
+        .map(p => p.isConnectionPlan)
+        .getOrElse(false);
   }
 }

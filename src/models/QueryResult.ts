@@ -16,6 +16,39 @@ export interface IMetaFields {
   bps: number;
 }
 
+/**
+ * {
+ *   people(firstName:"Joe") {
+ *     lastName
+ *     age
+ *   }
+ *   hero(id:123) {
+ *     firstName
+ *     lastName
+ *     age
+ *   }
+ * }
+ * {
+ *   "data": { // isList=false
+ *     "people": [ // isList=true
+ *       {
+ *         "lastName": "Smith", // string
+ *         "age": 17 // number
+ *       },
+ *       {
+ *         "lastName": "Jones",
+ *         "age": 23
+ *       }
+ *     ],
+ *     "hero": { // isList=false
+ *       "firstName": "Luke",
+ *       "lastName": "Skywalker",
+ *       "age": 27
+ *     }
+ *   }
+ * }
+ */
+
 export class QueryResult {
   public data: List<OrderedMap<string, QueryValue>>;
   public isList: boolean;
@@ -58,9 +91,20 @@ export class QueryResult {
     this.meta.errors = this.meta.errors.concat(messages);
   }
 
-  public toJS(): Array<{}> | {} {
-    const data = this.data.toJS();
-    return this.isList ? data : data.length > 0 ? data[0] : [];
+  public toJS(): Array<{}> | {} | null {
+    const js = this.data.toJSON().map(om => {
+      return om.reduce((obj, value, key) => {
+        if (value instanceof QueryResult) {
+          obj[key] = value.toJS();
+        } else if (value instanceof List) {
+          obj[key] = value.toJS();
+        } else {
+          obj[key] = value;
+        }
+        return obj;
+      }, {});
+    });
+    return this.isList ? js : js.length > 0 ? js[0] : null;
   }
 
   public merge(that: QueryResult, byKeys: List<string> = List<string>()) {
