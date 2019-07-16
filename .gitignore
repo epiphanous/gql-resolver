@@ -22,3 +22,4 @@ logs
 node_modules/
 pids
 typings/
+package-lock.json
