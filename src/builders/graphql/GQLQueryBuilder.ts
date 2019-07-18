@@ -516,6 +516,11 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
         case 'GQLBooleanValue':
           typeOk = expectedType === 'Boolean';
           break;
+        default:
+          typeOk = this.schema.inputTypes
+            .keySeq()
+            .includes(expectedType);
+          break;
         // todo: add more?
       }
 
