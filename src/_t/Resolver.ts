@@ -1,17 +1,18 @@
 import { expect } from 'chai';
 import fs = require('fs');
 import 'mocha';
+import { QueryResult } from '../models/QueryResult';
 import { ResolverContext } from '../models/ResolverContext';
 import { Resolver } from '../Resolver';
-import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
 import { KinesisQueryStrategyFactory } from '../strategies/KinesisQueryStrategyFactory';
+import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
 
 const schema = fs.readFileSync('./src/schema.graphql', 'utf8');
 describe('Resolver', () => {
   const sparqlEndpoint = process.env.SPARQL_ENDPOINT || '';
   const rc = new ResolverContext({
     schema,
-    strategies: Map({
+    strategies: {
       sparql: new SparqlQueryStrategyFactory({
         endpoint: sparqlEndpoint,
         prefixes: [['testv', 'http://test.com/testv/']]
@@ -30,7 +31,7 @@ describe('Resolver', () => {
         },
         partitionKey: (data) => {
           /**
-           * Compute the partition key from data, or in this case, 
+           * Compute the partition key from data, or in this case,
            * hardcode it to a string w/ length of < 256 chars
            */
           const partitionKey = 'partitionKey123';
@@ -41,9 +42,9 @@ describe('Resolver', () => {
           }
         }
       }),
-    }),
+    },
     defaultStrategy: 'sparql',
-  });
+    });
   it('creates a resolver context', () => {
     expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
   });
@@ -73,10 +74,14 @@ describe('Resolver', () => {
       {},
       'test'
     );
-    const resValue = await result.get();
-    const resValueObject = await resValue.getResult();
-    console.log('result', JSON.stringify(resValueObject, null, 2));
-    expect(resValueObject).to.be.an('object');
+    await result.fold(
+      err => { throw new Error(`Failed to resolve the request!' ${err}`); },
+      async resValue => {
+        const resValueObject = await resValue;
+        console.log('result', JSON.stringify(resValueObject, null, 2));
+        expect(resValueObject).to.be.an('object');
+      }
+    );
   });
   it('resolves a mutation', async () => {
     /**
@@ -87,12 +92,16 @@ describe('Resolver', () => {
         tripFilter(tripFilter: { countryCode: "GER" })
       }
     `,
-      Map(),
-      Some('kinesisMutationTest')
+      {},
+      'kinesisMutationTest'
     );
-    const resValue = await result.get();
-    const resValueObject = await resValue.getResult();
-    console.log('result', JSON.stringify(resValueObject, null, 2));
-    expect(resValueObject).to.be.an('object');
+    await result.fold(
+      err => { throw new Error(`Failed to resolve the request!' ${err}`); },
+      async resValue => {
+        const resValueObject = await resValue;
+        console.log('result', JSON.stringify(resValueObject, null, 2));
+        expect(resValueObject).to.be.an('object');
+      }
+    );
   });
 });

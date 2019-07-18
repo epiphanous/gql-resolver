@@ -15,6 +15,7 @@
 *.seed
 *.tgz
 *.map
+*.d.ts
 coverage
 lib-esm/
 lib/

@@ -1,5 +1,6 @@
 import { Option } from 'funfix';
 import { List, Map, Set } from 'immutable';
+import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
 import { GQLExecutionPlan } from './GQLExecutionPlan';
 import { GQLFragmentDefinition } from './GQLFragmentDefinition';
 import { GQLOperation } from './GQLOperation';
@@ -9,8 +10,8 @@ import {
   GQLInlineFragment,
   GQLSelection,
 } from './GQLSelection';
+import {QueryResult} from './QueryResult';
 import { ResolverContext } from './ResolverContext';
-import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;
@@ -33,7 +34,7 @@ export class GQLQueryDocument {
     this.makeExecutionPlan();
   }
 
-  public async execute(queryBuilder: GQLQueryBuilder) {
+  public async execute(queryBuilder: GQLQueryBuilder): Promise<QueryResult> {
     return await this.plan.execute(queryBuilder);
   }
 

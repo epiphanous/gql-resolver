@@ -1,4 +1,4 @@
-import { Kinesis } from 'aws-sdk';
+import { Kinesis, config } from 'aws-sdk';
 import {List, OrderedMap} from 'immutable';
 import { QueryResult } from '../models/QueryResult';
 import { IAWSKinesisConfig } from './KinesisQueryStrategyFactory';
@@ -41,10 +41,19 @@ export class KinesisQueryStrategy extends QueryStrategy {
    * @param {IAWSCreds} AWSCreds
    */
   public instantiateKinesis(AWSCreds: IAWSKinesisConfig) {
+    const accessKeyId = AWSCreds.accessKeyId || (config.credentials ? config.credentials.accessKeyId : '');
+    const secretAccessKey = AWSCreds.secretAccessKey || (config.credentials ? config.credentials.secretAccessKey : '');
+    const region = AWSCreds.region || config.region;
+    if (!accessKeyId || !secretAccessKey) {
+      throw new Error('Missing AWS credentials.');
+    }
+    if (!region) {
+      throw new Error('Missing AWS region.');
+    }
     this.kinesis = new Kinesis({
-      accessKeyId: AWSCreds.accessKeyId || process.env.AWS_ACCESS_KEY,
-      secretAccessKey: AWSCreds.secretAccessKey || process.env.SECRET_ACCESS_KEY,
-      region: AWSCreds.region || process.env.AWS_REGION
+      accessKeyId,
+      secretAccessKey,
+      region
     });
     if (!this.kinesis) {
       throw new Error('Could not instantiate a Kinesis service class');
@@ -52,15 +61,7 @@ export class KinesisQueryStrategy extends QueryStrategy {
   }
 
   public emitToKinesis(data: {[key: string]: any}): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.kinesis.putRecord(this.createParams(data), (err: any, res: any) => {
-        if (err) {
-          console.error(err);
-          return reject(err);
-        }
-        return resolve(res);
-      });
-    });
+    return this.kinesis.putRecord(this.createParams(data)).promise();
   }
 
   public async resolve(): Promise<QueryResult> {
@@ -80,6 +81,7 @@ export class KinesisQueryStrategy extends QueryStrategy {
           })
           .catch((err) => {
             queryResult.meta.errors = List([err]);
+            queryResult.meta.ok = false;
             return resolve(queryResult);
           });
     });
