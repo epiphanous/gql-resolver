@@ -12,6 +12,7 @@ import {
 import { QueryStrategy } from './QueryStrategy';
 import {GQLObjectQueryModifierDisjunction} from '../models/GQLObjectQueryModifierExpression';
 import * as memoize from 'memoizee';
+import { ID_BINDING_BASE } from '../models/Constants';
 
 const prefixify = (name: string) => name.replace(/_/, ':');
 /**
@@ -34,11 +35,8 @@ export class SparqlQueryStrategy extends QueryStrategy {
   private fetcher = new SparqlEndpointFetcher();
   private DEFAULT_CURSOR_LABEL = '?cursor';
   private DEFAULT_CURSOR_PREDICATE = 'j:id';
-  private IGNORED_PROJECTIONS = List(['totalCount']);
+  private IGNORED_PROJECTIONS = List(['totalCount', '__typename']);
   private DEFAULT_NEARBY_RADIUS = '500'; // km by default for Ontotext's GraphDB
-  private SPECIAL_PROJECTIONS = OrderedMap({
-    j__id: 'j_id',
-  });
   private RESERVED_KEYWORDS = List([
     'limit',
     'offset',
@@ -52,6 +50,9 @@ export class SparqlQueryStrategy extends QueryStrategy {
   private prefixesMemo!: any;
   private parentConstraintsMemo!: any;
   private endCursorPerSubject: Map<string, string> = Map<string, string>().asMutable();
+  private SPECIAL_PROJECTIONS = Map<string, any>([['__typename', this.plan.resultType.name]]);
+  // TODO add functionality to add custom prefixes for id fields and other constants -----------v
+  private idFieldName: string = Option.of(this.fields.find(f => f.isIdField)).getOrElse({name: `j${ID_BINDING_BASE}`}).name;
 
   public constructor(
     fields: List<GQLField>,
@@ -263,7 +264,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
           acc[key] = lit.value;
           return acc;
         },
-        { parentId: '', s: '', j_id: '' }
+        { parentId: '', s: '', [this.idFieldName]: '' }
       );
     });
   }
@@ -288,20 +289,27 @@ export class SparqlQueryStrategy extends QueryStrategy {
       });
     const getOnlyRequestedFields = (singleResultObjectOrList: {[key: string]: any}): {[key: string]: any} => {
       return Object.assign({}, ...Object.keys(singleResultObjectOrList)
-        .map(key => { if (fieldsAliases.includes(key)) {
-          return ({[key]: singleResultObjectOrList[key]});
-        } else if (this.SPECIAL_PROJECTIONS.includes(key)) {
-          // For endCursor (pageInfo) purposes
-          if (key === 'j_id') {
+        .map(key => {
+          if (key === this.idFieldName) {
             this.endCursorPerSubject.set(
               singleResultObjectOrList.parentId || singleResultObjectOrList.s,
-              singleResultObjectOrList.j_id);
+              singleResultObjectOrList[this.idFieldName]);
           }
-          const specProjKey: string = this.SPECIAL_PROJECTIONS.findKey((v, k) => v === key)!;
-          if (fieldsAliases.includes(specProjKey)) {
-            return ({[specProjKey]: singleResultObjectOrList[key]});
+          if (fieldsAliases.includes(key)) {
+            return ({[key]: singleResultObjectOrList[key]});
           }
-        }}));
+          /**
+           * Special projections won't necessarily end up in singleResultObjectOrList, depending on whether they were 
+           * explicitly ignored. This searches for an intersection between special projections and fieldsAliases, and 
+           * for those found, injects them into the resulting object.
+           */
+          const includedSpecialProjections = this.SPECIAL_PROJECTIONS.keySeq().filter(specProj => fieldsAliases.includes(specProj));
+          if (!includedSpecialProjections.isEmpty()) {
+            return includedSpecialProjections.reduce((acc, elem) => {
+              return Object.assign(acc, { [elem]: this.SPECIAL_PROJECTIONS.get(elem) });
+            }, {});
+          } 
+        }));
     };
     return List(results)
       .groupBy(row => (this.hasProperParent() || this.plan.greatGrandParentPlan().value ? row.parentId : row.s))
@@ -338,22 +346,12 @@ export class SparqlQueryStrategy extends QueryStrategy {
   }
 
   protected getProjections() {
-    const specialProjKeys = this.SPECIAL_PROJECTIONS.keySeq();
     return this.fields
       .filter((f: GQLField) => !this.IGNORED_PROJECTIONS.contains(f.name))
-      .map<{ name: string; projection: string }>(f => {
-        if (specialProjKeys.includes(f.name)) {
-          const sp = this.SPECIAL_PROJECTIONS.get(f.name) || '';
-          return {
-            name: prefixify(sp),
-            projection: sp,
-          };
-        }
-        return {
+      .map<{ name: string; projection: string }>(f => ({
           name: prefixify(f.name),
           projection: f.alias.getOrElse(f.name),
-        };
-      });
+      }));
   }
 
   /**

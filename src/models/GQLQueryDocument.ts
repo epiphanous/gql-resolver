@@ -11,6 +11,7 @@ import {
 } from './GQLSelection';
 import { ResolverContext } from './ResolverContext';
 import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
+import { SPECIAL_FIELDS } from './Constants';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;
@@ -105,6 +106,9 @@ export class GQLQueryDocument {
             ]);
           });
         if (typedFieldOpt.isEmpty()) {
+          if (SPECIAL_FIELDS.includes(field.name)) {
+            return List<[string, GQLField]>([[parentType, field]]);
+          }
           throw new Error(`can't find field definition ${field.name}`);
         }
         return typedFieldOpt.get();

@@ -497,6 +497,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
             name: fd.name,
             outputType: fd.gqlType.xsdType(),
             parentType: this.resultType.name,
+            isIdField: true
           })
       )
       .concat(fields);
