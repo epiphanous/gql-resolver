@@ -24,6 +24,7 @@ export interface IGQLField extends IGQLSelection {
   outputType?: string;
   parentType: string; // parent field's outputType
   fields?: List<[string, GQLField]>;
+  isIdField?: boolean;
 }
 
 export class GQLField extends GQLSelection implements IGQLField {
@@ -34,6 +35,7 @@ export class GQLField extends GQLSelection implements IGQLField {
   public outputType: string = 'xsd:string';
   public fields = List<[string, GQLField]>();
   public parentType: string = '';
+  public isIdField: boolean = false;
 
   constructor(data: Partial<IGQLField> = {}) {
     super(data.name || 'unknown');

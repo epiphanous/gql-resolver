@@ -14,7 +14,6 @@ import {
 } from './GQLTypeDefinition';
 import { QueryResult } from './QueryResult';
 import { ResolverContext } from './ResolverContext';
-import { stringify } from 'querystring';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan | null;
@@ -32,7 +31,7 @@ export interface IGQLExecutionPlan {
   result: QueryResult;
   allFields: List<GQLField>;
   defaultStrategy: string;
-
+  operationType: string;
   execute(queryBuilder: GQLQueryBuilder): Promise<QueryResult>; // Promise
 }
 
@@ -51,13 +50,16 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public resultType: GQLTypeDefinition;
   public processedArgs!: GQLQueryArguments;
 
-  public plans: List<GQLExecutionPlan>;
+  public plans!: List<GQLExecutionPlan>;
   public scalars!: List<QueryResult>;
   public objects!: List<QueryResult>;
   public result: QueryResult = new QueryResult();
   public allFields: List<GQLField>;
   public defaultStrategy!: string;
   public multipleSubjectIds: List<string> = List<string>();
+  public operationType: string = '';
+  // Fields that are NOT supposed to trigger strategy construction for themselves
+  private FIELDS_TO_IGNORE = List<string>(['cursor']);
 
   /**
    * Construct a new execution plan.
@@ -69,6 +71,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @param args the query args for this plan
    * @param directives the directives for this plan
    * @param fields the non-object fields this plan resolves
+   * @param operationType - type of the overarching operation
    */
   constructor(
     parent: GQLExecutionPlan | null,
@@ -78,7 +81,8 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     alias: Option<string>,
     args: List<GQLArgument>,
     directives: List<GQLDirective>,
-    fields: List<[string, GQLField]>
+    fields: List<[string, GQLField]>,
+    operationType: string
   ) {
     this.parent = parent;
     this.context = context;
@@ -87,11 +91,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.alias = alias;
     this.args = args;
     this.directives = directives;
-
-    // if (!parent) {
-    //   this.dumpOut(fields);
-    // }
-
+    this.operationType = operationType;
     this.allFields = fields.map(v => v[1]);
     const resultTypes = fields.map(v => v[0]).toSet();
     if (resultTypes.size > 1) {
@@ -108,33 +108,9 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.resultType = rtype.get();
 
     this._initFields();
-
-    this.plans = this.allFields
-      .filter((f, i) => f.isObject())
-      .map(
-        f =>
-          new GQLExecutionPlan(
-            this,
-            context,
-            vars,
-            f.name,
-            f.alias,
-            f.args,
-            f.directives,
-            f.fields
-          )
-      );
+    this._initSubPlans(context, vars);
     this.resolveDefaultStrategy();
   }
-
-  // public dumpOut(fields: List<[string, GQLField]>, indent = '') {
-  //   fields.forEach(([t, f]) => {
-  //     console.log(`${indent} ${t} ${f.name}`);
-  //     if (f.fields.size > 0) {
-  //       this.dumpOut(f.fields, `${indent}  `);
-  //     }
-  //   });
-  // }
 
   /**
    * Main entry point for this class. Resolves requested fields, then executes
@@ -142,13 +118,33 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @return Promise<QueryResult>
    */
   public async execute(queryBuilder: GQLQueryBuilder) {
-    const allValidFields = Map(
+    let fieldsForResultType = Map(
       (this.resultType as GQLObjectType).fields.map<[string, string]>(fd => [
         fd.name,
         fd.gqlType.name,
       ])
     );
-    this.processedArgs = queryBuilder.processArgs(this.args, allValidFields);
+    /**
+     * If we're resolving a Connection-typed object, the valid fields for arguments such as filter are found in its
+     * edge type as well.
+     */
+    if (this.isResolvingConnection()) {
+      const edgesFields = Map(
+        this.context.schema.getFieldsOf(fieldsForResultType.get('edges')!)!.map<[string, string]>(fd => [
+          fd.name,
+          fd.gqlType.name,
+        ])
+      );
+      // todo remap fields private func
+      const edgesNodeFields = Map(
+        this.context.schema.getFieldsOf(edgesFields.get('node')!)!.map<[string, string]>(fd => [
+          fd.name,
+          fd.gqlType.name
+        ])
+      );
+      fieldsForResultType = fieldsForResultType.merge(edgesNodeFields);
+    }
+    this.processedArgs = queryBuilder.processArgs(this.args, fieldsForResultType);
     if (this.isConnectionEdgesPlan()) {
       this.processedArgs = this.grandParentPlan().nonEmpty()
         ? this.grandParentPlan().get().processedArgs
@@ -174,7 +170,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     const parent = this.parent;
     const grandParent = parent && parent.parent;
     const greatGrandParent = grandParent && grandParent.parent;
-    return grandParent && grandParent.resultType.name === 'Connection';
+    return grandParent && grandParent.resultType.name.endsWith('Connection');
   }
 
   public getSubjectIds(): List<any> {
@@ -213,6 +209,10 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       .get(0)!
       .keySeq()
       .toList();
+  }
+
+  public isResolvingConnection() {
+    return this.resultType.name.includes('Connection') || this.name.includes('Connection');
   }
 
   /**
@@ -301,13 +301,13 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
           });
         } else {
           this.result.data = OrderedMap(
-            this.multipleSubjectIds.map<[string, any]>(subjId => [subjId, this.result.data.get(subjId)])
+            this.multipleSubjectIds.map<[string, any]>((subjId) => [subjId, this.result.data.get(subjId)])
           );
         }
       } else {
         // we want each value to be mapped to its proper parent via parent's ID
         this.result.data.map(value => {
-          return OrderedMap({ [this.alias.getOrElse(this.name)]: value });
+          return OrderedMap({ [this.alias.getOrElse(this.name) || 'edges']: value });
         });
       }
     } else {
@@ -344,6 +344,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    */
   protected strategies() {
     return this.fields
+      .filter(f => !this.FIELDS_TO_IGNORE.includes(f.name))
       .groupBy(f => this.getStrategyFor(f))
       .map((fields, qs) =>
         this.context.getStrategyFactory(qs)!.create(fields.toList(), this)
@@ -455,12 +456,13 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    */
   private _initFields() {
     let ids = List<GQLFieldDefinition>();
-    // todo we don't want the query object to include the _id scalar.
     // Should probably add all of the types alike to a conf and check based off of that
     if (
       this.resultType.name !== 'Query' &&
       this.resultType.name !== 'Edge' &&
-      this.resultType.name !== 'Connection'
+      this.resultType.name !== 'Connection' &&
+      !this.resultType.name.includes('Connection') &&
+      !this.resultType.name.includes('Edge')
     ) {
       switch (this.resultType.constructor) {
         case GQLInterface:
@@ -495,6 +497,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
             name: fd.name,
             outputType: fd.gqlType.xsdType(),
             parentType: this.resultType.name,
+            isIdField: true
           })
       )
       .concat(fields);
@@ -502,5 +505,34 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       type: this.resultType.name,
       fields: this.fields.map(f => f.name).toArray(),
     });
+  }
+
+  /**
+   * Creates subplans from fields that are objects.
+   * Depending on the scenario (operation type), we might or might not need
+   * subPlans and execPlan nesting. We'll only need it in query types (for now?).
+   * @private
+   */
+  private _initSubPlans(context: ResolverContext, vars: Map<string, any>) {
+    if (this.operationType === 'query') {
+      this.plans = this.allFields
+        .filter((f, i) => f.isObject())
+        .map(
+          f =>
+            new GQLExecutionPlan(
+              this,
+              context,
+              vars,
+              f.name,
+              f.alias,
+              f.args,
+              f.directives,
+              f.fields,
+              this.operationType
+            )
+        );
+    } else {
+      this.plans = List();
+    }
   }
 }

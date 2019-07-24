@@ -61,7 +61,8 @@ export class GQLOperation implements IGQLOperation {
       None,
       List<GQLArgument>(),
       this.directives,
-      this.fields
+      this.fields,
+      this.operationType
     );
   }
 

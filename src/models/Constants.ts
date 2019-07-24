@@ -16,6 +16,8 @@ export const DEFAULT_GEO_BINDING = 'schema_location';
 export const RDFS_LABEL_KEY = 'rdfs_label';
 export const INTERNAL_RDFS_LABEL_BINDING = INTERNAL_PREFIX + RDFS_LABEL_KEY;
 
+export const SPECIAL_FIELDS = [`_${TYPENAME_BINDING_BASE}`];
+
 export const DEFAULT_PREFIXES = Map([
   ['afn', new SimpleNamespace('afn', 'http://jena.hpl.hp.com/ARQ/function#')],
   ['dc', new SimpleNamespace('dc', 'http://purl.org/dc/elements/1.1/')],

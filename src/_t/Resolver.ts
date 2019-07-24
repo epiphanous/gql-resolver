@@ -29,7 +29,7 @@ describe('Resolver', () => {
      */
     const result = await resolver.resolve(
       `query test {
-      home: curatedDestination(filter: "s_name='yerevan' || s_name='tbilisi'") {
+      home: curatedDestinationConnection(filter: "s_name='yerevan' || s_name='tbilisi'") {
         s_name
         gn_nearby(first: 100, after: "3T_pXF6w6P.q0JPsc1wi") {
           totalCount
