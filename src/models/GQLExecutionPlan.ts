@@ -1,7 +1,7 @@
 import { None, Option, Some } from 'funfix';
 import { List, Map, OrderedMap } from 'immutable';
-import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
-import { QueryExecutionException } from './exceptions/QueryExecutionException';
+import { GQLQueryBuilder } from '../builders/graphql';
+import { QueryExecutionException } from './exceptions';
 import { GQLArgument } from './GQLArgument';
 import { GQLDirective } from './GQLDirective';
 import { GQLQueryArguments } from './GQLQueryArguments';
@@ -14,7 +14,6 @@ import {
 } from './GQLTypeDefinition';
 import { QueryResult } from './QueryResult';
 import { ResolverContext } from './ResolverContext';
-import { stringify } from 'querystring';
 
 export interface IGQLExecutionPlan {
   parent: GQLExecutionPlan | null;
@@ -27,11 +26,14 @@ export interface IGQLExecutionPlan {
   fields: List<GQLField>;
   resultType: GQLTypeDefinition;
   plans: List<GQLExecutionPlan>;
-  scalars: List<QueryResult>;
-  objects: List<QueryResult>;
   result: QueryResult;
   allFields: List<GQLField>;
+  subjectIdFields: List<GQLField>;
   defaultStrategy: string;
+  isConnectionPlan: boolean;
+  isConnectionEdgesPlan: boolean;
+  isConnectionEdgesNodePlan: boolean;
+  isConnectionPageInfoPlan: boolean;
 
   execute(queryBuilder: GQLQueryBuilder): Promise<QueryResult>; // Promise
 }
@@ -40,6 +42,11 @@ export interface IGQLExecutionPlan {
  * An execution plan for a graphql query.
  */
 export class GQLExecutionPlan implements IGQLExecutionPlan {
+  public static CONNECTION_PLAN_TYPE: string = 'Connection';
+  public static EDGES_PLAN_NAME: string = 'edges';
+  public static PAGE_INFO_PLAN_NAME: string = 'pageInfo';
+  public static NODE_PLAN_NAME: string = 'node';
+
   public parent: GQLExecutionPlan | null;
   public context: ResolverContext;
   public vars: Map<string, any>;
@@ -52,12 +59,14 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   public processedArgs!: GQLQueryArguments;
 
   public plans: List<GQLExecutionPlan>;
-  public scalars!: List<QueryResult>;
-  public objects!: List<QueryResult>;
   public result: QueryResult = new QueryResult();
   public allFields: List<GQLField>;
+  public subjectIdFields: List<GQLField> = List<GQLField>();
   public defaultStrategy!: string;
-  public multipleSubjectIds: List<string> = List<string>();
+  public isConnectionEdgesNodePlan: boolean = false;
+  public isConnectionEdgesPlan: boolean = false;
+  public isConnectionPageInfoPlan: boolean = false;
+  public isConnectionPlan: boolean = false;
 
   /**
    * Construct a new execution plan.
@@ -88,27 +97,27 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     this.args = args;
     this.directives = directives;
 
-    // if (!parent) {
-    //   this.dumpOut(fields);
-    // }
-
-    this.allFields = fields.map(v => v[1]);
     const resultTypes = fields.map(v => v[0]).toSet();
     if (resultTypes.size > 1) {
-      const errMsg = `ambiguous result type for ${fields.toJSON()}`;
-      throw new QueryExecutionException(errMsg);
+      throw new QueryExecutionException(
+        `ambiguous result type for ${this.toString()}`
+      );
     }
     const rtype = context.schema.getTypeDefinition(
       resultTypes.first('__unknown__')
     );
     if (rtype.isEmpty()) {
-      const errMsg = `unknown result type for ${fields.toJSON()}`;
-      throw new QueryExecutionException(errMsg);
+      throw new QueryExecutionException(
+        `unknown result type for ${this.toString()}`
+      );
     }
     this.resultType = rtype.get();
 
-    this._initFields();
+    // parse out fields
+    this.allFields = fields.map(v => v[1]);
+    this.subjectIdFields = this.getMarkedFields('id');
 
+    // create subplans for objects
     this.plans = this.allFields
       .filter((f, i) => f.isObject())
       .map(
@@ -125,16 +134,18 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
           )
       );
     this.resolveDefaultStrategy();
+    this.resolvePlanType();
   }
 
-  // public dumpOut(fields: List<[string, GQLField]>, indent = '') {
-  //   fields.forEach(([t, f]) => {
-  //     console.log(`${indent} ${t} ${f.name}`);
-  //     if (f.fields.size > 0) {
-  //       this.dumpOut(f.fields, `${indent}  `);
-  //     }
-  //   });
-  // }
+  public getAliasOrName() {
+    return this.alias.getOrElse(this.name);
+  }
+
+  public toString() {
+    return `ExecutionPlan[${this.getAliasOrName()}:(${this.fields
+      .map(f => f.name)
+      .join(', ')})]`;
+  }
 
   /**
    * Main entry point for this class. Resolves requested fields, then executes
@@ -149,14 +160,22 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       ])
     );
     this.processedArgs = queryBuilder.processArgs(this.args, allValidFields);
-    if (this.isConnectionEdgesPlan()) {
-      this.processedArgs = this.grandParentPlan().nonEmpty()
-        ? this.grandParentPlan().get().processedArgs
-        : this.processedArgs;
-    }
-    this.scalars = List(await Promise.all(this.resolveFields()));
-    this.objects = List(await Promise.all(this.resolvePlans(queryBuilder)));
+    this.merge(await this.resolveFields());
+    this.merge(await this.resolvePlans(queryBuilder));
     return this.makePlanResult();
+  }
+
+  public getConnectionPlan(): Option<GQLExecutionPlan> {
+    if (this.isConnectionPlan) {
+      return Some(this);
+    }
+    if (this.isConnectionPageInfoPlan || this.isConnectionEdgesPlan) {
+      return Option.of(this.parent);
+    }
+    if (this.isConnectionEdgesNodePlan) {
+      return Option.of(this.parent!.parent);
+    }
+    return None;
   }
 
   public grandParentPlan(): Option<GQLExecutionPlan> {
@@ -167,52 +186,20 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   }
 
   public greatGrandParentPlan(): Option<GQLExecutionPlan> {
-    return Option.of(this.grandParentPlan().value && this.grandParentPlan().value!.parent);
+    return this.parent ? this.parent.grandParentPlan() : None;
   }
 
-  public isConnectionEdgesPlan() {
-    const parent = this.parent;
-    const grandParent = parent && parent.parent;
-    const greatGrandParent = grandParent && grandParent.parent;
-    return grandParent && grandParent.resultType.name === 'Connection';
+  public getSubjectIds() {
+    const idFields = this.subjectIdFields.map(f => f.getAliasOrName());
+    return this.result.data
+      .map(om => om.filter((_, k) => idFields.contains(k)))
+      .map(om => om as OrderedMap<string, string | number>);
   }
 
-  public getSubjectIds(): List<any> {
-    const fields = this.scalars.map(scalarQr => scalarQr.data);
-    if (fields.isEmpty()) {
-      return List<string>();
-    }
-
-    const fieldWithIdDirective = this.fields.find(field =>
-      field.directives.some(directive => directive.name === 'id')
+  public getParentIds() {
+    return Option.of(this.parent && this.parent!.getSubjectIds()).getOrElse(
+      List<OrderedMap<string, string | number>>()
     );
-
-    if (fieldWithIdDirective) {
-      const fieldName = fieldWithIdDirective.name;
-      return fields
-        .get(0)!
-        .valueSeq()
-        .reduce(
-          (acc, value: OrderedMap<string, any>) =>
-            acc.push(value.get(fieldName)),
-          List().asMutable()
-        );
-    }
-
-    const fieldsMarkedId = fields
-      .get(0)!
-      .valueSeq()
-      .filter((field: GQLField) => field.name === 'id')
-      .toList();
-
-    if (!fieldsMarkedId.isEmpty()) {
-      return fieldsMarkedId;
-    }
-
-    return fields
-      .get(0)!
-      .keySeq()
-      .toList();
   }
 
   /**
@@ -221,13 +208,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @returns Promise<QueryResult[]>
    */
   protected resolveFields() {
-    // Promise.all<QueryResult>(
-    return List(
-      this.strategies()
-        .map(strategy => strategy.resolve())
-        .valueSeq()
-    );
-    // );
+    return Promise.all(this.strategies().map(strategy => strategy.resolve()));
   }
 
   /**
@@ -235,108 +216,114 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
    * @returns Promise<QueryResult[]>
    */
   protected resolvePlans(queryBuilder: GQLQueryBuilder) {
-    // Promise.all<QueryResult>(
-    return this.plans.map(plan => plan.execute(queryBuilder));
-    // );
+    return Promise.all(this.plans.map(plan => plan.execute(queryBuilder)));
+  }
+
+  /**
+   * Combine an array of query results into the plan result.
+   * @param results the query results to combine into the plan result
+   */
+  protected merge(results: QueryResult[]) {
+    results.forEach(qr => this.result.merge(qr));
   }
 
   /**
    * Stitch together the results from our own fields as well as any sub plans.
    */
   protected makePlanResult() {
-    const scData: List<OrderedMap<string, any>> = this.scalars.map(
-      sc => sc.data
-    );
-    const mappedScalars = scData.get(0) || OrderedMap<string, any>();
-    const obData = this.objects.map(sc => sc.data);
-    const mappedObjects = obData.get(0) || OrderedMap<string, any>();
-    this.result.merge(mappedScalars);
-    this.result.merge(mappedObjects);
-    const scErrors = this.getScalarsErrors();
-    if (scErrors.isEmpty()) {
-      this.result.meta.errors = this.result.meta.errors.concat(
-        ...this.getSubPlansErrors()
-      );
-    } else {
-      this.result.meta.errors = this.result.meta.errors.concat(...scErrors);
-    }
-    this.finalizeResults();
-    this.result.data = this.removeUnwantedFields(this.result.data);
-    this.result.addMetadata();
-    return this.result;
+    return this.result; // TODO: maybe remove unneeded objects?
   }
 
-  protected getScalarsErrors() {
-    return this.scalars.flatMap(sc => sc.meta.errors);
-  }
+  // this.scalars.concat(this.objects).forEach(qr => this.result.combine(qr));
+  // return this.result;
+  // const scData: List<OrderedMap<string, any>> = this.scalars.map(
+  //   sc => sc.data
+  // );
+  // const mappedScalars = scData.get(0) || OrderedMap<string, any>();
+  // const obData = this.objects.map(sc => sc.data);
+  // const mappedObjects = obData.get(0) || OrderedMap<string, any>();
+  // this.result.merge(mappedScalars);
+  // this.result.merge(mappedObjects);
+  // const scErrors = this.getScalarsErrors();
+  // if (scErrors.isEmpty()) {
+  //   this.result.meta.errors = this.result.meta.errors.concat(
+  //     ...this.getSubPlansErrors()
+  //   );
+  // } else {
+  //   this.result.meta.errors = this.result.meta.errors.concat(...scErrors);
+  // }
+  // this.finalizeResults();
+  // this.result.data = this.removeUnwantedFields(this.result.data);
+  // this.result.addMetadata();
+  // }
 
-  protected getSubPlansErrors() {
-    return this.plans.flatMap(pl => pl.result.meta.errors);
-  }
-
-  /**
-   * Handles 'hoisting', adds a key equal to this plan's name before its actual result data so that it can be
-   * properly merged with the parent object
-   */
-  protected finalizeResults() {
-    if (this.isConnectionEdgesPlan()) {
-      const grandParentPlanSubjectIds = this.grandParentPlan()
-        .get()
-        .parent!
-        .getSubjectIds();
-      if (grandParentPlanSubjectIds.size > 1) {
-        this.multipleSubjectIds = grandParentPlanSubjectIds;
-      } else {
-        this.name = grandParentPlanSubjectIds.get(0);
-      }
-    }
-    if (this.parent) {
-      // this is to handle situations where we have an array of n objects instead of just one object
-      if (this.parent.scalars.isEmpty()) {
-        // In case we have a single subjectId
-        if (this.multipleSubjectIds.isEmpty()) {
-          const newResArr = this.result.data.valueSeq().toList();
-          this.result.data = OrderedMap({
-            [this.alias.getOrElse(this.name)]: newResArr,
-          });
-        } else {
-          this.result.data = OrderedMap(
-            this.multipleSubjectIds.map<[string, any]>(subjId => [subjId, this.result.data.get(subjId)])
-          );
-        }
-      } else {
-        // we want each value to be mapped to its proper parent via parent's ID
-        this.result.data.map(value => {
-          return OrderedMap({ [this.alias.getOrElse(this.name)]: value });
-        });
-      }
-    } else {
-      this.result.data = OrderedMap({
-        [this.alias.getOrElse(this.name)]: this.result.data,
-      });
-    }
-  }
+  // /**
+  //  * Handles 'hoisting', adds a key equal to this plan's name before its actual result data so that it can be
+  //  * properly merged with the parent object
+  //  */
+  // protected finalizeResults() {
+  //   if (this.isConnectionEdgesPlan()) {
+  //     const grandParentPlanSubjectIds = this.grandParentPlan()
+  //       .get()
+  //       .parent!.getSubjectIds();
+  //     if (grandParentPlanSubjectIds.size > 1) {
+  //       this.multipleSubjectIds = grandParentPlanSubjectIds;
+  //     } else {
+  //       this.name = grandParentPlanSubjectIds.get(0);
+  //     }
+  //   }
+  //   if (this.parent) {
+  //     // this is to handle situations where we have an array of n objects instead of just one object
+  //     if (this.parent.scalars.isEmpty()) {
+  //       // In case we have a single subjectId
+  //       if (this.multipleSubjectIds.isEmpty()) {
+  //         const newResArr = this.result.data.valueSeq().toList();
+  //         this.result.data = OrderedMap({
+  //           [this.alias.getOrElse(this.name)]: newResArr,
+  //         });
+  //       } else {
+  //         this.result.data = OrderedMap(
+  //           this.multipleSubjectIds.map<[string, any]>(subjId => [
+  //             subjId,
+  //             this.result.data.get(subjId),
+  //           ])
+  //         );
+  //       }
+  //     } else {
+  //       // we want each value to be mapped to its proper parent via parent's ID
+  //       this.result.data.map(value => {
+  //         return OrderedMap({ [this.alias.getOrElse(this.name)]: value });
+  //       });
+  //     }
+  //   } else {
+  //     this.result.data = OrderedMap({
+  //       [this.alias.getOrElse(this.name)]: this.result.data,
+  //     });
+  //   }
+  // }
 
   /**
    * Filters out unwanted, residual properties that were needed for resolution.
    * @param {OrderedMap<any, any>} resultObject
    * @returns {OrderedMap<string, any>}
    */
-  protected removeUnwantedFields(resultObject: OrderedMap<string, any>): OrderedMap<string, any> {
-    const removeUnwanted = (obj: { [key: string]: any }) => {
-      Object.keys(obj).forEach((key: string) => {
-        if (['s', 'parentId'].includes(key)) {
-          delete obj[key];
-        } else if (obj[key] && typeof obj[key] === 'object') {
-          removeUnwanted(obj[key]);
-        }
-        return obj;
-      });
-      return obj;
-    };
-    const resObj = resultObject.toJS();
-    return OrderedMap(removeUnwanted(resObj));
-  }
+  // protected removeUnwantedFields(
+  //   resultObject: OrderedMap<string, any>
+  // ): OrderedMap<string, any> {
+  //   const removeUnwanted = (obj: { [key: string]: any }) => {
+  //     Object.keys(obj).forEach((key: string) => {
+  //       if (['s', 'parentId'].includes(key)) {
+  //         delete obj[key];
+  //       } else if (obj[key] && typeof obj[key] === 'object') {
+  //         removeUnwanted(obj[key]);
+  //       }
+  //       return obj;
+  //     });
+  //     return obj;
+  //   };
+  //   const resObj = resultObject.toJS();
+  //   return OrderedMap(removeUnwanted(resObj));
+  // }
 
   /**
    * Compute a list of strategies to resolve our fields.
@@ -346,7 +333,7 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
     return this.fields
       .groupBy(f => this.getStrategyFor(f))
       .map((fields, qs) =>
-        this.context.getStrategyFactory(qs)!.create(fields.toList(), this)
+        this.context.getStrategyFactory(qs).create(fields.toList(), this)
       )
       .valueSeq()
       .toList();
@@ -435,10 +422,13 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       .filter(s => this.isStrategyAvailable(s));
   }
 
-  protected idFields(directives: List<GQLDirective>) {
+  protected markedFields(
+    directiveName: string,
+    directives: List<GQLDirective>
+  ) {
     return (
       directives
-        .filter(d => d.name === 'id')
+        .filter(d => d.name === directiveName)
         .flatMap(d =>
           d
             .arg('fields')
@@ -453,54 +443,67 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
   /**
    * Make sure our fields list contains our resultType's id field(s).
    */
-  private _initFields() {
-    let ids = List<GQLFieldDefinition>();
-    // todo we don't want the query object to include the _id scalar.
-    // Should probably add all of the types alike to a conf and check based off of that
+  private getMarkedFields(mark: string) {
+    let marked = List<GQLFieldDefinition>();
+
     if (
-      this.resultType.name !== 'Query' &&
-      this.resultType.name !== 'Edge' &&
-      this.resultType.name !== 'Connection'
+      !(
+        this.isConnectionEdgesPlan ||
+        this.isConnectionPlan ||
+        this.isConnectionPageInfoPlan
+      )
     ) {
       switch (this.resultType.constructor) {
         case GQLInterface:
           const i = this.resultType as GQLInterface;
-          ids = i.idFields();
-          if (ids.isEmpty()) {
-            ids = this.idFields(i.directives);
+          marked = i.markedFields(mark);
+          if (marked.isEmpty()) {
+            marked = this.markedFields(mark, i.directives);
           }
           break;
         case GQLObjectType:
           const ot = this.resultType as GQLObjectType;
-          ids = ot.idFields();
-          if (ids.isEmpty()) {
-            ids = this.idFields(ot.directives);
+          marked = ot.markedFields(mark);
+          if (marked.isEmpty()) {
+            marked = this.markedFields(mark, ot.directives);
           }
           break;
         default:
           // noop
           break;
       }
-      if (ids.isEmpty()) {
-        ids = this.idFields(this.context.schema.schemaDirectives);
+      if (marked.isEmpty()) {
+        marked = this.markedFields(mark, this.context.schema.schemaDirectives);
       }
     }
-    const fields = this.allFields.filter(f => !f.isObject());
-    const fieldNames = fields.map(f => f.name).toSet();
-    this.fields = ids
-      .filter(fd => !fieldNames.contains(fd.name))
-      .map(
-        fd =>
-          new GQLField({
-            name: fd.name,
-            outputType: fd.gqlType.xsdType(),
-            parentType: this.resultType.name,
-          })
-      )
-      .concat(fields);
-    console.log({
-      type: this.resultType.name,
-      fields: this.fields.map(f => f.name).toArray(),
-    });
+    return marked.map(
+      fd =>
+        new GQLField({
+          name: fd.name,
+          outputType: fd.gqlType.xsdType(),
+          parentType: this.resultType.name,
+        })
+    );
+  }
+
+  private resolvePlanType() {
+    this.isTopPlan = this.parent === null;
+    this.isConnectionPlan =
+      this.resultType.name === GQLExecutionPlan.CONNECTION_PLAN_TYPE;
+    this.isConnectionPageInfoPlan =
+      this.name === GQLExecutionPlan.PAGE_INFO_PLAN_NAME &&
+      Option.of(this.parent)
+        .map(p => p.isConnectionPlan)
+        .getOrElse(false);
+    this.isConnectionEdgesPlan =
+      this.name === GQLExecutionPlan.EDGES_PLAN_NAME &&
+      Option.of(this.parent)
+        .map(p => p.isConnectionPlan)
+        .getOrElse(false);
+    this.isConnectionEdgesNodePlan =
+      this.name === GQLExecutionPlan.NODE_PLAN_NAME &&
+      this.grandParentPlan()
+        .map(p => p.isConnectionPlan)
+        .getOrElse(false);
   }
 }

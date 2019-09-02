@@ -49,6 +49,10 @@ export class GQLField extends GQLSelection implements IGQLField {
       .map(fl => fl.size > 0)
       .getOrElse(false);
   }
+
+  public getAliasOrName() {
+    return this.alias.getOrElse(this.name);
+  }
 }
 
 export interface IGQLFragmentSpread extends IGQLSelection {

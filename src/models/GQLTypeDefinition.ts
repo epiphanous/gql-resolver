@@ -58,8 +58,8 @@ export class GQLInterface extends GQLTypeDefinition implements IGQLInterface {
     this.fields = fields;
   }
 
-  public idFields(): List<GQLFieldDefinition> {
-    return this.fields.filter(f => f.isIdField());
+  public markedFields(mark: string): List<GQLFieldDefinition> {
+    return this.fields.filter(f => f.isMarkedField(mark));
   }
 }
 
@@ -94,8 +94,8 @@ export class GQLObjectType extends GQLTypeDefinition implements IGQLObjectType {
     );
   }
 
-  public idFields(): List<GQLFieldDefinition> {
-    return this.fields.filter(f => f.isIdField());
+  public markedFields(mark: string): List<GQLFieldDefinition> {
+    return this.fields.filter(f => f.isMarkedField(mark));
   }
 }
 
@@ -121,8 +121,8 @@ export class GQLFieldDefinition extends GQLTypeDefinition
     this.args = args;
   }
 
-  public isIdField(): boolean {
-    return Option.of(this.directives.find(d => d.name === 'id')).nonEmpty();
+  public isMarkedField(mark: string): boolean {
+    return Option.of(this.directives.find(d => d.name === mark)).nonEmpty();
   }
 }
 
