@@ -1,7 +1,7 @@
 {
   "name": "gql-resolver",
   "description": "A scalable GraphQL resolver to support large schemas with pluggable query strategies.",
-  "version": "1.0.0-beta",
+  "version": "0.9.1",
   "keywords": [
     "graphql",
     "graphql-js"
@@ -22,19 +22,23 @@
   "license": "MIT",
   "scripts": {
     "antlr": "yarn run antlr-gql && yarn run antlr-qm",
-    "antlr-gql": "cd src/antlr4 && antlr4ts -o generated GraphQL.g4",
-    "antlr-qm": "cd src/antlr4 && antlr4ts -o generated QueryModification.g4",
-    "build": "tsc",
-    "build-esm": "tsc -m es6 --outDir lib-esm",
-    "build-all": "yarn run build && yarn run build-esm",
+    "antlr:gql": "cd src/antlr4 && antlr4ts -o generated GraphQL.g4",
+    "antlr:qm": "cd src/antlr4 && antlr4ts -o generated QueryModification.g4",
+    "index": "cti create src",
+    "build:cjs": "yarn index && tsc",
+    "build:esm": "yarn index && tsc -m es6 --outDir dist/esm",
+    "build": "yarn run build:cjs && yarn run build:esm",
     "test": "ts-mocha src/_t/*.ts src/**/_t/*.ts",
     "testOnly": "ts-mocha"
   },
   "dependencies": {
     "@types/cheerio": "^0.22.11",
+    "@types/js-base64": "^2.3.1",
     "@types/lodash": "^4.14.124",
     "@types/memoizee": "^0.4.2",
+    "@types/n3": "^1.1.1",
     "@types/node-fetch": "^2.3.3",
+    "@waiting/base64": "^4.2.9",
     "antlr4ts": "^0.5.0-alpha.3",
     "aws-sdk": "^2.484.0",
     "cheerio": "^1.0.0-rc.3",
@@ -43,12 +47,14 @@
     "funfix": "^7.0.1",
     "id64": "^1.1.0",
     "immutable": "^4.0.0-rc.12",
+    "js-base64": "^2.5.1",
     "lodash": "^4.17.11",
     "memoizee": "^0.4.14",
     "mocha": "^6.1.4",
     "n3": "^1.1.1",
-    "node-fetch": "^2.5.0",
-    "object-sizeof": "^1.4.0"
+    "node-fetch": "^2.6.0",
+    "object-sizeof": "^1.4.0",
+    "sparql-http-client": "^1.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -56,6 +62,7 @@
     "@types/node": "^12.0.10",
     "antlr4ts-cli": "^0.5.0-alpha.3",
     "chai": "^4.2.0",
+    "create-ts-index": "^1.10.3",
     "prettier": "^1.17.0",
     "prettier-tslint": "^0.4.0",
     "ts-mocha": "^6.0.0",

@@ -4,12 +4,14 @@
   "jsRules": {},
   "rules": {
     "quotemark": [true, "single", "avoid-escape", "avoid-template"],
+    "one-line": false,
     "object-literal-sort-keys": [false],
     "trailing-comma": false,
     "arrow-parens": false,
     "max-classes-per-file": false,
     "object-literal-key-quotes": false,
-    "no-console": false
+    "no-console": false,
+    "brace-style": [true, "stroustrup"]
   },
   "rulesDirectory": []
 }

@@ -17,9 +17,9 @@
 *.map
 *.d.ts
 coverage
-lib-esm/
-lib/
+dist/
 logs
 node_modules/
 pids
+src/schema.graphql
 typings/

@@ -66,7 +66,11 @@ export class GQLObjectQueryModifierDisjunction extends GQLObjectQueryModifierExp
     >()
   ) {
     super(
-      disjunctives.size === 0 ? '' : (disjunctives.size > 1 ? disjunctives.map(x => `(${x.expression})`).join(' || ') : disjunctives.get(0)!.expression),
+      disjunctives.size === 0
+        ? ''
+        : disjunctives.size > 1
+        ? disjunctives.map(x => `(${x.expression})`).join(' || ')
+        : disjunctives.get(0)!.expression,
       'xsd:boolean'
     );
     this.disjunctives = disjunctives;
@@ -79,7 +83,11 @@ export class GQLObjectQueryModifierConjunction extends GQLObjectQueryModifierExp
 
   constructor(conjunctives: List<GQLObjectQueryModifierOptionalNegation>) {
     super(
-      conjunctives.size === 0 ? '' : (conjunctives.size > 1 ? conjunctives.map(x => `(${x.expression})`).join(' && ') : conjunctives.get(0)!.expression),
+      conjunctives.size === 0
+        ? ''
+        : conjunctives.size > 1
+        ? conjunctives.map(x => `(${x.expression})`).join(' && ')
+        : conjunctives.get(0)!.expression,
       'xsd:boolean'
     );
     this.conjunctives = conjunctives;

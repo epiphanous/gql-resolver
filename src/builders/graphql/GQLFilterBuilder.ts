@@ -1,20 +1,25 @@
-import { Map, Set } from 'immutable';
 import { Try } from 'funfix';
+import { List, Map, Set } from 'immutable';
+import { GQLObjectQueryModifierBuilder } from '.';
 import {
   FieldRefContext,
   QueryModificationParser,
   SearchConditionContext,
-} from '../../antlr4/generated/QueryModificationParser';
-import { GQLFilter } from '../../models/GQLFilter';
-import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import { GQLObjectQueryModifierBuilder } from './GQLObjectQueryModifierBuilder';
+} from '../../antlr4';
+import {
+  GQLFieldDefinition,
+  GQLFilter,
+  GQLVariableDefinition,
+} from '../../models';
 
 export class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
-  public validFields!: Map<string, string>;
-  public validVariables!: Set<GQLVariableDefinition>;
-  public vars!: Map<string, string>;
-  public prefixes!: Set<string>;
-  public source!: string;
+  public validFields: List<GQLFieldDefinition>;
+  public validVariables: Set<GQLVariableDefinition> = Set<
+    GQLVariableDefinition
+  >().asMutable();
+  public vars: Map<string, string> = Map<string, string>().asMutable();
+  public prefixes: Set<string> = Set<string>().asMutable();
+  public source: string = 'query';
   public referencedFields: Set<string> = Set<string>().asMutable();
   public result!: GQLFilter;
 
@@ -27,11 +32,7 @@ export class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
       this.parseWith(parser);
 
       if (this.errorCount > 0) {
-        throw this.errorReport.asThrowable();
-      }
-
-      if (this.warningCount > 0) {
-        this.errors.forEach(w => console.warn(w));
+        throw this.errors;
       }
 
       return this.result;
@@ -41,7 +42,8 @@ export class GQLFilterBuilder extends GQLObjectQueryModifierBuilder {
   public exitSearchCondition(context: SearchConditionContext): void {
     this.result = new GQLFilter(
       this.processSearchCondition(context, true),
-      this.referencedFields
+      this.referencedFields,
+      this.errors
     );
   }
 

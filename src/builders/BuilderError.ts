@@ -4,38 +4,37 @@ import { None, Option } from 'funfix';
 export interface IBuilderError {
   message: string;
   line: number;
-  position: number;
-  exception: Option<RecognitionException>;
+  column: number;
+  severity: 'ERROR' | 'WARNING';
 }
 
 export class BuilderError implements IBuilderError {
   public message: string;
   public line: number;
-  public position: number;
-  public exception: Option<RecognitionException>;
+  public column: number;
+  public severity: 'ERROR' | 'WARNING';
 
   constructor(
     message: string,
     line: number,
-    position: number,
-    exception: Option<RecognitionException> = None
+    column: number,
+    exception: Option<RecognitionException> = None,
+    isError: boolean = false
   ) {
-    this.message = message;
     this.line = line;
-    this.position = position;
-    this.exception = exception;
+    this.column = column;
+    this.severity = exception.nonEmpty() || isError ? 'ERROR' : 'WARNING';
+    const baseMessage = `${this.severity}: ${message}`;
+    this.message = exception
+      .map(e => `${baseMessage}\nDETAILS: ${e.message}`)
+      .getOrElse(baseMessage);
   }
 
   public isError() {
-    return this.exception.nonEmpty;
+    return this.severity === 'ERROR';
   }
 
   public isWarning() {
-    return !this.exception.nonEmpty;
-  }
-
-  public report() {
-    const label = this.isError() ? 'error' : 'warning';
-    return `${label}:${this.line}:${this.position}: ${this.message}`;
+    return !this.isError();
   }
 }

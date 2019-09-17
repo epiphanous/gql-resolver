@@ -1,8 +1,7 @@
 import { RecognitionException } from 'antlr4ts';
 import { ANTLRErrorListener } from 'antlr4ts/ANTLRErrorListener';
 import { Option } from 'funfix';
-import { BuilderBase } from './BuilderBase';
-import { BuilderError } from './BuilderError';
+import { BuilderBase, BuilderError } from '.';
 
 export class BuilderErrorListener<T> implements ANTLRErrorListener<any> {
   public builder: BuilderBase<T>;
@@ -19,7 +18,6 @@ export class BuilderErrorListener<T> implements ANTLRErrorListener<any> {
     message: string,
     exception: RecognitionException | undefined
   ) {
-    console.log('SYNTAX ERROR', { message, offendingSymbol, line, position });
     this.builder.addError(
       new BuilderError(message, line, position, Option.of(exception))
     );

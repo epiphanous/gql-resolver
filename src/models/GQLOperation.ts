@@ -1,17 +1,22 @@
 import { None } from 'funfix';
 import { List, Map } from 'immutable';
-import { GQLArgument } from './GQLArgument';
-import { GQLDirective } from './GQLDirective';
-import { GQLExecutionPlan } from './GQLExecutionPlan';
-import { GQLField, GQLSelection } from './GQLSelection';
-import { GQLVariable } from './GQLVariable';
-import { GQLVariableDefinition } from './GQLVariableDefinition';
-import { ResolverContext } from './ResolverContext';
+import {
+  GQLArgument,
+  GQLDirective,
+  GQLExecutionPlan,
+  GQLField,
+  GQLMutationExecutionPlan,
+  GQLSelection,
+  GQLVariable,
+  GQLVariableDefinition,
+  ResolverContext,
+} from '.';
+
+export type GQLOperationType = 'query' | 'mutation' | 'subscription';
 
 export interface IGQLOperation {
   name: string;
-  // operationType: 'query' | 'mutation' | 'subscription';
-  operationType: string;
+  operationType: GQLOperationType;
   directives: List<GQLDirective>;
   variables: List<GQLVariable>;
   selections: List<GQLSelection>;
@@ -25,23 +30,39 @@ export interface IGQLOperation {
 export class GQLOperation implements IGQLOperation {
   [key: string]: any;
 
-  public name!: string;
-  // public operationType: 'query' | 'mutation' | 'subscription';
-  public operationType!: string;
-  public outputType!: string;
-  public fields!: List<[string, GQLField]>;
-  public variables!: List<GQLVariableDefinition>;
+  public name: string = '';
+  public operationType: GQLOperationType = 'query';
+  public outputType: string = '';
+  public fields: List<[string, GQLField]> = List();
+  public variables: List<GQLVariableDefinition> = List();
   public directives: List<GQLDirective> = List();
   public selections: List<GQLSelection> = List();
   public isSelected = false;
 
   constructor(props: Partial<IGQLOperation>) {
-    // tslint:disable-next-line:prefer-const
-    for (let key in props) {
+    for (const key in props) {
       if (props.hasOwnProperty(key)) {
         this[key] = props[key];
       }
     }
+    if (this.name.length === 0) {
+      this.name = this.operationType;
+    }
+    if (this.outputType.length === 0) {
+      this.outputType = {
+        query: 'Query',
+        mutation: 'Mutation',
+        subscription: 'Subscription',
+      }[this.operationType];
+    }
+  }
+
+  public isMutation(): boolean {
+    return this.operationType === 'mutation';
+  }
+
+  public isSubscription(): boolean {
+    return this.operationType === 'subscription';
   }
 
   public copy(data: Partial<IGQLOperation>) {
@@ -53,17 +74,33 @@ export class GQLOperation implements IGQLOperation {
   }
 
   public getExecutionPlan(context: ResolverContext, vars: Map<string, any>) {
-    return new GQLExecutionPlan(
-      null,
-      context,
-      vars,
-      this.name,
-      None,
-      List<GQLArgument>(),
-      this.directives,
-      this.fields,
-      this.operationType
-    );
+    if (this.isMutation()) {
+      return new GQLMutationExecutionPlan(
+        null,
+        context,
+        vars,
+        this.name,
+        None,
+        List<GQLArgument>(),
+        this.directives,
+        this.fields,
+        this.operationType
+      );
+    } else if (this.isSubscription()) {
+      throw new Error('subscriptions are not supported');
+    } else {
+      return new GQLExecutionPlan(
+        null,
+        context,
+        vars,
+        this.name,
+        None,
+        List<GQLArgument>(),
+        this.directives,
+        this.fields,
+        this.operationType
+      );
+    }
   }
 
   public select() {

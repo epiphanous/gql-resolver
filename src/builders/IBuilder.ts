@@ -1,11 +1,11 @@
-import { ANTLRInputStream, Lexer, Parser, TokenStream } from 'antlr4ts';
+import { CodePointCharStream, Lexer, Parser, TokenStream } from 'antlr4ts';
 import { Try } from 'funfix';
-import { BuilderError } from './BuilderError';
+import { BuilderErrors } from '.';
 
 export interface IBuilder<T> {
-  errors: BuilderError[];
+  errors: BuilderErrors;
 
-  lexer(inputStream: ANTLRInputStream): Lexer;
+  lexer(inputStream: CodePointCharStream): Lexer;
 
   parser(tokenStream: TokenStream): Parser;
 

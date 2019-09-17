@@ -1,18 +1,16 @@
+import { GQLFieldDefinition } from '.';
+
 export interface IGQLSortBy {
-  field: string;
+  field: GQLFieldDefinition;
   desc: boolean;
 }
 
 export class GQLSortBy implements IGQLSortBy {
-  public field: string;
+  public field: GQLFieldDefinition;
   public desc: boolean;
 
-  constructor(field: string, desc: boolean = false) {
+  constructor(field: GQLFieldDefinition, desc: boolean = false) {
     this.field = field;
     this.desc = desc;
-  }
-
-  public toSparqlString() {
-    return `${this.desc ? 'DESC(' : ''}${this.field}${this.desc ? ')' : ''}`;
   }
 }

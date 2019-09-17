@@ -1,17 +1,16 @@
-import { Option } from 'funfix';
 import { List, Map, Set } from 'immutable';
-import { GQLQueryBuilder } from '../builders/graphql/GQLQueryBuilder';
-import { GQLExecutionPlan } from './GQLExecutionPlan';
-import { GQLFragmentDefinition } from './GQLFragmentDefinition';
-import { GQLOperation } from './GQLOperation';
 import {
+  GQLExecutionPlan,
   GQLField,
+  GQLFragmentDefinition,
   GQLFragmentSpread,
   GQLInlineFragment,
+  GQLOperation,
   GQLSelection,
-} from './GQLSelection';
-import {QueryResult} from './QueryResult';
-import { ResolverContext } from './ResolverContext';
+  QueryResult,
+  ResolverContext,
+} from '.';
+import { GQLQueryBuilder } from '../builders/graphql';
 
 export class GQLQueryDocument {
   public operations: List<GQLOperation>;
@@ -39,48 +38,47 @@ export class GQLQueryDocument {
   }
 
   protected makeExecutionPlan() {
-    const operation = this.operations.find(op => op.isSelected);
-    if (Option.of(operation).isEmpty()) {
+    const operation = this.operations.find(op => op.isSelected) as GQLOperation;
+    if (!operation) {
       // shouldn't happen given checks in the query builder, but...
       throw new Error(
         'GQLQueryDocument initialized without a selected operation'
       );
     }
-    this.selectedOperation = this.withFlattenedSelections(Option.of(operation));
+    this.selectedOperation = this.withFlattenedSelections(operation);
     this.plan = this.selectedOperation.getExecutionPlan(
       this.context,
       this.vars
     );
   }
 
-  protected withFlattenedSelections(operation: Option<GQLOperation>) {
-    if (operation.nonEmpty()) {
-      const operationVal = operation.get();
-      const outputTypeName = this.context.schema.operationTypes.get(
-        operationVal.operationType,
-        'query'
-      );
-      const operationOpt = this.context.schema
-        .getTypeDefinition(outputTypeName)
-        .map(td => {
-          const fields: List<[string, GQLField]> = this.flattenSelections(
-            td.name,
-            operationVal.selections
+  protected withFlattenedSelections(operation: GQLOperation): GQLOperation {
+    const operationType: string = this.context.schema.operationTypes.get(
+      operation.operationType,
+      'Query'
+    );
+    const operationOpt = this.context.schema
+      .getTypeDefinition(operationType)
+      .map(td => {
+        const fields: List<[string, GQLField]> = this.flattenSelections(
+          td.name,
+          operation.selections
+        );
+        const firstField = fields.get(0);
+        if (!firstField) {
+          // unlikely to happen
+          throw new Error(
+            `Operation type ${operationType} has no fields defined!`
           );
-          const firstField = fields.get(0);
-          if (!firstField) {
-            throw new Error('No field accessible!');
-          } else {
-            const outputType = firstField[0];
-            return operationVal.copy({ fields, outputType });
-          }
-        });
-      if (operationOpt.isEmpty()) {
-        throw new Error(`Can't find type ${outputTypeName}`);
-      }
-      return operationOpt.get();
+        } else {
+          const outputType = firstField[0];
+          return operation.copy({ fields, outputType });
+        }
+      });
+    if (operationOpt.isEmpty()) {
+      throw new Error(`Can't find operation type ${operationType}`);
     }
-    throw new Error(`Op doesn't exist: ${operation}`);
+    return operationOpt.get()!;
   }
 
   protected flattenSelections(

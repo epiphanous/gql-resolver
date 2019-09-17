@@ -1,8 +1,7 @@
-import { Option, None } from 'funfix';
+import { None, Option } from 'funfix';
 import * as id64 from 'id64';
 import { List } from 'immutable';
-import { GQLArgument } from './GQLArgument';
-import { GQLDirective } from './GQLDirective';
+import { GQLArgument, GQLDirective } from '.';
 
 export interface IGQLSelection {
   name: string;
@@ -48,6 +47,10 @@ export class GQLField extends GQLSelection implements IGQLField {
     return Option.of(this.fields)
       .map(fl => fl.size > 0)
       .getOrElse(false);
+  }
+
+  public getAliasOrName() {
+    return this.alias.getOrElse(this.name);
   }
 }
 

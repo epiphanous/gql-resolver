@@ -1,5 +1,6 @@
 import { Option, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
+import { GQLDocumentBuilder } from '.';
 import {
   ArgumentContext,
   ArgumentsContext,
@@ -36,12 +37,12 @@ import {
   UnionTypeDefinitionContext,
   UnionTypeExtensionWithDirectivesContext,
   UnionTypeExtensionWithMembersContext,
-} from '../../antlr4/generated/GraphQLParser';
-import { GQLAnyArgument, GQLArgument } from '../../models/GQLArgument';
-import { GQLDirective } from '../../models/GQLDirective';
-import { GQLSchema } from '../../models/GQLSchema';
+} from '../../antlr4';
 import {
+  GQLAnyArgument,
+  GQLArgument,
   GQLArgumentDefinition,
+  GQLDirective,
   GQLDirectiveDefinition,
   GQLEnum,
   GQLEnumValueDefinition,
@@ -50,10 +51,10 @@ import {
   GQLInterface,
   GQLObjectType,
   GQLScalarType,
+  GQLSchema,
   GQLTypeDefinition,
   GQLUnion,
-} from '../../models/GQLTypeDefinition';
-import { GQLDocumentBuilder } from './GQLDocumentBuilder';
+} from '../../models';
 
 const STANDARD_ARG_DESCRIPTION: { [key: string]: string } = {
   bindings:
@@ -96,7 +97,7 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
   public build(parser: GraphQLParser): Try<GQLSchema> {
     this.parseWith(parser);
     if (this.errorCount) {
-      return Try.failure(this.errorReport.asThrowable());
+      return Try.failure(this.errors);
     } else {
       const s = Map<string, GQLScalarType>(
         this.scalarTypes
@@ -410,7 +411,6 @@ export class GQLSchemaBuilder extends GQLDocumentBuilder<GQLSchema> {
     const name = this.textOf(ctx.NAME());
     const def = this.enums.find(d => d.name === name);
     if (!def) {
-      const values = this.getEnumValues(Option.of(ctx.enumValuesDefinition()));
       this.enums.add(
         new GQLEnum(
           name,

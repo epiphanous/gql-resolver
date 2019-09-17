@@ -1,20 +1,30 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "experimentalDecorators": true,
-    "lib": ["es6", "es7", "dom"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-//    "outDir": "lib",
-    "sourceMap": true,
-    "target": "es6",
-    "removeComments": true,
-    "strict": true,
-//  "strictNullChecks": false,
-//  "noImplicitAny": false,
-//  "suppressImplicitAnyIndexErrors": true,
-    "downlevelIteration": true
+    "declaration":                      true,
+    "declarationDir":                   "dist",
+    "experimentalDecorators":           true,
+    "forceConsistentCasingInFileNames": true,
+    "lib":                              [
+      "esnext"
+    ],
+    "module":                           "commonjs",
+    "moduleResolution":                 "node",
+    "noEmitOnError":                    true,
+    "outDir":                           "dist/cjs",
+    "sourceMap":                        true,
+    "strictPropertyInitialization":     false,
+    "target":                           "es5",
+    "removeComments":                   true,
+    "strict":                           true,
+    "downlevelIteration":               true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "lib/**/*.ts", "lib-esm", "**/_t/*"]
+  "include":         [
+    "src/**/*.ts"
+  ],
+  "exclude":         [
+    "node_modules",
+    "lib/**/*.ts",
+    "lib-esm",
+    "**/_t/*"
+  ]
 }

@@ -3,7 +3,7 @@ import 'mocha';
 describe('fetchResults', () => {
   // TODO should be rewritten to utilize the Factory class
   // const endpointURL = 'http://localhost:7200/repositories/test';
-  // // const QSSparql = new SparqlQueryStrategy(); // TODO fix
+  // // const QSSparql = new SparqlFieldQueryStrategy(); // TODO fix
   // const prefixes = 'PREFIX gn: <http://sws.geonames.org/>';
   // const query = 'SELECT ?o WHERE { ?s ?p ?o. ?s a gn:Feature } LIMIT 10';
   // it('should return a results stream', () => {

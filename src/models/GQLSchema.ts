@@ -1,19 +1,21 @@
 import { None, Option, Some, TNone, TSome } from 'funfix';
-import { List, Map, Seq, Set } from 'immutable';
-import { GQLDirective } from './GQLDirective';
-import { GQLField, GQLInlineFragment, GQLSelection } from './GQLSelection';
+import { List, Map, Set } from 'immutable';
 import {
   GQLArgumentDefinition,
+  GQLDirective,
   GQLDirectiveDefinition,
   GQLEnum,
+  GQLField,
   GQLFieldDefinition,
+  GQLInlineFragment,
   GQLInputType,
   GQLInterface,
   GQLObjectType,
   GQLScalarType,
+  GQLSelection,
   GQLTypeDefinition,
   GQLUnion,
-} from './GQLTypeDefinition';
+} from '.';
 
 export interface IGQLSchema {
   allFields: Map<string, GQLFieldDefinition>;
@@ -146,21 +148,21 @@ export class GQLSchema implements IGQLSchema {
     return this.objectTypes.has(this.getTypeName(t));
   }
 
-  public isObjectLike(t: string | GQLTypeDefinition): boolean {
-    return !this.isScalarLike(t);
-  }
-
-  public isMultiType(t: string | GQLTypeDefinition): boolean {
-    return this.isInterface(t) || this.isUnion(t);
-  }
+  // public isObjectLike(t: string | GQLTypeDefinition): boolean {
+  //   return !this.isScalarLike(t);
+  // }
+  //
+  // public isMultiType(t: string | GQLTypeDefinition): boolean {
+  //   return this.isInterface(t) || this.isUnion(t);
+  // }
 
   public isEnum(t: string | GQLTypeDefinition): boolean {
     return this.enums.has(this.getTypeName(t));
   }
 
-  public getTypeClass(tdOpt: Option<GQLTypeDefinition>): Option<string> {
-    return tdOpt.map(td => td.constructor.name);
-  }
+  // public getTypeClass(tdOpt: Option<GQLTypeDefinition>): Option<string> {
+  //   return tdOpt.map(td => td.constructor.name);
+  // }
 
   public getKind(t: Option<GQLTypeDefinition>): string {
     return t
@@ -236,9 +238,9 @@ export class GQLSchema implements IGQLSchema {
     return Option.of(this.allFields.get(f));
   }
 
-  public getFieldSubjectObjectTypes(f: string): Set<string> {
-    return this.objectTypesForField.get(f)!;
-  }
+  // public getFieldSubjectObjectTypes(f: string): Set<string> {
+  //   return this.objectTypesForField.get(f)!;
+  // }
 
   public getFieldType(f: string): Option<string> {
     return this.getFieldDefinition(f).map(fd => fd.gqlType.name);
@@ -248,153 +250,153 @@ export class GQLSchema implements IGQLSchema {
     return this.getFieldType(f).flatMap(t => this.getTypeDefinition(t));
   }
 
-  public containsFields(t: string, fields: List<string>) {
-    const td = this.allTypes.get(t);
-    if (td instanceof GQLInterface || td instanceof GQLObjectType) {
-      return fields.isSubset(td.fields.map(f => f.name));
-    }
-    return false;
-  }
+  // public containsFields(t: string, fields: List<string>) {
+  //   const td = this.allTypes.get(t);
+  //   if (td instanceof GQLInterface || td instanceof GQLObjectType) {
+  //     return fields.isSubset(td.fields.map(f => f.name));
+  //   }
+  //   return false;
+  // }
 
-  public validFieldsForType(t: string): Map<string, string> {
-    let types: Set<string>;
-    switch (this.getTypeDefinition(t).value!.constructor.name) {
-      case 'GQLUnion':
-        types = this.getTypeDefinition(t)
-          .value!.constructor()
-          .gqlTypes.toSet();
-        break;
-      case 'GQLTypeDefinition':
-        types = Set(this.getTypeDefinition(t).value!.constructor().name);
-        break;
-      default:
-        types = Set<string>();
-    }
+  // public validFieldsForType(t: string): Map<string, string> {
+  //   let types: Set<string>;
+  //   switch (this.getTypeDefinition(t).value!.constructor.name) {
+  //     case 'GQLUnion':
+  //       types = this.getTypeDefinition(t)
+  //         .value!.constructor()
+  //         .gqlTypes.toSet();
+  //       break;
+  //     case 'GQLTypeDefinition':
+  //       types = Set(this.getTypeDefinition(t).value!.constructor().name);
+  //       break;
+  //     default:
+  //       types = Set<string>();
+  //   }
+  //
+  //   return types
+  //     .map(p => {
+  //       if (this.isScalarObjectType(t)) {
+  //         // This probably won't work..
+  //         return this.objectTypes.get(p)!.fields.map(f => {
+  //           const key = f.gqlType.xsdType + '_' + f.name;
+  //           const val = f.gqlType.xsdType;
+  //           return [key, val];
+  //         });
+  //       } else {
+  //         let s = List<[string, string]>();
+  //         let o = List<[string, string]>();
+  //         const fbt = this.fieldsByType.get(p);
+  //         if (fbt) {
+  //           if (fbt.has('s')) {
+  //             s = fbt
+  //               .get('s')!
+  //               .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
+  //           }
+  //           if (fbt.has('o')) {
+  //             o = fbt
+  //               .get('o')!
+  //               .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
+  //           }
+  //         }
+  //         return s.concat(o);
+  //       }
+  //     })
+  //     .flatten()
+  //     .toMap();
+  // }
 
-    return types
-      .map(p => {
-        if (this.isScalarObjectType(t)) {
-          // This probably won't work..
-          return this.objectTypes.get(p)!.fields.map(f => {
-            const key = f.gqlType.xsdType + '_' + f.name;
-            const val = f.gqlType.xsdType;
-            return [key, val];
-          });
-        } else {
-          let s = List<[string, string]>();
-          let o = List<[string, string]>();
-          const fbt = this.fieldsByType.get(p);
-          if (fbt) {
-            if (fbt.has('s')) {
-              s = fbt
-                .get('s')!
-                .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
-            }
-            if (fbt.has('o')) {
-              o = fbt
-                .get('o')!
-                .map<[string, string]>(f => [f, this.getFieldType(f).get()]);
-            }
-          }
-          return s.concat(o);
-        }
-      })
-      .flatten()
-      .toMap();
-  }
+  // public parseTypeInfo(objType: string): List<string> {
+  //   if (objType.startsWith('U_')) {
+  //     return List(objType.substr(2).split('_OR_'));
+  //   } else {
+  //     return List(objType);
+  //   }
+  // }
 
-  public parseTypeInfo(objType: string): List<string> {
-    if (objType.startsWith('U_')) {
-      return List(objType.substr(2).split('_OR_'));
-    } else {
-      return List(objType);
-    }
-  }
-
-  public partitionFields(
-    fields: List<[string, GQLField]>
-  ): [List<[string, GQLField]>, List<[string, GQLField]>, List<Error>] {
-    const scalars = List<[string, GQLField]>().asMutable();
-    const objects = List<[string, GQLField]>().asMutable();
-    const errors = List<Error>().asMutable();
-    // console.log(fields);
-
-    fields
-      .flatMap<[string, GQLField]>((tf: [string, GQLField]) => {
-        console.log(tf);
-        const [objType, field] = tf;
-        if (objType.startsWith('U_')) {
-          return List<[string, GQLField]>(
-            objType
-              .slice(2)
-              .split('_OR_')
-              .map<[string, GQLField]>(t => [t, field])
-          );
-        } else {
-          return List<[string, GQLField]>([tf]);
-        }
-      })
-      .map<[string, GQLField]>(tf => {
-        const [objType, field] = tf;
-        if (objType.startsWith('xsd')) {
-          return [`O_${objType}`, field];
-        } else {
-          return tf;
-        }
-      })
-      .map(tf => {
-        const [objType, field] = tf;
-        const so: Map<string, List<string>> = this.fieldsByType.get(
-          objType,
-          Map<string, List<string>>()
-        );
-        if (so && !so.isEmpty()) {
-          // const toValues = fieldStrArrPair.get(1)
-          //   .map((opt: Option<List<string>>) => opt.value)
-          //   .filter((optval: string) => optval);
-          // const grouped = toValues.reduce((acc: any, current: any) => {
-          //   if (acc[current[0]]) {
-          //     acc[current[0]].push(current[1]);
-          //   } else {
-          //     acc[current[0]] = [current[1]];
-          //   }
-          //   return acc;
-          // }, {});
-          // const so = Map(grouped);
-          const s = Option.of(so.get('s'));
-          const o = Option.of(so.get('o'));
-          if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
-            scalars.push(tf);
-          } else if (
-            o.nonEmpty() &&
-            (o.value as List<string>).includes(field.name)
-          ) {
-            objects.push(tf);
-          } else {
-            errors.push(
-              new Error(`field '${field.name}' not in type '${objType}'`)
-            );
-          }
-        }
-      });
-    return [List(scalars), List(objects), List(errors)];
-  }
-
-  public getFieldsOf(t: string) {
-    return this.getTypeDefinition(t)
-      .map(td => {
-        if (td instanceof GQLInterface || td instanceof GQLObjectType) {
-          return td.fields;
-        } else {
-          List<GQLFieldDefinition>();
-        }
-      })
-      .getOrElse(List<GQLFieldDefinition>());
-  }
-
-  public getImplementingTypes(t: string) {
-    return Option.of(this.typesByInterface.get(t)).getOrElse(Set(t));
-  }
+  // public partitionFields(
+  //   fields: List<[string, GQLField]>
+  // ): [List<[string, GQLField]>, List<[string, GQLField]>, List<Error>] {
+  //   const scalars = List<[string, GQLField]>().asMutable();
+  //   const objects = List<[string, GQLField]>().asMutable();
+  //   const errors = List<Error>().asMutable();
+  //   // console.log(fields);
+  //
+  //   fields
+  //     .flatMap<[string, GQLField]>((tf: [string, GQLField]) => {
+  //       console.log(tf);
+  //       const [objType, field] = tf;
+  //       if (objType.startsWith('U_')) {
+  //         return List<[string, GQLField]>(
+  //           objType
+  //             .slice(2)
+  //             .split('_OR_')
+  //             .map<[string, GQLField]>(t => [t, field])
+  //         );
+  //       } else {
+  //         return List<[string, GQLField]>([tf]);
+  //       }
+  //     })
+  //     .map<[string, GQLField]>(tf => {
+  //       const [objType, field] = tf;
+  //       if (objType.startsWith('xsd')) {
+  //         return [`O_${objType}`, field];
+  //       } else {
+  //         return tf;
+  //       }
+  //     })
+  //     .map(tf => {
+  //       const [objType, field] = tf;
+  //       const so: Map<string, List<string>> = this.fieldsByType.get(
+  //         objType,
+  //         Map<string, List<string>>()
+  //       );
+  //       if (so && !so.isEmpty()) {
+  //         // const toValues = fieldStrArrPair.get(1)
+  //         //   .map((opt: Option<List<string>>) => opt.value)
+  //         //   .filter((optval: string) => optval);
+  //         // const grouped = toValues.reduce((acc: any, current: any) => {
+  //         //   if (acc[current[0]]) {
+  //         //     acc[current[0]].push(current[1]);
+  //         //   } else {
+  //         //     acc[current[0]] = [current[1]];
+  //         //   }
+  //         //   return acc;
+  //         // }, {});
+  //         // const so = Map(grouped);
+  //         const s = Option.of(so.get('s'));
+  //         const o = Option.of(so.get('o'));
+  //         if (s.nonEmpty() && (s.value as List<string>).includes(field.name)) {
+  //           scalars.push(tf);
+  //         } else if (
+  //           o.nonEmpty() &&
+  //           (o.value as List<string>).includes(field.name)
+  //         ) {
+  //           objects.push(tf);
+  //         } else {
+  //           errors.push(
+  //             new Error(`field '${field.name}' not in type '${objType}'`)
+  //           );
+  //         }
+  //       }
+  //     });
+  //   return [List(scalars), List(objects), List(errors)];
+  // }
+  //
+  // public getFieldsOf(t: string) {
+  //   return this.getTypeDefinition(t)
+  //     .map(td => {
+  //       if (td instanceof GQLInterface || td instanceof GQLObjectType) {
+  //         return td.fields;
+  //       } else {
+  //         List<GQLFieldDefinition>();
+  //       }
+  //     })
+  //     .getOrElse(List<GQLFieldDefinition>());
+  // }
+  //
+  // public getImplementingTypes(t: string) {
+  //   return Option.of(this.typesByInterface.get(t)).getOrElse(Set(t));
+  // }
 
   public getDirectiveDefinition(name: string) {
     return Option.of(this.directives.get(name));
@@ -504,44 +506,44 @@ export class GQLSchema implements IGQLSchema {
     return Option.of(result.first());
   }
 
-  public typeMembers(
-    fieldsOfType: (a: string) => Option<[GQLInlineFragment, Option<GQLField>]>,
-    typeInfo: string
-  ): List<GQLField> {
-    return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
-      return (
-        (fragmentInfo &&
-          fragmentInfo[0].selections
-            .filter(selection => selection.constructor.name === 'GQLField')
-            .map(selection => selection as GQLField)) ||
-        List()
-      );
-    });
-  }
+  // public typeMembers(
+  //   fieldsOfType: (a: string) => Option<[GQLInlineFragment, Option<GQLField>]>,
+  //   typeInfo: string
+  // ): List<GQLField> {
+  //   return List([fieldsOfType(typeInfo).value]).flatMap(fragmentInfo => {
+  //     return (
+  //       (fragmentInfo &&
+  //         fragmentInfo[0].selections
+  //           .filter(selection => selection.constructor.name === 'GQLField')
+  //           .map(selection => selection as GQLField)) ||
+  //       List()
+  //     );
+  //   });
+  // }
 
-  public inlineFragmentChildFieldMappingsOf(
-    selections: List<GQLSelection>,
-    field: string
-  ): Map<string, List<GQLField>> {
-    const nestedFieldSelections = (fieldStr: string) =>
-      this.nestedField(selections, fieldStr);
-    const optField = nestedFieldSelections(field);
-    const nestedFragmentSelections = (someStr: string) => () =>
-      this.nestedFragment(selections, someStr);
-    const membersOfParsedType = (str: string) =>
-      this.typeMembers(nestedFragmentSelections(str), str); // TODO finish
-    const listOfResTuples: Array<[string, List<GQLField>]> = [];
-    for (const fld of [optField.value]) {
-      for (const fieldType of [this.getFieldType(fld!.name)]) {
-        for (const parsedType of this.parseTypeInfo(
-          fieldType.value!
-        ).toArray()) {
-          listOfResTuples.push([parsedType, membersOfParsedType(parsedType)]);
-        }
-      }
-    }
-    return Map(listOfResTuples);
-  }
+  // public inlineFragmentChildFieldMappingsOf(
+  //   selections: List<GQLSelection>,
+  //   field: string
+  // ): Map<string, List<GQLField>> {
+  //   const nestedFieldSelections = (fieldStr: string) =>
+  //     this.nestedField(selections, fieldStr);
+  //   const optField = nestedFieldSelections(field);
+  //   const nestedFragmentSelections = (someStr: string) => () =>
+  //     this.nestedFragment(selections, someStr);
+  //   const membersOfParsedType = (str: string) =>
+  //     this.typeMembers(nestedFragmentSelections(str), str); // TODO finish
+  //   const listOfResTuples: Array<[string, List<GQLField>]> = [];
+  //   for (const fld of [optField.value]) {
+  //     for (const fieldType of [this.getFieldType(fld!.name)]) {
+  //       for (const parsedType of this.parseTypeInfo(
+  //         fieldType.value!
+  //       ).toArray()) {
+  //         listOfResTuples.push([parsedType, membersOfParsedType(parsedType)]);
+  //       }
+  //     }
+  //   }
+  //   return Map(listOfResTuples);
+  // }
 
   private _scalarsObjects(
     fields: List<GQLFieldDefinition>

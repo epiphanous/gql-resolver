@@ -1,4 +1,6 @@
-export * from './QueryStrategy';
-export * from './QueryStrategyFactory';
-export * from './SparqlQueryStrategy';
-export * from './SparqlQueryStrategyFactory';
+// created from 'create-ts-index'
+
+export * from './abstract';
+export * from './kinesis';
+export * from './sparql';
+export * from './sql';

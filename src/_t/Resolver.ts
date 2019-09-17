@@ -1,9 +1,10 @@
+import 'mocha';
+
 import { expect } from 'chai';
 import fs = require('fs');
-import 'mocha';
 import { QueryResult } from '../models/QueryResult';
 import { ResolverContext } from '../models/ResolverContext';
-import { Resolver } from '../Resolver';
+import { IResolvedResult, Resolver } from '../Resolver';
 import { KinesisQueryStrategyFactory } from '../strategies/KinesisQueryStrategyFactory';
 import { SparqlQueryStrategyFactory } from '../strategies/SparqlQueryStrategyFactory';
 
@@ -15,36 +16,34 @@ describe('Resolver', () => {
     strategies: {
       sparql: new SparqlQueryStrategyFactory({
         endpoint: sparqlEndpoint,
-        prefixes: [['testv', 'http://test.com/testv/']]
+        prefixes: [['testv', 'http://test.com/testv/']],
       }),
       kinesis: new KinesisQueryStrategyFactory({
-        accessKeyId: '',
-        secretAccessKey: '',
-        region: '',
-        streamName: (data) => {
+        streamName: data => {
           /**
            * Compute the stream name from data, or in this case,
            * hardcode it to a string value
            */
-          const streamName = 'cascadingFlow';
-          return streamName || process.env.AWS_STREAM_NAME;
+          return process.env.AWS_STREAM_NAME || 'test-stream';
         },
-        partitionKey: (data) => {
+        partitionKey: data => {
           /**
            * Compute the partition key from data, or in this case,
            * hardcode it to a string w/ length of < 256 chars
            */
           const partitionKey = 'partitionKey123';
           if (partitionKey.length > 256) {
-            throw new Error('Partition key length cannot be larger than 256 chars.');
+            throw new Error(
+              'Partition key length cannot be larger than 256 chars.'
+            );
           } else {
             return partitionKey;
           }
-        }
+        },
       }),
     },
     defaultStrategy: 'sparql',
-    });
+  });
   it('creates a resolver context', () => {
     expect(rc).to.have.keys('defaultStrategy', 'schema', 'strategies');
   });
@@ -52,7 +51,7 @@ describe('Resolver', () => {
 
   it('resolves a query', async () => {
     /**
-     * @type {Promise<QueryResult>}
+     * @type IResolvedResult
      */
     const result = await resolver.resolve(
       `query test {
@@ -74,34 +73,37 @@ describe('Resolver', () => {
       {},
       'test'
     );
-    await result.fold(
-      err => { throw new Error(`Failed to resolve the request!' ${err}`); },
-      async resValue => {
-        const resValueObject = await resValue;
-        console.log('result', JSON.stringify(resValueObject, null, 2));
-        expect(resValueObject).to.be.an('object');
-      }
-    );
+    console.log(result);
+    if (result.error) {
+      throw new Error(`Failed to resolve the request!' ${result.error}`);
+    } else {
+      expect(result.data).to.be.an('object');
+    }
   });
   it('resolves a mutation', async () => {
     /**
-     * @type {Promise<QueryResult>}
+     * @type IResolvedResult
      */
     const result = await resolver.resolve(
-      `mutation kinesisMutationTest @resolve(with: "kinesis"){
-        tripFilter(tripFilter: { countryCode: "GER" })
+      `mutation kinesisMutationTest {
+        updatePrefs(prefs: {
+          channel: "test",
+          mutationVersion: "abc",
+          mutationTimestamp: "2019-07-23T08:15:00Z",
+          departFrom: "JFK"
+        }) {
+          eventID
+        }
       }
     `,
       {},
       'kinesisMutationTest'
     );
-    await result.fold(
-      err => { throw new Error(`Failed to resolve the request!' ${err}`); },
-      async resValue => {
-        const resValueObject = await resValue;
-        console.log('result', JSON.stringify(resValueObject, null, 2));
-        expect(resValueObject).to.be.an('object');
-      }
-    );
+    console.log(result);
+    if (result.error) {
+      throw new Error(`Failed to resolve the request!' ${result.error}`);
+    } else {
+      expect(result.data).to.be.an('object');
+    }
   });
 });

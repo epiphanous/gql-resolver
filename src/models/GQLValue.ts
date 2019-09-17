@@ -1,5 +1,5 @@
 import { List, Map } from 'immutable';
-import { GQLVariable } from './GQLVariable';
+import { GQLVariable } from '.';
 
 export interface IGQLValue {
   value: any;

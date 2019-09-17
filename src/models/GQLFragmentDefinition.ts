@@ -1,6 +1,5 @@
 import { List } from 'immutable';
-import { GQLDirective } from './GQLDirective';
-import { GQLSelection } from './GQLSelection';
+import { GQLDirective, GQLSelection } from '.';
 
 export interface IGQLFragmentDefinition {
   name: string;

@@ -1,5 +1,6 @@
 import { None, Option, Some, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
+import { GQLDocumentBuilder, GQLFilterBuilder, GQLOrderByBuilder } from '.';
 import {
   ArgumentContext,
   ArgumentsContext,
@@ -18,70 +19,47 @@ import {
   SelectionOnlyOperationDefinitionContext,
   SelectionSetContext,
   TypeConditionContext,
-  VariableContext,
   VariableDefinitionContext,
   VariableDefinitionsContext,
-} from '../../antlr4/generated/GraphQLParser';
-import { DEFAULT_PREFIXES } from '../../models/Constants';
-import { GQLAny } from '../../models/GQLAny';
+} from '../../antlr4';
 import {
+  DEFAULT_PREFIXES,
   GQLAfterArgument,
+  GQLAny,
   GQLAnyArgument,
   GQLArgument,
   GQLBeforeArgument,
-  GQLBindingsArgument,
-  GQLBoostersArgument,
+  GQLDirective,
+  GQLDirectiveDefinition,
+  GQLField,
+  GQLFieldDefinition,
+  GQLFilter,
   GQLFilterArgument,
   GQLFirstArgument,
+  GQLFragmentDefinition,
+  GQLFragmentSpread,
   GQLIncludeDeprecatedArgument,
+  GQLInlineFragment,
+  GQLInputType,
   GQLInvalidArgument,
   GQLLastArgument,
   GQLNameArgument,
-  GQLPatternsArgument,
-  GQLSortByArgument,
-  GQLTransformsArgument,
-} from '../../models/GQLArgument';
-import { GQLBinding } from '../../models/GQLBinding';
-import { GQLBooster } from '../../models/GQLBooster';
-import { GQLDirective } from '../../models/GQLDirective';
-import { GQLFilter } from '../../models/GQLFilter';
-import { GQLFragmentDefinition } from '../../models/GQLFragmentDefinition';
-import { GQLOperation } from '../../models/GQLOperation';
-import { GQLSortBy } from '../../models/GQLSortBy';
-import { GQLPattern } from '../../models/GQLPattern';
-import { GQLQueryArguments } from '../../models/GQLQueryArguments';
-import { GQLQueryDocument } from '../../models/GQLQueryDocument';
-import { GQLSchema } from '../../models/GQLSchema';
-// import { GQLRootExecutionPlan } from '../../models/GQLRootExecutionPlan';
-// import { GQLSearchExecutionPlan } from '../../models/GQLSearchExecutionPlan';
-import {
-  GQLField,
-  GQLFragmentSpread,
-  GQLInlineFragment,
+  GQLOperation,
+  GQLOperationType,
+  GQLQueryArguments,
+  GQLQueryDocument,
+  GQLSchema,
   GQLSelection,
-} from '../../models/GQLSelection';
-import { GQLTransform } from '../../models/GQLTransform';
-import {
-  GQLDirectiveDefinition,
-  GQLFieldDefinition,
-  GQLInputType,
-} from '../../models/GQLTypeDefinition';
-import { GQLStringValue, GQLVariableValue } from '../../models/GQLValue';
-import { GQLVariable } from '../../models/GQLVariable';
-import { GQLVariableDefinition } from '../../models/GQLVariableDefinition';
-import { ResolverContext } from '../../models/ResolverContext';
+  GQLSortBy,
+  GQLSortByArgument,
+  GQLStringValue,
+  GQLVariableDefinition,
+  GQLVariableValue,
+  ResolverContext,
+} from '../../models';
 import { Builder } from '../Builder';
-import { GQLBindingsBuilder } from './GQLBindingsBuilder';
-import { GQLBoostersBuilder } from './GQLBoostersBuilder';
-import { GQLDocumentBuilder } from './GQLDocumentBuilder';
-import { GQLFilterBuilder } from './GQLFilterBuilder';
-import { GQLOrderByBuilder } from './GQLOrderByBuilder';
-import { GQLPatternsBuilder } from './GQLPatternsBuilder';
-import { GQLTransformsBuilder } from './GQLTransformsBuilder';
 
 const ARG_TYPES = {
-  ARG_BINDINGS: 'bindings',
-  ARG_BOOSTERS: 'boosters',
   ARG_FILTER: 'filter',
   ARG_INCLUDE_DEPRECATED: 'includeDeprecated',
   ARG_FIRST: 'first',
@@ -90,8 +68,6 @@ const ARG_TYPES = {
   ARG_BEFORE: 'before',
   ARG_AFTER: 'after',
   ARG_SORT_BY: 'sortBy',
-  ARG_PATTERNS: 'patterns',
-  ARG_TRANSFORMS: 'transforms',
 };
 
 export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
@@ -125,11 +101,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
       this.parseWith(parser);
 
       if (this.errorCount > 0) {
-        throw this.errorReport.asThrowable();
-      }
-
-      if (this.warningCount > 0) {
-        this.errors.forEach(w => console.warn(w));
+        throw this.errors;
       }
 
       return new GQLQueryDocument(
@@ -143,7 +115,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
 
   public processArgs(
     args: List<GQLArgument>,
-    allFields: Map<string, string>
+    allFields: List<GQLFieldDefinition>
   ): GQLQueryArguments {
     return args.reduce<GQLQueryArguments>((qa, arg) => {
       if (arg instanceof GQLAnyArgument) {
@@ -156,30 +128,10 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
         return qa.copy({
           filter: Some(this.processFilter(a.resolve(this.vars), allFields)),
         });
-      } else if (arg instanceof GQLPatternsArgument) {
-        const a = arg as GQLPatternsArgument;
-        return qa.copy({
-          patterns: this.processPatterns(a.resolve(this.vars), allFields),
-        });
-      } else if (arg instanceof GQLBoostersArgument) {
-        const a = arg as GQLBoostersArgument;
-        return qa.copy({
-          boosters: this.processBoosters(a.resolve(this.vars), allFields),
-        });
-      } else if (arg instanceof GQLBindingsArgument) {
-        const a = arg as GQLBindingsArgument;
-        return qa.copy({
-          bindings: this.processBindings(a.resolve(this.vars), allFields),
-        });
       } else if (arg instanceof GQLSortByArgument) {
         const a = arg as GQLSortByArgument;
         return qa.copy({
           sortBy: this.processOrder(a.resolve(this.vars), allFields),
-        });
-      } else if (arg instanceof GQLTransformsArgument) {
-        const a = arg as GQLTransformsArgument;
-        return qa.copy({
-          transforms: this.processTransforms(a.resolve(this.vars)),
         });
       } else if (arg instanceof GQLAfterArgument) {
         const a = arg as GQLAfterArgument;
@@ -210,7 +162,10 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
     }, new GQLQueryArguments());
   }
 
-  public processFilter(filterExpr: string, validFields: Map<string, string>) {
+  public processFilter(
+    filterExpr: string,
+    validFields: List<GQLFieldDefinition>
+  ) {
     // For cases where we have nested str identifiers in the GQL query but need to pass onto other builders
     console.log('filter expression', filterExpr);
     const builtFilter = new GQLFilterBuilder(
@@ -223,58 +178,13 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
     console.log('variables', this.variables.toJSON());
     console.log('builtFilter', builtFilter);
     // const exprWithoutDoubleEscape = filterExpr.replace(/\\/g, '');
-    return Builder.parse<GQLFilter>(
-      builtFilter,
-      filterExpr
-    ).get();
+    return Builder.parse<GQLFilter>(builtFilter, filterExpr).get();
   }
 
-  public processPatterns(
-    patternsExpr: string,
-    validFields: Map<string, string>
+  public processOrder(
+    orderExpr: string,
+    validFields: List<GQLFieldDefinition>
   ) {
-    return Builder.parse<List<GQLPattern>>(
-      new GQLPatternsBuilder(
-        validFields,
-        this.variables,
-        this.vars,
-        Set(this.getPrefixes().keys())
-      ),
-      patternsExpr
-    ).get();
-  }
-
-  public processBindings(
-    bindingsExpr: string,
-    validFields: Map<string, string>
-  ) {
-    return Builder.parse<List<GQLBinding>>(
-      new GQLBindingsBuilder(
-        validFields,
-        this.variables,
-        this.vars,
-        Set(this.getPrefixes().keys())
-      ),
-      bindingsExpr
-    ).get();
-  }
-
-  public processBoosters(
-    boostersExpr: string,
-    validFields: Map<string, string>
-  ) {
-    return Builder.parse<List<GQLBooster>>(
-      new GQLBoostersBuilder(
-        validFields,
-        this.variables,
-        this.vars,
-        Set(this.getPrefixes().keys())
-      ),
-      boostersExpr
-    ).get();
-  }
-
-  public processOrder(orderExpr: string, validFields: Map<string, string>) {
     return Builder.parse<List<GQLSortBy>>(
       new GQLOrderByBuilder(
         validFields,
@@ -283,13 +193,6 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
         Set(this.getPrefixes().keys())
       ),
       orderExpr
-    ).get();
-  }
-
-  public processTransforms(transformsExpr: string) {
-    return Builder.parse<List<GQLTransform>>(
-      new GQLTransformsBuilder(Set(this.getPrefixes().keys())),
-      transformsExpr
     ).get();
   }
 
@@ -322,7 +225,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
         .getOrElse(true)
     ) {
       if (selectedOp.isEmpty()) {
-        selectedOp = Option.of(this.operations.first());
+        selectedOp = Option.of(this.operations.first() as GQLOperation);
       }
       selectedOp.map(op => op.select());
     }
@@ -331,7 +234,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
   public exitFullOperationDefinition(ctx: FullOperationDefinitionContext) {
     const operation = new GQLOperation({
       name: this.textOf(ctx.NAME()!),
-      operationType: ctx.operationType().text,
+      operationType: ctx.operationType().text as GQLOperationType,
       variables: this.processVariableDefinitions(
         Option.of(ctx.variableDefinitions())
       ),
@@ -389,9 +292,9 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
     return vd;
   }
 
-  public processVariable(ctx: VariableContext): GQLVariable {
-    return new GQLVariable(this.textOf(ctx.NAME()));
-  }
+  // public processVariable(ctx: VariableContext): GQLVariable {
+  //   return new GQLVariable(this.textOf(ctx.NAME()));
+  // }
 
   public exitFragmentDefinition(ctx: FragmentDefinitionContext): void {
     this.fragmentDefinitions = this.fragmentDefinitions.add(
@@ -517,9 +420,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
           typeOk = expectedType === 'Boolean';
           break;
         default:
-          typeOk = this.schema.inputTypes
-            .keySeq()
-            .includes(expectedType);
+          typeOk = this.schema.inputTypes.keySeq().includes(expectedType);
           break;
         // todo: add more?
       }
@@ -538,14 +439,6 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
             return new GQLBeforeArgument(name, v);
           case ARG_TYPES.ARG_AFTER:
             return new GQLAfterArgument(name, v);
-          case ARG_TYPES.ARG_TRANSFORMS:
-            return new GQLTransformsArgument(name, v);
-          case ARG_TYPES.ARG_PATTERNS:
-            return new GQLPatternsArgument(name, v);
-          case ARG_TYPES.ARG_BOOSTERS:
-            return new GQLBoostersArgument(name, v);
-          case ARG_TYPES.ARG_BINDINGS:
-            return new GQLBindingsArgument(name, v);
           case ARG_TYPES.ARG_INCLUDE_DEPRECATED:
             return new GQLIncludeDeprecatedArgument(name, v);
           case ARG_TYPES.ARG_NAME:

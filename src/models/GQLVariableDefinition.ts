@@ -1,8 +1,6 @@
 import { None, Option } from 'funfix';
 import { List, Map } from 'immutable';
-import { GQLDirective } from './GQLDirective';
-import { GQLType } from './GQLType';
-import { GQLValue, GQLVariableValue } from './GQLValue';
+import { GQLDirective, GQLType, GQLValue, GQLVariableValue } from '.';
 
 export interface IGQLVariableDefinition {
   name: string;

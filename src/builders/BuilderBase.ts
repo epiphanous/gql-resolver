@@ -1,32 +1,26 @@
-import { ANTLRInputStream, Lexer, Parser, TokenStream } from 'antlr4ts';
+import { CodePointCharStream, Lexer, Parser, TokenStream } from 'antlr4ts';
 import { ParserRuleContext } from 'antlr4ts/ParserRuleContext';
 import { ParseTreeListener } from 'antlr4ts/tree/ParseTreeListener';
 import { TerminalNode } from 'antlr4ts/tree/TerminalNode';
 import { NotImplementedError, Option, Try } from 'funfix';
-import { BuilderError } from './BuilderError';
-import { BuildErrorReport } from './BuildErrorReport';
-import { IBuilder } from './IBuilder';
+import { BuilderError, BuilderErrors, IBuilder } from '.';
 
 export class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
-  public errors: BuilderError[] = [];
+  public errors: BuilderErrors;
 
   get errorCount() {
-    return this.errors.filter(e => e.isError()).length;
+    return this.errors.errorCount;
   }
 
   get warningCount() {
-    return this.errors.filter(e => e.isWarning()).length;
-  }
-
-  get errorReport() {
-    return new BuildErrorReport(this.errors);
+    return this.errors.warningCount;
   }
 
   public parser(tokenStream: TokenStream): Parser {
     throw new NotImplementedError('not implemented');
   }
 
-  public lexer(inputStream: ANTLRInputStream): Lexer {
+  public lexer(inputStream: CodePointCharStream): Lexer {
     throw new NotImplementedError('not implemented');
   }
 
@@ -35,7 +29,7 @@ export class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
   }
 
   public addError(error: BuilderError) {
-    this.errors.push(error);
+    this.errors.addError(error);
   }
 
   public textOf(t: TerminalNode, stripQuotes: boolean = true): string {
@@ -48,17 +42,19 @@ export class BuilderBase<T> implements IBuilder<T>, ParseTreeListener {
     ok: boolean,
     message: string,
     ctx: ParserRuleContext,
-    isError: boolean = true
+    isError: boolean = false
   ) {
     if (!ok) {
       const start = ctx.start;
-      const error = new BuilderError(
-        message,
-        start.line,
-        start.charPositionInLine,
-        Option.of(ctx.exception)
+      this.addError(
+        new BuilderError(
+          message,
+          start.line,
+          start.charPositionInLine,
+          Option.of(ctx.exception),
+          isError
+        )
       );
-      this.addError(error);
     }
     return ok;
   }

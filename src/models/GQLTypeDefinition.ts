@@ -1,8 +1,6 @@
 import { None, Option } from 'funfix';
 import { List } from 'immutable';
-import { GQLDirective } from './GQLDirective';
-import { GQLType } from './GQLType';
-import { GQLValue } from './GQLValue';
+import { GQLDirective, GQLField, GQLType, GQLValue } from '.';
 
 export interface IGQLTypeDefinition {
   name: string;
@@ -29,7 +27,7 @@ export class GQLTypeDefinition implements IGQLTypeDefinition {
 
   public deprecated() {
     return Option.of(this.directives.find(d => d.name === 'deprecated'))
-      .map(d => d.arguments.find(arg => arg.name === 'reason'))
+      .map(d => d.args.find(arg => arg.name === 'reason'))
       .map(arg => {
         if (arg) {
           return arg.value;
@@ -58,8 +56,14 @@ export class GQLInterface extends GQLTypeDefinition implements IGQLInterface {
     this.fields = fields;
   }
 
-  public idFields(): List<GQLFieldDefinition> {
-    return this.fields.filter(f => f.isIdField());
+  public markedFields(mark: string): List<GQLFieldDefinition> {
+    return this.fields.filter(f => f.isMarkedField(mark));
+  }
+
+  public idField(): GQLFieldDefinition {
+    return Option.of(
+      this.fields.find(fd => fd.gqlType.name === 'ID')
+    ).getOrElse(new GQLFieldDefinition('_id', new GQLType('ID')));
   }
 }
 
@@ -75,7 +79,7 @@ export class GQLObjectType extends GQLTypeDefinition implements IGQLObjectType {
   constructor(
     name: string,
     fields: List<GQLFieldDefinition>,
-    interfaces: List<string>,
+    interfaces = List<string>(),
     description: Option<string> = None,
     directives = List<GQLDirective>()
   ) {
@@ -94,8 +98,14 @@ export class GQLObjectType extends GQLTypeDefinition implements IGQLObjectType {
     );
   }
 
-  public idFields(): List<GQLFieldDefinition> {
-    return this.fields.filter(f => f.isIdField());
+  public markedFields(mark: string): List<GQLFieldDefinition> {
+    return this.fields.filter(f => f.isMarkedField(mark));
+  }
+
+  public idField(): GQLFieldDefinition {
+    return Option.of(
+      this.fields.find(fd => fd.gqlType.name === 'ID')
+    ).getOrElse(new GQLFieldDefinition('_id', new GQLType('ID')));
   }
 }
 
@@ -121,8 +131,20 @@ export class GQLFieldDefinition extends GQLTypeDefinition
     this.args = args;
   }
 
-  public isIdField(): boolean {
-    return Option.of(this.directives.find(d => d.name === 'id')).nonEmpty();
+  public isMarkedField(mark: string): boolean {
+    return Option.of(this.directives.find(d => d.name === mark)).nonEmpty();
+  }
+
+  public isIDField(): boolean {
+    return this.gqlType.name === 'ID';
+  }
+
+  public toField(parentType: string) {
+    return new GQLField({
+      name: this.name,
+      outputType: this.gqlType.xsdType(),
+      parentType,
+    });
   }
 }
 

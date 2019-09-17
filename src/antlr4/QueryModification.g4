@@ -1,7 +1,7 @@
 /**
  * Query Mods
  * 
- * An expression syntax to support modifying queries made against a graphql api, destined to be sent to a sparql compatible triple store.
+ * An expression syntax to support modifying queries made against a graphql api.
  * 
  * @author Robert Lyons <nextdude@gmail.com>
  */
@@ -12,24 +12,6 @@ filter
   : searchCondition EOF
   ;
 
-patterns
-  : pattern (
-    ',' pattern
-  )* EOF
-  ;
-
-boosters
-  : boost (
-    ',' boost
-  )* EOF
-  ;
-
-bindings
-  : binding (
-    ',' binding
-  )* EOF
-  ;
-
 orderBys
   : orderBy (
     ',' orderBy
@@ -37,32 +19,10 @@ orderBys
   ;
 
 orderBy
-  : expression (
+  : fieldRef (
     ASC
     | DESC
   )?
-  ;
-
-transforms
-  : transform (
-    ',' transform
-  )* EOF
-  ;
-
-transform
-  : TO_UNIT iriRefOrVarRef
-  | ABS
-  | CEIL
-  | FLOOR
-  | LCASE
-  | MD5
-  | OBFUSCATE
-  | ROUND
-  | SHA1
-  | SHA256
-  | SHA384
-  | SHA512
-  | UCASE
   ;
 
 searchCondition
@@ -97,9 +57,7 @@ expression
   ;
 
 expressionAtom
-  : builtinCall    # builtinCallAtom
-  | functionCall   # functionCallAtom
-  | rdfLiteral     # rdfLiteralAtom
+  : functionCall   # functionCallAtom
   | stringLiteral  # stringLiteralAtom
   | numericLiteral # numericLiteralAtom
   | booleanLiteral # booleanLiteralAtom
@@ -108,126 +66,29 @@ expressionAtom
   | varRef         # varRefAtom
   ;
 
-builtinCall
-  : ABS '(' expression ')'                         # absFunc
-  | BOUND '(' fieldRef ')'                         # boundFunc
-  | CEIL '(' expression ')'                        # ceilFunc
-  | COALESCE '[' iriRefOrVarRef ']' expressionList # coalesceFunc
-  | CONCAT expressionList                          # concatFunc
-  | CONTAINS '(' expression ',' expression ')'     # containsFunc
-  | DATATYPE '(' expression ')'                    # datatypeFunc
-  | DAY '(' expression ')'                         # dayFunc
-  | ENCODE_FOR_URI '(' expression ')'              # encodeForUriFunc
-  | EXISTS (
-    '{'
-    | '('
-  ) expression ','? expression ','? expression (
-    '}'
-    | ')'
-  )                                                            # existsFunc
-  | FLOOR '(' expression ')'                                   # floorFunc
-  | HOURS '(' expression ')'                                   # hoursFunc
-  | IF '(' predicate ',' expression ',' expression ')'         # ifFunc
-  | IRI '(' expression ')'                                     # iriFunc
-  | ISBLANK '(' expression ')'                                 # isBlankFunc
-  | ISIRI '(' expression ')'                                   # isIriFunc
-  | ISLITERAL '(' expression ')'                               # isLiteralFunc
-  | ISNUMERIC '(' expression ')'                               # isNumericFunc
-  | ISURI '(' expression ')'                                   # isURIFunc
-  | LANG '(' expression ')'                                    # langFunc
-  | LANGMATCHES '(' expression ',' expression ')'              # langMatchesFunc
-  | LCASE '(' expression ')'                                   # lcaseFunc
-  | MD5 '(' expression ')'                                     # md5Func
-  | MINUTES '(' expression ')'                                 # minutesFunc
-  | MONTH '(' expression ')'                                   # monthFunc
-  | NOW EMPTY_PARENS                                           # nowFunc
-  | RAND EMPTY_PARENS                                          # randFunc
-  | REGEX '(' expression ',' expression ( ',' expression)? ')' # regexFunc
-  | REPLACE '(' expression ',' expression ',' expression (
-    ',' expression
-  )? ')'                                                        # replaceFunc
-  | ROUND '(' expression ')'                                    # roundFunc
-  | SAMETERM '(' fieldRef ',' fieldRef ')'                      # sameTermFunc
-  | SECONDS '(' expression ')'                                  # secondsFunc
-  | SHA1 '(' expression ')'                                     # sha1Func
-  | SHA256 '(' expression ')'                                   # sha256Func
-  | SHA384 '(' expression ')'                                   # sha384Func
-  | SHA512 '(' expression ')'                                   # sha512Func
-  | STR '(' expression ')'                                      # strFunc
-  | STRAFTER '(' expression ',' expression ')'                  # strAfterFunc
-  | STRBEFORE '(' expression ',' expression ')'                 # strBeforeFunc
-  | STRDT '(' expression ',' iriRefOrVarRef ')'                 # strDtFunc
-  | STRENDS '(' expression ',' expression ')'                   # strEndsFunc
-  | STRLANG '(' expression ',' expression ')'                   # strLangFunc
-  | STRLEN '(' expression ')'                                   # strLenFunc
-  | STRSTARTS '(' expression ',' expression ')'                 # strStartsFunc
-  | STRUUID EMPTY_PARENS                                        # strUuidFunc
-  | SUBSTR '(' expression ',' expression ( ',' expression)? ')' # substrFunc
-  | TIMEZONE '(' expression ')'                                 # timezoneFunc
-  | TZ '(' expression ')'                                       # tzFunc
-  | UCASE '(' expression ')'                                    # ucaseFunc
-  | URI '(' expression ')'                                      # uriFunc
-  | UUID EMPTY_PARENS                                           # uuidFunc
-  | YEAR '(' expression ')'                                     # yearFunc
-  ;
-
-pattern
-  : fieldRef? (
-    TEXTMATCH
-    | GEOMATCH
-  ) stringLiteralOrVarRef (
-    '(' textMatchParam (
-      ',' textMatchParam
-    )* ')'
-  )?                                                  # textMatchPattern
-  | fieldRef? WITHIN proximitySpec OF featureOrLatLon # geoNearbyPattern
-  ;
-
-textMatchParam
-  : BOOST '=' numericLiteral # textMatchBoostParam
-  | MIN_SCORE '=' DECIMAL    # textMatchMinScoreParam
-  | MAX_HITS '=' INTEGER     # textMatchMaxHitsParam
-  ;
-
-boost
-  : BOOST? numericLiteral IF_FOLLOWS iriRefOrVarRef     # followsUserBoost
-  | BOOST? numericLiteral IF_FOLLOWED_BY iriRefOrVarRef # followedByUserBoost
-  ;
-
-binding
-  : BIND expression AS VARNAME
-  ;
-
 expressionList
   : '(' expression (
     ',' expression
   )* ')'
   ;
 
-featureOrLatLon
-  : varRef # varFeature
-  | iriRef # feature
-  | LATLON '(' (
-    varRef
-    | numericLiteral
-  ) ',' (
-    varRef
-    | numericLiteral
-  ) ')' # latLon
-  ;
-
-proximitySpec
-  : numericLiteralOrVarRef iriRefOrVarRef
-  ;
-
+// iriRef is the function, prefixedName is the return type (like xsd:string
 functionCall
-  : iriRef '[' prefixedName ']' EMPTY_PARENS   # funcWithoutArgs
-  | iriRef '[' prefixedName ']' expressionList # funcWithArgs
+  : iriRef '[' xsdType ']' EMPTY_PARENS   # funcWithoutArgs
+  | iriRef '[' xsdType ']' expressionList # funcWithArgs
   ;
 
-rdfLiteral
-  : stringLiteral LANGTAG     # langRdfLiteral
-  | stringLiteral '^^' iriRef # dtRdfLiteral
+xsdType
+  : XSD_STRING
+  | XSD_DECIMAL
+  | XSD_DOUBLE
+  | XSD_INTEGER
+  | XSD_BOOLEAN
+  | XSD_DATE
+  | XSD_TIME
+  | XSD_DATETIME
+  | XSD_DURATION
+  | XSD_MONTHDAY
   ;
 
 numericLiteral
@@ -278,24 +139,9 @@ stringLiteral
 //  | STRING_LITERAL2
   ;
 
-stringLiteralOrVarRef
-  : stringLiteral
-  | varRef
-  ;
-
 booleanLiteral
   : TRUE
   | FALSE
-  ;
-
-iriRefOrVarRef
-  : iriRef
-  | varRef
-  ;
-
-numericLiteralOrVarRef
-  : numericLiteral
-  | varRef
   ;
 
 iriRef
@@ -308,16 +154,37 @@ prefixedName
   | PNAME_NS
   ;
 
-blankNode
-  : BLANK_NODE_LABEL
-  | ANON
+XSD_STRING
+  : 'xsd:string'
+  ;
+XSD_DECIMAL
+  : 'xsd:decimal'
+  ;
+XSD_DOUBLE
+  : 'xsd:double'
+  ;
+XSD_INTEGER
+  : 'xsd:integer'
+  ;
+XSD_BOOLEAN
+  : 'xsd:boolean'
+  ;
+XSD_DATE
+  : 'xsd:date'
+  ;
+XSD_TIME
+  : 'xsd_time'
+  ;
+XSD_DATETIME
+  : 'xsd_datetime'
+  ;
+XSD_DURATION
+  : 'xsd:duration'
+  ;
+XSD_MONTHDAY
+  : 'xsd:monthday'
   ;
 
-// LEXER RULES
-ABS
-  : 'ABS'
-  | 'abs'
-  ;
 AND
   : 'AND'
   | 'and'
@@ -331,309 +198,34 @@ ASC
   : 'ASC'
   | 'asc'
   ;
-BIND
-  : 'BIND'
-  | 'bind'
-  ;
-BNODE
-  : 'BNODE'
-  | 'bnode'
-  ;
-BOOST
-  : 'BOOST'
-  | 'boost'
-  ;
-BOUND
-  : 'BOUND'
-  | 'bound'
-  ;
-CEIL
-  : 'CEIL'
-  | 'ceil'
-  ;
-COALESCE
-  : 'COALESCE'
-  | 'coalesce'
-  ;
-CONCAT
-  : 'CONCAT'
-  | 'concat'
-  ;
-CONTAINS
-  : 'CONTAINS'
-  | 'contains'
-  ;
-DATATYPE
-  : 'DATATYPE'
-  | 'datatype'
-  ;
-DAY
-  : 'DAY'
-  | 'day'
-  ;
 DESC
   : 'DESC'
   | 'desc'
   ;
-ENCODE_FOR_URI
-  : 'ENCODE_FOR_URI'
-  | 'encode_for_uri'
-  ;
-EXISTS
-  : 'EXISTS'
-  | 'exists'
-  ;
+
 FALSE
   : 'FALSE'
   | 'false'
-  ;
-FLOOR
-  : 'FLOOR'
-  | 'floor'
-  ;
-GEOMATCH
-  : 'GEOMATCH'
-  | 'geomatch'
-  ;
-HOURS
-  : 'HOURS'
-  | 'hours'
-  ;
-IF
-  : 'IF'
-  | 'if'
-  ;
-IF_FOLLOWED_BY
-  : 'IF_FOLLOWED_BY'
-  | 'if_followed_by'
-  ;
-IF_FOLLOWS
-  : 'IF_FOLLOWS'
-  | 'if_follows'
   ;
 IN
   : 'IN'
   | 'in'
   ;
-IRI
-  : 'IRI'
-  | 'iri'
-  ;
-ISBLANK
-  : 'ISBLANK'
-  | 'isblank'
-  ;
-ISIRI
-  : 'ISIRI'
-  | 'isiri'
-  ;
-ISLITERAL
-  : 'ISLITERAL'
-  | 'isliteral'
-  ;
-ISNUMERIC
-  : 'ISNUMERIC'
-  | 'isnumeric'
-  ;
-ISURI
-  : 'ISURI'
-  | 'isuri'
-  ;
-LANG
-  : 'LANG'
-  | 'lang'
-  ;
-LANGMATCHES
-  : 'LANGMATCHES'
-  | 'langmatches'
-  ;
-LATLON
-  : 'LATLON'
-  | 'latlon'
-  ;
-LCASE
-  : 'LCASE'
-  | 'lcase'
-  ;
-LOSS_TO
-  : 'LOSS_TO'
-  | 'loss_to'
-  ;
-MAX_HITS
-  : 'MAX_HITS'
-  | 'max_hits'
-  ;
-MD5
-  : 'MD5'
-  | 'md5'
-  ;
-MIN_SCORE
-  : 'MIN_SCORE'
-  | 'min_score'
-  ;
-MINUTES
-  : 'MINUTES'
-  | 'minutes'
-  ;
-MONTH
-  : 'MONTH'
-  | 'month'
-  ;
-NEAR
-  : 'NEAR'
-  | 'near'
-  ;
+
 NOT
   : 'NOT'
   | 'not'
   | '!'
   ;
-NOW
-  : 'NOW'
-  | 'now'
-  ;
-OBFUSCATE
-  : 'OBFUSCATE'
-  | 'obfuscate'
-  ;
-OF
-  : 'OF'
-  | 'of'
-  ;
+
 OR
   : 'OR'
   | 'or'
   | '||'
   ;
-RAND
-  : 'RAND'
-  | 'rand'
-  ;
-REGEX
-  : 'REGEX'
-  | 'regex'
-  ;
-REPLACE
-  : 'REPLACE'
-  | 'replace'
-  ;
-ROUND
-  : 'ROUND'
-  | 'round'
-  ;
-SAMETERM
-  : 'SAMETERM'
-  | 'sameterm'
-  ;
-SECONDS
-  : 'SECONDS'
-  | 'seconds'
-  ;
-SHA1
-  : 'SHA1'
-  | 'sha1'
-  ;
-SHA256
-  : 'SHA256'
-  | 'sha256'
-  ;
-SHA384
-  : 'SHA384'
-  | 'sha384'
-  ;
-SHA512
-  : 'SHA512'
-  | 'sha512'
-  ;
-STR
-  : 'STR'
-  | 'str'
-  ;
-STRAFTER
-  : 'STRAFTER'
-  | 'strafter'
-  ;
-STRBEFORE
-  : 'STRBEFORE'
-  | 'strbefore'
-  ;
-STRDT
-  : 'STRDT'
-  | 'strdt'
-  ;
-STRENDS
-  : 'STRENDS'
-  | 'strends'
-  ;
-STRLANG
-  : 'STRLANG'
-  | 'strlang'
-  ;
-STRLEN
-  : 'STRLEN'
-  | 'strlen'
-  ;
-STRSTARTS
-  : 'STRSTARTS'
-  | 'strstarts'
-  ;
-STRUUID
-  : 'STRUUID'
-  | 'struuid'
-  ;
-SUBJECT
-  : 'SUBJECT'
-  | 'subject'
-  ;
-SUBSTR
-  : 'SUBSTR'
-  | 'substr'
-  ;
-TEXTMATCH
-  : 'TEXTMATCH'
-  | 'textmatch'
-  ;
-TIMEZONE
-  : 'TIMEZONE'
-  | 'timezone'
-  ;
-TO_UNIT
-  : 'TO_UNIT'
-  | 'TOUNIT'
-  | 'to_unit'
-  | 'tounit'
-  ;
 TRUE
   : 'TRUE'
   | 'true'
-  ;
-TZ
-  : 'TZ'
-  | 'tz'
-  ;
-UCASE
-  : 'UCASE'
-  | 'ucase'
-  ;
-URI
-  : 'URI'
-  | 'uri'
-  ;
-UUID
-  : 'UUID'
-  | 'uuid'
-  ;
-WITHIN
-  : 'WITHIN'
-  | 'within'
-  ;
-YEAR
-  : 'YEAR'
-  | 'year'
-  ;
-YOU_MAY_KNOW
-  : 'YOU_MAY_KNOW'
-  | 'you_may_know'
   ;
 
 IRI_REF
@@ -659,18 +251,6 @@ PNAME_NS
 
 PNAME_LN
   : PNAME_NS PN_LOCAL
-  ;
-
-BLANK_NODE_LABEL
-  : '_:' PN_LOCAL
-  ;
-
-LANGTAG
-  : '@' PN_CHARS_BASE+ (
-    '-' (
-      PN_CHARS_BASE DIGIT
-    )+
-  )*
   ;
 
 INTEGER
@@ -736,10 +316,6 @@ ECHAR
 
 EMPTY_PARENS
   : '(' ')'
-  ;
-
-ANON
-  : '[' ']'
   ;
 
 VARNAME

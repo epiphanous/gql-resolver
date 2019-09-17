@@ -1,8 +1,6 @@
-import { ANTLRInputStream, TokenStream } from 'antlr4ts';
+import { CodePointCharStream, TokenStream } from 'antlr4ts';
 import { Option } from 'funfix';
 import { List, Map } from 'immutable';
-import { GraphQLLexer } from '../../antlr4/generated/GraphQLLexer';
-import { GraphQLListener } from '../../antlr4/generated/GraphQLListener';
 import {
   BooleanValueContext,
   DefaultValueContext,
@@ -12,6 +10,8 @@ import {
   EmptyObjectValueContext,
   EnumValueContext,
   FloatValueContext,
+  GraphQLLexer,
+  GraphQLListener,
   GraphQLParser,
   IntValueContext,
   NonEmptyListValueContext,
@@ -21,8 +21,7 @@ import {
   TypeContext,
   ValueContext,
   VariableValueContext,
-} from '../../antlr4/generated/GraphQLParser';
-import { GQLType } from '../../models/GQLType';
+} from '../../antlr4';
 import {
   GQLBooleanValue,
   GQLEnumValue,
@@ -31,16 +30,17 @@ import {
   GQLKeyedValueList,
   GQLNullValue,
   GQLStringValue,
+  GQLType,
   GQLValue,
   GQLValueList,
+  GQLVariable,
   GQLVariableValue,
-} from '../../models/GQLValue';
-import { GQLVariable } from '../../models/GQLVariable';
+} from '../../models';
 import { BuilderBase } from '../BuilderBase';
 
 export class GQLDocumentBuilder<T> extends BuilderBase<T>
   implements GraphQLListener {
-  public lexer(inputStream: ANTLRInputStream) {
+  public lexer(inputStream: CodePointCharStream) {
     return new GraphQLLexer(inputStream);
   }
 
