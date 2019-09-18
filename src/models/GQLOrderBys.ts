@@ -1,20 +1,20 @@
-import { Set } from 'immutable';
-import { GQLFieldDefinition, GQLVariableDefinition, QMDisjunction } from '.';
+import { List, Set } from 'immutable';
+import { GQLFieldDefinition, GQLVariableDefinition, QMOrderBy } from '.';
 import { BuilderErrors } from '../builders';
 
-export class GQLFilter {
-  public expression: QMDisjunction;
+export class GQLOrderBys {
+  public qmOrderBys: List<QMOrderBy>;
   public fieldRefs: Set<GQLFieldDefinition>;
   public varRefs: Set<GQLVariableDefinition>;
   public warnings: BuilderErrors;
 
   constructor(
-    expression: QMDisjunction,
+    qmOrderBys: List<QMOrderBy>,
     fieldRefs: Set<GQLFieldDefinition>,
     varRefs: Set<GQLVariableDefinition>,
     warnings: BuilderErrors
   ) {
-    this.expression = expression;
+    this.qmOrderBys = qmOrderBys;
     this.fieldRefs = fieldRefs;
     this.varRefs = varRefs;
     this.warnings = warnings;

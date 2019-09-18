@@ -1,13 +1,13 @@
 import { Try } from 'funfix';
 import { GQLQueryModifiersBuilder } from '.';
-import { QueryModificationParser, SearchConditionContext } from '../../antlr4';
-import { GQLFilter } from '../../models';
+import { OrderBysContext, QueryModificationParser } from '../../antlr4';
+import { GQLOrderBys } from '../../models';
 
-export class GQLFilterBuilder extends GQLQueryModifiersBuilder {
-  public result: GQLFilter;
+export class GQLOrdersByBuilder extends GQLQueryModifiersBuilder {
+  public result: GQLOrderBys;
 
   public parseWith(parser: QueryModificationParser) {
-    return parser.filter();
+    return parser.orderBys();
   }
 
   public build(parser: QueryModificationParser) {
@@ -22,9 +22,9 @@ export class GQLFilterBuilder extends GQLQueryModifiersBuilder {
     });
   }
 
-  public exitSearchCondition(context: SearchConditionContext): void {
-    this.result = new GQLFilter(
-      this.processSearchCondition(context),
+  public exitOrderBys(context: OrderBysContext) {
+    this.result = new GQLOrderBys(
+      this.processOrderBys(context),
       this.fieldRefs,
       this.varRefs,
       this.errors

@@ -2,7 +2,7 @@ import { List, Map, OrderedMap, Set } from 'immutable';
 import {
   GQLConnectionExecutionPlan,
   GQLField,
-  GQLSortBy,
+  GQLOrderBys,
   SimpleNamespace,
 } from '../../models';
 import { SparqlQueryStrategy } from './SparqlQueryStrategy';
@@ -47,9 +47,9 @@ export class SparqlConnectionCountQueryStrategy extends SparqlQueryStrategy {
 
   /**
    * Returns an empty list, since the count query doesn't sort.
-   * @returns {Set<GQLSortBy>}
+   * @returns {Set<GQLOrderBys>}
    */
-  protected getSortKeys(): List<GQLSortBy> {
+  protected getSortKeys(): List<GQLOrderBys> {
     return List();
   }
 

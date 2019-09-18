@@ -28,7 +28,6 @@ import { DoubleLiteralContext } from './QueryModificationParser';
 import { FilterContext } from './QueryModificationParser';
 import { OrderBysContext } from './QueryModificationParser';
 import { OrderByContext } from './QueryModificationParser';
-import { TransformsContext } from './QueryModificationParser';
 import { SearchConditionContext } from './QueryModificationParser';
 import { SearchConditionAndContext } from './QueryModificationParser';
 import { SearchConditionNotContext } from './QueryModificationParser';
@@ -386,17 +385,6 @@ export interface QueryModificationListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitOrderBy?: (ctx: OrderByContext) => void;
-
-  /**
-   * Enter a parse tree produced by `QueryModificationParser.transforms`.
-   * @param ctx the parse tree
-   */
-  enterTransforms?: (ctx: TransformsContext) => void;
-  /**
-   * Exit a parse tree produced by `QueryModificationParser.transforms`.
-   * @param ctx the parse tree
-   */
-  exitTransforms?: (ctx: TransformsContext) => void;
 
   /**
    * Enter a parse tree produced by `QueryModificationParser.searchCondition`.

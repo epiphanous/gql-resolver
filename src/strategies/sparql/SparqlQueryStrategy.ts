@@ -6,8 +6,10 @@ import {
   GQLExecutionPlan,
   GQLField,
   GQLFieldDefinition,
-  GQLSortBy,
   GQLType,
+  QMContext,
+  QMFieldRef,
+  QMOrderBy,
   QueryResult,
   SimpleNamespace,
 } from '../../models';
@@ -31,7 +33,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
   protected endpoint: string;
   protected prefixes: Map<string, SimpleNamespace>;
   protected parents: Set<string>;
-  protected sortKeys: List<GQLSortBy>;
+  protected sortKeys: List<QMOrderBy>;
   protected wantsParentBinding: boolean;
   protected wantsSubjectBinding: boolean;
   protected fieldAliases: OrderedMap<string, string>;
@@ -175,16 +177,23 @@ export class SparqlQueryStrategy extends QueryStrategy {
     return this.plan.processedArgs.filter.map(f => f.fields).getOrElse(Set());
   }
 
-  protected getSortKeys(): List<GQLSortBy> {
-    return this.plan.processedArgs.sortBy.push(
-      new GQLSortBy(
-        new GQLFieldDefinition(
-          SparqlQueryStrategy.SUBJECT_BINDING,
-          new GQLType('String')
-        ),
-        false
-      )
-    );
+  protected getSortKeys(): List<QMOrderBy> {
+    const qmc = new QMContext();
+    return this.plan.processedArgs.orderBys
+      .map(obs => obs.qmOrderBys)
+      .getOrElse(List<QMOrderBy>())
+      .push(
+        new QMOrderBy(
+          qmc,
+          new QMFieldRef(
+            qmc,
+            new GQLFieldDefinition(
+              SparqlQueryStrategy.SUBJECT_BINDING,
+              GQLType.String
+            )
+          )
+        )
+      );
   }
 
   protected getSubjectPatterns(indent: string = '  ') {

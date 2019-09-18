@@ -1,6 +1,6 @@
 import { None, Option } from 'funfix';
 import { List } from 'immutable';
-import { GQLAny, GQLFilter, GQLSortBy } from '.';
+import { GQLAny, GQLFilter, GQLOrderBys } from '.';
 
 export interface IGQLQueryArguments {
   after?: Option<string>;
@@ -11,7 +11,7 @@ export interface IGQLQueryArguments {
   includeDeprecated?: Option<boolean>;
   last?: Option<number>;
   name?: Option<string>;
-  sortBy?: List<GQLSortBy>;
+  orderBys?: Option<GQLOrderBys>;
 }
 
 export class GQLQueryArguments implements IGQLQueryArguments {
@@ -23,7 +23,7 @@ export class GQLQueryArguments implements IGQLQueryArguments {
   public includeDeprecated: Option<boolean> = None;
   public last: Option<number> = None;
   public name: Option<string> = None;
-  public sortBy = List<GQLSortBy>();
+  public orderBys: Option<GQLOrderBys> = None;
 
   constructor(data: Partial<IGQLQueryArguments> = {}) {
     Object.assign<GQLQueryArguments, Partial<IGQLQueryArguments>>(this, data);

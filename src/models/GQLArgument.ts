@@ -30,4 +30,4 @@ export class GQLIncludeDeprecatedArgument extends GQLArgument {}
 export class GQLInvalidArgument extends GQLArgument {}
 export class GQLLastArgument extends GQLArgument {}
 export class GQLNameArgument extends GQLArgument {}
-export class GQLSortByArgument extends GQLArgument {}
+export class GQLOrderByArgument extends GQLArgument {}

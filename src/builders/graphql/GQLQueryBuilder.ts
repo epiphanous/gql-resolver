@@ -1,6 +1,6 @@
 import { None, Option, Some, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
-import { GQLDocumentBuilder, GQLFilterBuilder, GQLOrderByBuilder } from '.';
+import { GQLDocumentBuilder, GQLFilterBuilder, GQLOrdersByBuilder } from '.';
 import {
   ArgumentContext,
   ArgumentsContext,
@@ -46,12 +46,12 @@ import {
   GQLNameArgument,
   GQLOperation,
   GQLOperationType,
+  GQLOrderByArgument,
+  GQLOrderBys,
   GQLQueryArguments,
   GQLQueryDocument,
   GQLSchema,
   GQLSelection,
-  GQLSortBy,
-  GQLSortByArgument,
   GQLStringValue,
   GQLVariableDefinition,
   GQLVariableValue,
@@ -119,42 +119,37 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
   ): GQLQueryArguments {
     return args.reduce<GQLQueryArguments>((qa, arg) => {
       if (arg instanceof GQLAnyArgument) {
-        const a = arg as GQLAnyArgument;
         return qa.copy({
-          any: qa.any.push(new GQLAny(a.name, Option.of(a.resolve(this.vars)))),
+          any: qa.any.push(
+            new GQLAny(arg.name, Option.of(arg.resolve(this.vars)))
+          ),
         });
       } else if (arg instanceof GQLFilterArgument) {
-        const a = arg as GQLFilterArgument;
         return qa.copy({
-          filter: Some(this.processFilter(a.resolve(this.vars), allFields)),
+          filter: Some(this.processFilter(arg.resolve(this.vars), allFields)),
         });
-      } else if (arg instanceof GQLSortByArgument) {
-        const a = arg as GQLSortByArgument;
+      } else if (arg instanceof GQLOrderByArgument) {
         return qa.copy({
-          sortBy: this.processOrder(a.resolve(this.vars), allFields),
+          orderBys: Some(
+            this.processOrderBys(arg.resolve(this.vars), allFields)
+          ),
         });
       } else if (arg instanceof GQLAfterArgument) {
-        const a = arg as GQLAfterArgument;
-        const after = Some(a.resolve(this.vars));
+        const after = Some(arg.resolve(this.vars));
         return qa.copy({ after });
       } else if (arg instanceof GQLBeforeArgument) {
-        const a = arg as GQLBeforeArgument;
-        const before = Some(a.resolve(this.vars));
+        const before = Some(arg.resolve(this.vars));
         return qa.copy({ before });
       } else if (arg instanceof GQLFirstArgument) {
-        const a = arg as GQLFirstArgument;
-        const first = Some(parseInt(a.resolve(this.vars), 10));
+        const first = Some(parseInt(arg.resolve(this.vars), 10));
         return qa.copy({ first });
       } else if (arg instanceof GQLLastArgument) {
-        const a = arg as GQLFirstArgument;
-        const last = Some(parseInt(a.resolve(this.vars), 10));
+        const last = Some(parseInt(arg.resolve(this.vars), 10));
         return qa.copy({ last });
       } else if (arg instanceof GQLNameArgument) {
-        const a = arg as GQLNameArgument;
-        return qa.copy({ name: Some(a.resolve(this.vars)) });
+        return qa.copy({ name: Some(arg.resolve(this.vars)) });
       } else if (arg instanceof GQLIncludeDeprecatedArgument) {
-        const a = arg as GQLIncludeDeprecatedArgument;
-        const b = /^(1|t|true)$/.test(a.resolve(this.vars).toLowerCase());
+        const b = /^(1|t|true)$/.test(arg.resolve(this.vars).toLowerCase());
         return qa.copy({ includeDeprecated: Some(b) });
       } else {
         return qa;
@@ -165,33 +160,19 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
   public processFilter(
     filterExpr: string,
     validFields: List<GQLFieldDefinition>
-  ) {
-    // For cases where we have nested str identifiers in the GQL query but need to pass onto other builders
-    console.log('filter expression', filterExpr);
-    const builtFilter = new GQLFilterBuilder(
-      validFields,
-      this.variables,
-      this.vars,
-      Set(this.getPrefixes().keys()),
+  ): GQLFilter {
+    return Builder.parse<GQLFilter>(
+      new GQLFilterBuilder(validFields, this.variables, this.vars, filterExpr),
       filterExpr
-    );
-    console.log('variables', this.variables.toJSON());
-    console.log('builtFilter', builtFilter);
-    // const exprWithoutDoubleEscape = filterExpr.replace(/\\/g, '');
-    return Builder.parse<GQLFilter>(builtFilter, filterExpr).get();
+    ).get();
   }
 
-  public processOrder(
+  public processOrderBys(
     orderExpr: string,
     validFields: List<GQLFieldDefinition>
-  ) {
-    return Builder.parse<List<GQLSortBy>>(
-      new GQLOrderByBuilder(
-        validFields,
-        this.variables,
-        this.vars,
-        Set(this.getPrefixes().keys())
-      ),
+  ): GQLOrderBys {
+    return Builder.parse<GQLOrderBys>(
+      new GQLOrdersByBuilder(validFields, this.variables, this.vars, orderExpr),
       orderExpr
     ).get();
   }
@@ -430,7 +411,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
           case ARG_TYPES.ARG_FILTER:
             return new GQLFilterArgument(name, v);
           case ARG_TYPES.ARG_SORT_BY:
-            return new GQLSortByArgument(name, v);
+            return new GQLOrderByArgument(name, v);
           case ARG_TYPES.ARG_FIRST:
             return new GQLFirstArgument(name, v);
           case ARG_TYPES.ARG_LAST:

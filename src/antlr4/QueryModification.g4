@@ -19,7 +19,7 @@ orderBys
   ;
 
 orderBy
-  : fieldRef (
+  : expression (
     ASC
     | DESC
   )?
@@ -120,7 +120,7 @@ comparisonOp
 
 unaryOp
   : '-'
-  | '+'
+  | '!'
   ;
 
 factorOp

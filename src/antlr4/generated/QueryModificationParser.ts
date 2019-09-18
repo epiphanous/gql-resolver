@@ -60,59 +60,55 @@ export class QueryModificationParser extends Parser {
   public static readonly AND = 33;
   public static readonly AS = 34;
   public static readonly ASC = 35;
-  public static readonly BOOST = 36;
-  public static readonly DESC = 37;
-  public static readonly FALSE = 38;
-  public static readonly IN = 39;
-  public static readonly NOT = 40;
-  public static readonly OF = 41;
-  public static readonly OR = 42;
-  public static readonly TRUE = 43;
-  public static readonly IRI_REF = 44;
-  public static readonly PNAME_NS = 45;
-  public static readonly PNAME_LN = 46;
-  public static readonly INTEGER = 47;
-  public static readonly DECIMAL = 48;
-  public static readonly DOUBLE = 49;
-  public static readonly EXPONENT = 50;
-  public static readonly STRING_LITERAL1 = 51;
-  public static readonly STRING_LITERAL2 = 52;
-  public static readonly ECHAR = 53;
-  public static readonly EMPTY_PARENS = 54;
-  public static readonly VARNAME = 55;
-  public static readonly PN_PREFIX = 56;
-  public static readonly PN_LOCAL = 57;
-  public static readonly WS = 58;
+  public static readonly DESC = 36;
+  public static readonly FALSE = 37;
+  public static readonly IN = 38;
+  public static readonly NOT = 39;
+  public static readonly OR = 40;
+  public static readonly TRUE = 41;
+  public static readonly IRI_REF = 42;
+  public static readonly PNAME_NS = 43;
+  public static readonly PNAME_LN = 44;
+  public static readonly INTEGER = 45;
+  public static readonly DECIMAL = 46;
+  public static readonly DOUBLE = 47;
+  public static readonly EXPONENT = 48;
+  public static readonly STRING_LITERAL1 = 49;
+  public static readonly STRING_LITERAL2 = 50;
+  public static readonly ECHAR = 51;
+  public static readonly EMPTY_PARENS = 52;
+  public static readonly VARNAME = 53;
+  public static readonly PN_PREFIX = 54;
+  public static readonly PN_LOCAL = 55;
+  public static readonly WS = 56;
   public static readonly RULE_filter = 0;
   public static readonly RULE_orderBys = 1;
   public static readonly RULE_orderBy = 2;
-  public static readonly RULE_transforms = 3;
-  public static readonly RULE_searchCondition = 4;
-  public static readonly RULE_searchConditionAnd = 5;
-  public static readonly RULE_searchConditionNot = 6;
-  public static readonly RULE_predicate = 7;
-  public static readonly RULE_expression = 8;
-  public static readonly RULE_expressionAtom = 9;
-  public static readonly RULE_expressionList = 10;
-  public static readonly RULE_functionCall = 11;
-  public static readonly RULE_xsdType = 12;
-  public static readonly RULE_numericLiteral = 13;
-  public static readonly RULE_varRef = 14;
-  public static readonly RULE_fieldRef = 15;
-  public static readonly RULE_comparisonOp = 16;
-  public static readonly RULE_unaryOp = 17;
-  public static readonly RULE_factorOp = 18;
-  public static readonly RULE_termOp = 19;
-  public static readonly RULE_stringLiteral = 20;
-  public static readonly RULE_booleanLiteral = 21;
-  public static readonly RULE_iriRef = 22;
-  public static readonly RULE_prefixedName = 23;
+  public static readonly RULE_searchCondition = 3;
+  public static readonly RULE_searchConditionAnd = 4;
+  public static readonly RULE_searchConditionNot = 5;
+  public static readonly RULE_predicate = 6;
+  public static readonly RULE_expression = 7;
+  public static readonly RULE_expressionAtom = 8;
+  public static readonly RULE_expressionList = 9;
+  public static readonly RULE_functionCall = 10;
+  public static readonly RULE_xsdType = 11;
+  public static readonly RULE_numericLiteral = 12;
+  public static readonly RULE_varRef = 13;
+  public static readonly RULE_fieldRef = 14;
+  public static readonly RULE_comparisonOp = 15;
+  public static readonly RULE_unaryOp = 16;
+  public static readonly RULE_factorOp = 17;
+  public static readonly RULE_termOp = 18;
+  public static readonly RULE_stringLiteral = 19;
+  public static readonly RULE_booleanLiteral = 20;
+  public static readonly RULE_iriRef = 21;
+  public static readonly RULE_prefixedName = 22;
   // tslint:disable:no-trailing-whitespace
   public static readonly ruleNames: string[] = [
     'filter',
     'orderBys',
     'orderBy',
-    'transforms',
     'searchCondition',
     'searchConditionAnd',
     'searchConditionNot',
@@ -138,7 +134,6 @@ export class QueryModificationParser extends Parser {
   private static readonly _LITERAL_NAMES: Array<string | undefined> = [
     undefined,
     "','",
-    "'|'",
     "'('",
     "')'",
     "'['",
@@ -155,10 +150,11 @@ export class QueryModificationParser extends Parser {
     "'!~'",
     "'!~*'",
     "'-'",
-    "'+'",
+    "'!'",
     "'*'",
     "'/'",
     "'%'",
+    "'+'",
     "'xsd:string'",
     "'xsd:decimal'",
     "'xsd:double'",
@@ -207,12 +203,10 @@ export class QueryModificationParser extends Parser {
     'AND',
     'AS',
     'ASC',
-    'BOOST',
     'DESC',
     'FALSE',
     'IN',
     'NOT',
-    'OF',
     'OR',
     'TRUE',
     'IRI_REF',
@@ -270,9 +264,9 @@ export class QueryModificationParser extends Parser {
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 48;
+        this.state = 46;
         this.searchCondition();
-        this.state = 49;
+        this.state = 47;
         this.match(QueryModificationParser.EOF);
       }
     } catch (re) {
@@ -296,25 +290,25 @@ export class QueryModificationParser extends Parser {
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 51;
+        this.state = 49;
         this.orderBy();
-        this.state = 56;
+        this.state = 54;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
         while (_la === QueryModificationParser.T__0) {
           {
             {
-              this.state = 52;
+              this.state = 50;
               this.match(QueryModificationParser.T__0);
-              this.state = 53;
+              this.state = 51;
               this.orderBy();
             }
           }
-          this.state = 58;
+          this.state = 56;
           this._errHandler.sync(this);
           _la = this._input.LA(1);
         }
-        this.state = 59;
+        this.state = 57;
         this.match(QueryModificationParser.EOF);
       }
     } catch (re) {
@@ -338,9 +332,9 @@ export class QueryModificationParser extends Parser {
     try {
       this.enterOuterAlt(_localctx, 1);
       {
+        this.state = 59;
+        this.expression(0);
         this.state = 61;
-        this.fieldRef();
-        this.state = 63;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
         if (
@@ -348,7 +342,7 @@ export class QueryModificationParser extends Parser {
           _la === QueryModificationParser.DESC
         ) {
           {
-            this.state = 62;
+            this.state = 60;
             _la = this._input.LA(1);
             if (
               !(
@@ -382,111 +376,31 @@ export class QueryModificationParser extends Parser {
     return _localctx;
   }
   // @RuleVersion(0)
-  public transforms(): TransformsContext {
-    let _localctx: TransformsContext = new TransformsContext(
-      this._ctx,
-      this.state
-    );
-    this.enterRule(_localctx, 6, QueryModificationParser.RULE_transforms);
-    let _la: number;
-    try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 65;
-        this.functionCall();
-        this.state = 72;
-        this._errHandler.sync(this);
-        _la = this._input.LA(1);
-        while (
-          _la === QueryModificationParser.T__0 ||
-          _la === QueryModificationParser.T__1 ||
-          (((_la - 44) & ~0x1f) === 0 &&
-            ((1 << (_la - 44)) &
-              ((1 << (QueryModificationParser.IRI_REF - 44)) |
-                (1 << (QueryModificationParser.PNAME_NS - 44)) |
-                (1 << (QueryModificationParser.PNAME_LN - 44)))) !==
-              0)
-        ) {
-          {
-            {
-              this.state = 67;
-              this._errHandler.sync(this);
-              _la = this._input.LA(1);
-              if (
-                _la === QueryModificationParser.T__0 ||
-                _la === QueryModificationParser.T__1
-              ) {
-                {
-                  this.state = 66;
-                  _la = this._input.LA(1);
-                  if (
-                    !(
-                      _la === QueryModificationParser.T__0 ||
-                      _la === QueryModificationParser.T__1
-                    )
-                  ) {
-                    this._errHandler.recoverInline(this);
-                  } else {
-                    if (this._input.LA(1) === Token.EOF) {
-                      this.matchedEOF = true;
-                    }
-
-                    this._errHandler.reportMatch(this);
-                    this.consume();
-                  }
-                }
-              }
-
-              this.state = 69;
-              this.functionCall();
-            }
-          }
-          this.state = 74;
-          this._errHandler.sync(this);
-          _la = this._input.LA(1);
-        }
-        this.state = 75;
-        this.match(QueryModificationParser.EOF);
-      }
-    } catch (re) {
-      if (re instanceof RecognitionException) {
-        _localctx.exception = re;
-        this._errHandler.reportError(this, re);
-        this._errHandler.recover(this, re);
-      } else {
-        throw re;
-      }
-    } finally {
-      this.exitRule();
-    }
-    return _localctx;
-  }
-  // @RuleVersion(0)
   public searchCondition(): SearchConditionContext {
     let _localctx: SearchConditionContext = new SearchConditionContext(
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 8, QueryModificationParser.RULE_searchCondition);
+    this.enterRule(_localctx, 6, QueryModificationParser.RULE_searchCondition);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 77;
+        this.state = 63;
         this.searchConditionAnd();
-        this.state = 82;
+        this.state = 68;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
         while (_la === QueryModificationParser.OR) {
           {
             {
-              this.state = 78;
+              this.state = 64;
               this.match(QueryModificationParser.OR);
-              this.state = 79;
+              this.state = 65;
               this.searchConditionAnd();
             }
           }
-          this.state = 84;
+          this.state = 70;
           this._errHandler.sync(this);
           _la = this._input.LA(1);
         }
@@ -512,28 +426,28 @@ export class QueryModificationParser extends Parser {
     );
     this.enterRule(
       _localctx,
-      10,
+      8,
       QueryModificationParser.RULE_searchConditionAnd
     );
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 85;
+        this.state = 71;
         this.searchConditionNot();
-        this.state = 90;
+        this.state = 76;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
         while (_la === QueryModificationParser.AND) {
           {
             {
-              this.state = 86;
+              this.state = 72;
               this.match(QueryModificationParser.AND);
-              this.state = 87;
+              this.state = 73;
               this.searchConditionNot();
             }
           }
-          this.state = 92;
+          this.state = 78;
           this._errHandler.sync(this);
           _la = this._input.LA(1);
         }
@@ -559,24 +473,24 @@ export class QueryModificationParser extends Parser {
     );
     this.enterRule(
       _localctx,
-      12,
+      10,
       QueryModificationParser.RULE_searchConditionNot
     );
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 94;
+        this.state = 80;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
         if (_la === QueryModificationParser.NOT) {
           {
-            this.state = 93;
+            this.state = 79;
             this.match(QueryModificationParser.NOT);
           }
         }
 
-        this.state = 96;
+        this.state = 82;
         this.predicate();
       }
     } catch (re) {
@@ -598,21 +512,21 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 14, QueryModificationParser.RULE_predicate);
+    this.enterRule(_localctx, 12, QueryModificationParser.RULE_predicate);
     let _la: number;
     try {
-      this.state = 120;
+      this.state = 106;
       this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 9, this._ctx)) {
+      switch (this.interpreter.adaptivePredict(this._input, 7, this._ctx)) {
         case 1:
           _localctx = new ComparisonPredicateContext(_localctx);
           this.enterOuterAlt(_localctx, 1);
           {
-            this.state = 98;
+            this.state = 84;
             this.expression(0);
-            this.state = 99;
+            this.state = 85;
             this.comparisonOp();
-            this.state = 100;
+            this.state = 86;
             this.expression(0);
           }
           break;
@@ -621,21 +535,21 @@ export class QueryModificationParser extends Parser {
           _localctx = new InPredicateContext(_localctx);
           this.enterOuterAlt(_localctx, 2);
           {
-            this.state = 102;
+            this.state = 88;
             this.expression(0);
-            this.state = 104;
+            this.state = 90;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
             if (_la === QueryModificationParser.NOT) {
               {
-                this.state = 103;
+                this.state = 89;
                 this.match(QueryModificationParser.NOT);
               }
             }
 
-            this.state = 106;
+            this.state = 92;
             this.match(QueryModificationParser.IN);
-            this.state = 107;
+            this.state = 93;
             this.expressionList();
           }
           break;
@@ -644,21 +558,21 @@ export class QueryModificationParser extends Parser {
           _localctx = new InVarPredicateContext(_localctx);
           this.enterOuterAlt(_localctx, 3);
           {
-            this.state = 109;
+            this.state = 95;
             this.expression(0);
-            this.state = 111;
+            this.state = 97;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
             if (_la === QueryModificationParser.NOT) {
               {
-                this.state = 110;
+                this.state = 96;
                 this.match(QueryModificationParser.NOT);
               }
             }
 
-            this.state = 113;
+            this.state = 99;
             this.match(QueryModificationParser.IN);
-            this.state = 114;
+            this.state = 100;
             this.varRef();
           }
           break;
@@ -667,12 +581,12 @@ export class QueryModificationParser extends Parser {
           _localctx = new ParenPredicateContext(_localctx);
           this.enterOuterAlt(_localctx, 4);
           {
-            this.state = 116;
-            this.match(QueryModificationParser.T__2);
-            this.state = 117;
+            this.state = 102;
+            this.match(QueryModificationParser.T__1);
+            this.state = 103;
             this.searchCondition();
-            this.state = 118;
-            this.match(QueryModificationParser.T__3);
+            this.state = 104;
+            this.match(QueryModificationParser.T__2);
           }
           break;
       }
@@ -705,10 +619,10 @@ export class QueryModificationParser extends Parser {
       _parentState
     );
     let _prevctx: ExpressionContext = _localctx;
-    let _startState: number = 16;
+    let _startState: number = 14;
     this.enterRecursionRule(
       _localctx,
-      16,
+      14,
       QueryModificationParser.RULE_expression,
       _p
     );
@@ -716,23 +630,23 @@ export class QueryModificationParser extends Parser {
       let _alt: number;
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 131;
+        this.state = 117;
         this._errHandler.sync(this);
         switch (this._input.LA(1)) {
+          case QueryModificationParser.T__16:
           case QueryModificationParser.T__17:
-          case QueryModificationParser.T__18:
             {
               _localctx = new UnaryExpressionContext(_localctx);
               this._ctx = _localctx;
               _prevctx = _localctx;
 
-              this.state = 123;
+              this.state = 109;
               this.unaryOp();
-              this.state = 124;
+              this.state = 110;
               this.expression(5);
             }
             break;
-          case QueryModificationParser.T__6:
+          case QueryModificationParser.T__5:
           case QueryModificationParser.FALSE:
           case QueryModificationParser.TRUE:
           case QueryModificationParser.IRI_REF:
@@ -747,30 +661,30 @@ export class QueryModificationParser extends Parser {
               _localctx = new PrimitiveExpressionContext(_localctx);
               this._ctx = _localctx;
               _prevctx = _localctx;
-              this.state = 126;
+              this.state = 112;
               this.expressionAtom();
             }
             break;
-          case QueryModificationParser.T__2:
+          case QueryModificationParser.T__1:
             {
               _localctx = new ParenExpressionContext(_localctx);
               this._ctx = _localctx;
               _prevctx = _localctx;
-              this.state = 127;
-              this.match(QueryModificationParser.T__2);
-              this.state = 128;
+              this.state = 113;
+              this.match(QueryModificationParser.T__1);
+              this.state = 114;
               this.expression(0);
-              this.state = 129;
-              this.match(QueryModificationParser.T__3);
+              this.state = 115;
+              this.match(QueryModificationParser.T__2);
             }
             break;
           default:
             throw new NoViableAltException(this);
         }
         this._ctx._stop = this._input.tryLT(-1);
-        this.state = 143;
+        this.state = 129;
         this._errHandler.sync(this);
-        _alt = this.interpreter.adaptivePredict(this._input, 12, this._ctx);
+        _alt = this.interpreter.adaptivePredict(this._input, 10, this._ctx);
         while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
           if (_alt === 1) {
             if (this._parseListeners != null) {
@@ -778,10 +692,10 @@ export class QueryModificationParser extends Parser {
             }
             _prevctx = _localctx;
             {
-              this.state = 141;
+              this.state = 127;
               this._errHandler.sync(this);
               switch (
-                this.interpreter.adaptivePredict(this._input, 11, this._ctx)
+                this.interpreter.adaptivePredict(this._input, 9, this._ctx)
               ) {
                 case 1:
                   {
@@ -793,16 +707,16 @@ export class QueryModificationParser extends Parser {
                       _startState,
                       QueryModificationParser.RULE_expression
                     );
-                    this.state = 133;
+                    this.state = 119;
                     if (!this.precpred(this._ctx, 4)) {
                       throw new FailedPredicateException(
                         this,
                         'this.precpred(this._ctx, 4)'
                       );
                     }
-                    this.state = 134;
+                    this.state = 120;
                     this.factorOp();
-                    this.state = 135;
+                    this.state = 121;
                     this.expression(5);
                   }
                   break;
@@ -817,25 +731,25 @@ export class QueryModificationParser extends Parser {
                       _startState,
                       QueryModificationParser.RULE_expression
                     );
-                    this.state = 137;
+                    this.state = 123;
                     if (!this.precpred(this._ctx, 3)) {
                       throw new FailedPredicateException(
                         this,
                         'this.precpred(this._ctx, 3)'
                       );
                     }
-                    this.state = 138;
+                    this.state = 124;
                     this.termOp();
-                    this.state = 139;
+                    this.state = 125;
                     this.expression(4);
                   }
                   break;
               }
             }
           }
-          this.state = 145;
+          this.state = 131;
           this._errHandler.sync(this);
-          _alt = this.interpreter.adaptivePredict(this._input, 12, this._ctx);
+          _alt = this.interpreter.adaptivePredict(this._input, 10, this._ctx);
         }
       }
     } catch (re) {
@@ -857,16 +771,16 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 18, QueryModificationParser.RULE_expressionAtom);
+    this.enterRule(_localctx, 16, QueryModificationParser.RULE_expressionAtom);
     try {
-      this.state = 153;
+      this.state = 139;
       this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 13, this._ctx)) {
+      switch (this.interpreter.adaptivePredict(this._input, 11, this._ctx)) {
         case 1:
           _localctx = new FunctionCallAtomContext(_localctx);
           this.enterOuterAlt(_localctx, 1);
           {
-            this.state = 146;
+            this.state = 132;
             this.functionCall();
           }
           break;
@@ -875,7 +789,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new StringLiteralAtomContext(_localctx);
           this.enterOuterAlt(_localctx, 2);
           {
-            this.state = 147;
+            this.state = 133;
             this.stringLiteral();
           }
           break;
@@ -884,7 +798,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new NumericLiteralAtomContext(_localctx);
           this.enterOuterAlt(_localctx, 3);
           {
-            this.state = 148;
+            this.state = 134;
             this.numericLiteral();
           }
           break;
@@ -893,7 +807,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new BooleanLiteralAtomContext(_localctx);
           this.enterOuterAlt(_localctx, 4);
           {
-            this.state = 149;
+            this.state = 135;
             this.booleanLiteral();
           }
           break;
@@ -902,7 +816,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new IriRefAtomContext(_localctx);
           this.enterOuterAlt(_localctx, 5);
           {
-            this.state = 150;
+            this.state = 136;
             this.iriRef();
           }
           break;
@@ -911,7 +825,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new FieldRefAtomContext(_localctx);
           this.enterOuterAlt(_localctx, 6);
           {
-            this.state = 151;
+            this.state = 137;
             this.fieldRef();
           }
           break;
@@ -920,7 +834,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new VarRefAtomContext(_localctx);
           this.enterOuterAlt(_localctx, 7);
           {
-            this.state = 152;
+            this.state = 138;
             this.varRef();
           }
           break;
@@ -944,33 +858,33 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 20, QueryModificationParser.RULE_expressionList);
+    this.enterRule(_localctx, 18, QueryModificationParser.RULE_expressionList);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 155;
-        this.match(QueryModificationParser.T__2);
-        this.state = 156;
+        this.state = 141;
+        this.match(QueryModificationParser.T__1);
+        this.state = 142;
         this.expression(0);
-        this.state = 161;
+        this.state = 147;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
         while (_la === QueryModificationParser.T__0) {
           {
             {
-              this.state = 157;
+              this.state = 143;
               this.match(QueryModificationParser.T__0);
-              this.state = 158;
+              this.state = 144;
               this.expression(0);
             }
           }
-          this.state = 163;
+          this.state = 149;
           this._errHandler.sync(this);
           _la = this._input.LA(1);
         }
-        this.state = 164;
-        this.match(QueryModificationParser.T__3);
+        this.state = 150;
+        this.match(QueryModificationParser.T__2);
       }
     } catch (re) {
       if (re instanceof RecognitionException) {
@@ -991,24 +905,24 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 22, QueryModificationParser.RULE_functionCall);
+    this.enterRule(_localctx, 20, QueryModificationParser.RULE_functionCall);
     try {
-      this.state = 178;
+      this.state = 164;
       this._errHandler.sync(this);
-      switch (this.interpreter.adaptivePredict(this._input, 15, this._ctx)) {
+      switch (this.interpreter.adaptivePredict(this._input, 13, this._ctx)) {
         case 1:
           _localctx = new FuncWithoutArgsContext(_localctx);
           this.enterOuterAlt(_localctx, 1);
           {
-            this.state = 166;
+            this.state = 152;
             this.iriRef();
-            this.state = 167;
-            this.match(QueryModificationParser.T__4);
-            this.state = 168;
+            this.state = 153;
+            this.match(QueryModificationParser.T__3);
+            this.state = 154;
             this.xsdType();
-            this.state = 169;
-            this.match(QueryModificationParser.T__5);
-            this.state = 170;
+            this.state = 155;
+            this.match(QueryModificationParser.T__4);
+            this.state = 156;
             this.match(QueryModificationParser.EMPTY_PARENS);
           }
           break;
@@ -1017,15 +931,15 @@ export class QueryModificationParser extends Parser {
           _localctx = new FuncWithArgsContext(_localctx);
           this.enterOuterAlt(_localctx, 2);
           {
-            this.state = 172;
+            this.state = 158;
             this.iriRef();
-            this.state = 173;
-            this.match(QueryModificationParser.T__4);
-            this.state = 174;
+            this.state = 159;
+            this.match(QueryModificationParser.T__3);
+            this.state = 160;
             this.xsdType();
-            this.state = 175;
-            this.match(QueryModificationParser.T__5);
-            this.state = 176;
+            this.state = 161;
+            this.match(QueryModificationParser.T__4);
+            this.state = 162;
             this.expressionList();
           }
           break;
@@ -1046,12 +960,12 @@ export class QueryModificationParser extends Parser {
   // @RuleVersion(0)
   public xsdType(): XsdTypeContext {
     let _localctx: XsdTypeContext = new XsdTypeContext(this._ctx, this.state);
-    this.enterRule(_localctx, 24, QueryModificationParser.RULE_xsdType);
+    this.enterRule(_localctx, 22, QueryModificationParser.RULE_xsdType);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 180;
+        this.state = 166;
         _la = this._input.LA(1);
         if (
           !(
@@ -1099,16 +1013,16 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 26, QueryModificationParser.RULE_numericLiteral);
+    this.enterRule(_localctx, 24, QueryModificationParser.RULE_numericLiteral);
     try {
-      this.state = 185;
+      this.state = 171;
       this._errHandler.sync(this);
       switch (this._input.LA(1)) {
         case QueryModificationParser.INTEGER:
           _localctx = new IntegerLiteralContext(_localctx);
           this.enterOuterAlt(_localctx, 1);
           {
-            this.state = 182;
+            this.state = 168;
             this.match(QueryModificationParser.INTEGER);
           }
           break;
@@ -1116,7 +1030,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new DecimalLiteralContext(_localctx);
           this.enterOuterAlt(_localctx, 2);
           {
-            this.state = 183;
+            this.state = 169;
             this.match(QueryModificationParser.DECIMAL);
           }
           break;
@@ -1124,7 +1038,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new DoubleLiteralContext(_localctx);
           this.enterOuterAlt(_localctx, 3);
           {
-            this.state = 184;
+            this.state = 170;
             this.match(QueryModificationParser.DOUBLE);
           }
           break;
@@ -1147,13 +1061,13 @@ export class QueryModificationParser extends Parser {
   // @RuleVersion(0)
   public varRef(): VarRefContext {
     let _localctx: VarRefContext = new VarRefContext(this._ctx, this.state);
-    this.enterRule(_localctx, 28, QueryModificationParser.RULE_varRef);
+    this.enterRule(_localctx, 26, QueryModificationParser.RULE_varRef);
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 187;
-        this.match(QueryModificationParser.T__6);
-        this.state = 188;
+        this.state = 173;
+        this.match(QueryModificationParser.T__5);
+        this.state = 174;
         this.match(QueryModificationParser.VARNAME);
       }
     } catch (re) {
@@ -1172,11 +1086,11 @@ export class QueryModificationParser extends Parser {
   // @RuleVersion(0)
   public fieldRef(): FieldRefContext {
     let _localctx: FieldRefContext = new FieldRefContext(this._ctx, this.state);
-    this.enterRule(_localctx, 30, QueryModificationParser.RULE_fieldRef);
+    this.enterRule(_localctx, 28, QueryModificationParser.RULE_fieldRef);
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 190;
+        this.state = 176;
         this.match(QueryModificationParser.VARNAME);
       }
     } catch (re) {
@@ -1198,18 +1112,19 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 32, QueryModificationParser.RULE_comparisonOp);
+    this.enterRule(_localctx, 30, QueryModificationParser.RULE_comparisonOp);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 192;
+        this.state = 178;
         _la = this._input.LA(1);
         if (
           !(
             (_la & ~0x1f) === 0 &&
             ((1 << _la) &
-              ((1 << QueryModificationParser.T__7) |
+              ((1 << QueryModificationParser.T__6) |
+                (1 << QueryModificationParser.T__7) |
                 (1 << QueryModificationParser.T__8) |
                 (1 << QueryModificationParser.T__9) |
                 (1 << QueryModificationParser.T__10) |
@@ -1217,8 +1132,7 @@ export class QueryModificationParser extends Parser {
                 (1 << QueryModificationParser.T__12) |
                 (1 << QueryModificationParser.T__13) |
                 (1 << QueryModificationParser.T__14) |
-                (1 << QueryModificationParser.T__15) |
-                (1 << QueryModificationParser.T__16))) !==
+                (1 << QueryModificationParser.T__15))) !==
               0
           )
         ) {
@@ -1248,17 +1162,17 @@ export class QueryModificationParser extends Parser {
   // @RuleVersion(0)
   public unaryOp(): UnaryOpContext {
     let _localctx: UnaryOpContext = new UnaryOpContext(this._ctx, this.state);
-    this.enterRule(_localctx, 34, QueryModificationParser.RULE_unaryOp);
+    this.enterRule(_localctx, 32, QueryModificationParser.RULE_unaryOp);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 194;
+        this.state = 180;
         _la = this._input.LA(1);
         if (
           !(
-            _la === QueryModificationParser.T__17 ||
-            _la === QueryModificationParser.T__18
+            _la === QueryModificationParser.T__16 ||
+            _la === QueryModificationParser.T__17
           )
         ) {
           this._errHandler.recoverInline(this);
@@ -1287,20 +1201,20 @@ export class QueryModificationParser extends Parser {
   // @RuleVersion(0)
   public factorOp(): FactorOpContext {
     let _localctx: FactorOpContext = new FactorOpContext(this._ctx, this.state);
-    this.enterRule(_localctx, 36, QueryModificationParser.RULE_factorOp);
+    this.enterRule(_localctx, 34, QueryModificationParser.RULE_factorOp);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 196;
+        this.state = 182;
         _la = this._input.LA(1);
         if (
           !(
             (_la & ~0x1f) === 0 &&
             ((1 << _la) &
-              ((1 << QueryModificationParser.T__19) |
-                (1 << QueryModificationParser.T__20) |
-                (1 << QueryModificationParser.T__21))) !==
+              ((1 << QueryModificationParser.T__18) |
+                (1 << QueryModificationParser.T__19) |
+                (1 << QueryModificationParser.T__20))) !==
               0
           )
         ) {
@@ -1330,17 +1244,17 @@ export class QueryModificationParser extends Parser {
   // @RuleVersion(0)
   public termOp(): TermOpContext {
     let _localctx: TermOpContext = new TermOpContext(this._ctx, this.state);
-    this.enterRule(_localctx, 38, QueryModificationParser.RULE_termOp);
+    this.enterRule(_localctx, 36, QueryModificationParser.RULE_termOp);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 198;
+        this.state = 184;
         _la = this._input.LA(1);
         if (
           !(
-            _la === QueryModificationParser.T__17 ||
-            _la === QueryModificationParser.T__18
+            _la === QueryModificationParser.T__16 ||
+            _la === QueryModificationParser.T__21
           )
         ) {
           this._errHandler.recoverInline(this);
@@ -1372,11 +1286,11 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 40, QueryModificationParser.RULE_stringLiteral);
+    this.enterRule(_localctx, 38, QueryModificationParser.RULE_stringLiteral);
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 200;
+        this.state = 186;
         this.match(QueryModificationParser.STRING_LITERAL1);
       }
     } catch (re) {
@@ -1398,12 +1312,12 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 42, QueryModificationParser.RULE_booleanLiteral);
+    this.enterRule(_localctx, 40, QueryModificationParser.RULE_booleanLiteral);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 202;
+        this.state = 188;
         _la = this._input.LA(1);
         if (
           !(
@@ -1437,16 +1351,16 @@ export class QueryModificationParser extends Parser {
   // @RuleVersion(0)
   public iriRef(): IriRefContext {
     let _localctx: IriRefContext = new IriRefContext(this._ctx, this.state);
-    this.enterRule(_localctx, 44, QueryModificationParser.RULE_iriRef);
+    this.enterRule(_localctx, 42, QueryModificationParser.RULE_iriRef);
     try {
-      this.state = 206;
+      this.state = 192;
       this._errHandler.sync(this);
       switch (this._input.LA(1)) {
         case QueryModificationParser.IRI_REF:
           _localctx = new LiteralIriRefContext(_localctx);
           this.enterOuterAlt(_localctx, 1);
           {
-            this.state = 204;
+            this.state = 190;
             this.match(QueryModificationParser.IRI_REF);
           }
           break;
@@ -1455,7 +1369,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new PrefixedNameIriRefContext(_localctx);
           this.enterOuterAlt(_localctx, 2);
           {
-            this.state = 205;
+            this.state = 191;
             this.prefixedName();
           }
           break;
@@ -1481,12 +1395,12 @@ export class QueryModificationParser extends Parser {
       this._ctx,
       this.state
     );
-    this.enterRule(_localctx, 46, QueryModificationParser.RULE_prefixedName);
+    this.enterRule(_localctx, 44, QueryModificationParser.RULE_prefixedName);
     let _la: number;
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 208;
+        this.state = 194;
         _la = this._input.LA(1);
         if (
           !(
@@ -1524,7 +1438,7 @@ export class QueryModificationParser extends Parser {
     predIndex: number
   ): boolean {
     switch (ruleIndex) {
-      case 8:
+      case 7:
         return this.expression_sempred(
           _localctx as ExpressionContext,
           predIndex
@@ -1547,94 +1461,88 @@ export class QueryModificationParser extends Parser {
   }
 
   public static readonly _serializedATN: string =
-    '\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03<\xD5\x04\x02' +
+    '\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03:\xC7\x04\x02' +
     '\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07' +
     '\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04' +
     '\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04' +
     '\x13\t\x13\x04\x14\t\x14\x04\x15\t\x15\x04\x16\t\x16\x04\x17\t\x17\x04' +
-    '\x18\t\x18\x04\x19\t\x19\x03\x02\x03\x02\x03\x02\x03\x03\x03\x03\x03\x03' +
-    '\x07\x039\n\x03\f\x03\x0E\x03<\v\x03\x03\x03\x03\x03\x03\x04\x03\x04\x05' +
-    '\x04B\n\x04\x03\x05\x03\x05\x05\x05F\n\x05\x03\x05\x07\x05I\n\x05\f\x05' +
-    '\x0E\x05L\v\x05\x03\x05\x03\x05\x03\x06\x03\x06\x03\x06\x07\x06S\n\x06' +
-    '\f\x06\x0E\x06V\v\x06\x03\x07\x03\x07\x03\x07\x07\x07[\n\x07\f\x07\x0E' +
-    '\x07^\v\x07\x03\b\x05\ba\n\b\x03\b\x03\b\x03\t\x03\t\x03\t\x03\t\x03\t' +
-    '\x03\t\x05\tk\n\t\x03\t\x03\t\x03\t\x03\t\x03\t\x05\tr\n\t\x03\t\x03\t' +
-    '\x03\t\x03\t\x03\t\x03\t\x03\t\x05\t{\n\t\x03\n\x03\n\x03\n\x03\n\x03' +
-    '\n\x03\n\x03\n\x03\n\x03\n\x05\n\x86\n\n\x03\n\x03\n\x03\n\x03\n\x03\n' +
-    '\x03\n\x03\n\x03\n\x07\n\x90\n\n\f\n\x0E\n\x93\v\n\x03\v\x03\v\x03\v\x03' +
-    '\v\x03\v\x03\v\x03\v\x05\v\x9C\n\v\x03\f\x03\f\x03\f\x03\f\x07\f\xA2\n' +
-    '\f\f\f\x0E\f\xA5\v\f\x03\f\x03\f\x03\r\x03\r\x03\r\x03\r\x03\r\x03\r\x03' +
-    '\r\x03\r\x03\r\x03\r\x03\r\x03\r\x05\r\xB5\n\r\x03\x0E\x03\x0E\x03\x0F' +
-    '\x03\x0F\x03\x0F\x05\x0F\xBC\n\x0F\x03\x10\x03\x10\x03\x10\x03\x11\x03' +
-    '\x11\x03\x12\x03\x12\x03\x13\x03\x13\x03\x14\x03\x14\x03\x15\x03\x15\x03' +
-    '\x16\x03\x16\x03\x17\x03\x17\x03\x18\x03\x18\x05\x18\xD1\n\x18\x03\x19' +
-    '\x03\x19\x03\x19\x02\x02\x03\x12\x1A\x02\x02\x04\x02\x06\x02\b\x02\n\x02' +
-    '\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C\x02' +
-    '\x1E\x02 \x02"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x02\x02\n\x04\x02%' +
-    "%''\x03\x02\x03\x04\x03\x02\x19\"\x03\x02\n\x13\x03\x02\x14\x15\x03" +
-    '\x02\x16\x18\x04\x02((--\x03\x02/0\x02\xD7\x022\x03\x02\x02\x02\x045\x03' +
-    '\x02\x02\x02\x06?\x03\x02\x02\x02\bC\x03\x02\x02\x02\nO\x03\x02\x02\x02' +
-    '\fW\x03\x02\x02\x02\x0E`\x03\x02\x02\x02\x10z\x03\x02\x02\x02\x12\x85' +
-    '\x03\x02\x02\x02\x14\x9B\x03\x02\x02\x02\x16\x9D\x03\x02\x02\x02\x18\xB4' +
-    '\x03\x02\x02\x02\x1A\xB6\x03\x02\x02\x02\x1C\xBB\x03\x02\x02\x02\x1E\xBD' +
-    '\x03\x02\x02\x02 \xC0\x03\x02\x02\x02"\xC2\x03\x02\x02\x02$\xC4\x03\x02' +
-    '\x02\x02&\xC6\x03\x02\x02\x02(\xC8\x03\x02\x02\x02*\xCA\x03\x02\x02\x02' +
-    ',\xCC\x03\x02\x02\x02.\xD0\x03\x02\x02\x020\xD2\x03\x02\x02\x0223\x05' +
-    '\n\x06\x0234\x07\x02\x02\x034\x03\x03\x02\x02\x025:\x05\x06\x04\x0267' +
-    '\x07\x03\x02\x0279\x05\x06\x04\x0286\x03\x02\x02\x029<\x03\x02\x02\x02' +
-    ':8\x03\x02\x02\x02:;\x03\x02\x02\x02;=\x03\x02\x02\x02<:\x03\x02\x02\x02' +
-    '=>\x07\x02\x02\x03>\x05\x03\x02\x02\x02?A\x05 \x11\x02@B\t\x02\x02\x02' +
-    'A@\x03\x02\x02\x02AB\x03\x02\x02\x02B\x07\x03\x02\x02\x02CJ\x05\x18\r' +
-    '\x02DF\t\x03\x02\x02ED\x03\x02\x02\x02EF\x03\x02\x02\x02FG\x03\x02\x02' +
-    '\x02GI\x05\x18\r\x02HE\x03\x02\x02\x02IL\x03\x02\x02\x02JH\x03\x02\x02' +
-    '\x02JK\x03\x02\x02\x02KM\x03\x02\x02\x02LJ\x03\x02\x02\x02MN\x07\x02\x02' +
-    '\x03N\t\x03\x02\x02\x02OT\x05\f\x07\x02PQ\x07,\x02\x02QS\x05\f\x07\x02' +
-    'RP\x03\x02\x02\x02SV\x03\x02\x02\x02TR\x03\x02\x02\x02TU\x03\x02\x02\x02' +
-    'U\v\x03\x02\x02\x02VT\x03\x02\x02\x02W\\\x05\x0E\b\x02XY\x07#\x02\x02' +
-    'Y[\x05\x0E\b\x02ZX\x03\x02\x02\x02[^\x03\x02\x02\x02\\Z\x03\x02\x02\x02' +
-    '\\]\x03\x02\x02\x02]\r\x03\x02\x02\x02^\\\x03\x02\x02\x02_a\x07*\x02\x02' +
-    '`_\x03\x02\x02\x02`a\x03\x02\x02\x02ab\x03\x02\x02\x02bc\x05\x10\t\x02' +
-    'c\x0F\x03\x02\x02\x02de\x05\x12\n\x02ef\x05"\x12\x02fg\x05\x12\n\x02' +
-    'g{\x03\x02\x02\x02hj\x05\x12\n\x02ik\x07*\x02\x02ji\x03\x02\x02\x02jk' +
-    '\x03\x02\x02\x02kl\x03\x02\x02\x02lm\x07)\x02\x02mn\x05\x16\f\x02n{\x03' +
-    '\x02\x02\x02oq\x05\x12\n\x02pr\x07*\x02\x02qp\x03\x02\x02\x02qr\x03\x02' +
-    '\x02\x02rs\x03\x02\x02\x02st\x07)\x02\x02tu\x05\x1E\x10\x02u{\x03\x02' +
-    '\x02\x02vw\x07\x05\x02\x02wx\x05\n\x06\x02xy\x07\x06\x02\x02y{\x03\x02' +
-    '\x02\x02zd\x03\x02\x02\x02zh\x03\x02\x02\x02zo\x03\x02\x02\x02zv\x03\x02' +
-    '\x02\x02{\x11\x03\x02\x02\x02|}\b\n\x01\x02}~\x05$\x13\x02~\x7F\x05\x12' +
-    '\n\x07\x7F\x86\x03\x02\x02\x02\x80\x86\x05\x14\v\x02\x81\x82\x07\x05\x02' +
-    '\x02\x82\x83\x05\x12\n\x02\x83\x84\x07\x06\x02\x02\x84\x86\x03\x02\x02' +
-    '\x02\x85|\x03\x02\x02\x02\x85\x80\x03\x02\x02\x02\x85\x81\x03\x02\x02' +
-    '\x02\x86\x91\x03\x02\x02\x02\x87\x88\f\x06\x02\x02\x88\x89\x05&\x14\x02' +
-    '\x89\x8A\x05\x12\n\x07\x8A\x90\x03\x02\x02\x02\x8B\x8C\f\x05\x02\x02\x8C' +
-    '\x8D\x05(\x15\x02\x8D\x8E\x05\x12\n\x06\x8E\x90\x03\x02\x02\x02\x8F\x87' +
-    '\x03\x02\x02\x02\x8F\x8B\x03\x02\x02\x02\x90\x93\x03\x02\x02\x02\x91\x8F' +
-    '\x03\x02\x02\x02\x91\x92\x03\x02\x02\x02\x92\x13\x03\x02\x02\x02\x93\x91' +
-    '\x03\x02\x02\x02\x94\x9C\x05\x18\r\x02\x95\x9C\x05*\x16\x02\x96\x9C\x05' +
-    '\x1C\x0F\x02\x97\x9C\x05,\x17\x02\x98\x9C\x05.\x18\x02\x99\x9C\x05 \x11' +
-    '\x02\x9A\x9C\x05\x1E\x10\x02\x9B\x94\x03\x02\x02\x02\x9B\x95\x03\x02\x02' +
-    '\x02\x9B\x96\x03\x02\x02\x02\x9B\x97\x03\x02\x02\x02\x9B\x98\x03\x02\x02' +
-    '\x02\x9B\x99\x03\x02\x02\x02\x9B\x9A\x03\x02\x02\x02\x9C\x15\x03\x02\x02' +
-    '\x02\x9D\x9E\x07\x05\x02\x02\x9E\xA3\x05\x12\n\x02\x9F\xA0\x07\x03\x02' +
-    '\x02\xA0\xA2\x05\x12\n\x02\xA1\x9F\x03\x02\x02\x02\xA2\xA5\x03\x02\x02' +
-    '\x02\xA3\xA1\x03\x02\x02\x02\xA3\xA4\x03\x02\x02\x02\xA4\xA6\x03\x02\x02' +
-    '\x02\xA5\xA3\x03\x02\x02\x02\xA6\xA7\x07\x06\x02\x02\xA7\x17\x03\x02\x02' +
-    '\x02\xA8\xA9\x05.\x18\x02\xA9\xAA\x07\x07\x02\x02\xAA\xAB\x05\x1A\x0E' +
-    '\x02\xAB\xAC\x07\b\x02\x02\xAC\xAD\x078\x02\x02\xAD\xB5\x03\x02\x02\x02' +
-    '\xAE\xAF\x05.\x18\x02\xAF\xB0\x07\x07\x02\x02\xB0\xB1\x05\x1A\x0E\x02' +
-    '\xB1\xB2\x07\b\x02\x02\xB2\xB3\x05\x16\f\x02\xB3\xB5\x03\x02\x02\x02\xB4' +
-    '\xA8\x03\x02\x02\x02\xB4\xAE\x03\x02\x02\x02\xB5\x19\x03\x02\x02\x02\xB6' +
-    '\xB7\t\x04\x02\x02\xB7\x1B\x03\x02\x02\x02\xB8\xBC\x071\x02\x02\xB9\xBC' +
-    '\x072\x02\x02\xBA\xBC\x073\x02\x02\xBB\xB8\x03\x02\x02\x02\xBB\xB9\x03' +
-    '\x02\x02\x02\xBB\xBA\x03\x02\x02\x02\xBC\x1D\x03\x02\x02\x02\xBD\xBE\x07' +
-    '\t\x02\x02\xBE\xBF\x079\x02\x02\xBF\x1F\x03\x02\x02\x02\xC0\xC1\x079\x02' +
-    '\x02\xC1!\x03\x02\x02\x02\xC2\xC3\t\x05\x02\x02\xC3#\x03\x02\x02\x02\xC4' +
-    "\xC5\t\x06\x02\x02\xC5%\x03\x02\x02\x02\xC6\xC7\t\x07\x02\x02\xC7'\x03" +
-    '\x02\x02\x02\xC8\xC9\t\x06\x02\x02\xC9)\x03\x02\x02\x02\xCA\xCB\x075\x02' +
-    '\x02\xCB+\x03\x02\x02\x02\xCC\xCD\t\b\x02\x02\xCD-\x03\x02\x02\x02\xCE' +
-    '\xD1\x07.\x02\x02\xCF\xD1\x050\x19\x02\xD0\xCE\x03\x02\x02\x02\xD0\xCF' +
-    '\x03\x02\x02\x02\xD1/\x03\x02\x02\x02\xD2\xD3\t\t\x02\x02\xD31\x03\x02' +
-    '\x02\x02\x14:AEJT\\`jqz\x85\x8F\x91\x9B\xA3\xB4\xBB\xD0';
+    '\x18\t\x18\x03\x02\x03\x02\x03\x02\x03\x03\x03\x03\x03\x03\x07\x037\n' +
+    '\x03\f\x03\x0E\x03:\v\x03\x03\x03\x03\x03\x03\x04\x03\x04\x05\x04@\n\x04' +
+    '\x03\x05\x03\x05\x03\x05\x07\x05E\n\x05\f\x05\x0E\x05H\v\x05\x03\x06\x03' +
+    '\x06\x03\x06\x07\x06M\n\x06\f\x06\x0E\x06P\v\x06\x03\x07\x05\x07S\n\x07' +
+    '\x03\x07\x03\x07\x03\b\x03\b\x03\b\x03\b\x03\b\x03\b\x05\b]\n\b\x03\b' +
+    '\x03\b\x03\b\x03\b\x03\b\x05\bd\n\b\x03\b\x03\b\x03\b\x03\b\x03\b\x03' +
+    '\b\x03\b\x05\bm\n\b\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03' +
+    '\t\x05\tx\n\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x03\t\x07\t\x82' +
+    '\n\t\f\t\x0E\t\x85\v\t\x03\n\x03\n\x03\n\x03\n\x03\n\x03\n\x03\n\x05\n' +
+    '\x8E\n\n\x03\v\x03\v\x03\v\x03\v\x07\v\x94\n\v\f\v\x0E\v\x97\v\v\x03\v' +
+    '\x03\v\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03' +
+    '\f\x03\f\x05\f\xA7\n\f\x03\r\x03\r\x03\x0E\x03\x0E\x03\x0E\x05\x0E\xAE' +
+    '\n\x0E\x03\x0F\x03\x0F\x03\x0F\x03\x10\x03\x10\x03\x11\x03\x11\x03\x12' +
+    '\x03\x12\x03\x13\x03\x13\x03\x14\x03\x14\x03\x15\x03\x15\x03\x16\x03\x16' +
+    '\x03\x17\x03\x17\x05\x17\xC3\n\x17\x03\x18\x03\x18\x03\x18\x02\x02\x03' +
+    '\x10\x19\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12' +
+    '\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02"\x02$\x02&' +
+    '\x02(\x02*\x02,\x02.\x02\x02\n\x03\x02%&\x03\x02\x19"\x03\x02\t\x12\x03' +
+    "\x02\x13\x14\x03\x02\x15\x17\x04\x02\x13\x13\x18\x18\x04\x02''++\x03" +
+    '\x02-.\x02\xC8\x020\x03\x02\x02\x02\x043\x03\x02\x02\x02\x06=\x03\x02' +
+    '\x02\x02\bA\x03\x02\x02\x02\nI\x03\x02\x02\x02\fR\x03\x02\x02\x02\x0E' +
+    'l\x03\x02\x02\x02\x10w\x03\x02\x02\x02\x12\x8D\x03\x02\x02\x02\x14\x8F' +
+    '\x03\x02\x02\x02\x16\xA6\x03\x02\x02\x02\x18\xA8\x03\x02\x02\x02\x1A\xAD' +
+    '\x03\x02\x02\x02\x1C\xAF\x03\x02\x02\x02\x1E\xB2\x03\x02\x02\x02 \xB4' +
+    '\x03\x02\x02\x02"\xB6\x03\x02\x02\x02$\xB8\x03\x02\x02\x02&\xBA\x03\x02' +
+    '\x02\x02(\xBC\x03\x02\x02\x02*\xBE\x03\x02\x02\x02,\xC2\x03\x02\x02\x02' +
+    '.\xC4\x03\x02\x02\x0201\x05\b\x05\x0212\x07\x02\x02\x032\x03\x03\x02\x02' +
+    '\x0238\x05\x06\x04\x0245\x07\x03\x02\x0257\x05\x06\x04\x0264\x03\x02\x02' +
+    '\x027:\x03\x02\x02\x0286\x03\x02\x02\x0289\x03\x02\x02\x029;\x03\x02\x02' +
+    '\x02:8\x03\x02\x02\x02;<\x07\x02\x02\x03<\x05\x03\x02\x02\x02=?\x05\x10' +
+    '\t\x02>@\t\x02\x02\x02?>\x03\x02\x02\x02?@\x03\x02\x02\x02@\x07\x03\x02' +
+    '\x02\x02AF\x05\n\x06\x02BC\x07*\x02\x02CE\x05\n\x06\x02DB\x03\x02\x02' +
+    '\x02EH\x03\x02\x02\x02FD\x03\x02\x02\x02FG\x03\x02\x02\x02G\t\x03\x02' +
+    '\x02\x02HF\x03\x02\x02\x02IN\x05\f\x07\x02JK\x07#\x02\x02KM\x05\f\x07' +
+    '\x02LJ\x03\x02\x02\x02MP\x03\x02\x02\x02NL\x03\x02\x02\x02NO\x03\x02\x02' +
+    '\x02O\v\x03\x02\x02\x02PN\x03\x02\x02\x02QS\x07)\x02\x02RQ\x03\x02\x02' +
+    '\x02RS\x03\x02\x02\x02ST\x03\x02\x02\x02TU\x05\x0E\b\x02U\r\x03\x02\x02' +
+    '\x02VW\x05\x10\t\x02WX\x05 \x11\x02XY\x05\x10\t\x02Ym\x03\x02\x02\x02' +
+    'Z\\\x05\x10\t\x02[]\x07)\x02\x02\\[\x03\x02\x02\x02\\]\x03\x02\x02\x02' +
+    ']^\x03\x02\x02\x02^_\x07(\x02\x02_`\x05\x14\v\x02`m\x03\x02\x02\x02ac' +
+    '\x05\x10\t\x02bd\x07)\x02\x02cb\x03\x02\x02\x02cd\x03\x02\x02\x02de\x03' +
+    '\x02\x02\x02ef\x07(\x02\x02fg\x05\x1C\x0F\x02gm\x03\x02\x02\x02hi\x07' +
+    '\x04\x02\x02ij\x05\b\x05\x02jk\x07\x05\x02\x02km\x03\x02\x02\x02lV\x03' +
+    '\x02\x02\x02lZ\x03\x02\x02\x02la\x03\x02\x02\x02lh\x03\x02\x02\x02m\x0F' +
+    '\x03\x02\x02\x02no\b\t\x01\x02op\x05"\x12\x02pq\x05\x10\t\x07qx\x03\x02' +
+    '\x02\x02rx\x05\x12\n\x02st\x07\x04\x02\x02tu\x05\x10\t\x02uv\x07\x05\x02' +
+    '\x02vx\x03\x02\x02\x02wn\x03\x02\x02\x02wr\x03\x02\x02\x02ws\x03\x02\x02' +
+    '\x02x\x83\x03\x02\x02\x02yz\f\x06\x02\x02z{\x05$\x13\x02{|\x05\x10\t\x07' +
+    '|\x82\x03\x02\x02\x02}~\f\x05\x02\x02~\x7F\x05&\x14\x02\x7F\x80\x05\x10' +
+    '\t\x06\x80\x82\x03\x02\x02\x02\x81y\x03\x02\x02\x02\x81}\x03\x02\x02\x02' +
+    '\x82\x85\x03\x02\x02\x02\x83\x81\x03\x02\x02\x02\x83\x84\x03\x02\x02\x02' +
+    '\x84\x11\x03\x02\x02\x02\x85\x83\x03\x02\x02\x02\x86\x8E\x05\x16\f\x02' +
+    '\x87\x8E\x05(\x15\x02\x88\x8E\x05\x1A\x0E\x02\x89\x8E\x05*\x16\x02\x8A' +
+    '\x8E\x05,\x17\x02\x8B\x8E\x05\x1E\x10\x02\x8C\x8E\x05\x1C\x0F\x02\x8D' +
+    '\x86\x03\x02\x02\x02\x8D\x87\x03\x02\x02\x02\x8D\x88\x03\x02\x02\x02\x8D' +
+    '\x89\x03\x02\x02\x02\x8D\x8A\x03\x02\x02\x02\x8D\x8B\x03\x02\x02\x02\x8D' +
+    '\x8C\x03\x02\x02\x02\x8E\x13\x03\x02\x02\x02\x8F\x90\x07\x04\x02\x02\x90' +
+    '\x95\x05\x10\t\x02\x91\x92\x07\x03\x02\x02\x92\x94\x05\x10\t\x02\x93\x91' +
+    '\x03\x02\x02\x02\x94\x97\x03\x02\x02\x02\x95\x93\x03\x02\x02\x02\x95\x96' +
+    '\x03\x02\x02\x02\x96\x98\x03\x02\x02\x02\x97\x95\x03\x02\x02\x02\x98\x99' +
+    '\x07\x05\x02\x02\x99\x15\x03\x02\x02\x02\x9A\x9B\x05,\x17\x02\x9B\x9C' +
+    '\x07\x06\x02\x02\x9C\x9D\x05\x18\r\x02\x9D\x9E\x07\x07\x02\x02\x9E\x9F' +
+    '\x076\x02\x02\x9F\xA7\x03\x02\x02\x02\xA0\xA1\x05,\x17\x02\xA1\xA2\x07' +
+    '\x06\x02\x02\xA2\xA3\x05\x18\r\x02\xA3\xA4\x07\x07\x02\x02\xA4\xA5\x05' +
+    '\x14\v\x02\xA5\xA7\x03\x02\x02\x02\xA6\x9A\x03\x02\x02\x02\xA6\xA0\x03' +
+    '\x02\x02\x02\xA7\x17\x03\x02\x02\x02\xA8\xA9\t\x03\x02\x02\xA9\x19\x03' +
+    '\x02\x02\x02\xAA\xAE\x07/\x02\x02\xAB\xAE\x070\x02\x02\xAC\xAE\x071\x02' +
+    '\x02\xAD\xAA\x03\x02\x02\x02\xAD\xAB\x03\x02\x02\x02\xAD\xAC\x03\x02\x02' +
+    '\x02\xAE\x1B\x03\x02\x02\x02\xAF\xB0\x07\b\x02\x02\xB0\xB1\x077\x02\x02' +
+    '\xB1\x1D\x03\x02\x02\x02\xB2\xB3\x077\x02\x02\xB3\x1F\x03\x02\x02\x02' +
+    '\xB4\xB5\t\x04\x02\x02\xB5!\x03\x02\x02\x02\xB6\xB7\t\x05\x02\x02\xB7' +
+    '#\x03\x02\x02\x02\xB8\xB9\t\x06\x02\x02\xB9%\x03\x02\x02\x02\xBA\xBB\t' +
+    "\x07\x02\x02\xBB'\x03\x02\x02\x02\xBC\xBD\x073\x02\x02\xBD)\x03\x02\x02" +
+    '\x02\xBE\xBF\t\b\x02\x02\xBF+\x03\x02\x02\x02\xC0\xC3\x07,\x02\x02\xC1' +
+    '\xC3\x05.\x18\x02\xC2\xC0\x03\x02\x02\x02\xC2\xC1\x03\x02\x02\x02\xC3' +
+    '-\x03\x02\x02\x02\xC4\xC5\t\t\x02\x02\xC5/\x03\x02\x02\x02\x128?FNR\\' +
+    'clw\x81\x83\x8D\x95\xA6\xAD\xC2';
   public static __ATN: ATN;
   public static get _ATN(): ATN {
     if (!QueryModificationParser.__ATN) {
@@ -1710,8 +1618,8 @@ export class OrderBysContext extends ParserRuleContext {
 }
 
 export class OrderByContext extends ParserRuleContext {
-  public fieldRef(): FieldRefContext {
-    return this.getRuleContext(0, FieldRefContext);
+  public expression(): ExpressionContext {
+    return this.getRuleContext(0, ExpressionContext);
   }
   public ASC(): TerminalNode | undefined {
     return this.tryGetToken(QueryModificationParser.ASC, 0);
@@ -1736,40 +1644,6 @@ export class OrderByContext extends ParserRuleContext {
   public exitRule(listener: QueryModificationListener): void {
     if (listener.exitOrderBy) {
       listener.exitOrderBy(this);
-    }
-  }
-}
-
-export class TransformsContext extends ParserRuleContext {
-  public functionCall(): FunctionCallContext[];
-  public functionCall(i: number): FunctionCallContext;
-  public functionCall(i?: number): FunctionCallContext | FunctionCallContext[] {
-    if (i === undefined) {
-      return this.getRuleContexts(FunctionCallContext);
-    } else {
-      return this.getRuleContext(i, FunctionCallContext);
-    }
-  }
-  public EOF(): TerminalNode {
-    return this.getToken(QueryModificationParser.EOF, 0);
-  }
-  constructor(parent: ParserRuleContext | undefined, invokingState: number) {
-    super(parent, invokingState);
-  }
-  // @Override
-  public get ruleIndex(): number {
-    return QueryModificationParser.RULE_transforms;
-  }
-  // @Override
-  public enterRule(listener: QueryModificationListener): void {
-    if (listener.enterTransforms) {
-      listener.enterTransforms(this);
-    }
-  }
-  // @Override
-  public exitRule(listener: QueryModificationListener): void {
-    if (listener.exitTransforms) {
-      listener.exitTransforms(this);
     }
   }
 }
