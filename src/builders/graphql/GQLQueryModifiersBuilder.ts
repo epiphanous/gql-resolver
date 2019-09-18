@@ -232,9 +232,6 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       this.unknownContext(context, 'Expression');
       expr = new QMIntegerLiteral(this.qmContext(context), 'error');
     }
-    Option.of(expr.conformableCheck('invalid expression')).forEach(err =>
-      this.check(false, err, context, true)
-    );
     return expr;
   }
 
@@ -261,9 +258,6 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       this.unknownContext(context, 'PrimitiveExpression');
       expr = new QMIntegerLiteral(this.qmContext(atom), 'error');
     }
-    Option.of(expr.conformableCheck('invalid primitive expression')).forEach(
-      err => this.check(false, err, context, true)
-    );
     return expr;
   }
 
