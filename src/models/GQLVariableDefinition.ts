@@ -1,24 +1,17 @@
 import { None, Option } from 'funfix';
 import { List, Map } from 'immutable';
-import { GQLDirective, GQLType, GQLValue, GQLVariableValue } from '.';
+import { GQLDirective, GQLType, GQLValueType } from '.';
 
-export interface IGQLVariableDefinition {
-  name: string;
-  gqlType: GQLType;
-  defaultValue: Option<GQLValue>;
-  directives: List<GQLDirective>;
-}
-
-export class GQLVariableDefinition implements IGQLVariableDefinition {
+export class GQLVariableDefinition {
   public name: string;
   public gqlType: GQLType;
-  public defaultValue: Option<GQLValue>;
+  public defaultValue: Option<GQLValueType>;
   public directives: List<GQLDirective>;
 
   constructor(
     name: string,
     gqlType: GQLType,
-    defaultValue: Option<GQLValue> = None,
+    defaultValue: Option<GQLValueType> = None,
     directives: List<GQLDirective> = List<GQLDirective>()
   ) {
     this.name = name;
@@ -33,31 +26,18 @@ export class GQLVariableDefinition implements IGQLVariableDefinition {
    * values and return false in cases where no value is found for a variable definition.
    * @param vars - a map of defined variable values passed in with a query
    */
-  public resolve(vars: Map<string, any>) {
-    // return true if
-    //   - vars contains a value for name
-    //   - defaultValue contains a value thats not a variable
-    //   - defaultValue is a variable, who's name is in vars
+  public resolve(vars: Map<string, GQLValueType>): boolean {
+    // return true if vars contains a value for this variable or we have
+    // a default value for this variable; otherwise false
     // todo: check type
     if (vars.has(this.name)) {
       return true;
     }
-    if (this.defaultValue.nonEmpty()) {
-      const v = this.defaultValue.get();
-      const value = v.resolve(vars);
-      switch (v.constructor.name) {
-        case 'GQLVariableValue':
-          if (vars.has(v.value.name)) {
-            vars.set(this.name, value);
-            return true;
-          } else {
-            return false;
-          }
-        default:
-          vars.set(this.name, value);
-          return true;
-      }
-    }
-    return false;
+    this.defaultValue
+      .map(defaultValue => {
+        vars.set(this.name, defaultValue);
+        return true;
+      })
+      .getOrElse(false);
   }
 }

@@ -2,6 +2,7 @@
 
 export * from './SparqlConnectionCountQueryStrategy';
 export * from './SparqlMutationQueryStrategy';
+export * from './SparqlQMRenderer';
 export * from './SparqlQueryStrategy';
 export * from './SparqlQueryStrategyFactory';
 export * from './SparqlResponse';

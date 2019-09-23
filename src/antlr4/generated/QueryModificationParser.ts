@@ -73,14 +73,15 @@ export class QueryModificationParser extends Parser {
   public static readonly DECIMAL = 46;
   public static readonly DOUBLE = 47;
   public static readonly EXPONENT = 48;
-  public static readonly STRING_LITERAL1 = 49;
-  public static readonly STRING_LITERAL2 = 50;
-  public static readonly ECHAR = 51;
-  public static readonly EMPTY_PARENS = 52;
-  public static readonly VARNAME = 53;
-  public static readonly PN_PREFIX = 54;
-  public static readonly PN_LOCAL = 55;
-  public static readonly WS = 56;
+  public static readonly SINGLE_QUOTED_ONE_LINE_STRING = 49;
+  public static readonly DOUBLE_QUOTED_ONE_LINE_STRING = 50;
+  public static readonly SINGLE_QUOTED_MULTI_LINE_STRING = 51;
+  public static readonly DOUBLE_QUOTED_MULTI_LINE_STRING = 52;
+  public static readonly EMPTY_PARENS = 53;
+  public static readonly VARNAME = 54;
+  public static readonly PN_PREFIX = 55;
+  public static readonly PN_LOCAL = 56;
+  public static readonly WS = 57;
   public static readonly RULE_filter = 0;
   public static readonly RULE_orderBys = 1;
   public static readonly RULE_orderBy = 2;
@@ -150,11 +151,11 @@ export class QueryModificationParser extends Parser {
     "'!~'",
     "'!~*'",
     "'-'",
+    "'+'",
     "'!'",
     "'*'",
     "'/'",
     "'%'",
-    "'+'",
     "'xsd:string'",
     "'xsd:decimal'",
     "'xsd:double'",
@@ -216,9 +217,10 @@ export class QueryModificationParser extends Parser {
     'DECIMAL',
     'DOUBLE',
     'EXPONENT',
-    'STRING_LITERAL1',
-    'STRING_LITERAL2',
-    'ECHAR',
+    'SINGLE_QUOTED_ONE_LINE_STRING',
+    'DOUBLE_QUOTED_ONE_LINE_STRING',
+    'SINGLE_QUOTED_MULTI_LINE_STRING',
+    'DOUBLE_QUOTED_MULTI_LINE_STRING',
     'EMPTY_PARENS',
     'VARNAME',
     'PN_PREFIX',
@@ -635,6 +637,7 @@ export class QueryModificationParser extends Parser {
         switch (this._input.LA(1)) {
           case QueryModificationParser.T__16:
           case QueryModificationParser.T__17:
+          case QueryModificationParser.T__18:
             {
               _localctx = new UnaryExpressionContext(_localctx);
               this._ctx = _localctx;
@@ -655,7 +658,10 @@ export class QueryModificationParser extends Parser {
           case QueryModificationParser.INTEGER:
           case QueryModificationParser.DECIMAL:
           case QueryModificationParser.DOUBLE:
-          case QueryModificationParser.STRING_LITERAL1:
+          case QueryModificationParser.SINGLE_QUOTED_ONE_LINE_STRING:
+          case QueryModificationParser.DOUBLE_QUOTED_ONE_LINE_STRING:
+          case QueryModificationParser.SINGLE_QUOTED_MULTI_LINE_STRING:
+          case QueryModificationParser.DOUBLE_QUOTED_MULTI_LINE_STRING:
           case QueryModificationParser.VARNAME:
             {
               _localctx = new PrimitiveExpressionContext(_localctx);
@@ -1171,8 +1177,12 @@ export class QueryModificationParser extends Parser {
         _la = this._input.LA(1);
         if (
           !(
-            _la === QueryModificationParser.T__16 ||
-            _la === QueryModificationParser.T__17
+            (_la & ~0x1f) === 0 &&
+            ((1 << _la) &
+              ((1 << QueryModificationParser.T__16) |
+                (1 << QueryModificationParser.T__17) |
+                (1 << QueryModificationParser.T__18))) !==
+              0
           )
         ) {
           this._errHandler.recoverInline(this);
@@ -1212,9 +1222,9 @@ export class QueryModificationParser extends Parser {
           !(
             (_la & ~0x1f) === 0 &&
             ((1 << _la) &
-              ((1 << QueryModificationParser.T__18) |
-                (1 << QueryModificationParser.T__19) |
-                (1 << QueryModificationParser.T__20))) !==
+              ((1 << QueryModificationParser.T__19) |
+                (1 << QueryModificationParser.T__20) |
+                (1 << QueryModificationParser.T__21))) !==
               0
           )
         ) {
@@ -1254,7 +1264,7 @@ export class QueryModificationParser extends Parser {
         if (
           !(
             _la === QueryModificationParser.T__16 ||
-            _la === QueryModificationParser.T__21
+            _la === QueryModificationParser.T__17
           )
         ) {
           this._errHandler.recoverInline(this);
@@ -1288,10 +1298,43 @@ export class QueryModificationParser extends Parser {
     );
     this.enterRule(_localctx, 38, QueryModificationParser.RULE_stringLiteral);
     try {
-      this.enterOuterAlt(_localctx, 1);
-      {
-        this.state = 186;
-        this.match(QueryModificationParser.STRING_LITERAL1);
+      this.state = 190;
+      this._errHandler.sync(this);
+      switch (this._input.LA(1)) {
+        case QueryModificationParser.SINGLE_QUOTED_ONE_LINE_STRING:
+          _localctx = new SingleQuotedOnelineContext(_localctx);
+          this.enterOuterAlt(_localctx, 1);
+          {
+            this.state = 186;
+            this.match(QueryModificationParser.SINGLE_QUOTED_ONE_LINE_STRING);
+          }
+          break;
+        case QueryModificationParser.SINGLE_QUOTED_MULTI_LINE_STRING:
+          _localctx = new SingleQuotedMultlineContext(_localctx);
+          this.enterOuterAlt(_localctx, 2);
+          {
+            this.state = 187;
+            this.match(QueryModificationParser.SINGLE_QUOTED_MULTI_LINE_STRING);
+          }
+          break;
+        case QueryModificationParser.DOUBLE_QUOTED_ONE_LINE_STRING:
+          _localctx = new DoubleQuotedOnelineContext(_localctx);
+          this.enterOuterAlt(_localctx, 3);
+          {
+            this.state = 188;
+            this.match(QueryModificationParser.DOUBLE_QUOTED_ONE_LINE_STRING);
+          }
+          break;
+        case QueryModificationParser.DOUBLE_QUOTED_MULTI_LINE_STRING:
+          _localctx = new DoubleQuotedMultilineContext(_localctx);
+          this.enterOuterAlt(_localctx, 4);
+          {
+            this.state = 189;
+            this.match(QueryModificationParser.DOUBLE_QUOTED_MULTI_LINE_STRING);
+          }
+          break;
+        default:
+          throw new NoViableAltException(this);
       }
     } catch (re) {
       if (re instanceof RecognitionException) {
@@ -1317,7 +1360,7 @@ export class QueryModificationParser extends Parser {
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 188;
+        this.state = 192;
         _la = this._input.LA(1);
         if (
           !(
@@ -1353,14 +1396,14 @@ export class QueryModificationParser extends Parser {
     let _localctx: IriRefContext = new IriRefContext(this._ctx, this.state);
     this.enterRule(_localctx, 42, QueryModificationParser.RULE_iriRef);
     try {
-      this.state = 192;
+      this.state = 196;
       this._errHandler.sync(this);
       switch (this._input.LA(1)) {
         case QueryModificationParser.IRI_REF:
           _localctx = new LiteralIriRefContext(_localctx);
           this.enterOuterAlt(_localctx, 1);
           {
-            this.state = 190;
+            this.state = 194;
             this.match(QueryModificationParser.IRI_REF);
           }
           break;
@@ -1369,7 +1412,7 @@ export class QueryModificationParser extends Parser {
           _localctx = new PrefixedNameIriRefContext(_localctx);
           this.enterOuterAlt(_localctx, 2);
           {
-            this.state = 191;
+            this.state = 195;
             this.prefixedName();
           }
           break;
@@ -1400,7 +1443,7 @@ export class QueryModificationParser extends Parser {
     try {
       this.enterOuterAlt(_localctx, 1);
       {
-        this.state = 194;
+        this.state = 198;
         _la = this._input.LA(1);
         if (
           !(
@@ -1461,7 +1504,7 @@ export class QueryModificationParser extends Parser {
   }
 
   public static readonly _serializedATN: string =
-    '\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03:\xC7\x04\x02' +
+    '\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03;\xCB\x04\x02' +
     '\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07' +
     '\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04' +
     '\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04' +
@@ -1479,70 +1522,72 @@ export class QueryModificationParser extends Parser {
     '\x03\v\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03\f\x03' +
     '\f\x03\f\x05\f\xA7\n\f\x03\r\x03\r\x03\x0E\x03\x0E\x03\x0E\x05\x0E\xAE' +
     '\n\x0E\x03\x0F\x03\x0F\x03\x0F\x03\x10\x03\x10\x03\x11\x03\x11\x03\x12' +
-    '\x03\x12\x03\x13\x03\x13\x03\x14\x03\x14\x03\x15\x03\x15\x03\x16\x03\x16' +
-    '\x03\x17\x03\x17\x05\x17\xC3\n\x17\x03\x18\x03\x18\x03\x18\x02\x02\x03' +
-    '\x10\x19\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12' +
-    '\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02"\x02$\x02&' +
-    '\x02(\x02*\x02,\x02.\x02\x02\n\x03\x02%&\x03\x02\x19"\x03\x02\t\x12\x03' +
-    "\x02\x13\x14\x03\x02\x15\x17\x04\x02\x13\x13\x18\x18\x04\x02''++\x03" +
-    '\x02-.\x02\xC8\x020\x03\x02\x02\x02\x043\x03\x02\x02\x02\x06=\x03\x02' +
-    '\x02\x02\bA\x03\x02\x02\x02\nI\x03\x02\x02\x02\fR\x03\x02\x02\x02\x0E' +
-    'l\x03\x02\x02\x02\x10w\x03\x02\x02\x02\x12\x8D\x03\x02\x02\x02\x14\x8F' +
-    '\x03\x02\x02\x02\x16\xA6\x03\x02\x02\x02\x18\xA8\x03\x02\x02\x02\x1A\xAD' +
-    '\x03\x02\x02\x02\x1C\xAF\x03\x02\x02\x02\x1E\xB2\x03\x02\x02\x02 \xB4' +
-    '\x03\x02\x02\x02"\xB6\x03\x02\x02\x02$\xB8\x03\x02\x02\x02&\xBA\x03\x02' +
-    '\x02\x02(\xBC\x03\x02\x02\x02*\xBE\x03\x02\x02\x02,\xC2\x03\x02\x02\x02' +
-    '.\xC4\x03\x02\x02\x0201\x05\b\x05\x0212\x07\x02\x02\x032\x03\x03\x02\x02' +
-    '\x0238\x05\x06\x04\x0245\x07\x03\x02\x0257\x05\x06\x04\x0264\x03\x02\x02' +
-    '\x027:\x03\x02\x02\x0286\x03\x02\x02\x0289\x03\x02\x02\x029;\x03\x02\x02' +
-    '\x02:8\x03\x02\x02\x02;<\x07\x02\x02\x03<\x05\x03\x02\x02\x02=?\x05\x10' +
-    '\t\x02>@\t\x02\x02\x02?>\x03\x02\x02\x02?@\x03\x02\x02\x02@\x07\x03\x02' +
-    '\x02\x02AF\x05\n\x06\x02BC\x07*\x02\x02CE\x05\n\x06\x02DB\x03\x02\x02' +
-    '\x02EH\x03\x02\x02\x02FD\x03\x02\x02\x02FG\x03\x02\x02\x02G\t\x03\x02' +
-    '\x02\x02HF\x03\x02\x02\x02IN\x05\f\x07\x02JK\x07#\x02\x02KM\x05\f\x07' +
-    '\x02LJ\x03\x02\x02\x02MP\x03\x02\x02\x02NL\x03\x02\x02\x02NO\x03\x02\x02' +
-    '\x02O\v\x03\x02\x02\x02PN\x03\x02\x02\x02QS\x07)\x02\x02RQ\x03\x02\x02' +
-    '\x02RS\x03\x02\x02\x02ST\x03\x02\x02\x02TU\x05\x0E\b\x02U\r\x03\x02\x02' +
-    '\x02VW\x05\x10\t\x02WX\x05 \x11\x02XY\x05\x10\t\x02Ym\x03\x02\x02\x02' +
-    'Z\\\x05\x10\t\x02[]\x07)\x02\x02\\[\x03\x02\x02\x02\\]\x03\x02\x02\x02' +
-    ']^\x03\x02\x02\x02^_\x07(\x02\x02_`\x05\x14\v\x02`m\x03\x02\x02\x02ac' +
-    '\x05\x10\t\x02bd\x07)\x02\x02cb\x03\x02\x02\x02cd\x03\x02\x02\x02de\x03' +
-    '\x02\x02\x02ef\x07(\x02\x02fg\x05\x1C\x0F\x02gm\x03\x02\x02\x02hi\x07' +
-    '\x04\x02\x02ij\x05\b\x05\x02jk\x07\x05\x02\x02km\x03\x02\x02\x02lV\x03' +
-    '\x02\x02\x02lZ\x03\x02\x02\x02la\x03\x02\x02\x02lh\x03\x02\x02\x02m\x0F' +
-    '\x03\x02\x02\x02no\b\t\x01\x02op\x05"\x12\x02pq\x05\x10\t\x07qx\x03\x02' +
-    '\x02\x02rx\x05\x12\n\x02st\x07\x04\x02\x02tu\x05\x10\t\x02uv\x07\x05\x02' +
-    '\x02vx\x03\x02\x02\x02wn\x03\x02\x02\x02wr\x03\x02\x02\x02ws\x03\x02\x02' +
-    '\x02x\x83\x03\x02\x02\x02yz\f\x06\x02\x02z{\x05$\x13\x02{|\x05\x10\t\x07' +
-    '|\x82\x03\x02\x02\x02}~\f\x05\x02\x02~\x7F\x05&\x14\x02\x7F\x80\x05\x10' +
-    '\t\x06\x80\x82\x03\x02\x02\x02\x81y\x03\x02\x02\x02\x81}\x03\x02\x02\x02' +
-    '\x82\x85\x03\x02\x02\x02\x83\x81\x03\x02\x02\x02\x83\x84\x03\x02\x02\x02' +
-    '\x84\x11\x03\x02\x02\x02\x85\x83\x03\x02\x02\x02\x86\x8E\x05\x16\f\x02' +
-    '\x87\x8E\x05(\x15\x02\x88\x8E\x05\x1A\x0E\x02\x89\x8E\x05*\x16\x02\x8A' +
-    '\x8E\x05,\x17\x02\x8B\x8E\x05\x1E\x10\x02\x8C\x8E\x05\x1C\x0F\x02\x8D' +
-    '\x86\x03\x02\x02\x02\x8D\x87\x03\x02\x02\x02\x8D\x88\x03\x02\x02\x02\x8D' +
-    '\x89\x03\x02\x02\x02\x8D\x8A\x03\x02\x02\x02\x8D\x8B\x03\x02\x02\x02\x8D' +
-    '\x8C\x03\x02\x02\x02\x8E\x13\x03\x02\x02\x02\x8F\x90\x07\x04\x02\x02\x90' +
-    '\x95\x05\x10\t\x02\x91\x92\x07\x03\x02\x02\x92\x94\x05\x10\t\x02\x93\x91' +
-    '\x03\x02\x02\x02\x94\x97\x03\x02\x02\x02\x95\x93\x03\x02\x02\x02\x95\x96' +
-    '\x03\x02\x02\x02\x96\x98\x03\x02\x02\x02\x97\x95\x03\x02\x02\x02\x98\x99' +
-    '\x07\x05\x02\x02\x99\x15\x03\x02\x02\x02\x9A\x9B\x05,\x17\x02\x9B\x9C' +
-    '\x07\x06\x02\x02\x9C\x9D\x05\x18\r\x02\x9D\x9E\x07\x07\x02\x02\x9E\x9F' +
-    '\x076\x02\x02\x9F\xA7\x03\x02\x02\x02\xA0\xA1\x05,\x17\x02\xA1\xA2\x07' +
-    '\x06\x02\x02\xA2\xA3\x05\x18\r\x02\xA3\xA4\x07\x07\x02\x02\xA4\xA5\x05' +
-    '\x14\v\x02\xA5\xA7\x03\x02\x02\x02\xA6\x9A\x03\x02\x02\x02\xA6\xA0\x03' +
-    '\x02\x02\x02\xA7\x17\x03\x02\x02\x02\xA8\xA9\t\x03\x02\x02\xA9\x19\x03' +
-    '\x02\x02\x02\xAA\xAE\x07/\x02\x02\xAB\xAE\x070\x02\x02\xAC\xAE\x071\x02' +
-    '\x02\xAD\xAA\x03\x02\x02\x02\xAD\xAB\x03\x02\x02\x02\xAD\xAC\x03\x02\x02' +
-    '\x02\xAE\x1B\x03\x02\x02\x02\xAF\xB0\x07\b\x02\x02\xB0\xB1\x077\x02\x02' +
-    '\xB1\x1D\x03\x02\x02\x02\xB2\xB3\x077\x02\x02\xB3\x1F\x03\x02\x02\x02' +
-    '\xB4\xB5\t\x04\x02\x02\xB5!\x03\x02\x02\x02\xB6\xB7\t\x05\x02\x02\xB7' +
-    '#\x03\x02\x02\x02\xB8\xB9\t\x06\x02\x02\xB9%\x03\x02\x02\x02\xBA\xBB\t' +
-    "\x07\x02\x02\xBB'\x03\x02\x02\x02\xBC\xBD\x073\x02\x02\xBD)\x03\x02\x02" +
-    '\x02\xBE\xBF\t\b\x02\x02\xBF+\x03\x02\x02\x02\xC0\xC3\x07,\x02\x02\xC1' +
-    '\xC3\x05.\x18\x02\xC2\xC0\x03\x02\x02\x02\xC2\xC1\x03\x02\x02\x02\xC3' +
-    '-\x03\x02\x02\x02\xC4\xC5\t\t\x02\x02\xC5/\x03\x02\x02\x02\x128?FNR\\' +
-    'clw\x81\x83\x8D\x95\xA6\xAD\xC2';
+    '\x03\x12\x03\x13\x03\x13\x03\x14\x03\x14\x03\x15\x03\x15\x03\x15\x03\x15' +
+    '\x05\x15\xC1\n\x15\x03\x16\x03\x16\x03\x17\x03\x17\x05\x17\xC7\n\x17\x03' +
+    '\x18\x03\x18\x03\x18\x02\x02\x03\x10\x19\x02\x02\x04\x02\x06\x02\b\x02' +
+    '\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A\x02\x1C' +
+    '\x02\x1E\x02 \x02"\x02$\x02&\x02(\x02*\x02,\x02.\x02\x02\n\x03\x02%&' +
+    '\x03\x02\x19"\x03\x02\t\x12\x03\x02\x13\x15\x03\x02\x16\x18\x03\x02\x13' +
+    "\x14\x04\x02''++\x03\x02-.\x02\xCF\x020\x03\x02\x02\x02\x043\x03\x02" +
+    '\x02\x02\x06=\x03\x02\x02\x02\bA\x03\x02\x02\x02\nI\x03\x02\x02\x02\f' +
+    'R\x03\x02\x02\x02\x0El\x03\x02\x02\x02\x10w\x03\x02\x02\x02\x12\x8D\x03' +
+    '\x02\x02\x02\x14\x8F\x03\x02\x02\x02\x16\xA6\x03\x02\x02\x02\x18\xA8\x03' +
+    '\x02\x02\x02\x1A\xAD\x03\x02\x02\x02\x1C\xAF\x03\x02\x02\x02\x1E\xB2\x03' +
+    '\x02\x02\x02 \xB4\x03\x02\x02\x02"\xB6\x03\x02\x02\x02$\xB8\x03\x02\x02' +
+    '\x02&\xBA\x03\x02\x02\x02(\xC0\x03\x02\x02\x02*\xC2\x03\x02\x02\x02,\xC6' +
+    '\x03\x02\x02\x02.\xC8\x03\x02\x02\x0201\x05\b\x05\x0212\x07\x02\x02\x03' +
+    '2\x03\x03\x02\x02\x0238\x05\x06\x04\x0245\x07\x03\x02\x0257\x05\x06\x04' +
+    '\x0264\x03\x02\x02\x027:\x03\x02\x02\x0286\x03\x02\x02\x0289\x03\x02\x02' +
+    '\x029;\x03\x02\x02\x02:8\x03\x02\x02\x02;<\x07\x02\x02\x03<\x05\x03\x02' +
+    '\x02\x02=?\x05\x10\t\x02>@\t\x02\x02\x02?>\x03\x02\x02\x02?@\x03\x02\x02' +
+    '\x02@\x07\x03\x02\x02\x02AF\x05\n\x06\x02BC\x07*\x02\x02CE\x05\n\x06\x02' +
+    'DB\x03\x02\x02\x02EH\x03\x02\x02\x02FD\x03\x02\x02\x02FG\x03\x02\x02\x02' +
+    'G\t\x03\x02\x02\x02HF\x03\x02\x02\x02IN\x05\f\x07\x02JK\x07#\x02\x02K' +
+    'M\x05\f\x07\x02LJ\x03\x02\x02\x02MP\x03\x02\x02\x02NL\x03\x02\x02\x02' +
+    'NO\x03\x02\x02\x02O\v\x03\x02\x02\x02PN\x03\x02\x02\x02QS\x07)\x02\x02' +
+    'RQ\x03\x02\x02\x02RS\x03\x02\x02\x02ST\x03\x02\x02\x02TU\x05\x0E\b\x02' +
+    'U\r\x03\x02\x02\x02VW\x05\x10\t\x02WX\x05 \x11\x02XY\x05\x10\t\x02Ym\x03' +
+    '\x02\x02\x02Z\\\x05\x10\t\x02[]\x07)\x02\x02\\[\x03\x02\x02\x02\\]\x03' +
+    '\x02\x02\x02]^\x03\x02\x02\x02^_\x07(\x02\x02_`\x05\x14\v\x02`m\x03\x02' +
+    '\x02\x02ac\x05\x10\t\x02bd\x07)\x02\x02cb\x03\x02\x02\x02cd\x03\x02\x02' +
+    '\x02de\x03\x02\x02\x02ef\x07(\x02\x02fg\x05\x1C\x0F\x02gm\x03\x02\x02' +
+    '\x02hi\x07\x04\x02\x02ij\x05\b\x05\x02jk\x07\x05\x02\x02km\x03\x02\x02' +
+    '\x02lV\x03\x02\x02\x02lZ\x03\x02\x02\x02la\x03\x02\x02\x02lh\x03\x02\x02' +
+    '\x02m\x0F\x03\x02\x02\x02no\b\t\x01\x02op\x05"\x12\x02pq\x05\x10\t\x07' +
+    'qx\x03\x02\x02\x02rx\x05\x12\n\x02st\x07\x04\x02\x02tu\x05\x10\t\x02u' +
+    'v\x07\x05\x02\x02vx\x03\x02\x02\x02wn\x03\x02\x02\x02wr\x03\x02\x02\x02' +
+    'ws\x03\x02\x02\x02x\x83\x03\x02\x02\x02yz\f\x06\x02\x02z{\x05$\x13\x02' +
+    '{|\x05\x10\t\x07|\x82\x03\x02\x02\x02}~\f\x05\x02\x02~\x7F\x05&\x14\x02' +
+    '\x7F\x80\x05\x10\t\x06\x80\x82\x03\x02\x02\x02\x81y\x03\x02\x02\x02\x81' +
+    '}\x03\x02\x02\x02\x82\x85\x03\x02\x02\x02\x83\x81\x03\x02\x02\x02\x83' +
+    '\x84\x03\x02\x02\x02\x84\x11\x03\x02\x02\x02\x85\x83\x03\x02\x02\x02\x86' +
+    '\x8E\x05\x16\f\x02\x87\x8E\x05(\x15\x02\x88\x8E\x05\x1A\x0E\x02\x89\x8E' +
+    '\x05*\x16\x02\x8A\x8E\x05,\x17\x02\x8B\x8E\x05\x1E\x10\x02\x8C\x8E\x05' +
+    '\x1C\x0F\x02\x8D\x86\x03\x02\x02\x02\x8D\x87\x03\x02\x02\x02\x8D\x88\x03' +
+    '\x02\x02\x02\x8D\x89\x03\x02\x02\x02\x8D\x8A\x03\x02\x02\x02\x8D\x8B\x03' +
+    '\x02\x02\x02\x8D\x8C\x03\x02\x02\x02\x8E\x13\x03\x02\x02\x02\x8F\x90\x07' +
+    '\x04\x02\x02\x90\x95\x05\x10\t\x02\x91\x92\x07\x03\x02\x02\x92\x94\x05' +
+    '\x10\t\x02\x93\x91\x03\x02\x02\x02\x94\x97\x03\x02\x02\x02\x95\x93\x03' +
+    '\x02\x02\x02\x95\x96\x03\x02\x02\x02\x96\x98\x03\x02\x02\x02\x97\x95\x03' +
+    '\x02\x02\x02\x98\x99\x07\x05\x02\x02\x99\x15\x03\x02\x02\x02\x9A\x9B\x05' +
+    ',\x17\x02\x9B\x9C\x07\x06\x02\x02\x9C\x9D\x05\x18\r\x02\x9D\x9E\x07\x07' +
+    '\x02\x02\x9E\x9F\x077\x02\x02\x9F\xA7\x03\x02\x02\x02\xA0\xA1\x05,\x17' +
+    '\x02\xA1\xA2\x07\x06\x02\x02\xA2\xA3\x05\x18\r\x02\xA3\xA4\x07\x07\x02' +
+    '\x02\xA4\xA5\x05\x14\v\x02\xA5\xA7\x03\x02\x02\x02\xA6\x9A\x03\x02\x02' +
+    '\x02\xA6\xA0\x03\x02\x02\x02\xA7\x17\x03\x02\x02\x02\xA8\xA9\t\x03\x02' +
+    '\x02\xA9\x19\x03\x02\x02\x02\xAA\xAE\x07/\x02\x02\xAB\xAE\x070\x02\x02' +
+    '\xAC\xAE\x071\x02\x02\xAD\xAA\x03\x02\x02\x02\xAD\xAB\x03\x02\x02\x02' +
+    '\xAD\xAC\x03\x02\x02\x02\xAE\x1B\x03\x02\x02\x02\xAF\xB0\x07\b\x02\x02' +
+    '\xB0\xB1\x078\x02\x02\xB1\x1D\x03\x02\x02\x02\xB2\xB3\x078\x02\x02\xB3' +
+    '\x1F\x03\x02\x02\x02\xB4\xB5\t\x04\x02\x02\xB5!\x03\x02\x02\x02\xB6\xB7' +
+    '\t\x05\x02\x02\xB7#\x03\x02\x02\x02\xB8\xB9\t\x06\x02\x02\xB9%\x03\x02' +
+    "\x02\x02\xBA\xBB\t\x07\x02\x02\xBB'\x03\x02\x02\x02\xBC\xC1\x073\x02" +
+    '\x02\xBD\xC1\x075\x02\x02\xBE\xC1\x074\x02\x02\xBF\xC1\x076\x02\x02\xC0' +
+    '\xBC\x03\x02\x02\x02\xC0\xBD\x03\x02\x02\x02\xC0\xBE\x03\x02\x02\x02\xC0' +
+    '\xBF\x03\x02\x02\x02\xC1)\x03\x02\x02\x02\xC2\xC3\t\b\x02\x02\xC3+\x03' +
+    '\x02\x02\x02\xC4\xC7\x07,\x02\x02\xC5\xC7\x05.\x18\x02\xC6\xC4\x03\x02' +
+    '\x02\x02\xC6\xC5\x03\x02\x02\x02\xC7-\x03\x02\x02\x02\xC8\xC9\t\t\x02' +
+    '\x02\xC9/\x03\x02\x02\x02\x138?FNR\\clw\x81\x83\x8D\x95\xA6\xAD\xC0\xC6';
   public static __ATN: ATN;
   public static get _ATN(): ATN {
     if (!QueryModificationParser.__ATN) {
@@ -2548,9 +2593,6 @@ export class TermOpContext extends ParserRuleContext {
 }
 
 export class StringLiteralContext extends ParserRuleContext {
-  public STRING_LITERAL1(): TerminalNode {
-    return this.getToken(QueryModificationParser.STRING_LITERAL1, 0);
-  }
   constructor(parent: ParserRuleContext | undefined, invokingState: number) {
     super(parent, invokingState);
   }
@@ -2558,16 +2600,103 @@ export class StringLiteralContext extends ParserRuleContext {
   public get ruleIndex(): number {
     return QueryModificationParser.RULE_stringLiteral;
   }
+  public copyFrom(ctx: StringLiteralContext): void {
+    super.copyFrom(ctx);
+  }
+}
+export class SingleQuotedOnelineContext extends StringLiteralContext {
+  public SINGLE_QUOTED_ONE_LINE_STRING(): TerminalNode {
+    return this.getToken(
+      QueryModificationParser.SINGLE_QUOTED_ONE_LINE_STRING,
+      0
+    );
+  }
+  constructor(ctx: StringLiteralContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
   // @Override
   public enterRule(listener: QueryModificationListener): void {
-    if (listener.enterStringLiteral) {
-      listener.enterStringLiteral(this);
+    if (listener.enterSingleQuotedOneline) {
+      listener.enterSingleQuotedOneline(this);
     }
   }
   // @Override
   public exitRule(listener: QueryModificationListener): void {
-    if (listener.exitStringLiteral) {
-      listener.exitStringLiteral(this);
+    if (listener.exitSingleQuotedOneline) {
+      listener.exitSingleQuotedOneline(this);
+    }
+  }
+}
+export class SingleQuotedMultlineContext extends StringLiteralContext {
+  public SINGLE_QUOTED_MULTI_LINE_STRING(): TerminalNode {
+    return this.getToken(
+      QueryModificationParser.SINGLE_QUOTED_MULTI_LINE_STRING,
+      0
+    );
+  }
+  constructor(ctx: StringLiteralContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
+  // @Override
+  public enterRule(listener: QueryModificationListener): void {
+    if (listener.enterSingleQuotedMultline) {
+      listener.enterSingleQuotedMultline(this);
+    }
+  }
+  // @Override
+  public exitRule(listener: QueryModificationListener): void {
+    if (listener.exitSingleQuotedMultline) {
+      listener.exitSingleQuotedMultline(this);
+    }
+  }
+}
+export class DoubleQuotedOnelineContext extends StringLiteralContext {
+  public DOUBLE_QUOTED_ONE_LINE_STRING(): TerminalNode {
+    return this.getToken(
+      QueryModificationParser.DOUBLE_QUOTED_ONE_LINE_STRING,
+      0
+    );
+  }
+  constructor(ctx: StringLiteralContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
+  // @Override
+  public enterRule(listener: QueryModificationListener): void {
+    if (listener.enterDoubleQuotedOneline) {
+      listener.enterDoubleQuotedOneline(this);
+    }
+  }
+  // @Override
+  public exitRule(listener: QueryModificationListener): void {
+    if (listener.exitDoubleQuotedOneline) {
+      listener.exitDoubleQuotedOneline(this);
+    }
+  }
+}
+export class DoubleQuotedMultilineContext extends StringLiteralContext {
+  public DOUBLE_QUOTED_MULTI_LINE_STRING(): TerminalNode {
+    return this.getToken(
+      QueryModificationParser.DOUBLE_QUOTED_MULTI_LINE_STRING,
+      0
+    );
+  }
+  constructor(ctx: StringLiteralContext) {
+    super(ctx.parent, ctx.invokingState);
+    this.copyFrom(ctx);
+  }
+  // @Override
+  public enterRule(listener: QueryModificationListener): void {
+    if (listener.enterDoubleQuotedMultiline) {
+      listener.enterDoubleQuotedMultiline(this);
+    }
+  }
+  // @Override
+  public exitRule(listener: QueryModificationListener): void {
+    if (listener.exitDoubleQuotedMultiline) {
+      listener.exitDoubleQuotedMultiline(this);
     }
   }
 }

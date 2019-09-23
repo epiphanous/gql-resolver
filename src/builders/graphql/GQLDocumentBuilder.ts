@@ -22,20 +22,7 @@ import {
   ValueContext,
   VariableValueContext,
 } from '../../antlr4';
-import {
-  GQLBooleanValue,
-  GQLEnumValue,
-  GQLFloatValue,
-  GQLIntValue,
-  GQLKeyedValueList,
-  GQLNullValue,
-  GQLStringValue,
-  GQLType,
-  GQLValue,
-  GQLValueList,
-  GQLVariable,
-  GQLVariableValue,
-} from '../../models';
+import { GQLType, GQLValueType } from '../../models';
 import { BuilderBase } from '../BuilderBase';
 
 export class GQLDocumentBuilder<T> extends BuilderBase<T>
@@ -59,10 +46,6 @@ export class GQLDocumentBuilder<T> extends BuilderBase<T>
     );
   }
 
-  public enterDocument(ctx: DocumentContext) {
-    console.log('start parse');
-  }
-
   public parseWith(parser: GraphQLParser): DocumentContext {
     return parser.document();
   }
@@ -71,75 +54,64 @@ export class GQLDocumentBuilder<T> extends BuilderBase<T>
     return ctxOpt.map(dc => this.textOf(dc.STRING_VALUE()));
   }
 
-  public processValue(ctx: ValueContext): GQLValue {
+  public processValue(ctx: ValueContext): GQLValueType {
     if (ctx instanceof VariableValueContext) {
-      const varName = this.textOf(
-        (ctx as VariableValueContext).variable().NAME()
-      );
-      return new GQLVariableValue(new GQLVariable(varName));
+      return (ctx as VariableValueContext).variable().text;
     }
     if (ctx instanceof IntValueContext) {
-      return new GQLIntValue(
-        parseInt(this.textOf((ctx as IntValueContext).INT_VALUE()), 10)
-      );
+      return parseInt(this.textOf((ctx as IntValueContext).INT_VALUE()), 10);
     }
     if (ctx instanceof FloatValueContext) {
-      return new GQLFloatValue(
-        parseFloat(this.textOf((ctx as FloatValueContext).FLOAT_VALUE()))
-      );
+      return parseFloat(this.textOf((ctx as FloatValueContext).FLOAT_VALUE()));
     }
     if (ctx instanceof StringValueContext) {
-      return new GQLStringValue(
-        this.textOf((ctx as StringValueContext).STRING_VALUE())
-      );
+      return this.textOf((ctx as StringValueContext).STRING_VALUE());
     }
     if (ctx instanceof BooleanValueContext) {
-      return new GQLBooleanValue(
-        this.textOf((ctx as BooleanValueContext).BOOLEAN_VALUE()) === 'true'
+      return (
+        this.textOf(
+          (ctx as BooleanValueContext).BOOLEAN_VALUE()
+        ).toLowerCase() === 'true'
       );
     }
 
     if (ctx instanceof NullValueContext) {
-      return new GQLNullValue();
+      return null;
     }
 
     if (ctx instanceof EnumValueContext) {
-      return new GQLEnumValue(this.textOf((ctx as EnumValueContext).NAME()));
+      return this.textOf((ctx as EnumValueContext).NAME());
     }
 
     if (ctx instanceof EmptyListValueContext) {
-      return new GQLValueList(List<GQLValue>());
+      return List<GQLValueType>();
     }
 
     if (ctx instanceof NonEmptyListValueContext) {
-      return new GQLValueList(
-        List(
-          (ctx as NonEmptyListValueContext)
-            .value()
-            .map(vc => this.processValue(vc))
-        )
+      return List(
+        (ctx as NonEmptyListValueContext)
+          .value()
+          .map(vc => this.processValue(vc))
       );
     }
 
     if (ctx instanceof EmptyObjectValueContext) {
-      return new GQLKeyedValueList(Map<string, GQLValue>());
+      return Map<string, GQLValueType>();
     }
 
     if (ctx instanceof NonEmptyObjectValueContext) {
-      return new GQLKeyedValueList(
-        Map(
-          (ctx as NonEmptyObjectValueContext)
-            .objectField()
-            .map<[string, GQLValue]>(of => {
-              return [this.textOf(of.NAME()), this.processValue(of.value())];
-            })
-        )
+      return Map(
+        (ctx as NonEmptyObjectValueContext)
+          .objectField()
+          .map<[string, GQLValueType]>(of => {
+            return [this.textOf(of.NAME()), this.processValue(of.value())];
+          })
       );
     }
     throw new Error('Unsupported ValueContext ' + ctx);
   }
 
   public processDefaultValue(ctxOpt: Option<DefaultValueContext>) {
-    return ctxOpt.map(dv => this.processValue(dv.value()));
+    return ctxOpt.map<GQLValueType>(dv => this.processValue(dv.value()));
   }
 }

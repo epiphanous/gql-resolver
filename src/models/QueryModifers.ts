@@ -1,8 +1,10 @@
 import { List } from 'immutable';
 import { GQLFieldDefinition } from './GQLTypeDefinition';
+import { GQLValueType } from './GQLValueType';
 import { GQLVariableDefinition } from './GQLVariableDefinition';
 
 export type QMTermOperator = '+' | '-';
+export type QMUnaryOperator = '+' | '-' | '!';
 export type QMProductOperator = '*' | '/' | '%';
 export type QMComparisonOperator =
   | '>'
@@ -15,6 +17,7 @@ export type QMComparisonOperator =
   | '!~';
 
 export class QMContext {
+  public static readonly DUMMY = new QMContext();
   public label: string;
   public line: number;
   public column: number;
@@ -29,7 +32,7 @@ export abstract class QueryModifiers {
   public context: QMContext;
   public resultType: string;
 
-  constructor(context: QMContext, resultType: string) {
+  constructor(resultType: string, context: QMContext = QMContext.DUMMY) {
     this.context = context;
     this.resultType = resultType;
   }
@@ -63,11 +66,11 @@ export class QMOrderBy extends QueryModifiers {
   public desc: boolean;
 
   constructor(
-    context: QMContext,
     expression: QMExpression,
-    desc: boolean = false
+    desc: boolean = false,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, expression.resultType);
+    super(expression.resultType, context);
     this.expression = expression;
     this.desc = desc;
   }
@@ -75,16 +78,22 @@ export class QMOrderBy extends QueryModifiers {
 
 export class QMDisjunction extends QueryModifiers {
   public conjunctions: List<QMConjunction>;
-  constructor(context: QMContext, conjunctions: List<QMConjunction>) {
-    super(context, 'xsd:boolean');
+  constructor(
+    conjunctions: List<QMConjunction>,
+    context: QMContext = QMContext.DUMMY
+  ) {
+    super('xsd:boolean', context);
     this.conjunctions = conjunctions;
   }
 }
 
 export class QMConjunction extends QueryModifiers {
   public optionalNegations: List<QMOptionalNegation>;
-  constructor(context: QMContext, optionalNegations: List<QMOptionalNegation>) {
-    super(context, 'xsd:boolean');
+  constructor(
+    optionalNegations: List<QMOptionalNegation>,
+    context: QMContext = QMContext.DUMMY
+  ) {
+    super('xsd:boolean', context);
     this.optionalNegations = optionalNegations;
   }
 }
@@ -92,8 +101,12 @@ export class QMConjunction extends QueryModifiers {
 export class QMOptionalNegation extends QueryModifiers {
   public predicate: QMPredicate;
   public negate: boolean;
-  constructor(context: QMContext, predicate: QMPredicate, negate: boolean) {
-    super(context, 'xsd:boolean');
+  constructor(
+    predicate: QMPredicate,
+    negate: boolean,
+    context: QMContext = QMContext.DUMMY
+  ) {
+    super('xsd:boolean', context);
     this.predicate = predicate;
     this.negate = negate;
   }
@@ -107,12 +120,12 @@ export class QMComparisonPredicate extends QMPredicate {
   public right: QMExpression;
 
   constructor(
-    context: QMContext,
     operator: QMComparisonOperator,
     left: QMExpression,
-    right: QMExpression
+    right: QMExpression,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, 'xsd:boolean');
+    super('xsd:boolean', context);
     this.operator = operator;
     this.left = left;
     this.right = right;
@@ -132,12 +145,12 @@ export class QMInPredicate extends QMPredicate {
   public negate: boolean;
 
   constructor(
-    context: QMContext,
     target: QMExpression,
     list: List<QMExpression>,
-    negate: boolean
+    negate: boolean,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, 'xsd:boolean');
+    super('xsd:boolean', context);
     this.target = target;
     this.list = list;
     this.negate = negate;
@@ -157,12 +170,12 @@ export class QMInVarPredicate extends QMPredicate {
   public negate: boolean;
 
   constructor(
-    context: QMContext,
     target: QMExpression,
     varRef: QMVarRef,
-    negate: boolean
+    negate: boolean,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, 'xsd:boolean');
+    super('xsd:boolean', context);
     this.target = target;
     this.varRef = varRef;
     this.negate = negate;
@@ -179,8 +192,11 @@ export class QMInVarPredicate extends QMPredicate {
 export class QMParenPredicate extends QMPredicate {
   public disjunction: QMDisjunction;
 
-  constructor(context: QMContext, disjunction: QMDisjunction) {
-    super(context, 'xsd:boolean');
+  constructor(
+    disjunction: QMDisjunction,
+    context: QMContext = QMContext.DUMMY
+  ) {
+    super('xsd:boolean', context);
     this.disjunction = disjunction;
   }
 }
@@ -188,10 +204,16 @@ export class QMParenPredicate extends QMPredicate {
 export abstract class QMExpression extends QueryModifiers {}
 
 export class QMUnaryExpression extends QMExpression {
+  public operator: QMUnaryOperator;
   public expression: QMExpression;
 
-  constructor(context: QMContext, expression: QMExpression) {
-    super(context, expression.resultType);
+  constructor(
+    operator: QMUnaryOperator,
+    expression: QMExpression,
+    context: QMContext = QMContext.DUMMY
+  ) {
+    super(expression.resultType, context);
+    this.operator = operator;
     this.expression = expression;
   }
 }
@@ -202,12 +224,12 @@ export class QMFactorExpression extends QMExpression {
   public right: QMExpression;
 
   constructor(
-    context: QMContext,
     operator: QMProductOperator,
     left: QMExpression,
-    right: QMExpression
+    right: QMExpression,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, left.resultType);
+    super(left.resultType, context);
     this.operator = operator;
     this.left = left;
     this.right = right;
@@ -227,12 +249,12 @@ export class QMTermExpression extends QMExpression {
   public right: QMExpression;
 
   constructor(
-    context: QMContext,
     operator: QMTermOperator,
     left: QMExpression,
-    right: QMExpression
+    right: QMExpression,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, left.resultType);
+    super(left.resultType, context);
     this.operator = operator;
     this.left = left;
     this.right = right;
@@ -250,8 +272,8 @@ export class QMPrimitiveExpression extends QMExpression {}
 
 export class QMParenExpression extends QMExpression {
   public expression: QMExpression;
-  constructor(context: QMContext, expression: QMExpression) {
-    super(context, expression.resultType);
+  constructor(expression: QMExpression, context: QMContext = QMContext.DUMMY) {
+    super(expression.resultType, context);
     this.expression = expression;
   }
 }
@@ -261,12 +283,12 @@ export class QMFunctionCall extends QMPrimitiveExpression {
   public args: List<QMExpression>;
 
   constructor(
-    context: QMContext,
     name: string,
     args: List<QMExpression>,
-    resultType: string
+    resultType: string,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, resultType);
+    super(resultType, context);
     this.name = name;
     this.args = args;
   }
@@ -275,62 +297,66 @@ export class QMFunctionCall extends QMPrimitiveExpression {
 export class QMLiteral extends QMPrimitiveExpression {
   public value: string;
 
-  constructor(context: QMContext, value: string, resultType: string) {
-    super(context, resultType);
+  constructor(
+    value: string,
+    resultType: string,
+    context: QMContext = QMContext.DUMMY
+  ) {
+    super(resultType, context);
     this.value = value;
   }
 }
 
 export class QMStringLiteral extends QMLiteral {
-  constructor(context: QMContext, value: string) {
-    super(context, value, 'xsd:string');
+  constructor(value: string, context: QMContext = QMContext.DUMMY) {
+    super(value, 'xsd:string', context);
   }
 }
 
 export class QMNumericLiteral extends QMLiteral {}
 
 export class QMIntegerLiteral extends QMNumericLiteral {
-  constructor(context: QMContext, value: string | number) {
-    super(context, String(value), 'xsd:integer');
+  constructor(value: string | number, context: QMContext = QMContext.DUMMY) {
+    super(String(value), 'xsd:integer', context);
   }
 }
 
 export class QMDecimalLiteral extends QMNumericLiteral {
-  constructor(context: QMContext, value: string | number) {
-    super(context, String(value), 'xsd:decimal');
+  constructor(value: string | number, context: QMContext = QMContext.DUMMY) {
+    super(String(value), 'xsd:decimal', context);
   }
 }
 
 export class QMDoubleLiteral extends QMNumericLiteral {
-  constructor(context: QMContext, value: string | number) {
-    super(context, String(value), 'xsd:double');
+  constructor(value: string | number, context: QMContext = QMContext.DUMMY) {
+    super(String(value), 'xsd:double', context);
   }
 }
 
 export class QMBooleanLiteral extends QMLiteral {
-  constructor(context: QMContext, value: boolean) {
-    super(context, String(value), 'xsd:boolean');
+  constructor(value: boolean, context: QMContext = QMContext.DUMMY) {
+    super(String(value), 'xsd:boolean', context);
   }
 }
 
 export class QMIriRef extends QMPrimitiveExpression {
   public iri: string;
 
-  constructor(context: QMContext, iri: string) {
-    super(context, 'xsd:anyURI');
+  constructor(iri: string, context: QMContext = QMContext.DUMMY) {
+    super('xsd:anyURI', context);
     this.iri = iri;
   }
 }
 
 export class QMVarRef extends QMPrimitiveExpression {
   public variable: GQLVariableDefinition;
-  public value: string;
+  public value: GQLValueType;
   constructor(
-    context: QMContext,
     variable: GQLVariableDefinition,
-    value: string
+    value: GQLValueType,
+    context: QMContext = QMContext.DUMMY
   ) {
-    super(context, variable.gqlType.xsdType());
+    super(variable.gqlType.xsdType(), context);
     this.variable = variable;
     this.value = value;
   }
@@ -338,8 +364,8 @@ export class QMVarRef extends QMPrimitiveExpression {
 
 export class QMFieldRef extends QMPrimitiveExpression {
   public field: GQLFieldDefinition;
-  constructor(context: QMContext, field: GQLFieldDefinition) {
-    super(context, field.gqlType.xsdType());
+  constructor(field: GQLFieldDefinition, context: QMContext = QMContext.DUMMY) {
+    super(field.gqlType.xsdType(), context);
     this.field = field;
   }
 }

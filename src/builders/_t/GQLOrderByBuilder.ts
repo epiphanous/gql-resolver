@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import fs = require('fs');
 import { Map, Set } from 'immutable';
-import { GQLOrdersByBuilder } from '../graphql/GQLOrdersByBuilder';
+import { GQLOrderBysBuilder } from '../graphql/GQLOrderBysBuilder';
 import { GQLObjectType } from '../../models/GQLTypeDefinition';
 import { ResolverContext } from '../../models/ResolverContext';
 import { Builder } from '../Builder';
 
-describe('GQLOrdersByBuilder test', () => {
+describe('GQLOrderBysBuilder test', () => {
   const schema = ResolverContext.buildSchema(
     fs.readFileSync('./src/schema.graphql', 'utf8')
   );
@@ -18,7 +18,7 @@ describe('GQLOrdersByBuilder test', () => {
     const validFields = Map(
       gnFeature.fields.map<[string, string]>(fd => [fd.name, fd.gqlType.name])
     );
-    const filterBuilder = new GQLOrdersByBuilder(
+    const filterBuilder = new GQLOrderBysBuilder(
       validFields,
       Set(),
       Map<string, any>(),

@@ -8,6 +8,7 @@ import {
   GQLFieldDefinition,
   GQLType,
   QMContext,
+  QMExpression,
   QMFieldRef,
   QMOrderBy,
   QueryResult,
@@ -109,18 +110,22 @@ export class SparqlQueryStrategy extends QueryStrategy {
     return OrderedMap(projections);
   }
 
-  protected getOrderByProjections(): OrderedMap<string, string> {
-    const sortByFields = OrderedMap(
-      this.sortKeys.map<[string, string]>(s => [
-        s.field.name,
-        `${s.desc ? 'DESC(' : ''}${variablify(
-          Option.of(this.fieldProjections.get(s.field.name)).getOrElse(
-            s.field.name
-          )
-        )}${s.desc ? ')' : ''}`,
-      ])
-    );
-    return this.parentSubjectProjections.concat(sortByFields);
+  protected renderOrderBy(ob: QMOrderBy) {
+    return `${ob.desc ? 'DESC(' : ''}${this.renderExpression(ob.expression)}${
+      ob.desc ? ')' : ''
+    }`;
+  }
+
+  protected renderExpression(e: QMExpression) {
+    if (e instanceof QM)
+  }
+
+  protected getOrderByProjections(): OrderedMap<string, string> {}
+
+  protected getOrderByExpressions(): string {
+    const x = this.plan.processedArgs.orderBys
+      .map(obs => obs.qmOrderBys.map(ob => this.renderOrderBy(ob)))
+      .getOrElse(List<string>());
   }
 
   protected getProjections(): OrderedMap<string, string> {
@@ -175,6 +180,11 @@ export class SparqlQueryStrategy extends QueryStrategy {
 
   protected getFilterFields(): Set<string> {
     return this.plan.processedArgs.filter.map(f => f.fields).getOrElse(Set());
+  }
+
+  protected getSubjectBindingAsOrderBy(): QMOrderBy {}
+  protected getParentBindingAsOrderBy(): QMOrderBy {
+    return new QMOrderBy(new QMContext(), new QMFieldRef());
   }
 
   protected getSortKeys(): List<QMOrderBy> {
@@ -313,7 +323,7 @@ export class SparqlQueryStrategy extends QueryStrategy {
 
   protected getOrderClause() {
     return this.getOptionalProjectionClause(
-      this.getOrderByProjections(),
+      this.getOrderByExpressions(),
       'ORDER BY'
     );
   }

@@ -120,6 +120,7 @@ comparisonOp
 
 unaryOp
   : '-'
+  | '+'
   | '!'
   ;
 
@@ -135,8 +136,10 @@ termOp
   ;
 
 stringLiteral
-  : STRING_LITERAL1
-//  | STRING_LITERAL2
+  : SINGLE_QUOTED_ONE_LINE_STRING     # singleQuotedOneline
+  | SINGLE_QUOTED_MULTI_LINE_STRING   # singleQuotedMultline
+  | DOUBLE_QUOTED_ONE_LINE_STRING     # doubleQuotedOneline
+  | DOUBLE_QUOTED_MULTI_LINE_STRING   # doubleQuotedMultiline
   ;
 
 booleanLiteral
@@ -278,41 +281,38 @@ EXPONENT
   )? DIGIT+
   ;
 
-STRING_LITERAL1
-  : '\'' (
-    ~(
-      '\u0027'
-      | '\u005C'
-      | '\u000A'
-      | '\u000D'
-    )
-    | ECHAR
-  )* '\''
+SINGLE_QUOTED_ONE_LINE_STRING
+  : '\'' ( ~['\\\n\r\u2028\u2029] | ESCAPED_CHARACTER )* '\''
   ;
 
-STRING_LITERAL2
-  : '"' (
-    ~(
-      '\u0022'
-      | '\u005C'
-      | '\u000A'
-      | '\u000D'
-    )
-    | ECHAR
-  )* '"'
+DOUBLE_QUOTED_ONE_LINE_STRING
+  : '"' ( ~["\\\n\r\u2028\u2029] | ESCAPED_CHARACTER )* '"'
   ;
 
-ECHAR
-  : '\\' (
-    't'
-    | 'b'
-    | 'n'
-    | 'r'
-    | 'f'
-    | '"'
-    | '\''
-  )
+SINGLE_QUOTED_MULTI_LINE_STRING
+  : '\'\'\'' TRIPLE_SINGLE_QUOTED_CHAR*? '\'\'\''
   ;
+
+DOUBLE_QUOTED_MULTI_LINE_STRING
+  : '"""' TRIPLE_DOUBLE_QUOTED_CHAR*? '"""'
+  ;
+
+fragment ESCAPED_TRIPLE_SINGLE_QUOTE
+  : '\\\'\'\''
+  ;
+fragment ESCAPED_TRIPLE_DOUBLE_QUOTE
+  : '\\"""'
+  ;
+fragment SOURCE_CHARACTER
+  : [\u0009\u000A\u000D\u0020-\uFFFF]
+  ;
+
+fragment ESCAPED_CHARACTER
+  : '\\' [tbnrf\\'"]
+  ;
+
+fragment TRIPLE_SINGLE_QUOTED_CHAR: ESCAPED_TRIPLE_SINGLE_QUOTE | SOURCE_CHARACTER;
+fragment TRIPLE_DOUBLE_QUOTED_CHAR: ESCAPED_TRIPLE_DOUBLE_QUOTE | SOURCE_CHARACTER;
 
 EMPTY_PARENS
   : '(' ')'

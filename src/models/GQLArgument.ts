@@ -1,26 +1,27 @@
+import { Option } from 'funfix';
 import { Map } from 'immutable';
-import { GQLValue } from '.';
+import { GQLValueType } from '.';
 
-export interface IGQLArgument {
-  name: string;
-  value: GQLValue;
-
-  resolve(vars: Map<string, any>): any;
-}
-
-export class GQLArgument implements IGQLArgument {
+export class GQLArgument {
   public name: string;
-  public value: GQLValue;
+  public value: GQLValueType;
 
-  constructor(name: string, value: GQLValue) {
+  constructor(name: string, value: GQLValueType) {
     this.name = name;
     this.value = value;
   }
 
-  public resolve(vars: Map<string, any>) {
-    return this.value.resolve(vars);
+  public resolve(vars: Map<string, GQLValueType>): GQLValueType {
+    if (
+      typeof this.value === 'string' &&
+      /^\$([_A-Za-z][_0-9A-Za-z]*)$/.test(this.value)
+    ) {
+      return Option.of(vars.get(RegExp.$1)).getOrElse(null);
+    }
+    return this.value;
   }
 }
+
 export class GQLAfterArgument extends GQLArgument {}
 export class GQLAnyArgument extends GQLArgument {}
 export class GQLBeforeArgument extends GQLArgument {}

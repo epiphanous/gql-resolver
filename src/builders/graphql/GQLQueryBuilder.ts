@@ -1,6 +1,6 @@
 import { None, Option, Some, Try } from 'funfix';
 import { List, Map, Set } from 'immutable';
-import { GQLDocumentBuilder, GQLFilterBuilder, GQLOrdersByBuilder } from '.';
+import { GQLDocumentBuilder, GQLFilterBuilder, GQLOrderBysBuilder } from '.';
 import {
   ArgumentContext,
   ArgumentsContext,
@@ -23,7 +23,6 @@ import {
   VariableDefinitionsContext,
 } from '../../antlr4';
 import {
-  DEFAULT_PREFIXES,
   GQLAfterArgument,
   GQLAny,
   GQLAnyArgument,
@@ -40,7 +39,6 @@ import {
   GQLFragmentSpread,
   GQLIncludeDeprecatedArgument,
   GQLInlineFragment,
-  GQLInputType,
   GQLInvalidArgument,
   GQLLastArgument,
   GQLNameArgument,
@@ -52,12 +50,12 @@ import {
   GQLQueryDocument,
   GQLSchema,
   GQLSelection,
-  GQLStringValue,
+  GQLValueType,
   GQLVariableDefinition,
-  GQLVariableValue,
   ResolverContext,
 } from '../../models';
 import { Builder } from '../Builder';
+import { BuilderError } from '../BuilderError';
 
 const ARG_TYPES = {
   ARG_FILTER: 'filter',
@@ -73,7 +71,7 @@ const ARG_TYPES = {
 export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
   public schema: GQLSchema;
   public context: ResolverContext;
-  public vars: Map<string, any>;
+  public vars: Map<string, GQLValueType>;
   public operationName: Option<string>;
   // these collections are mutable
   public operations = List<GQLOperation>().asMutable();
@@ -82,7 +80,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
 
   constructor(
     context: ResolverContext,
-    vars: Map<string, any> = Map<string, any>(),
+    vars: Map<string, GQLValueType>,
     operationName: Option<string> = None
   ) {
     super();
@@ -92,13 +90,24 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
     this.operationName = operationName;
   }
 
-  public getPrefixes() {
-    return DEFAULT_PREFIXES;
-  }
-
   public build(parser: GraphQLParser) {
     return Try.of(() => {
       this.parseWith(parser);
+
+      // resolve default variables
+      this.variables
+        .filterNot(vd => vd.resolve(this.vars))
+        .forEach(vd => {
+          this.addError(
+            new BuilderError(
+              `no value provided for variable ${vd.name}`,
+              1,
+              1,
+              None,
+              true
+            )
+          );
+        });
 
       if (this.errorCount > 0) {
         throw this.errors;
@@ -108,7 +117,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
         this.operations,
         this.fragmentDefinitions.asImmutable(),
         this.context,
-        this.vars
+        this.vars.asImmutable()
       );
     });
   }
@@ -126,31 +135,36 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
         });
       } else if (arg instanceof GQLFilterArgument) {
         return qa.copy({
-          filter: Some(this.processFilter(arg.resolve(this.vars), allFields)),
+          filter: Some(
+            this.processFilter(arg.resolve(this.vars) as string, allFields)
+          ),
         });
       } else if (arg instanceof GQLOrderByArgument) {
         return qa.copy({
           orderBys: Some(
-            this.processOrderBys(arg.resolve(this.vars), allFields)
+            this.processOrderBys(arg.resolve(this.vars) as string, allFields)
           ),
         });
       } else if (arg instanceof GQLAfterArgument) {
-        const after = Some(arg.resolve(this.vars));
+        const after = Option.of(arg.resolve(this.vars) as string | null);
         return qa.copy({ after });
       } else if (arg instanceof GQLBeforeArgument) {
-        const before = Some(arg.resolve(this.vars));
+        const before = Option.of(arg.resolve(this.vars) as string | null);
         return qa.copy({ before });
       } else if (arg instanceof GQLFirstArgument) {
-        const first = Some(parseInt(arg.resolve(this.vars), 10));
+        const first = Option.of(arg.resolve(this.vars) as number | null);
         return qa.copy({ first });
       } else if (arg instanceof GQLLastArgument) {
-        const last = Some(parseInt(arg.resolve(this.vars), 10));
+        const last = Option.of(arg.resolve(this.vars) as number | null);
         return qa.copy({ last });
       } else if (arg instanceof GQLNameArgument) {
-        return qa.copy({ name: Some(arg.resolve(this.vars)) });
+        const name = Option.of(arg.resolve(this.vars) as string | null);
+        return qa.copy({ name });
       } else if (arg instanceof GQLIncludeDeprecatedArgument) {
-        const b = /^(1|t|true)$/.test(arg.resolve(this.vars).toLowerCase());
-        return qa.copy({ includeDeprecated: Some(b) });
+        const includeDeprecated = Option.of(arg.resolve(this.vars) as
+          | boolean
+          | null);
+        return qa.copy({ includeDeprecated });
       } else {
         return qa;
       }
@@ -172,7 +186,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
     validFields: List<GQLFieldDefinition>
   ): GQLOrderBys {
     return Builder.parse<GQLOrderBys>(
-      new GQLOrdersByBuilder(validFields, this.variables, this.vars, orderExpr),
+      new GQLOrderBysBuilder(validFields, this.variables, this.vars, orderExpr),
       orderExpr
     ).get();
   }
@@ -273,10 +287,6 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
     return vd;
   }
 
-  // public processVariable(ctx: VariableContext): GQLVariable {
-  //   return new GQLVariable(this.textOf(ctx.NAME()));
-  // }
-
   public exitFragmentDefinition(ctx: FragmentDefinitionContext): void {
     this.fragmentDefinitions = this.fragmentDefinitions.add(
       new GQLFragmentDefinition(
@@ -347,9 +357,7 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
 
   public getArguments(
     ctxOpt: Option<ArgumentsContext>,
-    typeDefOpt: Option<
-      GQLFieldDefinition | GQLDirectiveDefinition | GQLInputType
-    >
+    typeDefOpt: Option<GQLFieldDefinition | GQLDirectiveDefinition>
   ): List<GQLArgument> {
     return ctxOpt
       .map(args =>
@@ -360,77 +368,86 @@ export class GQLQueryBuilder extends GQLDocumentBuilder<GQLQueryDocument> {
 
   public getArgument(
     ctx: ArgumentContext,
-    typeDef: Option<GQLFieldDefinition | GQLDirectiveDefinition | GQLInputType>
+    typeDefOpt: Option<GQLFieldDefinition | GQLDirectiveDefinition>
   ): GQLArgument {
     const name = this.textOf(ctx.NAME());
-    const typeDefName = typeDef.map(d => d.name).getOrElse('unknown');
-    const argDefOpt = typeDef.map(d => d.args.find(def => def.name === name));
-    if (argDefOpt.isEmpty()) {
-      this.check(
-        false,
-        `unknown argument '${name}' on ${typeDef.constructor.name
-          .replace(/(GQL|Definition)/, '')
-          .toLowerCase()} '${typeDefName}`,
-        ctx
-      );
-      return new GQLInvalidArgument(name, new GQLStringValue('error'));
-    } else {
-      const argDef = argDefOpt.get();
-      const expectedType = argDef!.gqlType.name;
-      const v = this.processValue(ctx.value());
-      let typeOk = false;
-      switch (v.constructor.name) {
-        case 'GQLVariableValue':
-          const hasVar = this.variables.find(
-            a => a.name === (v as GQLVariableValue).value.name
-          );
-          if (hasVar) {
-            typeOk = hasVar.gqlType.name === expectedType;
-          }
-          break;
-        case 'GQLStringValue':
-          typeOk = expectedType === 'String';
-          break;
-        case 'GQLIntValue':
-          typeOk = expectedType === 'Int';
-          break;
-        case 'GQLFloatValue':
-          typeOk = expectedType === 'Float';
-          break;
-        case 'GQLBooleanValue':
-          typeOk = expectedType === 'Boolean';
-          break;
-        default:
-          typeOk = this.schema.inputTypes.keySeq().includes(expectedType);
-          break;
-        // todo: add more?
-      }
+    const badArg = new GQLInvalidArgument(name, 'error');
+    return typeDefOpt
+      .map(typeDef => {
+        return Option.of(typeDef.args.find(arg => arg.name === name))
+          .map(ad => {
+            const expectedType = ad.gqlType.xsdType();
+            const isList = ad.gqlType.isList;
+            const isReq = ad.gqlType.isRequired;
+            const argValue = this.processValue(ctx.value());
+            const argType = typeof argValue;
+            const errMessage = (actualType: string = argType) =>
+              Some(
+                `[${name}] expected argument type ${expectedType} , got ${actualType}`
+              );
+            const typeOK = (() => {
+              if (argType === 'string') {
+                if (/^\$[_A-Za-z][_0-9A-Za-z]*$/.test(argValue as string)) {
+                  return None;
+                } else {
+                  return expectedType === 'xsd:string' ? None : errMessage();
+                }
+              } else if (argType === 'number') {
+                return List([
+                  'xsd:decimal',
+                  'xsd:integer',
+                  'xsd:float',
+                ]).contains(expectedType)
+                  ? None
+                  : errMessage();
+              } else if (argType === 'boolean') {
+                return expectedType === 'xsd:boolean' ? None : errMessage();
+              } else if (argValue instanceof List) {
+                return isList ? None : errMessage('list');
+              } else if (argValue instanceof Map) {
+                return List(['string', 'number', 'boolean']).contains(
+                  expectedType
+                ) || isList
+                  ? errMessage('object')
+                  : None;
+              } else if (argValue == null) {
+                return isReq ? errMessage('null') : None;
+              }
+            })()
+              .map(errMsg => {
+                this.check(false, errMsg, ctx, true);
+                return false;
+              })
+              .getOrElse(true);
 
-      if (typeOk) {
-        switch (name) {
-          case ARG_TYPES.ARG_FILTER:
-            return new GQLFilterArgument(name, v);
-          case ARG_TYPES.ARG_SORT_BY:
-            return new GQLOrderByArgument(name, v);
-          case ARG_TYPES.ARG_FIRST:
-            return new GQLFirstArgument(name, v);
-          case ARG_TYPES.ARG_LAST:
-            return new GQLLastArgument(name, v);
-          case ARG_TYPES.ARG_BEFORE:
-            return new GQLBeforeArgument(name, v);
-          case ARG_TYPES.ARG_AFTER:
-            return new GQLAfterArgument(name, v);
-          case ARG_TYPES.ARG_INCLUDE_DEPRECATED:
-            return new GQLIncludeDeprecatedArgument(name, v);
-          case ARG_TYPES.ARG_NAME:
-            return new GQLNameArgument(name, v);
-          default:
-            return new GQLAnyArgument(name, v);
-        }
-      } else {
-        return new GQLInvalidArgument(name, new GQLStringValue('error'));
-      }
-    }
+            if (typeOK) {
+              switch (name) {
+                case ARG_TYPES.ARG_FILTER:
+                  return new GQLFilterArgument(name, argValue);
+                case ARG_TYPES.ARG_SORT_BY:
+                  return new GQLOrderByArgument(name, argValue);
+                case ARG_TYPES.ARG_FIRST:
+                  return new GQLFirstArgument(name, argValue);
+                case ARG_TYPES.ARG_LAST:
+                  return new GQLLastArgument(name, argValue);
+                case ARG_TYPES.ARG_BEFORE:
+                  return new GQLBeforeArgument(name, argValue);
+                case ARG_TYPES.ARG_AFTER:
+                  return new GQLAfterArgument(name, argValue);
+                case ARG_TYPES.ARG_INCLUDE_DEPRECATED:
+                  return new GQLIncludeDeprecatedArgument(name, argValue);
+                case ARG_TYPES.ARG_NAME:
+                  return new GQLNameArgument(name, argValue);
+                default:
+                  return new GQLAnyArgument(name, argValue);
+              }
+            } else {
+              return badArg;
+            }
+          })
+          .getOrElse(badArg);
+      })
+      .getOrElse(badArg);
   }
 
   public processInlineFragment(ctx: InlineFragmentContext): GQLInlineFragment {

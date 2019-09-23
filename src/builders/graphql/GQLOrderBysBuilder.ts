@@ -3,7 +3,7 @@ import { GQLQueryModifiersBuilder } from '.';
 import { OrderBysContext, QueryModificationParser } from '../../antlr4';
 import { GQLOrderBys } from '../../models';
 
-export class GQLOrdersByBuilder extends GQLQueryModifiersBuilder {
+export class GQLOrderBysBuilder extends GQLQueryModifiersBuilder<GQLOrderBys> {
   public result: GQLOrderBys;
 
   public parseWith(parser: QueryModificationParser) {

@@ -1,5 +1,5 @@
 import { None, Option } from 'funfix';
-import { List, Map } from 'immutable';
+import { List, Map, Set } from 'immutable';
 import {
   GQLArgument,
   GQLConnectionEdgesExecutionPlan,
@@ -370,7 +370,9 @@ export class GQLExecutionPlan implements IGQLExecutionPlan {
       .filter(s => this.context.strategies.has(s));
   }
 
-  protected getSortFields(): List<GQLFieldDefinition> {
-    return this.processedArgs.sortBy.map(sf => sf.field);
+  protected getSortFields(): Set<GQLFieldDefinition> {
+    return this.processedArgs.orderBys
+      .map(obs => obs.fieldRefs)
+      .getOrElse(Set<GQLFieldDefinition>());
   }
 }

@@ -11,6 +11,10 @@ import { ComparisonPredicateContext } from './QueryModificationParser';
 import { InPredicateContext } from './QueryModificationParser';
 import { InVarPredicateContext } from './QueryModificationParser';
 import { ParenPredicateContext } from './QueryModificationParser';
+import { SingleQuotedOnelineContext } from './QueryModificationParser';
+import { SingleQuotedMultlineContext } from './QueryModificationParser';
+import { DoubleQuotedOnelineContext } from './QueryModificationParser';
+import { DoubleQuotedMultilineContext } from './QueryModificationParser';
 import { FunctionCallAtomContext } from './QueryModificationParser';
 import { StringLiteralAtomContext } from './QueryModificationParser';
 import { NumericLiteralAtomContext } from './QueryModificationParser';
@@ -170,6 +174,58 @@ export interface QueryModificationListener extends ParseTreeListener {
    * @param ctx the parse tree
    */
   exitParenPredicate?: (ctx: ParenPredicateContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `singleQuotedOneline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  enterSingleQuotedOneline?: (ctx: SingleQuotedOnelineContext) => void;
+  /**
+   * Exit a parse tree produced by the `singleQuotedOneline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  exitSingleQuotedOneline?: (ctx: SingleQuotedOnelineContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `singleQuotedMultline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  enterSingleQuotedMultline?: (ctx: SingleQuotedMultlineContext) => void;
+  /**
+   * Exit a parse tree produced by the `singleQuotedMultline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  exitSingleQuotedMultline?: (ctx: SingleQuotedMultlineContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `doubleQuotedOneline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  enterDoubleQuotedOneline?: (ctx: DoubleQuotedOnelineContext) => void;
+  /**
+   * Exit a parse tree produced by the `doubleQuotedOneline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  exitDoubleQuotedOneline?: (ctx: DoubleQuotedOnelineContext) => void;
+
+  /**
+   * Enter a parse tree produced by the `doubleQuotedMultiline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  enterDoubleQuotedMultiline?: (ctx: DoubleQuotedMultilineContext) => void;
+  /**
+   * Exit a parse tree produced by the `doubleQuotedMultiline`
+   * labeled alternative in `QueryModificationParser.stringLiteral`.
+   * @param ctx the parse tree
+   */
+  exitDoubleQuotedMultiline?: (ctx: DoubleQuotedMultilineContext) => void;
 
   /**
    * Enter a parse tree produced by the `functionCallAtom`

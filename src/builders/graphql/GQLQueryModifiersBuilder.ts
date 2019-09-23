@@ -7,6 +7,8 @@ import {
   ComparisonPredicateContext,
   DecimalLiteralContext,
   DoubleLiteralContext,
+  DoubleQuotedMultilineContext,
+  DoubleQuotedOnelineContext,
   ExpressionContext,
   FactorExpressionContext,
   FieldRefAtomContext,
@@ -35,6 +37,8 @@ import {
   SearchConditionAndContext,
   SearchConditionContext,
   SearchConditionNotContext,
+  SingleQuotedMultlineContext,
+  SingleQuotedOnelineContext,
   StringLiteralAtomContext,
   StringLiteralContext,
   TermExpressionContext,
@@ -47,6 +51,7 @@ import {
   GQLFilter,
   GQLOrderBys,
   GQLType,
+  GQLValueType,
   GQLVariableDefinition,
   QMBooleanLiteral,
   QMComparisonOperator,
@@ -76,16 +81,15 @@ import {
   QMTermExpression,
   QMTermOperator,
   QMUnaryExpression,
+  QMUnaryOperator,
   QMVarRef,
 } from '../../models';
 import { BuilderBase } from '../BuilderBase';
 
-export abstract class GQLQueryModifiersBuilder extends BuilderBase<
-  GQLFilter | GQLOrderBys
-> {
+export abstract class GQLQueryModifiersBuilder<T> extends BuilderBase<T> {
   public validFields: List<GQLFieldDefinition>;
   public validVariables: Set<GQLVariableDefinition>;
-  public vars: Map<string, string>;
+  public vars: Map<string, GQLValueType>;
   public source: string;
   public fieldRefs: Set<GQLFieldDefinition> = Set<
     GQLFieldDefinition
@@ -97,7 +101,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
   constructor(
     validFields: List<GQLFieldDefinition>,
     validVariables: Set<GQLVariableDefinition>,
-    vars: Map<string, string>,
+    vars: Map<string, GQLValueType>,
     source: string
   ) {
     super();
@@ -126,9 +130,9 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
 
   protected processOrderBy(context: OrderByContext): QMOrderBy {
     return new QMOrderBy(
-      this.qmContext(context),
       this.processExpression(context.expression()),
-      Option.of(context.DESC()).nonEmpty()
+      Option.of(context.DESC()).nonEmpty(),
+      this.qmContext(context)
     );
   }
 
@@ -136,12 +140,12 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     context: SearchConditionContext
   ): QMDisjunction {
     return new QMDisjunction(
-      this.qmContext(context),
       List(
         context
           .searchConditionAnd()
           .map(sca => this.processSearchConditionAnd(sca))
-      )
+      ),
+      this.qmContext(context)
     );
   }
 
@@ -149,12 +153,12 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     context: SearchConditionAndContext
   ): QMConjunction {
     return new QMConjunction(
-      this.qmContext(context),
       List(
         context
           .searchConditionNot()
           .map(scn => this.processSearchConditionNot(scn))
-      )
+      ),
+      this.qmContext(context)
     );
   }
 
@@ -162,9 +166,9 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     context: SearchConditionNotContext
   ): QMOptionalNegation {
     return new QMOptionalNegation(
-      this.qmContext(context),
       this.processPredicate(context.predicate()),
-      !!context.NOT()
+      !!context.NOT(),
+      this.qmContext(context)
     );
   }
 
@@ -176,7 +180,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       const expressions = context
         .expression()
         .map(e => this.processExpression(e));
-      pred = new QMComparisonPredicate(qmc, op, expressions[0], expressions[1]);
+      pred = new QMComparisonPredicate(op, expressions[0], expressions[1], qmc);
     } else if (context instanceof InPredicateContext) {
       const target = this.processExpression(context.expression());
       const list = List(
@@ -186,28 +190,28 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
           .map(e => this.processExpression(e))
       );
       const negate = !!context.NOT();
-      pred = new QMInPredicate(qmc, target, list, negate);
+      pred = new QMInPredicate(target, list, negate, qmc);
     } else if (context instanceof InVarPredicateContext) {
       const target = this.processExpression(context.expression());
       const varRef = this.processVarRef(context.varRef());
       const negate = !!context.NOT();
-      pred = new QMInVarPredicate(qmc, target, varRef, negate);
+      pred = new QMInVarPredicate(target, varRef, negate, qmc);
     } else if (context instanceof ParenPredicateContext) {
       const disjunction = this.processSearchCondition(
         context.searchCondition()
       );
-      pred = new QMParenPredicate(qmc, disjunction);
+      pred = new QMParenPredicate(disjunction, qmc);
     } else {
       this.unknownContext(context, 'Predicate');
       pred = new QMInVarPredicate(
-        qmc,
-        new QMIntegerLiteral(qmc, 'error'),
+        new QMIntegerLiteral('error', qmc),
         new QMVarRef(
-          qmc,
           new GQLVariableDefinition('error', GQLType.Error),
-          'error'
+          'error',
+          qmc
         ),
-        false
+        false,
+        qmc
       );
     }
     Option.of(pred.conformableCheck('invalid predicate')).forEach(err =>
@@ -230,7 +234,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       expr = this.processParenExpression(context);
     } else {
       this.unknownContext(context, 'Expression');
-      expr = new QMIntegerLiteral(this.qmContext(context), 'error');
+      expr = new QMIntegerLiteral('error', this.qmContext(context));
     }
     return expr;
   }
@@ -256,7 +260,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       expr = this.processIriRef(atom.iriRef());
     } else {
       this.unknownContext(context, 'PrimitiveExpression');
-      expr = new QMIntegerLiteral(this.qmContext(atom), 'error');
+      expr = new QMIntegerLiteral('error', this.qmContext(atom));
     }
     return expr;
   }
@@ -269,20 +273,30 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     }
     this.unknownContext(context, 'FunctionCall');
     return new QMFunctionCall(
-      this.qmContext(context),
       'error',
       List<QMExpression>(),
-      'error'
+      'error',
+      this.qmContext(context)
     );
   }
 
   protected processStringLiteral(
     context: StringLiteralContext
   ): QMStringLiteral {
-    return new QMStringLiteral(
-      this.qmContext(context),
-      this.textOf(context.STRING_LITERAL1())
-    );
+    let s: string = '';
+    if (context instanceof SingleQuotedOnelineContext) {
+      s = this.textOf(context.SINGLE_QUOTED_ONE_LINE_STRING());
+    } else if (context instanceof SingleQuotedMultlineContext) {
+      s = this.textOf(context.SINGLE_QUOTED_MULTI_LINE_STRING());
+    } else if (context instanceof DoubleQuotedOnelineContext) {
+      s = this.textOf(context.DOUBLE_QUOTED_ONE_LINE_STRING());
+    } else if (context instanceof DoubleQuotedMultilineContext) {
+      s = this.textOf(context.DOUBLE_QUOTED_MULTI_LINE_STRING());
+    } else {
+      this.unknownContext(context, 'StringLiteral');
+      s = 'error';
+    }
+    return new QMStringLiteral(s, this.qmContext(context));
   }
 
   protected processNumericLiteral(
@@ -291,14 +305,14 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     const qmc = this.qmContext(context);
     let lit: QMNumericLiteral;
     if (context instanceof IntegerLiteralContext) {
-      lit = new QMIntegerLiteral(qmc, context.INTEGER().text);
+      lit = new QMIntegerLiteral(context.INTEGER().text, qmc);
     } else if (context instanceof DecimalLiteralContext) {
-      lit = new QMDecimalLiteral(qmc, context.DECIMAL().text);
+      lit = new QMDecimalLiteral(context.DECIMAL().text, qmc);
     } else if (context instanceof DoubleLiteralContext) {
-      lit = new QMDoubleLiteral(qmc, context.DOUBLE().text);
+      lit = new QMDoubleLiteral(context.DOUBLE().text, qmc);
     } else {
       this.unknownContext(context, 'NumericLiteral');
-      lit = new QMIntegerLiteral(qmc, 'error');
+      lit = new QMIntegerLiteral('error', qmc);
     }
     return lit;
   }
@@ -316,8 +330,8 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     context: BooleanLiteralContext
   ): QMBooleanLiteral {
     return new QMBooleanLiteral(
-      this.qmContext(context),
-      Option.of(context.TRUE()).nonEmpty()
+      Option.of(context.TRUE()).nonEmpty(),
+      this.qmContext(context)
     );
   }
 
@@ -331,7 +345,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       this.unknownContext(context, 'IriRef');
       iri = 'error';
     }
-    return new QMIriRef(this.qmContext(context), iri);
+    return new QMIriRef(iri, this.qmContext(context));
   }
 
   protected processFieldRef(context: FieldRefContext): QMFieldRef {
@@ -345,8 +359,8 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     );
     field.forEach(fd => this.fieldRefs.add(fd));
     return new QMFieldRef(
-      this.qmContext(context),
-      field.getOrElse(new GQLFieldDefinition(fieldName, GQLType.Error))
+      field.getOrElse(new GQLFieldDefinition(fieldName, GQLType.Error)),
+      this.qmContext(context)
     );
   }
 
@@ -359,7 +373,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       context,
       true
     );
-    const value = Option.of(this.vars.get(varName));
+    const value = varDef.map(vd => vd.resolve(this.vars));
     this.check(
       value.nonEmpty(),
       `no value provided for referenced variable '${varName}', vars: ${this.vars}`,
@@ -368,9 +382,9 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     );
     varDef.forEach(vd => this.varRefs.add(vd));
     return new QMVarRef(
-      this.qmContext(context),
       varDef.getOrElse(new GQLVariableDefinition(varName, GQLType.Error)),
-      value.getOrElse('error')
+      value.getOrElse('error'),
+      this.qmContext(context)
     );
   }
 
@@ -382,10 +396,10 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       .expression()
       .map(e => this.processExpression(e));
     return new QMFunctionCall(
-      this.qmContext(context),
       funcName,
       List<QMExpression>(args),
-      returnType
+      returnType,
+      this.qmContext(context)
     );
   }
 
@@ -395,10 +409,10 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     const returnType = context.xsdType().text;
     const funcName = context.iriRef().text;
     return new QMFunctionCall(
-      this.qmContext(context),
       funcName,
       List<QMExpression>(),
-      returnType
+      returnType,
+      this.qmContext(context)
     );
   }
 
@@ -406,15 +420,15 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
     context: ParenExpressionContext
   ): QMParenExpression {
     return new QMParenExpression(
-      this.qmContext(context),
-      this.processExpression(context.expression())
+      this.processExpression(context.expression()),
+      this.qmContext(context)
     );
   }
 
   protected processUnaryExpression(
     context: UnaryExpressionContext
   ): QMUnaryExpression {
-    const op = context.unaryOp().text;
+    const op = context.unaryOp().text as QMUnaryOperator;
     const unaryMinus = op === '-';
     const expr = this.processExpression(context.expression());
     const [expectedTypes, typeName] = unaryMinus
@@ -426,7 +440,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       context,
       true
     );
-    return new QMUnaryExpression(this.qmContext(context), expr);
+    return new QMUnaryExpression(op, expr, this.qmContext(context));
   }
 
   protected processFactorExpression(
@@ -445,7 +459,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       );
       return qme;
     });
-    return new QMFactorExpression(this.qmContext(context), op, lhs, rhs);
+    return new QMFactorExpression(op, lhs, rhs, this.qmContext(context));
   }
 
   protected processTermExpression(
@@ -464,7 +478,7 @@ export abstract class GQLQueryModifiersBuilder extends BuilderBase<
       );
       return qme;
     });
-    return new QMTermExpression(this.qmContext(context), op, lhs, rhs);
+    return new QMTermExpression(op, lhs, rhs, this.qmContext(context));
   }
 }
 

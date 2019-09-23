@@ -3,7 +3,7 @@ import { GQLQueryModifiersBuilder } from '.';
 import { QueryModificationParser, SearchConditionContext } from '../../antlr4';
 import { GQLFilter } from '../../models';
 
-export class GQLFilterBuilder extends GQLQueryModifiersBuilder {
+export class GQLFilterBuilder extends GQLQueryModifiersBuilder<GQLFilter> {
   public result: GQLFilter;
 
   public parseWith(parser: QueryModificationParser) {

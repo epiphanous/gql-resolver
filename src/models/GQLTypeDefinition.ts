@@ -1,6 +1,6 @@
 import { None, Option } from 'funfix';
 import { List } from 'immutable';
-import { GQLDirective, GQLField, GQLType, GQLValue } from '.';
+import { GQLDirective, GQLField, GQLType, GQLValueType } from '.';
 
 export interface IGQLTypeDefinition {
   name: string;
@@ -27,15 +27,8 @@ export class GQLTypeDefinition implements IGQLTypeDefinition {
 
   public deprecated() {
     return Option.of(this.directives.find(d => d.name === 'deprecated'))
-      .map(d => d.args.find(arg => arg.name === 'reason'))
-      .map(arg => {
-        if (arg) {
-          return arg.value;
-        } else {
-          throw new Error('Undefined argument');
-        }
-      })
-      .map(v => v.value as string);
+      .flatMap(d => Option.of(d.args.find(arg => arg.name === 'reason')))
+      .map(arg => arg.value as string);
   }
 }
 
@@ -150,18 +143,18 @@ export class GQLFieldDefinition extends GQLTypeDefinition
 
 export interface IGQLArgumentDefinition extends IGQLTypeDefinition {
   gqlType: GQLType;
-  defaultValue: Option<GQLValue>;
+  defaultValue: Option<GQLValueType>;
 }
 
 export class GQLArgumentDefinition extends GQLTypeDefinition
   implements IGQLArgumentDefinition {
   public gqlType: GQLType;
-  public defaultValue: Option<GQLValue>;
+  public defaultValue: Option<GQLValueType>;
 
   constructor(
     name: string,
     gqlType: GQLType,
-    defaultValue: Option<GQLValue> = None,
+    defaultValue: Option<GQLValueType> = None,
     description: Option<string> = None,
     directives = List<GQLDirective>()
   ) {
